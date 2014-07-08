@@ -1,0 +1,189 @@
+I think the best way to understand what the optional clause means in SPARQL is to think of it as always extending the immediately preceding pattern; one thing to keep in mind is that that preceding pattern can be empty.  An empty pattern will always match and produce no bindings; that is, it will not bind the value of any variable, since it does not have any.  And extending means that an optional pattern can bind variables that it mentions but have not been bound in the main pattern that it extends; for variables that have been bound by the main pattern, the optional must match the values.
+
+ Applying this theory to the test cases in ARQ, starting with those in the Optionals section, we get the following:
+
+opt-01:
+SELECT ?mbox ?name
+   {
+     ?x foaf:mbox ?mbox .
+     OPTIONAL { ?x foaf:name  ?name } .
+   }
+
+This is the simple case we all know and love:  the optional pattern extends the one above, and will bind the variable 'name'.
+
+opt-02:
+SELECT ?mbox ?name ?nick
+   {
+     ?x foaf:mbox ?mbox .
+     OPTIONAL { ?x foaf:name  ?name } .
+     OPTIONAL { ?x foaf:nick  ?nick } .
+   }
+
+ This is slightly more complex, because there are two optionals.  The way to think about this is that optional is a left-associative binary operator, which basically means that it works like - does in arithmetic.  Thus, a optional b optional c means (a optional b) optional c, just as a - b - c means (a - b) - c.  For this particular test, this associativity has no impact, which probably why the suite does not have a version of this test with the optionals switched.
+
+ In this case, we  get results for every node with an mbox, and picks up either nick, name, or both if they exist.
+
+opt-03:
+SELECT ?mbox ?name ?nick
+   {
+     ?x foaf:mbox ?mbox .
+     OPTIONAL { ?x foaf:nick  ?nick
+         OPTIONAL { ?x foaf:name  ?name }
+     }
+   }
+
+The next level of complexity is nesting; once again, think of how - works to help see what is going on, where the { ... } work like ( ... ) in arithmetic.  Thus, this pattern is like a - (b - c), so it semantically quite different from the one above.  
+
+  In this case, the main pattern once again matches all three individuals, but the optionals being nested means the second optional has the result of the first optional as its main pattern.  Thus, the results have mbox, and optionally nick, and possibly name if it has nick too.  In particular, the name of bert is not returned, since it has no nick property.
+
+opt-04:
+SELECT ?x ?nick
+   {
+     OPTIONAL { ?x foaf:nick  ?nick }
+   }
+
+ This is another wrinkle, but once again, thinking about - helps.  People write -a to mean 0 - a, and SPARQL has an analogous notion of 0: the empty pattern always matches and binds no variables.  So, this is the empty pattern, optionally extended with the given pattern.  Thus, we should simply see all matches of the 'optional' pattern.
+
+  This is what the results indeed show: all pairs of x and nick.
+
+  Note that I chose - rather than + because a optional b is not the same as b optional a, so in that way, - is a closer analogy.  However, it is misleading in one way: with 0 (the empty pattern), observe that optional is not like - but more like + in that {} optional a mostly means a.
+
+opt-05:
+SELECT ?name ?nick
+   {
+     OPTIONAL { ?x foaf:name  ?name } .
+     OPTIONAL { ?x foaf:nick  ?nick } .
+   }
+
+Applying our - analogy here, we get 0 - a - b, which means (0 - a) - b.  Thus, we should expect the outer (i.e. second) pattern to extend the inner (i.e. first) one; in particular, if the inner pattern binds a variable such as x, then the outer one must match it.
+
+ In this case, the inner pattern will bind x and name, and the outer pattern will extend that with nick if appropriate.  The key point is that the inner pattern has already bound x, and so the outer pattern must match it and is not free to make up a new x.  Thus, we can see nick only if we see name as well. 
+
+ This is indeed what the results show.
+
+opt-06:
+SELECT ?name ?nick
+   {
+     OPTIONAL { ?x foaf:nick  ?nick } .
+     OPTIONAL { ?x foaf:name  ?name } .
+   }
+
+This is just like 5, except that the order is switched.  Now the match of nick is the inner pattern, and so, by the same logic as above, we can see name only if we see nick too.
+
+opt-07:
+SELECT ?name ?nick
+{
+    OPTIONAL 
+    { ?x foaf:nick  ?nick
+      OPTIONAL { ?x foaf:name  ?name }
+    }
+}
+
+This is 0 - (a - b), because of nesting.  That is, the empty pattern is optionally extended by (a optional b).  Thus, we should expect that b can extend the binding produced by a.
+
+In this case, that means we should expect all nick properties and any name property for which the subject also has a nick property.  This is indeed what the results contain.
+
+opt-08:
+SELECT ?name ?nick
+{
+    OPTIONAL 
+    { ?x foaf:name  ?name
+      OPTIONAL {  ?x foaf:nick  ?nick }
+    }
+}
+
+ This is just like opt-07, except the order is switched.  By the same logic as above, we should expect to see all name properties and any nick that also has a name on the same subject.
+
+opt-10:
+SELECT ?label
+   {
+     ?x foaf:mbox ?mbox .
+     OPTIONAL { ?x foaf:name  ?label }
+     OPTIONAL { ?x foaf:nick  ?label  }
+   }
+
+ This is a - b - c, which means (a - b) - c.  Here the notion of patterns binding variables becomes intricate, since label is shared.
+
+  Thus, the inner pattern will bind x, mbox and optionally label.  If it binds label, then the outer pattern has to match it and cannot extend it.  So we should expect that the result will have all mbox properties, and all name properties that also have an mbox.  
+
+  Then the outer pattern extends these results.  If a subject has no name property, then any nick property for it will be returned.  If it does have a name property, then a nick property will be returned only if its target matches a name property for the same subject.  
+
+  However, adding to the confusion, only label is projected.  So then, if there is a name property, label will be bound to that.  If not, then it will bind any nick property.  Thus, for Alice, we should see the name and not the nick.
+
+opt-11:
+SELECT ?label
+   {
+     ?x foaf:mbox ?mbox .
+     OPTIONAL { ?x foaf:nick  ?label  }
+     OPTIONAL { ?x foaf:name  ?label }
+   }
+
+ This is just like 10, except in reverse.
+
+The Planning section:
+
+q-opt-1:
+SELECT * 
+WHERE 
+{
+  :x :p ?v .
+  OPTIONAL {:y :q ?v }
+}
+
+ This is the optional we all know and love once again, except that it is not binding any more variables.  Thus, this optional extends the main pattern with no variables at all, and hence is a no-op.  The result should return just :a.
+
+q-opt-2:
+SELECT * 
+WHERE 
+{
+  OPTIONAL {:y :q ?v }
+  :x :p ?v .
+}
+
+ This is 0 - a again.  In this case, the optional pattern extends the empty pattern and will bind v to :b.  But :b does not match the next pattern, and this query returns nothing.
+
+q-opt-3:
+SELECT * 
+WHERE 
+{
+  :x :p ?v .
+  OPTIONAL {:y ?p ?a } 
+  OPTIONAL {:z ?p ?v }
+}
+
+This is a - b - c or (a - b) - c.  The first pattern binds v to :a.  The second pattern extends that and binds p to :q and a to :b.  The third pattern matches nothing since p is bound to :q and :z does not have a :q.
+
+This is what appears to be the right answer.  There is something mysterious in the manifest, talking about reordering being enabled.  The answer in that case looks very odd, and is surely not right.
+
+The Algebra Section:
+
+opt-filter-1:
+SELECT *
+{ 
+  ?x :p ?v .
+  OPTIONAL
+  { 
+    ?y :q ?w .
+    FILTER(?v=2)
+  }
+}
+
+This is mostly the optional pattern we know and love, except for the filter.  Note that the filter controls the match only of the pattern to which it is attached, in this case inside the optional pattern.  The results illustrate this.
+
+ Two of the results are for v=2, which matches the filter.  These two results happen because when x,v are bound to x2,2, then the optional pattern has two matches for y,w = x3,3 and y,w = x3,4.  One of the results is for v=1; in this case, the optional clause has no matches due to the filter, so the result has only the variables x and v.
+
+opt-filter-2:
+SELECT *
+{ 
+  ?x :p ?v .
+  OPTIONAL
+  { 
+    ?y :q ?w .
+    FILTER(?v=2)
+    FILTER(?w=3)
+  }
+}
+
+This is just like the case above, except for the additional filter on w.  This kills one of the matches of the optional clause, since w is 4 in that case.
+
+Please let me know if this is helpful; if so, I will do more of the tests later,

@@ -1,0 +1,14 @@
+sed s@http://purl.org/dc/elements/1.1/@1:@g $1\
+| sed s@http://xmlns.com/foaf/0.1/@2:@g\
+| sed s@http://www.w3.org/1999/02/22-rdf-syntax-ns#@3:@g\
+| sed s@http://localhost/vocabulary/bench/@4:@g\
+| sed s@http://purl.org/dc/terms/@5:@g\
+| sed s@http://swrc.ontoware.org/ontology#@6:@g\
+| sed s@http://www.w3.org/2000/01/rdf-schema#@7:@g\
+| sed s@http://localhost/misc/@8:@g\
+| sed s@http://localhost/publications/inprocs/@9:@g\
+| sed s@http://localhost/publications/incolls/@10:@g\
+| sed s@http://localhost/publications/journals/@11:@g\
+| sed s@http://localhost/publications/articles/@12:@g\
+| sed s@http://localhost/publications/procs/@13:@g\
+| sed s@http://www.w3.org/2001/XMLSchema#@14:@g\

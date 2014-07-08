@@ -1,0 +1,228 @@
+package com.ibm.rdf.store.sparql11;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
+import com.ibm.rdf.store.testing.RandomizedRepeat;
+
+public abstract class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
+	private final String queryDir;
+	
+	protected static final int[] dbpedia10mAnswers = {9, 1, 119, 3, 90, 310, 2, 129, 3, 1, 1, 98, 2, 6, 39, 2, 2, 1, 20, 99780, 2};
+	protected static final int[] dbpedia100mAnswers = {0, 1, 32, 0, 5, 55716, 2, 4354, 5, 1, 1, 1, 7, 2, 2,1,338676,856,0,4};
+	
+	protected DBpediaQueryUtilityTest(DatabaseEngine<D> engine, D data, int[] answers, String queryDir) {
+		super(data, engine, answers);
+		this.queryDir = queryDir;
+	}
+
+	//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	//@RandomizedRepeat(8)
+	public static class Reversed10M extends DBpediaQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://pasta-dev.watson.ibm.com:50002/testrev", "dbp10m_r", "db2inst4", "sheruser", "db2inst4", false);
+		public Reversed10M() {
+			super(new DB2Engine(), data, dbpedia10mAnswers, "../rdfstore-data/dbpedia_queries_rev/");
+		}
+	}
+
+	//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	//@RandomizedRepeat(8)
+	public static class RDFStoreDBpedia37 extends DBpediaQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://localhost:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		public RDFStoreDBpedia37() {
+			super(new DB2Engine(), data, dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
+		}
+	}
+
+	
+	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	@RandomizedRepeat(8)
+	public static class RDFStoreDBpediaRC237 extends DBpediaQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.202.45:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		public RDFStoreDBpediaRC237() {
+			super(new DB2Engine(), data, dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
+		}
+	}
+	
+
+	public static class RDFStoreDBpedia37_RC2 extends DBpediaQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.202.45:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		public RDFStoreDBpedia37_RC2() {
+			super(new DB2Engine(), data, dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
+		}
+	}
+		
+	@Test
+	public  void testQueryQ1() throws Exception {
+		String file = queryDir + "dq.1.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 0);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ2() throws Exception {
+		String file = queryDir + "dq.2.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 1);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ3() throws Exception {
+		String file = queryDir + "dq.3.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 2);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ4() throws Exception {
+		String file = queryDir + "dq.4.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 3);
+		System.out.println(file + " has : " + result + " rows");
+	}
+		
+	
+	@Test
+	public  void testQueryQ5() throws Exception {
+		String file = queryDir + "dq.5.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 4);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ6() throws Exception {
+		String file = queryDir + "dq.6.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 5);
+		System.out.println(file + " has : " + result + " rows");
+	}
+			
+	@Test
+	public  void testQueryQ7() throws Exception {
+		String file = queryDir + "dq.7.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 6);
+		System.out.println(file + " has : " + result + " rows");
+	}
+
+	
+	@Test
+	public  void testQueryQ8() throws Exception {
+		String file = queryDir + "dq.8.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 7);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ9() throws Exception {
+		String file = queryDir + "dq.9.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 8);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	
+	@Test
+	public  void testQueryQ10() throws Exception {
+		String file = queryDir + "dq.10.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 9);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ11() throws Exception {
+		String file = queryDir + "dq.11.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 10);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ12() throws Exception {
+		String file = queryDir + "dq.12.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 11);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ13() throws Exception {
+		String file = queryDir + "dq.13.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 12);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ14() throws Exception {
+		String file = queryDir + "dq.14.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 13);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@Test
+	public  void testQueryQ15() throws Exception {
+		String file = queryDir + "dq.15.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 14);
+		System.out.println(file + " has : " + result + " rows");
+	}	
+	@Test
+	public  void testQueryQ16() throws Exception {
+		String file = queryDir + "dq.16.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 15);
+		System.out.println(file + " has : " + result + " rows");
+	}	
+	@Test
+	public  void testQueryQ17() throws Exception {
+		String file = queryDir + "dq.17.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 16);
+		System.out.println(file + " has : " + result + " rows");
+	}	
+	@Test
+	public  void testQueryQ18() throws Exception {
+		String file = queryDir + "dq.18.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 17);
+		System.out.println(file + " has : " + result + " rows");
+	}	
+	@Test
+	public  void testQueryQ19() throws Exception {
+		String file = queryDir + "dq.19.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 18);
+		System.out.println(file + " has : " + result + " rows");
+	}	
+	@Test
+	public  void testQueryQ20() throws Exception {
+		String file = queryDir + "dq.20.sparql";
+		System.out.println("Testing:" + file);
+		int result = executeQuery(file, 19);
+		System.out.println(file + " has : " + result + " rows");
+	}
+	
+	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	@RandomizedRepeat(8)
+	public static class Driver extends DBpediaQueryUtilityTest<DB2TestData> {
+		public Driver() {
+			super(new DB2Engine(), junitHackData, dbpedia100mAnswers, junitHackDirectory);
+		}
+	}
+	
+	public static void main(String[] args) {
+		main(Driver.class, "dbp37_r", args);
+	}
+
+}

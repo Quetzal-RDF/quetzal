@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/rdfstore-base/src/com/ibm/rdf/store/cmd/CreateRdfStore.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="/tmp/create.log"/>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.rdf.store.cmd.CreateRdfStore"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="testdb -backend postgresql -db testdb -host helix1.pok.ibm.com -port 24973 -user akement -password _Tjv8smr! -schema db2inst1 -predicateMappings /tmp/predicate_mappings.load"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-base"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcom.ibm.rdf.createStore=false -Dcom.ibm.rdf.createTables=false -Dcom.ibm.rdf.generateStoreSQL=false -Dcom.ibm.rdf.createIndex=true -Dcom.ibm.rdf.longStringsLength=117"/>
+</launchConfiguration>

@@ -1,0 +1,80 @@
+<project name="rdfstore" default="install" basedir=".">
+	<property name="src" location="src" />
+	<property name="build" location="bin1" />
+	<property name="lib" location="lib" />
+	<property name="scripts" location="scripts" />
+	<property name="install" location="install" />
+	<property name="jarname" value="rdfstore.jar" />
+
+	<path id="path.compile">
+		<pathelement path="${classpath}" />
+		<pathelement location="${lib}/log4j.jar" />
+		<pathelement location="${lib}/commons-logging-1-0-3.jar" />
+		<pathelement location="${lib}/openrdf-sesame-2.2.3-onejar.jar" />
+		<pathelement location="${lib}/parser.jar" />
+		<pathelement location="${lib}/antlr-3.3-complete.jar" />
+		<pathelement location="${lib}/slf4j-api-1.5.8.jar" />
+		<pathelement location="${lib}/slf4j-simple-1.5.8" />
+		<pathelement location="${lib}/pdq.jar" />
+		<pathelement location="${lib}/jena-2.6.3-patched.jar" />
+		<pathelement location="${lib}/iri-0.8.jar" />
+		<pathelement location="${lib}/icu4j-3.4.4.jar" />
+		<pathelement location="${lib}/arq-2.8.5-patched.jar" />
+		<pathelement location="${lib}/tdb-0.8.7.jar" />
+		<pathelement location="${lib}/wala.jar" />
+		<pathelement location="${lib}/db2jcc.jar" />
+	</path>
+
+	<target name="init" depends="clean">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="clean">
+		<delete dir="${install}" />
+		<delete dir="${build}" />
+	</target>
+
+	<target name="install" depends="init">
+		<!-- Install has the following steps:
+		     1. create the install folder 
+		     2. create the jar file and put it in install/lib
+		     3. copy scripts to install
+		-->
+		<delete dir="${install}" />
+		<mkdir dir="${install}" />
+		<mkdir dir="${install}/lib" />
+
+		<javac srcdir="${src}" destdir="${build}" source="1.5" target="1.5" excludes="**/tests/**, **/others/**, **/generators/**, **/procedures/**">
+			<classpath refid="path.compile" />
+		</javac>
+		<copy todir="${build}">
+			<fileset dir="${src}">
+				<include name="**/store/*" />
+				<include name="**/store/cmd/*" />
+				<include name="**/jena/*" />
+				<include name="**/jena/impl/*" />
+				<include name="**/jena/impl/update/*" />
+				<include name="**/runtime/service/sql/*" />
+				<include name="**/runtime/service/nls/*.properties" />
+				<include name="**/store/statistics/*"/>
+				<include name="**/sparql11/*"/>
+				<include name="**/polynomials.csv"/>
+				<include name="**/sqlwriter/SQLTemplates.stg"/>
+				<include name="**/sqlwriter/SQLTemplatesNew.stg"/>
+				<exclude name="**/store/others" />
+				<exclude name="**/tests"/>
+			</fileset>
+		</copy>
+		<jar destfile="${install}/lib/${jarname}" basedir="${build}" />
+		<copy todir="${install}/lib">
+			<fileset dir="${lib}" />
+		</copy>
+		<copy todir="${install}">
+			<fileset dir="${scripts}" />
+		</copy>
+	<!--	<copy todir="C:\work\workspace_RDF_01\ARQ-20111121\lib" file="${install}/lib/${jarname}" /> -->	
+	</target>
+</project>

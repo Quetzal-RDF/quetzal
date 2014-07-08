@@ -1,0 +1,86 @@
+CREATE  PROCEDURE  REACHABLENODES(IN result VARCHAR(100), IN delta VARCHAR(100), IN oldDelta VARCHAR(100), 
+		IN initializationSTMT VARCHAR(10240), IN loopSTMTFromOldDetaToDelta VARCHAR(10240), IN loopSTMTFromDetaToOldDelta   VARCHAR(10240), 
+		IN maxLevel INTEGER DEFAULT -1)  
+		-- result : the name of the table where result will be added. 
+		-- delta : the table where new results from each iteration will be added. This table must be initially empty
+		-- oldDeta: the table that holds the previous value of the delta table. This table must be initially empty
+		-- NOTE: result, delta and oldDelta must have the same signature and must already exist.
+		-- initializationSTMT: a statement whose execution will populate the delta table during the initialization phase
+		-- loopSTMTFromOldDetaToDelta: a statement that will execute at iteration i+1 to discover new values (and store them in delta table)
+		--			 from new values discovered at iteration i and stored in oldDelta table 
+		-- loopSTMTFromDetaToOldDelta: a statement that will execute at iteration i+1 to discover new values (and store them in oldDelta table)
+		-- 			from new values discovered at iteration i and stored in delta table 
+		-- NOTE: loopSTMTFromOldDetaToDelta is identically to loopSTMTFromDetaToOldDelta after swamping delta and oldDelta
+		-- maxLevel: the maximum number of iterations. A negative value indicates iteration to a fixed point. 0 indicates that only the initialization step is performed.
+		
+LANGUAGE SQL
+BEGIN 
+   DECLARE rowCount INTEGER;
+   DECLARE level INTEGER;
+   DECLARE var VARCHAR(10240);
+   DECLARE deltatable VARCHAR(100);
+   DECLARE olddeltatable VARCHAR(100);
+   DECLARE sndStmt  VARCHAR(10240);
+   DECLARE oldSndStmt  VARCHAR(10240);
+  
+  
+ 
+   -- initialization 
+   -- DECLARE GLOBAL TEMPORARY TABLE SESSION.TEMP(VAL BIGINT) IN USERTEMP1 ON COMMIT DELETE ROWS WITH REPLACE NOT LOGGED;
+   
+   -- DECLARE GLOBAL TEMPORARY TABLE SESSION.DELTAT(VAL BIGINT) IN USERTEMP1 ON COMMIT DELETE ROWS WITH REPLACE NOT LOGGED;
+    
+   -- DECLARE GLOBAL TEMPORARY TABLE SESSION.OLDDELTAT(VAL BIGINT) IN USERTEMP1 ON COMMIT DELETE ROWS WITH REPLACE NOT LOGGED;
+   
+   EXECUTE IMMEDIATE initializationSTMT;
+      
+   EXECUTE IMMEDIATE 'INSERT INTO ' || result || ' select * from ' || delta;
+   GET DIAGNOSTICS rowCount = ROW_COUNT;	
+   -- SET rowsAddedToResultTable = rowCount;
+  
+   SET level = 1;
+   SET deltatable = delta;
+   SET olddeltatable = oldDelta;
+   SET sndStmt = loopSTMTFromOldDetaToDelta;
+   SET oldSndStmt = loopSTMTFromDetaToOldDelta  ;
+   
+   
+   -- end initialization 
+ 
+   -- iteration to fix point   
+   WHILE (rowCount > 0   AND (maxLevel < 0 OR  level <= maxLevel) ) DO  		  		   		
+   		-- switch olddeltat and deltat
+   		SET var = olddeltatable;
+   		SET olddeltatable = deltatable;
+   		SET deltatable = var;
+   		
+   		-- switch sndStmt and oldSndStmt
+   		 SET var = oldSndStmt;
+   		 SET oldSndStmt = sndStmt;
+   		 SET sndStmt = var;
+   		 --
+   		
+   		-- delete delta
+   		EXECUTE IMMEDIATE 'DELETE FROM ' || deltatable;
+   		--
+        
+        -- update stats
+        CALL SYSPROC.ADMIN_CMD('RUNSTATS ON TABLE ' || result) ; 
+        CALL SYSPROC.ADMIN_CMD('RUNSTATS ON TABLE ' || olddeltatable) ; 
+        --
+	    
+	    -- recompute delta
+	  	EXECUTE IMMEDIATE sndStmt;
+	 	--	   		
+   		
+   		
+   		EXECUTE IMMEDIATE 'INSERT INTO ' || result || ' select * from ' || deltatable;
+   		GET DIAGNOSTICS rowCount = ROW_COUNT;
+	 	
+   		-- SET rowsAddedToResultTable = rowsAddedToResultTable + rowCount;
+   		SET level = level + 1;
+   		
+   END WHILE; 
+   -- end iteration to fix point
+  
+END

@@ -1,0 +1,26 @@
+/BofABenchTest.java/1.1.2.3/Fri Nov  1 18:46:30 2013//Trdfstore-basePerf
+/DB2JazzNewTest.java/1.1.2.3/Fri Nov 22 20:57:26 2013//Trdfstore-basePerf
+/DB2RDFQuery.java/1.1.2.2/Fri Nov  1 18:46:29 2013//Trdfstore-basePerf
+/DB2SP2BTest.java/1.1.2.11/Thu Dec  5 22:08:48 2013//Trdfstore-basePerf
+/DBpediaQueryUtilityTest.java/1.1.2.22/Tue Nov  5 17:12:49 2013//Trdfstore-basePerf
+/JazzNewStore.java/1.1.2.3/Tue Nov  5 14:41:35 2013//Trdfstore-basePerf
+/JazzNewTest.java/1.1.2.7/Fri Nov 22 20:57:26 2013//Trdfstore-basePerf
+/JazzQueryUtilityTest.java/1.2.2.8/Tue Jul  8 19:17:42 2014//Trdfstore-basePerf
+/LUBMQueryUtilityTest.java/1.2.2.49/Tue Jul  8 19:17:42 2014//Trdfstore-basePerf
+/ParseSparqlTest.java/1.2.2.1/Wed Oct 16 12:37:20 2013//Trdfstore-basePerf
+/QueriesPredicateIndexTest.java/1.4.8.1/Wed Oct 16 12:37:20 2013//Trdfstore-basePerf
+/RDFStoreExerciser.java/1.1.2.3/Fri Nov  1 18:46:29 2013//Trdfstore-basePerf
+/SP2BQ7RewriteTest.java/1.1.2.8/Fri Nov  1 18:46:29 2013//Trdfstore-basePerf
+/SP2QueryUtilityTest.java/1.5.2.32/Tue Jul  8 19:17:42 2014//Trdfstore-basePerf
+/SPARQLBaseTests.java/1.8.2.4/Thu Dec  5 22:08:48 2013//Trdfstore-basePerf
+/SPRQLParser.java/1.1.2.5/Thu Dec  5 22:08:48 2013//Trdfstore-basePerf
+/SharkJDBCClientTest.java/1.1.2.3/Tue Jul  8 19:17:42 2014//Trdfstore-basePerf
+/SingleQueryUtilityTest.java/1.1.2.6/Thu Dec  5 22:08:48 2013//Trdfstore-basePerf
+/TestRunner.java/1.4.2.33/Thu Jul  3 17:12:02 2014//Trdfstore-basePerf
+/TestSuiteUOBMALLQueries.java/1.1.2.1/Thu Mar 20 22:18:25 2014//Trdfstore-basePerf
+/UOBMQueryUtilityTest.java/1.1.2.18/Wed Jun 18 14:21:41 2014//Trdfstore-basePerf
+/UniprotQ9RewriteTest.java/1.1.2.4/Fri Nov  1 18:46:30 2013//Trdfstore-basePerf
+/UniprotQueryUtilityTest.java/1.1.2.6/Fri Nov  1 18:46:30 2013//Trdfstore-basePerf
+D/optimizer////
+D/planmerger////
+D/stopt////

@@ -1,0 +1,210 @@
+castsForColumns(column, type) ::= << <column> >>
+RDF_OPERATOR(left, right, operator, left_type, right_type, ltype, rtype)  ::= <<  (<left> <operator> <right>
+<if(left_type)> AND <left_type> = <right_type> <endif>) >>
+
+RDF_OPERATOR(left, right, operator, left_type, right_type, ltype, rtype)  ::= <<  (<left><if(ltype)>::<ltype> <endif> <operator> <right><if(rtype)>::<rtype><endif> 
+<if(left_type)> AND <left_type> = <right_type> <endif>) >>
+
+RDF_ABS(args)  ::= <<  abs(<args>)  >>
+
+RDF_CEIL(args)  ::= <<  CEIL(<args>) >>
+
+RDF_CONCAT(lexpr, rexpr)  ::= <<  CONCAT(<lexpr>, <rexpr>) >>
+
+RDF_FLOOR(args)  ::= <<  FLOOR(<args>) >>
+
+RDF_DAY(args)  ::= <<  DAY(<args>) >>
+
+RDF_HOURS(args)  ::= <<  HOUR(<args>) >>
+
+RDF_MONTH(args)  ::= <<  MONTH(<args>)  >>
+
+RDF_YEAR(args)  ::= <<  YEAR(<args>) >>
+
+RDF_MINUTES(args)  ::= <<  MINUTE(<args>) >>
+
+RDF_SECONDS(args)  ::= <<  SECOND(<args>) >>
+
+RDF_TIMEZONE(args)  ::= <<  TIMEZONE(<args>) >>
+
+RDF_RAND()  ::= <<  RAND() >>
+
+RDF_REPLACE(var, pat, rep)  ::= << regexp_replace(<var>, <pat>, <rep>) >>
+
+RDF_ROUND(args)  ::= <<  ROUND(<args>) >>
+
+RDF_STRAFTER(var, value)  ::= << 
+  (CASE 
+   WHEN LOCATE('<value>', <var>) IS NOT NULL THEN SUBSTR(<var>, LOCATE('<value>', <var>) + 1) 
+   ELSE ''
+   END)
+>>
+
+
+RDF_NOW()  ::= << from_unixtime(unix_timestamp()) >>
+
+RDF_TZ(args)  ::= <<  TIMEZONE(<args>)  >>
+
+RDF_STRBEFORE(var, value)  ::= << 
+  (CASE 
+   WHEN LOCATE('<value>', <var>) IS NOT NULL THEN LEFT(<var>, LENGTH(<var>) - LOCATE('<value>', <var>)) 
+   ELSE ''
+   END)
+>>
+
+
+
+GROUP_CONCAT(var)  ::= << 
+  LISTAGG(<var>, ',') 
+>>
+
+GT_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
+ ( 
+CASE WHEN <ltype> BETWEEN <nrstart> AND <nrend> AND <rtype> BETWEEN <nrstart> AND <nrend> AND CAST(<left> AS FLOAT)<operator> CAST(<right> AS FLOAT) THEN TRUE
+ 	WHEN <simpleLitMatch> AND <left> <operator> <right> THEN TRUE
+ 	WHEN <ltype> = <tdatetime> AND <rtype> = <tdatetime> AND CAST ( <left> AS TIMESTAMP) <operator> CAST ( <right> AS TIMESTAMP) THEN TRUE
+
+ 	else false end
+) = true
+>>
+
+EQ_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
+ ( 
+CASE WHEN <ltype> BETWEEN <nrstart> AND <nrend> AND <rtype> BETWEEN <nrstart> AND <nrend> AND CAST(<left> AS FLOAT) = CAST(<right> AS FLOAT) THEN TRUE
+ 	WHEN <simpleLitMatch> AND <left> = <right> THEN TRUE
+ 	WHEN <ltype> = <tdatetime> AND <rtype> = <tdatetime> AND CAST ( <left> AS TIMESTAMP) = CAST ( <right> AS TIMESTAMP) THEN TRUE
+ 	WHEN <ltype> >= 1500 AND <rtype> >= 1500 AND <ltype>=<rtype> AND <left>=<right> THEN TRUE
+	WHEN <ltype> = <tiri> AND <rtype> = <tiri> AND <left>=<right> THEN TRUE
+	WHEN <ltype> = <tbn> AND <rtype> = <tbn> AND <left>=<right> THEN TRUE
+	
+ 	else false end
+) = true
+>>
+
+NEQ_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
+ ( 
+CASE WHEN <ltype> BETWEEN <nrstart> AND <nrend> AND <rtype> BETWEEN <nrstart> AND <nrend> AND CAST(<left> AS FLOAT) = CAST(<right> AS FLOAT) THEN FALSE
+ 	WHEN <simpleLitMatch> AND <left> = <right> THEN FALSE
+ 	WHEN <ltype> = <tdatetime> AND <rtype> = <tdatetime> AND CAST ( <left> AS TIMESTAMP) = CAST ( <right> AS TIMESTAMP) THEN FALSE
+ 	WHEN <ltype> >= 1500 AND <rtype> >= 1500 AND <ltype>=<rtype> AND <left>=<right> THEN FALSE
+ 	WHEN <ltype> = <tiri> AND <rtype> = <tiri> AND <left>=<right> THEN FALSE
+ 	WHEN <ltype> = <tbn> AND <rtype> = <tbn> AND <left>=<right> THEN FALSE
+ 	
+ 	else true end
+) = true
+>>
+
+numeric_expression(left,right,operator)  ::= <<  
+ <left> <operator> <right>
+>>
+
+
+TYPE_CHECK_CASE(left, right, operator, typeTest, typeToCastTo)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then <left> else null end) <operator> <right>) >>
+
+TYPE_CHECK(left, right, operator, typeTest, typeToCastTo)  ::= <<  
+(<typeTest> AND <left> <operator> <right>) >>
+
+RDF_DATATYPE_EXPRESSION(var, returnType, xmlSchemaType)  ::= << 
+(CASE
+    WHEN CAST( <var> AS <xmlSchemaType>) IS NOT NULL THEN '<returnType>'	
+	else
+	  'http://www.w3.org/2001/XMLSchema#string'
+	 end)
+>>
+
+XSD_BOOLEAN_CAST(arg, type, nrstart, nrend, simpleLit, string, boolean)  ::= <<  
+ ( 
+CASE
+    WHEN <arg> = 'true' THEN 'true'
+    WHEN <type> BETWEEN <nrstart> AND <nrend> AND CAST(<arg> AS FLOAT) \<\> 0 THEN 'true'
+ 	else null end
+)
+>>
+
+RDF_REGEX(regex_var, regex_pattern, regex_flag, stringTypes)  ::= << 
+(CASE WHEN <if(stringTypes)> (<stringTypes; separator=" OR ">) AND <endif> <regex_var> RLIKE '<regex_pattern>' then 0 else 1 end = 0)
+>>
+
+RDF_DATATYPE_NUMERIC_EXPRESSION(types)  ::= << 
+max(<types; separator=" , ">)
+>>
+
+aggregate_function_with_type_check(function,var, typecheck)  ::= << 
+<function>(CASE WHEN <typecheck> THEN <var> ELSE NULL END)
+>>
+
+RDF_ISNUMERIC(arg)  ::= <<  CAST(<arg> AS FLOAT)  IS NOT NULL >>
+
+TYPE_CHECK_WITH_CAST(left, right, cast, cast_function_start, cast_function_end, operator, typeTest)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then CAST ( <left>  AS <cast>) else null end) <operator> <right>) >>
+
+LOCATE(string_var, pattern)  ::= << 
+NOT(LOCATE('<pattern>', <string_var>) = 0)
+>>
+
+XSD_DATETIME_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> CAST( <value> as <xmlType>) IS NOT NULL THEN CAST(<value> AS <DBType>) 
+	else null end
+)
+>>
+
+
+LOCATE_LCASE(string_var, pattern)  ::= << 
+NOT(LOCATE(LCASE('<pattern>'), LCASE(<string_var>)) = 0)
+>>
+
+ 
+RDF_OPERATOR_NUM(left, right, operator)  ::= <<  (CAST(<left> AS FLOAT) <operator> CAST(<right> AS FLOAT)) >>
+
+
+
+RDF_EBV(fterm, ftype, nrstart, nrend, tstring, pstring, tboolean)  ::= <<  
+ (((<ftype> BETWEEN <nrstart> AND <nrend>) AND CAST(<fterm> AS FLOAT) \<\> 0) OR
+ ((<ftype> = <tstring> OR <ftype> = <pstring>) AND <fterm> \<\> '') OR 
+ (<ftype> = <tboolean> AND <fterm> = 'true')) 
+>>
+
+
+
+RDF_STRENDS(var, value)  ::= << 
+  (RIGHT(<var>, LENGTH('<value>')) = '<value>' )
+>>
+
+
+
+aggregate_function(function,var)  ::= << 
+ <function>(<var>)
+>>
+
+
+RDF_OPERATOR_DATE(left, right, operator)  ::= <<  (CAST ( <left> AS TIMESTAMP) <operator> CAST ( <right> AS TIMESTAMP)) ) >>
+
+
+CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, operator)  ::= <<  
+ (((<ltype> BETWEEN <nrstart> AND <nrend>) AND (<rtype> BETWEEN <nrstart> AND <nrend>) AND CAST(<left> AS FLOAT) <operator> CAST(<right> AS FLOAT)) OR
+ (<ltype> \> <tstring> AND <rtype> = <ltype> AND <left> <operator> <right>) OR 
+ (<ltype> = <tdatetime> AND <rtype> = <tdatetime> AND CAST ( <left> AS TIMESTAMP) <operator> CAST ( <right> AS TIMESTAMP)) ) 
+>>
+
+
+
+unary_minus(expression)  ::= << 
+ (0 - <expression>)
+>>
+
+
+
+RDF_XSD_INTEGER (var)  ::= << 
+CASE WHEN CAST(<var> AS INT) THEN CAST( <var> AS FLOAT ) ELSE NULL END
+>>
+
+
+
+RDF_XSD_INTEGER_DS (type, var)  ::= << 
+CASE WHEN <type> = 'D' THEN CAST( <var> AS FLOAT ) ELSE NULL END
+>>
+

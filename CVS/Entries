@@ -1,0 +1,88 @@
+/.classpath/1.29.2.36/Tue Jul  1 20:18:09 2014//Trdfstore-basePerf
+/.cvsignore/1.4/Mon Jul 18 18:05:01 2011//Trdfstore-basePerf
+/.project/1.1/Mon Sep 27 21:32:40 2010//Trdfstore-basePerf
+D/.settings////
+/BenchGenerator.launch/1.1.2.3/Tue Mar 19 02:37:18 2013//Trdfstore-basePerf
+D/ColumnStore////
+D/CompareUDFs////
+/CreateRdfStore - create indexes sql.launch/1.1.2.1/Thu May 16 02:23:25 2013//Trdfstore-basePerf
+/CreateRdfStore - create store sql.launch/1.1.2.1/Thu May 16 02:23:25 2013//Trdfstore-basePerf
+/CreateRdfStore - uniprot - index.launch/1.1.2.1/Sun Oct 28 21:03:17 2012//Trdfstore-basePerf
+/CreateRdfStore - uniprot xiv_c6.launch/1.1.2.1/Wed Oct 10 17:06:59 2012//Trdfstore-basePerf
+/CreateRdfStore.launch/1.1.2.3/Thu Dec  5 22:07:24 2013//Trdfstore-basePerf
+/DB2JazzHelix1.launch/1.1.2.1/Tue Dec 17 23:38:03 2013//Trdfstore-basePerf
+/DB2RDFQuery.launch/1.1.2.2/Fri Jan 17 21:17:18 2014//Trdfstore-basePerf
+/DB2SP2B10MHelix1.launch/1.1.2.1/Tue Dec 17 23:38:04 2013//Trdfstore-basePerf
+/DB2SP2B1MHelix1.launch/1.1.2.1/Fri Jan 17 21:17:18 2014//Trdfstore-basePerf
+/DataLoader.launch/1.3.12.1/Sat Sep 29 14:27:22 2012//Trdfstore-basePerf
+D/DataLoaderTest////
+/DataLoaderTest.launch/1.1.10.1/Sat Sep 29 14:27:22 2012//Trdfstore-basePerf
+/DebugDataLoader.launch/1.1/Mon Apr  4 15:31:26 2011//Trdfstore-basePerf
+/JazzNewTest.launch/1.1.2.1/Mon Oct 21 19:06:03 2013//Trdfstore-basePerf
+/JazzOptimizedStore.launch/1.1.2.5/Tue Dec 17 23:38:03 2013//Trdfstore-basePerf
+/JazzOptimizedStoreSL.launch/1.1.2.1/Fri Nov  1 18:46:30 2013//Trdfstore-basePerf
+/LUBMQueryUtilityTestShark.launch/1.1.2.1/Thu Jun 19 17:50:55 2014//Trdfstore-basePerf
+/MicrobenchTester.launch/1.1.2.2/Thu Jan 23 15:28:52 2014//Trdfstore-basePerf
+D/Modified_jazz_queries////
+/PSQLJazzHelix1.launch/1.1.2.1/Tue Dec 17 15:22:10 2013//Trdfstore-basePerf
+/PSQLSP2B100MHelix1.launch/1.1.2.1/Tue Dec 17 15:22:09 2013//Trdfstore-basePerf
+/PSQLSP2B10MHelix1.launch/1.1.2.1/Tue Dec 17 15:22:09 2013//Trdfstore-basePerf
+/PSQLSP2B1MHelix1.launch/1.1.2.1/Wed Jan 15 18:41:02 2014//Trdfstore-basePerf
+/RRCQueryFileParser.launch/1.1.2.1/Thu Apr 18 13:10:29 2013//Trdfstore-basePerf
+D/RSA-Keys////
+D/ResourceBundle////
+D/ResourceBundles////
+/Reversed100K.launch/1.1.2.1/Mon Oct  7 19:03:30 2013//Trdfstore-basePerf
+/Reversed100M_WithOWLQLCompilation.launch/1.2.2.2/Thu Dec  5 22:07:24 2013//Trdfstore-basePerf
+/SP2B100K_R_RC2.launch/1.1.2.1/Thu Nov  7 15:31:48 2013//Trdfstore-basePerf
+/SP2B100M_R_RC2.launch/1.1.2.3/Tue Dec 17 23:38:03 2013//Trdfstore-basePerf
+/SP2B10M_R_RC2.launch/1.1.2.2/Tue Jan 14 18:17:08 2014//Trdfstore-basePerf
+/SP2B1M_R_HELIX1.launch/1.1.2.3/Thu Jan 23 15:28:52 2014//Trdfstore-basePerf
+/SP2QueryUtilityTest.launch/1.1.2.1/Thu Jan 23 15:28:52 2014//Trdfstore-basePerf
+/StatisticsLoader.launch/1.2/Wed Jul 20 21:03:06 2011//Trdfstore-basePerf
+/TDBTestDBpedia37_RC2.launch/1.1.2.1/Mon Sep 30 20:40:59 2013//Trdfstore-basePerf
+/TDBTestJazzOptimizedStore.launch/1.1.2.1/Mon Sep 30 20:40:59 2013//Trdfstore-basePerf
+/TDBTestSP2B100M_R_RC2.launch/1.1.2.1/Mon Sep 30 20:40:59 2013//Trdfstore-basePerf
+/TDBTestUOBM1.launch/1.1.2.1/Mon Sep 30 20:40:59 2013//Trdfstore-basePerf
+/TestRandomCompleteDB2GraphMultipleEvalPerRound (all).launch/1.1.2.1/Thu Jan 23 21:58:23 2014//Trdfstore-basePerf
+/TestRandomCompleteDB2GraphMultipleEvalPerRound (delta with runstats).launch/1.1.2.1/Thu Jan 23 21:58:23 2014//Trdfstore-basePerf
+/TestRandomCompleteDB2GraphMultipleEvalPerRound.launch/1.1.2.1/Tue Jan 21 02:41:14 2014//Trdfstore-basePerf
+/UOBM30_PROPPATHS_EXPANSION.launch/1.1.2.2/Thu Jun 19 17:50:55 2014//Trdfstore-basePerf
+/UOBM_SHARK.launch/1.1.2.1/Thu Jun 19 17:50:55 2014//Trdfstore-basePerf
+/UpdateRdfStoreStats.launch/1.1.2.2/Tue Jun 24 14:18:36 2014//Trdfstore-basePerf
+D/bin////
+/build-grammar.xml/1.6.10.1/Wed Oct 16 12:37:14 2013//Trdfstore-basePerf
+/build.xml/1.14/Wed Dec  7 05:42:28 2011//Trdfstore-basePerf
+/bulk_load.sh/1.1.2.3/Tue Nov  5 20:28:20 2013/-kb/Trdfstore-basePerf
+D/conf////
+D/data////
+D/distrEval-conf////
+D/doc////
+D/expected_sql_jazz_queries////
+D/expected_sql_jazz_queries_def////
+D/individual_test_queries////
+D/issues////
+D/jazz_queries////
+D/jazz_queries_rev////
+D/jni////
+D/launches////
+D/lib////
+D/lubm_queries////
+D/microbench////
+/optionals.txt/1.1.2.1/Fri Aug 16 14:45:00 2013//Trdfstore-basePerf
+D/otherjazzdata////
+D/proxies////
+D/queries////
+D/rdf_data////
+/run_result_matching_with_kepler.txt/1.1.2.1/Thu May 16 02:23:25 2013//Trdfstore-basePerf
+D/schema_files////
+D/scripts////
+D/sp2b_queries////
+D/sql////
+D/sql_jazz_queries////
+D/src////
+D/src-gen////
+/suspicious_queries/1.1.2.1/Thu May  9 23:21:17 2013/-kb/Trdfstore-basePerf
+D/tasos_test_queries////
+D/test////
+D/uniprot_queries////

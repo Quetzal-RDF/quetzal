@@ -1,0 +1,16 @@
+FLOAT=FLOAT
+STRING=STRING
+DOUBLE=DOUBLE
+DECIMAL=DECIMAL
+DATETIME=TIMESTAMP
+INTEGER=INT
+DATE=DATE
+NUMERIC=FLOAT
+xs_dateTime=TIMESTAMP
+xs_integer=INT
+xs_date=date
+xs_decimal=decimal
+xs_float=float
+xs_double=double
+xs_boolean=boolean
+xs_string=string

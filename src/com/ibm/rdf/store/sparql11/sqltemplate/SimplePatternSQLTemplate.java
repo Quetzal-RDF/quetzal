@@ -1,0 +1,157 @@
+package com.ibm.rdf.store.sparql11.sqltemplate;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.ibm.rdf.store.Context;
+import com.ibm.rdf.store.Store;
+import com.ibm.rdf.store.config.Constants;
+import com.ibm.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.rdf.store.sparql11.model.BinaryUnion;
+import com.ibm.rdf.store.sparql11.model.BindPattern;
+import com.ibm.rdf.store.sparql11.model.Expression;
+import com.ibm.rdf.store.sparql11.model.IRI;
+import com.ibm.rdf.store.sparql11.model.QueryTripleTerm;
+import com.ibm.rdf.store.sparql11.model.Variable;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
+import com.ibm.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
+import com.ibm.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.rdf.store.sparql11.stopt.STPlanNode;
+import com.ibm.wala.util.collections.Pair;
+
+public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
+	protected Set<Variable> projectedInPrimary = null;
+	//
+
+	public SimplePatternSQLTemplate(String templateName, Store store,
+			Context ctx, STPlanWrapper wrapper, STPlanNode planNode) {
+		super(templateName, store, ctx, wrapper, planNode);
+		this.wrapper.mapPlanNode(planNode);
+	}
+
+	protected void addConstantEntrySQLConstraint(QueryTripleTerm entryTerm, List<String> entrySQLConstraint, boolean hasSqlType, String entryColumn) {
+		entrySQLConstraint.add(entryColumn + " = '"+entryTerm.toSqlDataString()+"'");
+		if(hasSqlType){
+			if (entryTerm.isConstant() && !entryTerm.isIRI()) {
+				if (entryTerm.getConstant().getLiteral() != null && entryTerm.getConstant().getLiteral().getType() != null) {
+					String str = entryTerm.getConstant().getLiteral().getType().getValue();
+					short s = TypeMap.getDatatypeType(str);
+					entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(s, "T."+Constants.NAME_COLUMN_PREFIX_TYPE));
+				} else {
+					// KAVITHA: Turns out that when a constant appears in a graph we don't need to look for its value, but rather match its exact type
+					//entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(entryTerm.getConstant().toDataType(), Constants.NAME_COLUMN_PREFIX_TYPE));
+					entrySQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + " = " + entryTerm.getConstant().toDataType());				
+					
+				}
+			}
+		}
+	}
+
+	protected List<String> getProjectedSQLClause() throws SQLWriterException {
+		List<String> projectSQLClause = new LinkedList<String>();
+		List<String> entryMap = mapEntryForProject();
+		List<String> valMap = mapValForProject();
+		List<String> eVarMap = mapExternalVarForProject();
+		List<String> graphMap = mapGraphForProject();
+		List<String> bindMap = mapBindForProject();
+
+		if(entryMap!=null)projectSQLClause.addAll(entryMap);
+		if(valMap!=null)projectSQLClause.addAll(valMap);
+		if(eVarMap!=null)projectSQLClause.addAll(eVarMap);
+		if(graphMap!=null)projectSQLClause.addAll(graphMap);
+		if (applyBind() && bindMap != null) projectSQLClause.addAll(bindMap);
+
+		return projectSQLClause;
+
+	}
+	
+	protected abstract boolean applyBind();
+
+	protected List<String> mapBindForProject() throws SQLWriterException {
+		return mapBindForProject(varMap);
+	}
+		
+	protected List<String> mapBindForProject(Map<String, Pair<String, String>> variableMap) throws SQLWriterException {
+		List<String> ret = new LinkedList<String>();
+		if (planNode.getBindPatterns() == null) {
+			return null;
+		}
+		for (BindPattern bp : planNode.getBindPatterns()) {
+			Expression e = bp.getExpression();
+			if( ! planNode.getAvailableVariables().containsAll(e.gatherVariables()))continue ;			
+			String eSql = expGenerator.getSQLBind(bp, new FilterContext(variableMap,  wrapper.getPropertyValueTypes(), planNode));
+			ret.add(eSql);
+
+			String vType = null;
+			if (e.getReturnType() != TypeMap.BLANK_NODE_ID || e.getReturnType() != TypeMap.IRI_ID) {
+				vType = bp.getVar().getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
+				ret.add(e.getReturnType() +" AS " + vType);				
+			}
+			String expression = expGenerator.getSQLExpression(bp.getExpression(), new FilterContext(variableMap, wrapper.getPropertyValueTypes(), planNode), store);
+
+			variableMap.put(bp.getVar().getName(), Pair.make(expression, vType));			
+		}
+		
+		return ret;
+	}
+	
+	
+
+	abstract List<String> mapEntryForProject();
+	abstract List<String> mapValForProject();
+	abstract List<String> mapExternalVarForProject();
+	
+	protected List<String> mapGraphForProject(){
+		BinaryUnion<Variable,IRI> graphRestriction = planNode.getGraphRestriction();
+		if(graphRestriction !=null){	
+			if(graphRestriction.isFirstType()){
+				Variable graphVariable = graphRestriction.getFirst();
+				if(projectedInPrimary.contains(graphVariable))return null;
+				projectedInPrimary.add(graphVariable);
+				List<String> graphSqlToSparql =  new LinkedList<String>();
+				graphSqlToSparql.add(Constants.NAME_COLUMN_GRAPH_ID+" AS "+graphVariable.getName());
+				return graphSqlToSparql;
+			}			
+		}
+		return null;
+	}
+	
+	protected List<String> getGraphSQLConstraint(){
+		List<String> graphSQLConstraint = new LinkedList<String>();
+		if(planNode.getGraphRestriction()!=null){
+			if(planNode.getGraphRestriction().isFirstType()){
+				Variable graphVar = planNode.getGraphRestriction().getFirst();
+				STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
+				boolean graphHasConstraintWithPredecessor = false;
+				if(predecessor!=null ){
+					Set<Variable> availableVariables = predecessor.getAvailableVariables();
+					if(availableVariables != null){
+						if(availableVariables.contains(graphVar)){
+							String graphPredName = wrapper.getPlanNodeVarMapping(predecessor,graphVar.getName());
+							graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " = "+wrapper.getPlanNodeCTE(predecessor) + "." +graphPredName);
+							graphHasConstraintWithPredecessor = true;
+						}
+					}
+				}
+				if(!graphHasConstraintWithPredecessor){
+					if(varMap.containsKey(graphVar.getName())){
+						graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " = "+varMap.get(graphVar.getName()).fst);
+					} else if (! Boolean.TRUE.equals(store.getContext().get(Context.unionDefaultGraph))) {
+						graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " <> 'DEF'");						
+					}
+				}
+				//filters go on secondary table
+				varMap.put(graphVar.getName(), Pair.make("T."+Constants.NAME_COLUMN_GRAPH_ID, (String)null));
+			}
+			else{
+				String graphTermString = planNode.getGraphRestriction().getSecond().getSqlDataString();
+				graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID+ " = '"+graphTermString+"'");
+			}
+		} else if (! Boolean.TRUE.equals(store.getContext().get(Context.unionDefaultGraph))) {
+			graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " = 'DEF'");						
+		}
+		return graphSQLConstraint;
+	}
+}

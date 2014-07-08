@@ -1,0 +1,10 @@
+/BatchSetOrientedLoad.sql/1.1.2.1/Thu Sep 19 15:22:08 2013/-kb/Trdfstore-basePerf
+/IncrementalLoad.sql/1.1.2.2/Wed Oct  2 12:06:34 2013/-kb/Trdfstore-basePerf
+/SetOrientedLoad.sql/1.1.2.1/Thu Sep 19 15:22:08 2013/-kb/Trdfstore-basePerf
+/db2typeof.sql/1.1.2.1/Wed Jan 22 19:09:10 2014//Trdfstore-basePerf
+/psql2typeof.sql/1.1.2.1/Wed Jan 22 19:09:10 2014//Trdfstore-basePerf
+/psqlDatatypeFunction.sql/1.1.2.2/Mon Jun 23 19:33:38 2014/-kb/Trdfstore-basePerf
+/psqlIsCastableFunction/1.1.2.2/Fri Jun 27 18:42:11 2014/-kb/Trdfstore-basePerf
+/psqlIsNumericFunction/1.1.2.1/Mon Jun 30 02:09:27 2014/-kb/Trdfstore-basePerf
+/pssqlSHAFunctions/1.1.2.1/Mon Jun 30 02:09:27 2014/-kb/Trdfstore-basePerf
+/readtext.sql/1.1.2.1/Thu May 16 02:23:27 2013//Trdfstore-basePerf

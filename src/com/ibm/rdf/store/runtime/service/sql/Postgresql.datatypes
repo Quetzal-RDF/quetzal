@@ -1,0 +1,16 @@
+FLOAT=REAL
+STRING=TEXT
+DOUBLE=DOUBLE PRECISION
+DECIMAL=DECIMAL
+DATETIME=TIMESTAMP WITH TIME ZONE
+INTEGER=INTEGER
+DATE=DATE
+NUMERIC=NUMERIC
+xs_dateTime=http://www.w3.org/2001/XMLSchema#dateTime
+xs_integer=http://www.w3.org/2001/XMLSchema#integer
+xs_date=http://www.w3.org/2001/XMLSchema#date
+xs_decimal=http://www.w3.org/2001/XMLSchema#decimal
+xs_float=http://www.w3.org/2001/XMLSchema#float
+xs_double=http://www.w3.org/2001/XMLSchema#double
+xs_boolean=http://www.w3.org/2001/XMLSchema#boolean
+xs_string=http://www.w3.org/2001/XMLSchema#string
