@@ -1,8 +1,0 @@
-/DB2CreateStore.launch/1.2.2.3/Fri Jan 17 21:16:23 2014//Trdfstore-basePerf
-/DB2CreateStoreAndIndexes.launch/1.2.2.2/Thu Dec  5 22:08:43 2013//Trdfstore-basePerf
-/DB2DropStore.launch/1.2.2.4/Mon Jan 20 19:44:10 2014//Trdfstore-basePerf
-/PostgreSQLCreateIndexes.launch/1.2.2.2/Thu Dec  5 22:08:43 2013//Trdfstore-basePerf
-/PostgreSQLCreateStore.launch/1.2.2.8/Thu Feb 13 20:57:23 2014//Trdfstore-basePerf
-/PostgreSQLCreateStoreAndIndexes.launch/1.2.2.4/Fri Jan 17 21:16:23 2014//Trdfstore-basePerf
-/PostgreSQLDropStore.launch/1.2.2.7/Thu Feb 13 20:57:23 2014//Trdfstore-basePerf
-/PostgreSQLUpdateStoreStats.launch/1.1.2.1/Wed Jan 15 23:22:38 2014//Trdfstore-basePerf
