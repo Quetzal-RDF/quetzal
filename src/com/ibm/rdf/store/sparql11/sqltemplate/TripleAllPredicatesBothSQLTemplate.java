@@ -98,7 +98,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 					if (p.startsWith(target+".") && p.length()>target.length()+1) {
 						p = "Q"+getQIDMapping()+"Prime."+p.substring(target.length()+1);
 					}
-					if (p.startsWith("T.") && p.length()>2) {
+					if (p.startsWith(tTableColumnPrefix) && p.length()>2) {
 						p = "Q"+getQIDMapping()+"Prime."+p.substring(2);
 					}
 					tmp.add(p);
@@ -383,14 +383,14 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean typConstraint = false;
 			if(hasSqlType && wrapper.getIRIBoundVariables().contains(entryVariable)){
-				entrySQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
+				entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
 			}
 			else if(hasSqlType && !wrapper.getIRIBoundVariables().contains(entryVariable)){
 				typConstraint = true;
 			}
 			boolean entryHasConstraintWithPredecessor = false;
 			if(predecessor!=null ){
-				entryHasConstraintWithPredecessor = super.getPredecessorConstraint(entrySQLConstraint, entryVariable, predecessor,"T."+ Constants.NAME_COLUMN_ENTRY, "T."+Constants.NAME_COLUMN_PREFIX_TYPE, typConstraint);
+				entryHasConstraintWithPredecessor = super.getPredecessorConstraint(entrySQLConstraint, entryVariable, predecessor,tTableColumnPrefix+ Constants.NAME_COLUMN_ENTRY, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE, typConstraint);
 			}
 			if(!entryHasConstraintWithPredecessor){
 				/* This is for constraints imposed by using the same variable name on different positions of the triple node
@@ -400,17 +400,17 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 				   														subject = predicate is redundant						
 				*/
 				if(varMap.containsKey(entryVariable.getName())){
-					entrySQLConstraint.add("T."+Constants.NAME_COLUMN_ENTRY + " = " + varMap.get(entryVariable.getName()).fst);
+					entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY + " = " + varMap.get(entryVariable.getName()).fst);
 				}
 			}
-			String entryType = (typConstraint) ? "T."+Constants.NAME_COLUMN_PREFIX_TYPE : null;
+			String entryType = (typConstraint) ? tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE : null;
 			String sEntryType = (typConstraint) ? entryVariable.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS : null;
-			varMap.put(entryVariable.getName(), Pair.make("T."+Constants.NAME_COLUMN_ENTRY, entryType));
+			varMap.put(entryVariable.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, entryType));
 			// The entry is mapped in the secondary with its variable name
 			sVarMap.put(entryVariable.getName(), Pair.make(entryVariable.getName(), sEntryType));
 		}
 		else{
-			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, "T."+Constants.NAME_COLUMN_ENTRY);
+			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY);
 		}
 		return entrySQLConstraint;
 	}

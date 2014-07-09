@@ -24,11 +24,17 @@ import com.ibm.wala.util.collections.Pair;
 public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 	protected Set<Variable> projectedInPrimary = null;
 	//
+	protected String tTableColumnPrefix;
 
 	public SimplePatternSQLTemplate(String templateName, Store store,
 			Context ctx, STPlanWrapper wrapper, STPlanNode planNode) {
 		super(templateName, store, ctx, wrapper, planNode);
 		this.wrapper.mapPlanNode(planNode);
+		if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+			tTableColumnPrefix = "T.";
+		} else {
+			tTableColumnPrefix ="";
+		}
 	}
 
 	protected void addConstantEntrySQLConstraint(QueryTripleTerm entryTerm, List<String> entrySQLConstraint, boolean hasSqlType, String entryColumn) {
@@ -38,11 +44,11 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 				if (entryTerm.getConstant().getLiteral() != null && entryTerm.getConstant().getLiteral().getType() != null) {
 					String str = entryTerm.getConstant().getLiteral().getType().getValue();
 					short s = TypeMap.getDatatypeType(str);
-					entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(s, "T."+Constants.NAME_COLUMN_PREFIX_TYPE));
+					entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(s, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE));
 				} else {
 					// KAVITHA: Turns out that when a constant appears in a graph we don't need to look for its value, but rather match its exact type
 					//entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(entryTerm.getConstant().toDataType(), Constants.NAME_COLUMN_PREFIX_TYPE));
-					entrySQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + " = " + entryTerm.getConstant().toDataType());				
+					entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + " = " + entryTerm.getConstant().toDataType());				
 					
 				}
 			}
@@ -130,27 +136,27 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 					if(availableVariables != null){
 						if(availableVariables.contains(graphVar)){
 							String graphPredName = wrapper.getPlanNodeVarMapping(predecessor,graphVar.getName());
-							graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " = "+wrapper.getPlanNodeCTE(predecessor) + "." +graphPredName);
+							graphSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_GRAPH_ID + " = "+wrapper.getPlanNodeCTE(predecessor) + "." +graphPredName);
 							graphHasConstraintWithPredecessor = true;
 						}
 					}
 				}
 				if(!graphHasConstraintWithPredecessor){
 					if(varMap.containsKey(graphVar.getName())){
-						graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " = "+varMap.get(graphVar.getName()).fst);
+						graphSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_GRAPH_ID + " = "+varMap.get(graphVar.getName()).fst);
 					} else if (! Boolean.TRUE.equals(store.getContext().get(Context.unionDefaultGraph))) {
-						graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " <> 'DEF'");						
+						graphSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_GRAPH_ID + " <> 'DEF'");						
 					}
 				}
 				//filters go on secondary table
-				varMap.put(graphVar.getName(), Pair.make("T."+Constants.NAME_COLUMN_GRAPH_ID, (String)null));
+				varMap.put(graphVar.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_GRAPH_ID, (String)null));
 			}
 			else{
 				String graphTermString = planNode.getGraphRestriction().getSecond().getSqlDataString();
-				graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID+ " = '"+graphTermString+"'");
+				graphSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_GRAPH_ID+ " = '"+graphTermString+"'");
 			}
 		} else if (! Boolean.TRUE.equals(store.getContext().get(Context.unionDefaultGraph))) {
-			graphSQLConstraint.add("T."+Constants.NAME_COLUMN_GRAPH_ID + " = 'DEF'");						
+			graphSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_GRAPH_ID + " = 'DEF'");						
 		}
 		return graphSQLConstraint;
 	}
