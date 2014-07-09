@@ -147,8 +147,21 @@ XSD_DATETIME_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<
 (
 CASE 
     WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
-    AND	<endif> CAST( <value> as <xmlType>) IS NOT NULL THEN CAST(<value> AS <DBType>) 
-	else null end
+    AND	<endif> CAST( <value> as <xmlType>) IS NOT NULL THEN 
+        CASE 
+        	WHEN lower('<DBType>') = 'decimal'  THEN 
+    			CASE WHEN locate('E', <value>) > 0 OR locate('e', <value>) >0 THEN NULL
+    			ELSE  CAST(<value> AS <DBType>) 
+    			END 
+    		WHEN lower('<DBType>') = 'timestamp'  THEN 
+    			CASE WHEN  <value> RLIKE '^([0-9]{4})-([0-1][0-9])-([0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](([0-2][0-9]:[0-6][0-9])|Z)?)$'  THEN CAST(<value> AS <DBType>)
+    			ELSE  NULL 
+    			END 
+    		ELSE
+    			CAST(<value> AS <DBType>) 
+    	END
+    	
+   ELSE NULL END
 )
 >>
 

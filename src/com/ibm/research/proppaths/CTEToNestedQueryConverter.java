@@ -1061,7 +1061,13 @@ public class CTEToNestedQueryConverter {
 		sqlWithCTEs = p.fst;
 		replacement2LateralViewText.putAll(p.snd);
 		System.err.println("sql: "+sqlWithCTEs); 
-		
+		String dateTimeRegex = Pattern.quote("'^([0-9]{4})-([0-1][0-9])-([0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](([0-2][0-9]:[0-6][0-9])|Z)?)$'");
+		Pattern dateTimePattern = Pattern.compile("RLIKE "+dateTimeRegex);
+		replacementPrefix = " = 0 OR 1 = dateTimeRegex";
+		p = replace(dateTimePattern, sqlWithCTEs, replacementPrefix,"");
+		sqlWithCTEs = p.fst;
+		replacement2LateralViewText.putAll(p.snd);
+		System.err.println("sql: "+sqlWithCTEs); 
 		/*if (true) {
 			return sqlWithCTEs;
 		}*/
@@ -1100,6 +1106,8 @@ public class CTEToNestedQueryConverter {
 				} else {
 					replacement = e.getKey();
 				}
+				//int index = ret.indexOf(replacement);
+				//System.out.println("Index : "+ index+" replacement = "+replacement);
 				ret = ret.replace(replacement," "+ e.getValue());
 			}
 			System.err.println("Final transformed sql: "+ret); 
