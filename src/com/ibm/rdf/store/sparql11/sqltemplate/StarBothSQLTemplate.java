@@ -274,26 +274,26 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean entryHasConstraintWithPredecessor = false;
 			if(predecessor!=null ){
-				entryHasConstraintWithPredecessor = super.getPredecessorConstraint(entrySQLConstraint, entryTermVar, predecessor, "T."+Constants.NAME_COLUMN_ENTRY, "T."+Constants.NAME_COLUMN_PREFIX_TYPE, hasSqlType);
+				entryHasConstraintWithPredecessor = super.getPredecessorConstraint(entrySQLConstraint, entryTermVar, predecessor, tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE, hasSqlType);
 			}
 			if(!entryHasConstraintWithPredecessor){
 				if(varMap.containsKey(entryTermVar.getName())){
-					entrySQLConstraint.add("T."+Constants.NAME_COLUMN_ENTRY+ " = "+ varMap.get(entryTermVar.getName()).fst);
+					entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY+ " = "+ varMap.get(entryTermVar.getName()).fst);
 				}
 			}
 			String entryType = null;
 			String sEntryType = null;
 			if(hasSqlType && !wrapper.getIRIBoundVariables().contains(entryTermVar)){
-				entryType = "T."+Constants.NAME_COLUMN_PREFIX_TYPE;
+				entryType = tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE;
 				sEntryType = entryTermVar.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
 			}
-			varMap.put(entryTermVar.getName(), Pair.make("T."+Constants.NAME_COLUMN_ENTRY, entryType));
+			varMap.put(entryTermVar.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, entryType));
 			// The entry is mapped in the secondary with its variable name
 			sVarMap.put(entryTermVar.getName(), Pair.make(entryTermVar.getName(), sEntryType));
 		} else {
 			QueryTriple t = planNode.starTriples.iterator().next();
 			QueryTripleTerm val = STEAccessMethodType.isDirectAccess(am.getType())? t.getSubject(): t.getObject();
-			super.addConstantEntrySQLConstraint(val, entrySQLConstraint, hasSqlType, "T."+Constants.NAME_COLUMN_ENTRY);
+			super.addConstantEntrySQLConstraint(val, entrySQLConstraint, hasSqlType, tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY);
 		}
 
 		return entrySQLConstraint;

@@ -243,25 +243,25 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean typConstraint = false;
 			if(hasSqlType && wrapper.getIRIBoundVariables().contains(entryVariable)){
-				entrySQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
+				entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
 			}
 			else if(hasSqlType && !wrapper.getIRIBoundVariables().contains(entryVariable)){
 				typConstraint = true;
 			}
 			boolean entryHasConstraintWithPredecessor = false;
 			if(predecessor!=null ){
-				entryHasConstraintWithPredecessor= super.getPredecessorConstraint(entrySQLConstraint, entryVariable, predecessor, "T."+Constants.NAME_COLUMN_ENTITY,"T."+ Constants.NAME_COLUMN_PREFIX_TYPE, typConstraint);
+				entryHasConstraintWithPredecessor= super.getPredecessorConstraint(entrySQLConstraint, entryVariable, predecessor, tTableColumnPrefix+Constants.NAME_COLUMN_ENTITY,tTableColumnPrefix+ Constants.NAME_COLUMN_PREFIX_TYPE, typConstraint);
 			}
 			/*if(!entryHasConstraintWithPredecessor){
 				if(varMap.containsKey(entryVariable.getName())){
-					entrySQLConstraint.add("T."+Constants.NAME_COLUMN_ENTITY + " = " + varMap.get(entryVariable.getName()).fst);
+					entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_ENTITY + " = " + varMap.get(entryVariable.getName()).fst);
 				}
 			} */
-			String typeSQL = (typConstraint) ? "T."+Constants.NAME_COLUMN_PREFIX_TYPE : null;
-			varMap.put(entryVariable.getName(), Pair.make("T."+Constants.NAME_COLUMN_ENTITY, typeSQL));
+			String typeSQL = (typConstraint) ? tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE : null;
+			varMap.put(entryVariable.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_ENTITY, typeSQL));
 		}
 		else{
-			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, "T."+Constants.NAME_COLUMN_ENTITY);
+			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, tTableColumnPrefix+Constants.NAME_COLUMN_ENTITY);
 		}
 		return entrySQLConstraint;
 	}
@@ -280,14 +280,14 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			valueTerm = qt.getSubject();
 		}
 		
-		String valueSQLName = "T."+Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT;
+		String valueSQLName = tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT;
 		
 		if(valueTerm.isVariable()){
 			Variable valueVariable = valueTerm.getVariable();
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean typConstraint = false;
 			if(hasSqlType && wrapper.getIRIBoundVariables().contains(valueVariable)){
-				valueSQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
+				valueSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
 			}
 			if(hasSqlType && !wrapper.getIRIBoundVariables().contains(valueVariable)){
 				typConstraint = true;
@@ -301,7 +301,7 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 						valueSQLConstraint.add(valueSQLName+ 
 								" = "+ wrapper.getPlanNodeCTE(predecessor)+ "." + valPredName);
 						if(typConstraint){
-							valueSQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + 
+							valueSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + 
 									" = " + wrapper.getPlanNodeCTE(predecessor) + "." + valPredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 						}
 						hasValueConstraintWithPredecessor = true;
@@ -313,8 +313,8 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 					valueSQLConstraint.add(valueSQLName + " = "+ varMap.get(valueVariable.getName()).fst);
 				}
 			}
-			String valType = (typConstraint) ?"T."+ Constants.NAME_COLUMN_PREFIX_TYPE : null;
-			varMap.put(valueVariable.getName(), Pair.make("T."+Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT, valType));
+			String valType = (typConstraint) ?tTableColumnPrefix+ Constants.NAME_COLUMN_PREFIX_TYPE : null;
+			varMap.put(valueVariable.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT, valType));
 		}
 		else{
 			valueSQLConstraint.add(valueSQLName+ " = '"+valueTerm.toSqlDataString()+"'");
@@ -334,16 +334,16 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 				if(availableVariables != null){
 					if(availableVariables.contains(propTerm.getVariable())){
 						String propPredName = wrapper.getPlanNodeVarMapping(predecessor,propTerm.getVariable().getName());	
-						propSQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_PREDICATE+
+						propSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_PREDICATE+
 								" = " +  wrapper.getPlanNodeCTE(predecessor) + "." + propPredName);
 					}
 				}
 			}
-			varMap.put(propTerm.getVariable().getName(), Pair.make("T."+Constants.NAME_COLUMN_PREFIX_PREDICATE, (String)null));			
+			varMap.put(propTerm.getVariable().getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_PREDICATE, (String)null));			
 			
 		}
 		else{
-			propSQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_PREDICATE+ " = '"+propTerm.toSqlDataString()+"'");
+			propSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_PREDICATE+ " = '"+propTerm.toSqlDataString()+"'");
 		}
 		
 		return propSQLConstraint;

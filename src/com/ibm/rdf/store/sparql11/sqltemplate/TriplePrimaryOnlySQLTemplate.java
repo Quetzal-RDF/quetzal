@@ -212,25 +212,25 @@ public class TriplePrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean typConstraint = false;
 			if(hasSqlType && wrapper.getIRIBoundVariables().contains(entryVariable)){
-				entrySQLConstraint.add("T."+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
+				entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
 			}
 			else if(hasSqlType && !wrapper.getIRIBoundVariables().contains(entryVariable)){
 				typConstraint = true;
 			}
 			boolean entryConstraintWithPredecessor = getPredecessorConstraint(
 					entrySQLConstraint, entryVariable, predecessor,
-					"T."+Constants.NAME_COLUMN_ENTRY, "T."+Constants.NAME_COLUMN_PREFIX_TYPE, typConstraint);
+					tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE, typConstraint);
 			if(!entryConstraintWithPredecessor){
 				//Check for entry constraint for variable with the same name on different positions
 				if(varMap.containsKey(entryVariable.getName())){
-					entrySQLConstraint.add("T."+Constants.NAME_COLUMN_ENTRY + " = " +varMap.get(entryVariable.getName()).fst);
+					entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY + " = " +varMap.get(entryVariable.getName()).fst);
 				}
 			}
-			String entryType = (typConstraint) ?"T."+ Constants.NAME_COLUMN_PREFIX_TYPE : null;
-			varMap.put(entryVariable.getName(), Pair.make("T."+Constants.NAME_COLUMN_ENTRY, entryType));
+			String entryType = (typConstraint) ?tTableColumnPrefix+ Constants.NAME_COLUMN_PREFIX_TYPE : null;
+			varMap.put(entryVariable.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, entryType));
 		}
 		else {
-			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, "T."+Constants.NAME_COLUMN_ENTRY);
+			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY);
 		}
 		return entrySQLConstraint;
 	}

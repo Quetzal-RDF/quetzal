@@ -198,22 +198,22 @@ public class StarPrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean entryHasConstraintWithPredecestor = false;
 			if(predecessor!=null ){
-				entryHasConstraintWithPredecestor = super.getPredecessorConstraint(entrySQLConstraint, entryTermVar, predecessor, "T."+Constants.NAME_COLUMN_ENTRY, "T."+Constants.NAME_COLUMN_PREFIX_TYPE, hasSqlType);
+				entryHasConstraintWithPredecestor = super.getPredecessorConstraint(entrySQLConstraint, entryTermVar, predecessor, tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE, hasSqlType);
 			}
 			if(!entryHasConstraintWithPredecestor){
 				if(varMap.containsKey(entryTermVar.getName())){
-					entrySQLConstraint.add(varMap.get(entryTermVar.getName()).fst+"="+"T."+Constants.NAME_COLUMN_ENTRY);
+					entrySQLConstraint.add(varMap.get(entryTermVar.getName()).fst+"="+tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY);
 				}
 			}
 			String entryType = null;
 			if(hasSqlType && !wrapper.getIRIBoundVariables().contains(entryTermVar)){
-				entryType = "T."+Constants.NAME_COLUMN_PREFIX_TYPE;
+				entryType = tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE;
 			}
-			varMap.put(entryTermVar.getName(), Pair.make("T."+Constants.NAME_COLUMN_ENTRY, entryType));
+			varMap.put(entryTermVar.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY, entryType));
 		} else {
 			QueryTriple t = planNode.starTriples.iterator().next();
 			QueryTripleTerm val = STEAccessMethodType.isDirectAccess(am.getType())? t.getSubject(): t.getObject();
-			super.addConstantEntrySQLConstraint(val, entrySQLConstraint, hasSqlType, "T."+Constants.NAME_COLUMN_ENTRY);
+			super.addConstantEntrySQLConstraint(val, entrySQLConstraint, hasSqlType, tTableColumnPrefix+Constants.NAME_COLUMN_ENTRY);
 		}
 		return entrySQLConstraint;
 	}
