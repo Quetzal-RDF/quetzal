@@ -1,3 +1,8 @@
+RDF_ISBLANK(args)  ::= << 
+ (<args> LIKE '!_:%' ESCAPE '!') 
+>>
+
+
 RDF_ABS(args)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:abs($arg cast as xs:float) return $res' PASSING <args> as "arg") AS VARCHAR(256)) >>
 
 RDF_CEIL(args)  ::= <<  CEIL(<args>) >>

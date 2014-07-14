@@ -1,3 +1,8 @@
+RDF_ISBLANK(args)  ::= << 
+ (<args> LIKE '!_:%' ESCAPE '!') 
+>>
+
+
 RDF_ABS(args)  ::= << CASE WHEN isNumeric(<args>) THEN abs(<args>::numeric) ELSE NULL END >>
 
 RDF_CEIL(args)  ::= <<  CASE WHEN isNumeric(<args>) THEN CEIL(<args>::numeric) ELSE NULL END>>

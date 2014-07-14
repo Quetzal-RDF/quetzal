@@ -147,7 +147,7 @@ public class DB2ResultSetImpl implements ResultSet
                String colName = varList.get(i);
                String result = null;
 
-               result = set.getString(colName);
+               result = set.getString(colName.toLowerCase());
 
                if (result != null)
                   {
@@ -155,7 +155,7 @@ public class DB2ResultSetImpl implements ResultSet
                      {
                      if (liRs.isLiteralVariable(colName))
                         {
-                        short type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS));
+                        short type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
                         sidMap.put(new TypedValue(result, type), colName);
                         }
                      else
@@ -170,7 +170,7 @@ public class DB2ResultSetImpl implements ResultSet
                      RDFNode n = null;
                      if (liRs.isLiteralVariable(colName))
                         {
-                        short type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS));
+                        short type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
 
                         n = new String2Node(Constants.NAME_COLUMN_OBJECT, result, type).getNode();
                         }
@@ -209,12 +209,12 @@ public class DB2ResultSetImpl implements ResultSet
                   setSID = sStmt.executeQuery();
                   while (setSID.next())
                      {
-                     String sid = setSID.getString(Constants.NAME_COLUMN_SHORT_STRING);
-                     short type = setSID.getShort(Constants.NAME_COLUMN_PREFIX_TYPE);
+                     String sid = setSID.getString(Constants.NAME_COLUMN_SHORT_STRING.toLowerCase());
+                     short type = setSID.getShort(Constants.NAME_COLUMN_PREFIX_TYPE.toLowerCase());
 
                      RDFNode n = new String2Node(Constants.NAME_COLUMN_OBJECT,
-                           setSID.getString(Constants.NAME_COLUMN_LONG_STRING)
-                                 + setSID.getString(Constants.NAME_COLUMN_LONG_STRING_OVERFLOW), type).getNode();
+                           setSID.getString(Constants.NAME_COLUMN_LONG_STRING.toLowerCase())
+                                 + setSID.getString(Constants.NAME_COLUMN_LONG_STRING_OVERFLOW.toLowerCase()), type).getNode();
 
                      binding.add(Var.alloc(sidMap.get(new TypedValue(sid, type))), n.asNode());
                      }

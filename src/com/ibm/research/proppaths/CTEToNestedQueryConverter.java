@@ -207,11 +207,13 @@ public class CTEToNestedQueryConverter {
 			boolean tmpWhereOnlyExpFound = false;
 			boolean prevIsTopVal = isTopLevel;
 			isTopLevel = false;
-			for (Expression e: function.getParameters().getExpressions()) {
-				e.accept(this);
-				tmpLeftTableFound |= leftTableFound;
-				tmpRightTableFound |= rightTableFound;
-				tmpWhereOnlyExpFound |= whereOnlyExpFound;
+			if (function.getParameters()!=null) {
+				for (Expression e: function.getParameters().getExpressions()) {
+					e.accept(this);
+					tmpLeftTableFound |= leftTableFound;
+					tmpRightTableFound |= rightTableFound;
+					tmpWhereOnlyExpFound |= whereOnlyExpFound;
+				}
 			}
 			leftTableFound = tmpLeftTableFound;
 			rightTableFound = tmpRightTableFound;
@@ -268,7 +270,30 @@ public class CTEToNestedQueryConverter {
 			/*clear();
 			boolean prevIsTopVal = isTopLevel;
 			isTopLevel = false;*/
-			parenthesis.getExpression().accept(this);
+			if (!parenthesis.isNot()) {
+				parenthesis.getExpression().accept(this);
+			} else {
+				clear();
+				boolean prevIsTopVal = isTopLevel;
+				boolean tmpLeftTableFound = false;
+				boolean tmpRightTableFound = false;
+				isTopLevel = false;
+				parenthesis.getExpression().accept(this);
+				// update tmp
+				tmpLeftTableFound |= leftTableFound;
+				tmpRightTableFound |= rightTableFound;
+				//
+				
+				
+				// update 
+				leftTableFound = tmpLeftTableFound;
+				rightTableFound = tmpRightTableFound;
+				whereOnlyExpFound = true;
+				//
+				
+				isTopLevel = prevIsTopVal;
+				defaultTopLevelProcessing(parenthesis);
+			}
 			/*isTopLevel = prevIsTopVal;
 			defaultTopLevelProcessing(parenthesis);*/
 		}
@@ -310,19 +335,19 @@ public class CTEToNestedQueryConverter {
 		}
 		@Override
 		public void visit(Addition addition) {
-			visitBinary(addition, true);
+			visitBinary(addition, false);
 		}
 		@Override
 		public void visit(Division division) {
-			visitBinary(division, true);
+			visitBinary(division, false);
 		}
 		@Override
 		public void visit(Multiplication multiplication) {
-			visitBinary(multiplication, true);
+			visitBinary(multiplication, false);
 		}
 		@Override
 		public void visit(Subtraction subtraction) {
-			visitBinary(subtraction, true);
+			visitBinary(subtraction, false);
 			
 		}
 		
@@ -797,6 +822,21 @@ public class CTEToNestedQueryConverter {
 					plainSelect.setFromItem(res);
 				}
 			}
+			//order by 
+			if (plainSelect.getOrderByElements()!=null) {
+				List<OrderByElement> newOrderBy = new LinkedList<OrderByElement>();
+				for (OrderByElement oe: plainSelect.getOrderByElements()) {
+					if (oe.getExpression() instanceof Parenthesis) {
+						OrderByElement noe =new OrderByElement();
+						noe.setExpression( ((Parenthesis)oe.getExpression()).getExpression());
+						noe.setAsc(oe.isAsc());
+						newOrderBy.add(noe);
+					} else {
+						newOrderBy.add(oe);
+					}
+				}
+				plainSelect.setOrderByElements(newOrderBy);
+			}
 			if (plainSelect.getJoins()!=null) {
 				int nonPlaceHolderTables =getNumberNonPlaceHolderFromItem(plainSelect);
 				for (Join join: plainSelect.getJoins()) {
@@ -983,6 +1023,12 @@ public class CTEToNestedQueryConverter {
        // }
         
 	}
+	private String addSuffix(String st, String suffix, int numOfTimes) {
+		for (int i=0; i<numOfTimes;i++) {
+			st = st+suffix;
+		}
+		return st;
+	}
 	private static String computeAbsentPrefix(String input, String prefix, String replacementSuffix) {
 		if (input.contains(prefix+replacementSuffix)) {
 			prefix = prefix+"_";
@@ -994,6 +1040,7 @@ public class CTEToNestedQueryConverter {
 			i++;
 		}
 		return prefix+i+"_";
+		
 	}
 	private static Pair<String, Map<String, String>> replace(String regex, String input, String replacementPrefix, String replacementSuffix) {
 		return replace(Pattern.compile(regex), input, replacementPrefix,replacementSuffix);
@@ -1010,6 +1057,7 @@ public class CTEToNestedQueryConverter {
 			m.appendReplacement(sb, repl);
 			ret.put(replacementPrefix+i+replacementSuffix, matchedText);
 			i++;
+			
 		}
 		m.appendTail(sb);
 		return Pair.make(sb.toString(), ret);
@@ -1061,13 +1109,14 @@ public class CTEToNestedQueryConverter {
 		sqlWithCTEs = p.fst;
 		replacement2LateralViewText.putAll(p.snd);
 		System.err.println("sql: "+sqlWithCTEs); 
-		String dateTimeRegex = Pattern.quote("'^([0-9]{4})-([0-1][0-9])-([0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](([0-2][0-9]:[0-6][0-9])|Z)?)$'");
-		Pattern dateTimePattern = Pattern.compile("RLIKE "+dateTimeRegex);
-		replacementPrefix = " = 0 OR 1 = dateTimeRegex";
-		p = replace(dateTimePattern, sqlWithCTEs, replacementPrefix,"");
+		//String dateTimeRegex = Pattern.quote("'^([0-9]{4})-([0-1][0-9])-([0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](([0-2][0-9]:[0-6][0-9])|Z)?)$'");
+		Pattern dateTimePattern = Pattern.compile("\\s+RLIKE\\s+");//+dateTimeRegex);
+		replacementPrefix = "= RLIKE";// = 0 OR 1 = dateTimeRegex";
+		p = replace(dateTimePattern, sqlWithCTEs, replacementPrefix,"() OR '10' = ");
 		sqlWithCTEs = p.fst;
 		replacement2LateralViewText.putAll(p.snd);
 		System.err.println("sql: "+sqlWithCTEs); 
+		//System.err.println(p.snd);
 		/*if (true) {
 			return sqlWithCTEs;
 		}*/
@@ -1095,6 +1144,12 @@ public class CTEToNestedQueryConverter {
 					Map<String, SelectBody> cteName2Def = HashMapFactory.make();
 					replace(select.getSelectBody(), cteName2Def, placeHolderTables);
 					ret= select.getSelectBody().toString();//sqlWithCTEs;
+				}
+				if (select.getSelectBody() instanceof PlainSelect) {
+					PlainSelect ps = (PlainSelect) select.getSelectBody();
+					if (ps.getLimit()!=null && ps.getLimit().getRowCount() == 0 && ps.getLimit().toString().equals("")) {
+						ret += " LIMIT 0";
+					}
 				}
 			} else {
 				ret = sqlWithCTEs;
