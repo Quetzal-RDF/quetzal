@@ -104,7 +104,22 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D>
          super(new PSQLEngine(), data, "../rdfstore-data/lubm_queries_QL_reversed/", lubm100mAnswers);
          }
       }
-   
+
+   //
+   // connect to SL to run this config:
+   // ssh -v -L 9999:localhost:5432 kavitha@174.37.245.155
+   //
+   public static class PSQLLUBM100MSL extends LUBMQueryUtilityTest<PSQLTestData>
+   {
+   private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://localhost:9999/lubm", "l100m", "kavitha", "sherlives",
+                                               "db2inst1", false);
+
+   public PSQLLUBM100MSL()
+      {
+      super(new PSQLEngine(), data, System.getProperty("rdfstore_data") + "/lubm_queries_QL_reversed/", lubm100mAnswers);
+      }
+   }
+
    // @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
    // @RandomizedRepeat(1)
    public static class PSQLLUBMPropPathHelix1 extends LUBMQueryUtilityTest<PSQLTestData>
