@@ -127,9 +127,6 @@ relational_expression(left, right, operator)  ::= <<
 
 
 
-RDF_IF(expr1, expr2, expr3)  ::= <<  (CASE WHEN <expr1> THEN <expr2> ELSE <expr3> END) >>
-
-
 
 aggregate_count(var)  ::= << 
  COUNT(<var>)

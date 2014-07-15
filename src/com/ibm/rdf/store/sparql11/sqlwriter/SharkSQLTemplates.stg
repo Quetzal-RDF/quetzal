@@ -1,3 +1,5 @@
+RDF_IF(expr1, expr2, expr3, type1, type2, type3)  ::= <<  (CASE WHEN <expr1> THEN <expr2> ELSE <expr3> END) >>
+
 castsForColumns(column, type) ::= << <column> >>
 RDF_OPERATOR(left, right, operator, left_type, right_type, ltype, rtype)  ::= <<  (<left> <operator> <right>
 <if(left_type)> AND <left_type> = <right_type> <endif>) >>

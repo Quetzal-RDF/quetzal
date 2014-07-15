@@ -1,3 +1,7 @@
+RDF_IF(expr1, expr2, expr3, type1, type2, type3)  ::= <<  
+(CASE WHEN <expr1><if(type1)>::<type1><endif> THEN 
+<expr2><if(type2)>::<type2><endif> ELSE <expr3><if(type3)>::<type3><endif> END) >>
+
 RDF_ABS(args)  ::= << CASE WHEN isNumeric(<args>) THEN abs(<args>::numeric) ELSE NULL END >>
 
 RDF_CEIL(args)  ::= <<  CASE WHEN isNumeric(<args>) THEN CEIL(<args>::numeric) ELSE NULL END>>
