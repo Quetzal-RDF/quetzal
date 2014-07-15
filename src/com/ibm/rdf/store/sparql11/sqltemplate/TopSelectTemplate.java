@@ -59,13 +59,13 @@ public class TopSelectTemplate extends AbstractSelectTemplate {
 		else return Collections.emptyList();
 	}
 	
-	
-	protected List<String> getProjectMapping() throws Exception{
-		if(q.isSelectQuery())return super.getProjectMapping();
+	/*@Override
+	protected List<String> getProjectMapping(List<String> projectAliasNames) throws Exception{
+		if(q.isSelectQuery())return super.getProjectMapping(projectAliasNames);
 		if(q.isDescribeQuery())return getDescribeProjectMapping();
 		if(q.isConstructQuery())return getConstructProjectMapping();
 		return null;
-	}
+	}*/
 	
 	private List<String> getConstructProjectMapping() throws Exception{
 		List<String> projectMapping = new LinkedList<String>();

@@ -1346,6 +1346,7 @@ private String handleDataTypeForVariable(FilterContext context, Expression e,
          e = iter.next();
          if (e instanceof VariableExpression)
             {
+        	 System.out.println("e= "+e+"\t e.var = "+((VariableExpression) e).getVariable());
             s = context.getVarMap().get(((VariableExpression) e).getVariable()).fst;
             }
          else if (e instanceof ConstantExpression)

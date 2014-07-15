@@ -201,8 +201,8 @@ public class DbBasedPredicateMappingMgr {
 			// Calculate edge set
 			while (rst.next()) {
 	
-				currSubject = rst.getString("SUBJECT");
-				currPred = rst.getString("PREDICATE");
+				currSubject = rst.getString("subject");
+				currPred = rst.getString("predicate");
 				
 				if(prevSubject != null && prevSubject.equals(currSubject))
 				{

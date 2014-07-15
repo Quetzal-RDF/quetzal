@@ -278,11 +278,11 @@ public class PrimaryRowHashtable implements Map<String, String> {
 	}
 	
 	protected String getKey(int i) throws SQLException {
-		return resultSet.getString(Constants.NAME_COLUMN_PREFIX_PREDICATE + i);
+		return resultSet.getString(Constants.NAME_COLUMN_PREFIX_PREDICATE.toLowerCase() + i);
 	}
 	
 	protected String getValue(int i) throws SQLException {
-		return resultSet.getString(Constants.NAME_COLUMN_PREFIX_VALUE + i);
+		return resultSet.getString(Constants.NAME_COLUMN_PREFIX_VALUE.toLowerCase() + i);
 	}
 
 	public Map<String, String> getAsMap() throws SQLException {

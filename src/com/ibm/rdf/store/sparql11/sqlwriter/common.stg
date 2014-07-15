@@ -440,9 +440,6 @@ predicate_value(num, value)  ::= <<  PROP<num> = '<value>' >>
 
 
 
-RDF_ISBLANK(args)  ::= << 
- (<args> LIKE '!_:%' ESCAPE '!') 
->>
 
 
 BOOLEAN_CASE(condition)  ::= <<  (CASE WHEN <condition> THEN 1 ELSE 0 END) >>

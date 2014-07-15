@@ -162,7 +162,7 @@ public class StoreManager
             rs = stmt.executeQuery();
             while (rs.next())
                {
-               TypeMap.add(rs.getString(Constants.NAME_COLUMN_DATATYPE_NAME), rs.getShort(Constants.NAME_COLUMN_DATATYPE_ID));
+               TypeMap.add(rs.getString(Constants.NAME_COLUMN_DATATYPE_NAME.toLowerCase()), rs.getShort(Constants.NAME_COLUMN_DATATYPE_ID.toLowerCase()));
                }
             }
          catch (SQLException e)

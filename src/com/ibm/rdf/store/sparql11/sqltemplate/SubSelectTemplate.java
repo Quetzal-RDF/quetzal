@@ -110,12 +110,12 @@ public class SubSelectTemplate extends AbstractSelectTemplate {
 		}
 		return map;
 	}
-	
-	protected List<String> getProjectMapping() throws Exception {
-		List<String> projectMapping = new LinkedList<String>(super.getProjectMapping());
+	/*@Override
+	protected List<String> getProjectMapping(List<String> projectAliasNames) throws Exception {
+		List<String> projectMapping = new LinkedList<String>(super.getProjectMapping(projectAliasNames));
 		projectMapping.addAll(mapExternalVarForProject());
 		return projectMapping;
-	}
+	}*/
 
 
 }

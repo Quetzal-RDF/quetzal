@@ -1,4 +1,10 @@
+
 RDF_IF(expr1, expr2, expr3, type1, type2, type3)  ::= <<  (CASE WHEN <expr1> THEN <expr2> ELSE <expr3> END) >>
+
+RDF_ISBLANK(args)  ::= << 
+ (<args> LIKE '!_:%' ESCAPE '!') 
+>>
+
 
 RDF_ABS(args)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:abs($arg cast as xs:float) return $res' PASSING <args> as "arg") AS VARCHAR(256)) >>
 
