@@ -1,6 +1,7 @@
 package com.ibm.rdf.store.sparql11.sqlwriter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1174,13 +1175,30 @@ private static final String AGGREGATE_FUNCTION_WITH_TYP_CHECK = "aggregate_funct
          }
       else if (type.equals("RDF_IF"))
          {
- 
+     	 Set<TypeMap.TypeCategory> types = new HashSet<TypeMap.TypeCategory>();
+     	 for (Expression arg : exp.getArguments()) {
+     		types.add(TypeMap.getTypeCategory(arg.getReturnType()));
+     	 }
+     	 TypeMap.TypeCategory castType = TypeMap.getCastTypeCategory(types);
+     	 
          e = iter.next();
+         if (e.getReturnType() == TypeMap.NONE_ID) {
+        	 t.setAttribute("type1", castType);
+         }
          t.setAttribute("expr1", getSQLExpression(e, context));
+
          e = iter.next(); 
+         if (e.getReturnType() == TypeMap.NONE_ID) {
+        	 t.setAttribute("type2", castType);
+         }
          t.setAttribute("expr2", getSQLExpression(e, context));
+         
          e = iter.next();
+         if (e.getReturnType() == TypeMap.NONE_ID) {
+        	 t.setAttribute("type3", castType);
+         }
          t.setAttribute("expr3", getSQLExpression(e, context));
+
          return t.toString();
          }
       else if (type.equals("RDF_COALESCE"))
@@ -1225,6 +1243,9 @@ private static final String AGGREGATE_FUNCTION_WITH_TYP_CHECK = "aggregate_funct
          return t.toString();
          }
       }
+
+
+
 
 
 	private String handleExpressionForDatatype(FilterContext context,
@@ -1325,6 +1346,7 @@ private String handleDataTypeForVariable(FilterContext context, Expression e,
          e = iter.next();
          if (e instanceof VariableExpression)
             {
+        	 System.out.println("e= "+e+"\t e.var = "+((VariableExpression) e).getVariable());
             s = context.getVarMap().get(((VariableExpression) e).getVariable()).fst;
             }
          else if (e instanceof ConstantExpression)

@@ -56,19 +56,19 @@ public class FunctionCall {
 			returnType = TypeMap.BOOLEAN_ID;
 		} else if (function.getValue().equals(ENDS_WITH)) {
 			returnType = TypeMap.BOOLEAN_ID;
-		} else if (function.getValue().equals(XSD_DATETIME)) {
+		} else if (function.getValue().equals(XSD_DATETIME) || (function.getValue().equals("xsd:dateTime"))) {
 			returnType = TypeMap.DATETIME_ID;
-		} else if (function.getValue().equals(XSD_BOOLEAN)) {
+		} else if (function.getValue().equals(XSD_BOOLEAN)|| (function.getValue().equals("xsd:boolean"))) {
 			returnType = TypeMap.BOOLEAN_ID;
-		} else if (function.getValue().equals(XSD_DOUBLE)) {
+		} else if (function.getValue().equals(XSD_DOUBLE)|| (function.getValue().equals("xsd:double"))) {
 			returnType = TypeMap.DOUBLE_ID;
-		} else if (function.getValue().equals(XSD_FLOAT)) {
+		} else if (function.getValue().equals(XSD_FLOAT)|| (function.getValue().equals("xsd:float"))) {
 			returnType = TypeMap.FLOAT_ID;
-		} else if (function.getValue().equals(XSD_DECIMAL)) {
+		} else if (function.getValue().equals(XSD_DECIMAL)|| (function.getValue().equals("xsd:decimal"))) {
 			returnType = TypeMap.DECIMAL_ID;
-		} else if (function.getValue().equals(XSD_INTEGER)) {
+		} else if (function.getValue().equals(XSD_INTEGER)|| (function.getValue().equals("xsd:integer"))) {
 			returnType = TypeMap.INTEGER_ID;
-		} else if (function.getValue().equals(XSD_STRING)) {
+		} else if (function.getValue().equals(XSD_STRING)|| (function.getValue().equals("xsd:string"))) {
 			returnType = TypeMap.STRING_ID;
 		} else {
 			returnType = TypeMap.NONE_ID;

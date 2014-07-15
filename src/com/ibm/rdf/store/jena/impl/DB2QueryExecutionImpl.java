@@ -218,14 +218,14 @@ public class DB2QueryExecutionImpl implements QueryExecution
                   while (sqlrs.next())
                      {
                 	  
-                	  String S_dbValue = sqlrs.getString("DESCRIBED_RESOURCE");
+                	  String S_dbValue = sqlrs.getString("described_resource");
                       Node sNode = new String2Node(Constants.NAME_COLUMN_SUBJECT, S_dbValue).getNode().asNode();
                 	  
-                      String P_dbValue = sqlrs.getString("PROPERTY");
+                      String P_dbValue = sqlrs.getString("property");
                       Node pNode = new String2Node(Constants.NAME_COLUMN_SUBJECT, S_dbValue).getNode().asNode();
                       
-                      String O_dbValue = sqlrs.getString("OBJECT");
-                      short T_dbValue = sqlrs.getShort("TYP");
+                      String O_dbValue = sqlrs.getString("object");
+                      short T_dbValue = sqlrs.getShort("typ");
                       Node oNode = new String2Node(Constants.NAME_COLUMN_SUBJECT, S_dbValue,T_dbValue).getNode().asNode();
                       
                       Triple t = Triple.create(sNode, pNode, oNode);
@@ -375,7 +375,7 @@ public class DB2QueryExecutionImpl implements QueryExecution
             	                    	sNode = new String2Node(Constants.NAME_COLUMN_SUBJECT, sub.getVariable().toString() + blankNodeId).getNode().asNode();
             	                    	incrementBlankNodeId = true;
                                     } else {
-                                    	String dbValue = sqlrs.getString(sub.getVariable().getName());
+                                    	String dbValue = sqlrs.getString(sub.getVariable().getName().toLowerCase());
                                     	if (dbValue != null) {
                                     		sNode = new String2Node(Constants.NAME_COLUMN_SUBJECT, dbValue).getNode().asNode();
                                     	}
@@ -389,7 +389,7 @@ public class DB2QueryExecutionImpl implements QueryExecution
             				   PropertyTerm pred = t.getPredicate();
             				   if (pred.isVariable())
             				   {
-            					   String varName = sqlrs.getString(pred.getVariable().getName());
+            					   String varName = sqlrs.getString(pred.getVariable().getName().toLowerCase());
             					   if (varName != null) {
             						   pNode = new String2Node(Constants.NAME_COLUMN_PREDICATE, varName).getNode().asNode();
             					   }
@@ -404,11 +404,11 @@ public class DB2QueryExecutionImpl implements QueryExecution
             				   if (obj.isVariable())
             				   {
             					   String varName = obj.getVariable().getName();
-            					   String dbvalue = sqlrs.getString(varName);
+            					   String dbvalue = sqlrs.getString(varName.toLowerCase());
             					   if (dbvalue != null) {
             						   if (rs.isLiteralVariable(varName))
             						   {
-            							   short type = sqlrs.getShort((varName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS));
+            							   short type = sqlrs.getShort((varName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
             							   oNode = new String2Node(Constants.NAME_COLUMN_OBJECT, dbvalue, type).getNode().asNode();
             						   }
             						   else

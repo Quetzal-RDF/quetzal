@@ -52,10 +52,10 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 		}
 		
 		protected Triple extractRow(ResultSet res) throws SQLException {
-			String sub = res.getString("ENTRY");
-			String pred = res.getString("PREDICATE");
-			String obj = res.getString("VALUE");
-			short typ = res.getShort("TYPE");
+			String sub = res.getString("entry");
+			String pred = res.getString("predicate");
+			String obj = res.getString("value");
+			short typ = res.getShort("type");
 
 			Resource subject;
 			Property predicate;

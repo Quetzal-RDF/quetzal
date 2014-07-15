@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import com.ibm.rdf.store.jena.RdfStoreException;
@@ -115,6 +116,18 @@ public class TypeMap {
 
 		assert false;
 		return -1;
+	}
+	
+	public static TypeMap.TypeCategory getCastTypeCategory(Set<TypeMap.TypeCategory> types) {
+		TypeMap.TypeCategory castType = null;
+		 if (types.contains(TypeMap.TypeCategory.DATE)) {
+			 castType = TypeMap.TypeCategory.DATE;
+		 } else if (types.contains(TypeMap.TypeCategory.DATETIME)) {
+			 castType = TypeMap.TypeCategory.DATETIME;
+		 } else if (types.contains(TypeMap.TypeCategory.NUMERIC)) {
+			 castType = TypeMap.TypeCategory.NUMERIC;
+		 }
+		return castType;
 	}
 
 	public static final short DATATYPE_NUMERICS_IDS_START = idForIRI(FIRST_NUMERIC_IRI);

@@ -1,12 +1,6 @@
 group sql;
 
-sub_select(outerProject, project,target,sql_id,distinct,const_filter, endModifiers)  ::= << 
-<if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
-QS<sql_id> AS (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM <target> 
-<if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif>
-<if(endModifiers)> <endModifiers> <endif>)
-<if(outerProject)>)<endif>
->>
+
 
 not_exists(left_project,left_target,filter_constraints,sql_id)  ::= << 
 QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> WHERE <filter_constraints; separator=" AND ">)

@@ -10,11 +10,23 @@ QR<sql_id> AS ( SELECT DESCRIBED_RESOURCE, PROPERTY, COALESCE(ELEM, OBJECT) AS O
 FROM QD<sql_id> LEFT OUTER JOIN <s_target> target_temp_table ON QD<sql_id>.OBJECT = target_temp_table.list_id AND QD<sql_id>.OBJECT LIKE 'lid:%' ORDER BY QD<sql_id>.DESCRIBED_RESOURCE)	   
 >>
 
-top_select(outerProject, project,target,sql_id,distinct,const_filter, endModifiers, store_name)  ::= << 
+
+sub_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers)  ::= << 
 <if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
-<if(sql_id)> QS<sql_id> AS (<endif>SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> 
-<if(endModifiers)> <endModifiers> <endif>
-<if(sql_id)>)<endif>
+	<if(sql_id)> QS<sql_id> AS (<endif>
+		<if(project_orderby_vars)>SELECT <project_alias_name; separator=","> FROM (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","><if(project_orderby_vars)><if(project)>,<endif> <project_orderby_vars; separator=","><endif>  FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif>) AS <if(sql_id)>QS<sql_id>Nested<else> QSNested<endif>
+		<else>SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif><endif>
+	<if(sql_id)>)<endif>
+<if(outerProject)>)<endif>
+>>
+
+
+top_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers, store_name)  ::= << 
+<if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
+	<if(sql_id)> QS<sql_id> AS (<endif>
+		<if(project_orderby_vars)>SELECT <project_alias_name; separator=","> FROM (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","><if(project_orderby_vars)><if(project)>,<endif> <project_orderby_vars; separator=","><endif>  FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif>) AS <if(sql_id)>QS<sql_id>Nested<else> QSNested<endif>
+		<else>SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif><endif>
+	<if(sql_id)>)<endif>
 <if(outerProject)>)<endif>
 >>
 

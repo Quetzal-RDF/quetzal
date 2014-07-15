@@ -3,6 +3,7 @@ package com.ibm.rdf.store.sparql11.sqltemplate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import com.ibm.rdf.store.sparql11.model.AggregateExpression;
 import com.ibm.rdf.store.sparql11.model.BlankNodeVariable;
 import com.ibm.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.rdf.store.sparql11.model.Expression;
+import com.ibm.rdf.store.sparql11.model.OrderCondition;
 import com.ibm.rdf.store.sparql11.model.Pattern;
 import com.ibm.rdf.store.sparql11.model.ProjectedVariable;
 import com.ibm.rdf.store.sparql11.model.SelectClause;
@@ -63,25 +65,63 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 			SQLMapping selectDistinctMapping=new SQLMapping("distinct", selectDistinctMap, null);
 			mappings.add(selectDistinctMapping);
 		}
-		
-		List<String> projectList = getSelectProjectMapping() != null ? getSelectProjectMapping().fst : null;
+		List<String> projectAliasNames = new LinkedList<String>();
+		Pair<List<String>, Set<String>> selectProjectMapping = getSelectProjectMapping(projectAliasNames) ;
+		List<String> projectList = selectProjectMapping != null ? selectProjectMapping.fst : null;
+		boolean projectAll = false;
 		if(projectList == null || projectList.isEmpty()) {
 			projectList = new LinkedList<String>();
 			projectList.add("*");
-		}
+			assert projectAliasNames == null || projectAliasNames.isEmpty() : projectAliasNames;
+			projectAliasNames.add("*");
+			projectAll = true;
+		} 
+		SQLMapping projectAliasNameMapping=new SQLMapping("project_alias_name", projectAliasNames,null);
+		mappings.add(projectAliasNameMapping);
+		
 		SQLMapping projectMapping=new SQLMapping("project", projectList,null);
 		mappings.add(projectMapping);
 		
+		SolutionModifiers solMod = getSolutionModifiers();
+		if (!projectAll && store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name()) 
+			&& solMod!=null && solMod.getOrderClause()!=null && solMod.getOrderClause().size()>0) {
+			Set<Variable> varsInOrderBy = HashSetFactory.make();
+			for (OrderCondition order : solMod.getOrderClause()) {
+				varsInOrderBy.addAll(order.getExpression().gatherVariables());
+			}
+			Set<Variable> projectedVars = HashSetFactory.make();
+			for (ProjectedVariable pv : getProjectedVariables()) {
+				projectedVars.add(pv.getVariable());
+			}
+			Set<Variable> varsInOrderByNotInProjectedVars = HashSetFactory.make(varsInOrderBy);
+			varsInOrderByNotInProjectedVars.removeAll(projectedVars);
+			List<String> vars = new LinkedList<String>();
+			for (Variable v: varsInOrderByNotInProjectedVars) {
+				vars.add(wrapper.getRenamedVariableFor(v).getName());
+				if (!(v instanceof BlankNodeVariable)) {
+					if ( !getPattern().gatherIRIBoundVariables().contains(v)) {
+						vars.add(wrapper.getRenamedVariableFor(v).getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS );
+					}
+				}
+			}
+			SQLMapping project_orderByVarsMapping =  new SQLMapping("project_orderby_vars", 
+					vars, null);
+			mappings.add(project_orderByVarsMapping);
+		} else {
+			SQLMapping project_orderByVarsMapping =  new SQLMapping("project_orderby_vars", 
+					null, null);
+			mappings.add(project_orderByVarsMapping);
+		}
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
 		mappings.add(tMapping);
 	
 		String solnModifiers = getSolutionModifiersMappings();
 		if (solnModifiers != null && solnModifiers.length() != 0) {
-			mappings.add(new SQLMapping("endModifiers", getSolutionModifiersMappings(), null));
+			mappings.add(new SQLMapping("endModifiers", solnModifiers, null));
 		}
 		
-		Set<String> outerProject = getSelectProjectMapping() != null ? getSelectProjectMapping().snd : null;
+		Set<String> outerProject = selectProjectMapping != null ? selectProjectMapping.snd : null;
 		if (outerProject != null) {
 			mappings.add(new SQLMapping("outerProject", outerProject, null));
 		}
@@ -123,13 +163,13 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 
 
 	
-	private Pair<List<String>, Set<String>> getSelectProjectMapping() throws Exception{
+	private Pair<List<String>, Set<String>> getSelectProjectMapping(List<String> projectAliasNames) throws Exception{
 		List<ProjectedVariable> projectedVariables = getProjectedVariables();
 		if (projectedVariables == null || projectedVariables.isEmpty()) {
 			return null;
 		}
 
-		Pair<List<String>, Set<AggregateExpression>> exps = getProjectionMapping(projectedVariables);
+		Pair<List<String>, Set<AggregateExpression>> exps = getProjectionMapping(projectedVariables, projectAliasNames);
 		List<String> projectMapping = exps.fst; 
 		Set<AggregateExpression> aggregateExpressions = exps.snd;
 		
@@ -139,7 +179,9 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 				for (Variable v : e.gatherVariables()) {
 					assert varMap.containsKey(v.getName());
 					aggs.add("MIN(" + varMap.get(v.getName()).snd + ") AS " + varMap.get(v.getName()).snd + "_MIN");
-					aggs.add("MAX(" + varMap.get(v.getName()).snd + ") AS "+ varMap.get(v.getName()).snd + "_MAX");				
+					projectAliasNames.add(varMap.get(v.getName()).snd + "_MIN");
+					aggs.add("MAX(" + varMap.get(v.getName()).snd + ") AS "+ varMap.get(v.getName()).snd + "_MAX");	
+					projectAliasNames.add( varMap.get(v.getName()).snd + "_MAX");	
 				}
 			}
 		}
@@ -189,7 +231,7 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 		return t.toString();
 	}
 
-	private Pair<List<String>, Set<AggregateExpression>> getProjectionMapping(List<ProjectedVariable> projectedVariables) throws SQLWriterException {
+	private Pair<List<String>, Set<AggregateExpression>> getProjectionMapping(List<ProjectedVariable> projectedVariables, List<String> projectAliasNames) throws SQLWriterException {
 		if (projectedVariables == null || projectedVariables.isEmpty()) {
 			return null;
 		}
@@ -212,33 +254,36 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 		if (projectedVariables != null) {
 			for (ProjectedVariable pv : projectedVariables) {
 				Variable renamedpv = wrapper.getRenamedVariableFor(pv.getVariable());
-
+				
 				if (queryPatternVariables != null && queryPatternVariables.contains(pv.getVariable())) {
 					String sqlVarName = wrapper.getLastVarMappingForQueryInfo(pv.getVariable());
 					projectMapping.add(sqlVarName+" AS "+ renamedpv.getName());
+					projectAliasNames.add(renamedpv.getName());
 					if( !iriBoundVariables.contains(pv.getVariable())){
 						String sqlVarTypeName = (sqlVarName != null)?sqlVarName+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS:null; 
 						projectMapping.add(sqlVarTypeName+" AS "+ renamedpv.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+						projectAliasNames.add(renamedpv.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 					}
 				}
 				else if (pv.getExpression() != null) {
-					handleProjectedExpression(pv.getExpression(), renamedpv, projectMapping, aggregateExpressions);
+					handleProjectedExpression(pv.getExpression(), renamedpv, projectMapping, projectAliasNames, aggregateExpressions);
 				} else if (expressionsInSolutions.containsKey(pv.getVariable().getName())) {
 					Expression e = expressionsInSolutions.get(pv.getVariable().getName());
-					handleProjectedExpression(e, renamedpv, projectMapping, aggregateExpressions);
+					handleProjectedExpression(e, renamedpv, projectMapping, projectAliasNames, aggregateExpressions);
 				} else {
 					projectMapping.add(renamedpv.getName());
+					projectAliasNames.add(renamedpv.getName());
 				}
 			}
 		}
 		return Pair.make(projectMapping, aggregateExpressions);
 	}
 	
-	protected List<String> getProjectMapping() throws Exception{
-		return getSelectProjectMapping().fst;
-	}
+	/*protected List<String> getProjectMapping(List<String> projectAliasNames) throws Exception{
+		return getSelectProjectMapping(projectAliasNames).fst;
+	}*/
 	
-	private void handleProjectedExpression(Expression e, Variable renamedpv, List<String> projectMapping, Set<AggregateExpression> aggregateExpressions) throws SQLWriterException {
+	private void handleProjectedExpression(Expression e, Variable renamedpv, List<String> projectMapping,List<String> projectAliasNames, Set<AggregateExpression> aggregateExpressions) throws SQLWriterException {
 
 		FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
 		if (wrapper.getPlan() != null) {
@@ -256,12 +301,14 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 		
 		String str = expGenerator.getSQLExpression(e, context);
 
+		
 		if (e.getReturnType() == TypeMap.BOOLEAN_ID) {
 			// boolean expressions cannot be projected directly  They need to be wrapped in a case statement
 			projectMapping.add(expGenerator.wrapBooleanExpressionInCase(str) +" AS "+renamedpv.getName());
 		}  else {
 			projectMapping.add(str + " AS " + renamedpv.getName());
 		}
+		projectAliasNames.add(renamedpv.getName());
 		
 		String vtyp = null;
 		if (e instanceof AggregateExpression) {
@@ -270,9 +317,11 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 				Variable v = vars.iterator().next();
 				vtyp = varMap.get(v.getName()).snd;
 				projectMapping.add("MAX(" + vtyp + ") AS " + renamedpv.getName() + "_TYP");
+				projectAliasNames.add( renamedpv.getName() + "_TYP");
 			}
 		} else if (!(e instanceof VariableExpression) && !(e instanceof ConstantExpression)){
 			projectMapping.add(e.getReturnType() + " AS " + renamedpv.getName() + "_TYP");
+			projectAliasNames.add( renamedpv.getName() + "_TYP");
 		}
 		// done with this expression.  Add the projected variable in to varmap in case it gets referenced later in another expression
 		if (!varMap.containsKey(renamedpv.getName())) {

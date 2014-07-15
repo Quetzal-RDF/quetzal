@@ -73,9 +73,20 @@ public class BuiltinFunctionExpression extends Expression
          case LANGMATCHES:
          case EXISTS:
          case NOT_EXISTS:
+         case ISNUMERIC:
          case SAMETERM:
             returnType = TypeMap.BOOLEAN_ID;
             break;
+         case COALESCE:
+        	 short max = 0;
+        	 for (Expression e : arguments) {
+        		 if (e.getReturnType() > max) {
+        			 System.out.println(e + " has: " + e.getReturnType());
+        			 max = e.getReturnType();
+        		 }
+        	 }
+        	 returnType = max;
+        	 break;
          case STR:
             returnType = TypeMap.SIMPLE_LITERAL_ID;
             break;

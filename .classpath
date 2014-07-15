@@ -20,7 +20,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/owlapi-distribution-3.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/parser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/wala.jar"/>
-	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-3.3-complete.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsqlparser-0.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hive-exec-0.11.0-shark-0.9.1.jar"/>
@@ -33,5 +32,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/hadoop-common-2.2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/hash.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

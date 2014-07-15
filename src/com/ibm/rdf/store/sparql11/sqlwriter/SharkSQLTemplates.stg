@@ -1,4 +1,16 @@
+
+RDF_IF(expr1, expr2, expr3, type1, type2, type3)  ::= <<  (CASE WHEN <expr1> THEN <expr2> ELSE <expr3> END) >>
+
+RDF_ISBLANK(args)  ::= << 
+ (<args> LIKE '\_:%') 
+>>
+outer_aggregate_function_type_check(var, typecheck)  ::= << 
+(CASE WHEN <typecheck; separator=" AND "> THEN <var> ELSE NULL END)
+>>
+
+
 castsForColumns(column, type) ::= << <column> >>
+
 RDF_OPERATOR(left, right, operator, left_type, right_type, ltype, rtype)  ::= <<  (<left> <operator> <right>
 <if(left_type)> AND <left_type> = <right_type> <endif>) >>
 
@@ -147,8 +159,21 @@ XSD_DATETIME_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<
 (
 CASE 
     WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
-    AND	<endif> CAST( <value> as <xmlType>) IS NOT NULL THEN CAST(<value> AS <DBType>) 
-	else null end
+    AND	<endif> CAST( <value> as <xmlType>) IS NOT NULL THEN 
+        CASE 
+        	WHEN lower('<DBType>') = 'decimal'  THEN 
+    			CASE WHEN locate('E', <value>) > 0 OR locate('e', <value>) >0 THEN NULL
+    			ELSE  CAST(<value> AS <DBType>) 
+    			END 
+    		WHEN lower('<DBType>') = 'timestamp'  THEN 
+    			CASE WHEN  <value> RLIKE '^([0-9]{4})-([0-1][0-9])-([0-3][0-9]T[0-2][0-9]:[0-6][0-9]:[0-6][0-9](([0-2][0-9]:[0-6][0-9])|Z)?)$'  THEN CAST(<value> AS <DBType>)
+    			ELSE  NULL 
+    			END 
+    		ELSE
+    			CAST(<value> AS <DBType>) 
+    	END
+    	
+   ELSE NULL END
 )
 >>
 
