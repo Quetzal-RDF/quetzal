@@ -67,7 +67,7 @@ RDF_STRBEFORE(var, value)  ::= <<
 
 
 GROUP_CONCAT(var)  ::= << 
-  LISTAGG(<var>, ',') 
+  CONCAT_WS(',', collect_set(<var>)) 
 >>
 
 GT_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
