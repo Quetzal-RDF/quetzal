@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparql.g 2014-05-16 16:06:59
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparql.g 2014-07-16 17:10:17
  
 package com.ibm.rdf.store.sparql11;
 
@@ -552,9 +552,9 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: p, c, a, s, b, d
+            // elements: c, s, a, d, p, b
             // token labels: 
-            // rule labels: retval, d, b, s, c, a, p
+            // rule labels: retval, d, b, s, c, p, a
             // token list labels: 
             // rule list labels: 
             // wildcard labels: 
@@ -565,8 +565,8 @@ public class IbmSparqlParser extends Parser {
             RewriteRuleSubtreeStream stream_b=new RewriteRuleSubtreeStream(adaptor,"rule b",b!=null?b.tree:null);
             RewriteRuleSubtreeStream stream_s=new RewriteRuleSubtreeStream(adaptor,"rule s",s!=null?s.tree:null);
             RewriteRuleSubtreeStream stream_c=new RewriteRuleSubtreeStream(adaptor,"rule c",c!=null?c.tree:null);
-            RewriteRuleSubtreeStream stream_a=new RewriteRuleSubtreeStream(adaptor,"rule a",a!=null?a.tree:null);
             RewriteRuleSubtreeStream stream_p=new RewriteRuleSubtreeStream(adaptor,"rule p",p!=null?p.tree:null);
+            RewriteRuleSubtreeStream stream_a=new RewriteRuleSubtreeStream(adaptor,"rule a",a!=null?a.tree:null);
 
             root_0 = (XTree)adaptor.nil();
             // 131:3: -> ^( QUERY $p ( $s)? ( $c)? ( $d)? ( $a)? ( $b)? )
@@ -970,7 +970,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: i, p, PREFIX
+            // elements: p, PREFIX, i
             // token labels: p
             // rule labels: retval, i
             // token list labels: 
@@ -1110,7 +1110,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: s, m, w, d
+            // elements: s, w, d, m
             // token labels: 
             // rule labels: w, retval, s, m
             // token list labels: 
@@ -1264,7 +1264,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: s, w, m, d
+            // elements: m, d, s, w
             // token labels: 
             // rule labels: w, retval, d, s, m
             // token list labels: 
@@ -1577,25 +1577,25 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: e, t1, f, v1, t2, 251
+            // elements: t2, 251, v1, f, e, t1
             // token labels: t2, t1
             // rule labels: retval
             // token list labels: 
-            // rule list labels: v1, f, e
+            // rule list labels: f, v1, e
             // wildcard labels: 
             if ( state.backtracking==0 ) {
             retval.tree = root_0;
             RewriteRuleTokenStream stream_t2=new RewriteRuleTokenStream(adaptor,"token t2",t2);
             RewriteRuleTokenStream stream_t1=new RewriteRuleTokenStream(adaptor,"token t1",t1);
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
-            RewriteRuleSubtreeStream stream_v1=new RewriteRuleSubtreeStream(adaptor,"token v1",list_v1);
             RewriteRuleSubtreeStream stream_f=new RewriteRuleSubtreeStream(adaptor,"token f",list_f);
+            RewriteRuleSubtreeStream stream_v1=new RewriteRuleSubtreeStream(adaptor,"token v1",list_v1);
             RewriteRuleSubtreeStream stream_e=new RewriteRuleSubtreeStream(adaptor,"token e",list_e);
             root_0 = (XTree)adaptor.nil();
             // 171:3: -> ( ^( TYPE ( $t1)? ( $t2)? ) )? ^( PVARS ( $v1)* ( $e)* ( $f)* ( '*' )? )
             {
                 // IbmSparql.g:171:8: ( ^( TYPE ( $t1)? ( $t2)? ) )?
-                if ( stream_t1.hasNext()||stream_t2.hasNext() ) {
+                if ( stream_t2.hasNext()||stream_t1.hasNext() ) {
                     // IbmSparql.g:171:8: ^( TYPE ( $t1)? ( $t2)? )
                     {
                     XTree root_1 = (XTree)adaptor.nil();
@@ -1618,8 +1618,8 @@ public class IbmSparqlParser extends Parser {
                     }
 
                 }
-                stream_t1.reset();
                 stream_t2.reset();
+                stream_t1.reset();
                 // IbmSparql.g:171:27: ^( PVARS ( $v1)* ( $e)* ( $f)* ( '*' )? )
                 {
                 XTree root_1 = (XTree)adaptor.nil();
@@ -1733,7 +1733,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: e, v, AS
+            // elements: v, AS, e
             // token labels: 
             // rule labels: v, retval, e
             // token list labels: 
@@ -2045,7 +2045,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: s1, w1, c, CONSTRUCT, d1
+                    // elements: w1, d1, s1, CONSTRUCT, c
                     // token labels: 
                     // rule labels: retval, s1, c, w1
                     // token list labels: 
@@ -2185,7 +2185,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: s2, t, d2, CONSTRUCT
+                    // elements: d2, s2, t, CONSTRUCT
                     // token labels: 
                     // rule labels: retval, s2, t
                     // token list labels: 
@@ -2447,7 +2447,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: r, w, d, v, DESCRIBE, s
+            // elements: w, v, s, DESCRIBE, d, r
             // token labels: r
             // rule labels: w, retval, d, s
             // token list labels: 
@@ -2590,7 +2590,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: w, d, ASK
+            // elements: d, w, ASK
             // token labels: 
             // rule labels: w, retval, d
             // token list labels: 
@@ -2722,7 +2722,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: d, n, FROM
+            // elements: FROM, d, n
             // token labels: 
             // rule labels: retval, d, n
             // token list labels: 
@@ -3188,7 +3188,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: l, h, o, g
+            // elements: h, g, l, o
             // token labels: 
             // rule labels: g, retval, o, l, h
             // token list labels: 
@@ -3723,7 +3723,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: HAVING, h
+            // elements: h, HAVING
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -4347,7 +4347,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: i, LIMIT
+            // elements: LIMIT, i
             // token labels: i
             // rule labels: retval
             // token list labels: 
@@ -4428,7 +4428,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: i, OFFSET
+            // elements: OFFSET, i
             // token labels: i
             // rule labels: retval
             // token list labels: 
@@ -4671,7 +4671,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: v, bv, nil, BINDINGS
+                    // elements: nil, v, bv, BINDINGS
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -7620,7 +7620,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: graphPatternNotTriples, triplesBlock
+            // elements: triplesBlock, graphPatternNotTriples
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8466,7 +8466,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: v, b
+            // elements: b, v
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -8726,7 +8726,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: g, OPTIONAL
+            // elements: OPTIONAL, g
             // token labels: 
             // rule labels: g, retval
             // token list labels: 
@@ -8818,7 +8818,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: GRAPH, g, v
+            // elements: g, GRAPH, v
             // token labels: 
             // rule labels: v, g, retval
             // token list labels: 
@@ -8935,17 +8935,17 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: v, g, s, SERVICE
+            // elements: SERVICE, g, s, v
             // token labels: s
-            // rule labels: g, v, retval
+            // rule labels: v, g, retval
             // token list labels: 
             // rule list labels: 
             // wildcard labels: 
             if ( state.backtracking==0 ) {
             retval.tree = root_0;
             RewriteRuleTokenStream stream_s=new RewriteRuleTokenStream(adaptor,"token s",s);
-            RewriteRuleSubtreeStream stream_g=new RewriteRuleSubtreeStream(adaptor,"rule g",g!=null?g.tree:null);
             RewriteRuleSubtreeStream stream_v=new RewriteRuleSubtreeStream(adaptor,"rule v",v!=null?v.tree:null);
+            RewriteRuleSubtreeStream stream_g=new RewriteRuleSubtreeStream(adaptor,"rule g",g!=null?g.tree:null);
             RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
 
             root_0 = (XTree)adaptor.nil();
@@ -9057,7 +9057,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: e, v, BIND
+            // elements: BIND, e, v
             // token labels: 
             // rule labels: v, retval, e
             // token list labels: 
@@ -9203,7 +9203,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: g2, g1, UNION
+                    // elements: g1, UNION, g2
                     // token labels: 
                     // rule labels: retval, g1
                     // token list labels: 
@@ -9326,7 +9326,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: MINUS, n
+            // elements: n, MINUS
             // token labels: 
             // rule labels: retval, n
             // token list labels: 
@@ -9409,7 +9409,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: FILTER, c
+            // elements: c, FILTER
             // token labels: 
             // rule labels: retval, c
             // token list labels: 
@@ -9662,7 +9662,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: a, i
+            // elements: i, a
             // token labels: 
             // rule labels: retval, a, i
             // token list labels: 
@@ -9880,7 +9880,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e2, d, e1
+                    // elements: d, e2, e1
                     // token labels: d
                     // rule labels: retval, e1
                     // token list labels: 
@@ -10080,7 +10080,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e1, e2
+                    // elements: e2, e1
                     // token labels: 
                     // rule labels: retval, e1
                     // token list labels: 
@@ -11794,7 +11794,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: objectListPath, objectList
+            // elements: objectList, objectListPath
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -12175,7 +12175,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: s1, s2
+                    // elements: s2, s1
                     // token labels: 
                     // rule labels: retval, s1
                     // token list labels: 
@@ -12359,7 +12359,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: s1, s2
+                    // elements: s2, s1
                     // token labels: 
                     // rule labels: retval, s1
                     // token list labels: 
@@ -13408,7 +13408,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: c, p
+            // elements: p, c
             // token labels: 
             // rule labels: retval, c, p
             // token list labels: 
@@ -14949,7 +14949,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: c2, LOGICAL_OR, c1, c1
+            // elements: c1, LOGICAL_OR, c2, c1
             // token labels: 
             // rule labels: retval, c1
             // token list labels: 
@@ -15083,7 +15083,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: v1, v1, v2, LOGICAL_AND
+            // elements: v1, v1, LOGICAL_AND, v2
             // token labels: 
             // rule labels: v1, retval
             // token list labels: 
@@ -15694,7 +15694,7 @@ public class IbmSparqlParser extends Parser {
 
 
             	    // AST REWRITE
-            	    // elements: additiveExpression, rhs2, 263
+            	    // elements: 263, additiveExpression, rhs2
             	    // token labels: 
             	    // rule labels: retval, rhs2
             	    // token list labels: 
@@ -15802,7 +15802,7 @@ public class IbmSparqlParser extends Parser {
 
 
             	            // AST REWRITE
-            	            // elements: op1, rhs3, litp, additiveExpression
+            	            // elements: op1, rhs3, additiveExpression, litp
             	            // token labels: op1
             	            // rule labels: rhs3, retval, litp
             	            // token list labels: 
@@ -15962,7 +15962,7 @@ public class IbmSparqlParser extends Parser {
 
 
             	            // AST REWRITE
-            	            // elements: additiveExpression, op2, litn, rhs4
+            	            // elements: litn, rhs4, op2, additiveExpression
             	            // token labels: op2
             	            // rule labels: rhs4, litn, retval
             	            // token list labels: 
@@ -17610,7 +17610,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e1, STR
+                    // elements: STR, e1
                     // token labels: 
                     // rule labels: retval, e1
                     // token list labels: 
@@ -17660,7 +17660,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e2, LANG
+                    // elements: LANG, e2
                     // token labels: 
                     // rule labels: retval, e2
                     // token list labels: 
@@ -17719,7 +17719,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e4, LANGMATCHES, e3
+                    // elements: LANGMATCHES, e4, e3
                     // token labels: 
                     // rule labels: e3, e4, retval
                     // token list labels: 
@@ -17771,7 +17771,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e5, DATATYPE
+                    // elements: DATATYPE, e5
                     // token labels: 
                     // rule labels: retval, e5
                     // token list labels: 
@@ -18119,7 +18119,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ABS, e8
+                    // elements: e8, ABS
                     // token labels: 
                     // rule labels: retval, e8
                     // token list labels: 
@@ -18169,7 +18169,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e9, CEIL
+                    // elements: CEIL, e9
                     // token labels: 
                     // rule labels: retval, e9
                     // token list labels: 
@@ -18219,7 +18219,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: FLOOR, e10
+                    // elements: e10, FLOOR
                     // token labels: 
                     // rule labels: retval, e10
                     // token list labels: 
@@ -18396,7 +18396,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: STRLEN, e13
+                    // elements: e13, STRLEN
                     // token labels: 
                     // rule labels: retval, e13
                     // token list labels: 
@@ -18560,7 +18560,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e16, ENCODE_FOR_URI
+                    // elements: ENCODE_FOR_URI, e16
                     // token labels: 
                     // rule labels: retval, e16
                     // token list labels: 
@@ -18619,7 +18619,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e17, e18, CONTAINS
+                    // elements: CONTAINS, e17, e18
                     // token labels: 
                     // rule labels: retval, e18, e17
                     // token list labels: 
@@ -18680,7 +18680,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: STRSTARTS, e19, e20
+                    // elements: STRSTARTS, e20, e19
                     // token labels: 
                     // rule labels: retval, e19, e20
                     // token list labels: 
@@ -18863,7 +18863,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: STRAFTER, e21, e22
+                    // elements: e22, STRAFTER, e21
                     // token labels: 
                     // rule labels: retval, e22, e21
                     // token list labels: 
@@ -19015,7 +19015,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e25, DAY
+                    // elements: DAY, e25
                     // token labels: 
                     // rule labels: retval, e25
                     // token list labels: 
@@ -19065,7 +19065,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: HOURS, e26
+                    // elements: e26, HOURS
                     // token labels: 
                     // rule labels: retval, e26
                     // token list labels: 
@@ -19165,7 +19165,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: SECONDS, e28
+                    // elements: e28, SECONDS
                     // token labels: 
                     // rule labels: retval, e28
                     // token list labels: 
@@ -19265,7 +19265,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e30, TZ
+                    // elements: TZ, e30
                     // token labels: 
                     // rule labels: e30, retval
                     // token list labels: 
@@ -19420,7 +19420,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: MD5, e31
+                    // elements: e31, MD5
                     // token labels: 
                     // rule labels: e31, retval
                     // token list labels: 
@@ -19570,7 +19570,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e34, SHA256
+                    // elements: SHA256, e34
                     // token labels: 
                     // rule labels: retval, e34
                     // token list labels: 
@@ -19620,7 +19620,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: SHA384, e35
+                    // elements: e35, SHA384
                     // token labels: 
                     // rule labels: retval, e35
                     // token list labels: 
@@ -19670,7 +19670,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: SHA512, e36
+                    // elements: e36, SHA512
                     // token labels: 
                     // rule labels: retval, e36
                     // token list labels: 
@@ -19782,7 +19782,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e40, e38, e39, IF
+                    // elements: e40, e38, IF, e39
                     // token labels: 
                     // rule labels: e40, retval, e38, e39
                     // token list labels: 
@@ -19845,7 +19845,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: STRLANG, e42, e41
+                    // elements: e42, e41, STRLANG
                     // token labels: 
                     // rule labels: retval, e41, e42
                     // token list labels: 
@@ -19906,7 +19906,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e44, STRDT, e43
+                    // elements: e43, e44, STRDT
                     // token labels: 
                     // rule labels: retval, e43, e44
                     // token list labels: 
@@ -19967,7 +19967,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e46, SAMETERM, e45
+                    // elements: SAMETERM, e45, e46
                     // token labels: 
                     // rule labels: retval, e45, e46
                     // token list labels: 
@@ -20119,7 +20119,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: ISBLANK, e52
+                    // elements: e52, ISBLANK
                     // token labels: 
                     // rule labels: retval, e52
                     // token list labels: 
@@ -20219,7 +20219,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: e50, ISNUMERIC
+                    // elements: ISNUMERIC, e50
                     // token labels: 
                     // rule labels: retval, e50
                     // token list labels: 
@@ -20402,7 +20402,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: e3, REGEX, e2, e1
+            // elements: REGEX, e2, e3, e1
             // token labels: 
             // rule labels: e3, retval, e1, e2
             // token list labels: 
@@ -20550,7 +20550,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: e1, SUBSTR, e3, e2
+            // elements: e3, e2, SUBSTR, e1
             // token labels: 
             // rule labels: e3, retval, e1, e2
             // token list labels: 
@@ -20711,7 +20711,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: e1, REPLACE, e4, e2, e3
+            // elements: e3, e1, e2, e4, REPLACE
             // token labels: 
             // rule labels: e3, e4, retval, e1, e2
             // token list labels: 
@@ -21176,7 +21176,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: 251, COUNT, d1, e1
+                    // elements: 251, e1, COUNT, d1
                     // token labels: d1
                     // rule labels: retval, e1
                     // token list labels: 
@@ -21341,7 +21341,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: MIN, e3, d3
+                    // elements: e3, d3, MIN
                     // token labels: d3
                     // rule labels: e3, retval
                     // token list labels: 
@@ -21418,7 +21418,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: MAX, d4, e4
+                    // elements: e4, d4, MAX
                     // token labels: d4
                     // rule labels: e4, retval
                     // token list labels: 
@@ -21495,7 +21495,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: d5, e5, AVG
+                    // elements: AVG, d5, e5
                     // token labels: d5
                     // rule labels: retval, e5
                     // token list labels: 
@@ -21572,7 +21572,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: d6, e6, SAMPLE
+                    // elements: SAMPLE, d6, e6
                     // token labels: d6
                     // rule labels: retval, e6
                     // token list labels: 
@@ -21681,7 +21681,7 @@ public class IbmSparqlParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: SEPARATOR, GROUP_CONCAT, e7, d7, s
+                    // elements: d7, e7, s, GROUP_CONCAT, SEPARATOR
                     // token labels: d7
                     // rule labels: retval, s, e7
                     // token list labels: 
@@ -21710,7 +21710,7 @@ public class IbmSparqlParser extends Parser {
                         stream_d7.reset();
                         adaptor.addChild(root_1, stream_e7.nextTree());
                         // IbmSparql.g:882:33: ( ^( SEPARATOR $s) )?
-                        if ( stream_SEPARATOR.hasNext()||stream_s.hasNext() ) {
+                        if ( stream_s.hasNext()||stream_SEPARATOR.hasNext() ) {
                             // IbmSparql.g:882:33: ^( SEPARATOR $s)
                             {
                             XTree root_2 = (XTree)adaptor.nil();
@@ -21722,8 +21722,8 @@ public class IbmSparqlParser extends Parser {
                             }
 
                         }
-                        stream_SEPARATOR.reset();
                         stream_s.reset();
+                        stream_SEPARATOR.reset();
 
                         adaptor.addChild(root_0, root_1);
                         }
@@ -21815,7 +21815,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: i, a, i
+            // elements: a, i, i
             // token labels: 
             // rule labels: retval, a, i
             // token list labels: 

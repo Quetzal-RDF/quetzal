@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparqlAstWalker.g 2014-05-16 16:07:10
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparqlAstWalker.g 2014-07-16 17:10:28
  
 package com.ibm.rdf.store.sparql11;
 	
@@ -9004,7 +9004,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     match(input, Token.UP, null); if (state.failed) return e;
                     if ( state.backtracking==0 ) {
-                       args.add(e7); e = new BuiltinFunctionExpression(Expression.EBuiltinType.URI, args);			
+                       args.add(e7); e = new BuiltinFunctionExpression(Expression.EBuiltinType.IRI, args);			
                     }
 
                     }

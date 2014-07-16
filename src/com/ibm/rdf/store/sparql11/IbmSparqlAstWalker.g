@@ -824,7 +824,7 @@ builtInCall	returns [Expression e]
 	|	^(IRI e6=expression)
 			{ args.add(e6); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.IRI, args);			}
 	| 	^(URI e7=expression)
-			{ args.add(e7); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.URI, args);			}
+			{ args.add(e7); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.IRI, args);			}
 	|	^(BNODE e8=expression)
 			{ args.add(e8); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.BNODE, args);		}
 	|	BNODE
