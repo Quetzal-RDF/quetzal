@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparqlAstRewriter.g 2014-07-16 17:10:27
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparqlAstRewriter.g 2014-07-17 09:08:07
  
 package com.ibm.rdf.store.sparql11;
 	
@@ -967,7 +967,7 @@ public class IbmSparqlAstRewriter extends TreeRewriter {
 
 
             // AST REWRITE
-            // elements: GROUP_GRAPH_PATTERN, x, x
+            // elements: x, GROUP_GRAPH_PATTERN, x
             // token labels: 
             // rule labels: retval
             // token list labels: 

@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparqlAstWalker.g 2014-07-16 17:10:28
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparqlAstWalker.g 2014-07-17 09:08:09
  
 package com.ibm.rdf.store.sparql11;
 	
@@ -2348,7 +2348,6 @@ public class IbmSparqlAstWalker extends TreeParser {
                 case STRUUID:
                 case MD5:
                 case SHA1:
-                case SHA224:
                 case SHA256:
                 case SHA384:
                 case SHA512:
@@ -2523,7 +2522,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                 int alt31=2;
                 int LA31_0 = input.LA(1);
 
-                if ( ((LA31_0>=FUNCTION && LA31_0<=NOT_EXISTS)||(LA31_0>=STR && LA31_0<=EXISTS)) ) {
+                if ( ((LA31_0>=FUNCTION && LA31_0<=NOT_EXISTS)||(LA31_0>=STR && LA31_0<=SHA1)||(LA31_0>=SHA256 && LA31_0<=EXISTS)) ) {
                     alt31=1;
                 }
 
@@ -2631,7 +2630,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                 int alt32=2;
                 int LA32_0 = input.LA(1);
 
-                if ( (LA32_0==VAR||(LA32_0>=FUNCTION && LA32_0<=NOT_EXISTS)||(LA32_0>=ASC && LA32_0<=DESC)||(LA32_0>=STR && LA32_0<=EXISTS)) ) {
+                if ( (LA32_0==VAR||(LA32_0>=FUNCTION && LA32_0<=NOT_EXISTS)||(LA32_0>=ASC && LA32_0<=DESC)||(LA32_0>=STR && LA32_0<=SHA1)||(LA32_0>=SHA256 && LA32_0<=EXISTS)) ) {
                     alt32=1;
                 }
 
@@ -2747,7 +2746,6 @@ public class IbmSparqlAstWalker extends TreeParser {
             case STRUUID:
             case MD5:
             case SHA1:
-            case SHA224:
             case SHA256:
             case SHA384:
             case SHA512:
@@ -2835,7 +2833,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                     int alt33=2;
                     int LA33_0 = input.LA(1);
 
-                    if ( ((LA33_0>=FUNCTION && LA33_0<=NOT_EXISTS)||(LA33_0>=STR && LA33_0<=EXISTS)) ) {
+                    if ( ((LA33_0>=FUNCTION && LA33_0<=NOT_EXISTS)||(LA33_0>=STR && LA33_0<=SHA1)||(LA33_0>=SHA256 && LA33_0<=EXISTS)) ) {
                         alt33=1;
                     }
                     else if ( (LA33_0==VAR) ) {
@@ -4897,7 +4895,6 @@ public class IbmSparqlAstWalker extends TreeParser {
             case STRUUID:
             case MD5:
             case SHA1:
-            case SHA224:
             case SHA256:
             case SHA384:
             case SHA512:
@@ -5115,7 +5112,6 @@ public class IbmSparqlAstWalker extends TreeParser {
             case STRUUID:
             case MD5:
             case SHA1:
-            case SHA224:
             case SHA256:
             case SHA384:
             case SHA512:
@@ -5181,7 +5177,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                         int alt57=2;
                         int LA57_0 = input.LA(1);
 
-                        if ( ((LA57_0>=BROKEN_PLUS && LA57_0<=BROKEN_MINUS)||(LA57_0>=VAR && LA57_0<=NOT_EXISTS)||(LA57_0>=STRING && LA57_0<=BOOLEAN)||LA57_0==LTE||(LA57_0>=BIG_INTEGER && LA57_0<=BIG_DECIMAL)||(LA57_0>=LOGICAL_OR && LA57_0<=GROUP_CONCAT)||LA57_0==DOUBLE||LA57_0==251||LA57_0==254||(LA57_0>=257 && LA57_0<=263)) ) {
+                        if ( ((LA57_0>=BROKEN_PLUS && LA57_0<=BROKEN_MINUS)||(LA57_0>=VAR && LA57_0<=NOT_EXISTS)||(LA57_0>=STRING && LA57_0<=BOOLEAN)||LA57_0==LTE||(LA57_0>=BIG_INTEGER && LA57_0<=BIG_DECIMAL)||(LA57_0>=LOGICAL_OR && LA57_0<=SHA1)||(LA57_0>=SHA256 && LA57_0<=GROUP_CONCAT)||LA57_0==DOUBLE||LA57_0==251||LA57_0==254||(LA57_0>=257 && LA57_0<=263)) ) {
                             alt57=1;
                         }
 
@@ -5225,7 +5221,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                         int alt58=2;
                         int LA58_0 = input.LA(1);
 
-                        if ( ((LA58_0>=BROKEN_PLUS && LA58_0<=BROKEN_MINUS)||(LA58_0>=VAR && LA58_0<=NOT_EXISTS)||(LA58_0>=STRING && LA58_0<=BOOLEAN)||LA58_0==LTE||(LA58_0>=BIG_INTEGER && LA58_0<=BIG_DECIMAL)||(LA58_0>=LOGICAL_OR && LA58_0<=GROUP_CONCAT)||LA58_0==DOUBLE||LA58_0==251||LA58_0==254||(LA58_0>=257 && LA58_0<=263)) ) {
+                        if ( ((LA58_0>=BROKEN_PLUS && LA58_0<=BROKEN_MINUS)||(LA58_0>=VAR && LA58_0<=NOT_EXISTS)||(LA58_0>=STRING && LA58_0<=BOOLEAN)||LA58_0==LTE||(LA58_0>=BIG_INTEGER && LA58_0<=BIG_DECIMAL)||(LA58_0>=LOGICAL_OR && LA58_0<=SHA1)||(LA58_0>=SHA256 && LA58_0<=GROUP_CONCAT)||LA58_0==DOUBLE||LA58_0==251||LA58_0==254||(LA58_0>=257 && LA58_0<=263)) ) {
                             alt58=1;
                         }
 
@@ -5290,7 +5286,7 @@ public class IbmSparqlAstWalker extends TreeParser {
             if ( (LA61_0==NIL) ) {
                 alt61=1;
             }
-            else if ( ((LA61_0>=BROKEN_PLUS && LA61_0<=BROKEN_MINUS)||(LA61_0>=VAR && LA61_0<=NOT_EXISTS)||(LA61_0>=STRING && LA61_0<=BOOLEAN)||LA61_0==LTE||(LA61_0>=BIG_INTEGER && LA61_0<=BIG_DECIMAL)||(LA61_0>=LOGICAL_OR && LA61_0<=GROUP_CONCAT)||LA61_0==DOUBLE||LA61_0==251||LA61_0==254||(LA61_0>=257 && LA61_0<=263)) ) {
+            else if ( ((LA61_0>=BROKEN_PLUS && LA61_0<=BROKEN_MINUS)||(LA61_0>=VAR && LA61_0<=NOT_EXISTS)||(LA61_0>=STRING && LA61_0<=BOOLEAN)||LA61_0==LTE||(LA61_0>=BIG_INTEGER && LA61_0<=BIG_DECIMAL)||(LA61_0>=LOGICAL_OR && LA61_0<=SHA1)||(LA61_0>=SHA256 && LA61_0<=GROUP_CONCAT)||LA61_0==DOUBLE||LA61_0==251||LA61_0==254||(LA61_0>=257 && LA61_0<=263)) ) {
                 alt61=2;
             }
             else {
@@ -5318,7 +5314,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                         int alt60=2;
                         int LA60_0 = input.LA(1);
 
-                        if ( ((LA60_0>=BROKEN_PLUS && LA60_0<=BROKEN_MINUS)||(LA60_0>=VAR && LA60_0<=NOT_EXISTS)||(LA60_0>=STRING && LA60_0<=BOOLEAN)||LA60_0==LTE||(LA60_0>=BIG_INTEGER && LA60_0<=BIG_DECIMAL)||(LA60_0>=LOGICAL_OR && LA60_0<=GROUP_CONCAT)||LA60_0==DOUBLE||LA60_0==251||LA60_0==254||(LA60_0>=257 && LA60_0<=263)) ) {
+                        if ( ((LA60_0>=BROKEN_PLUS && LA60_0<=BROKEN_MINUS)||(LA60_0>=VAR && LA60_0<=NOT_EXISTS)||(LA60_0>=STRING && LA60_0<=BOOLEAN)||LA60_0==LTE||(LA60_0>=BIG_INTEGER && LA60_0<=BIG_DECIMAL)||(LA60_0>=LOGICAL_OR && LA60_0<=SHA1)||(LA60_0>=SHA256 && LA60_0<=GROUP_CONCAT)||LA60_0==DOUBLE||LA60_0==251||LA60_0==254||(LA60_0>=257 && LA60_0<=263)) ) {
                             alt60=1;
                         }
 
@@ -7825,7 +7821,6 @@ public class IbmSparqlAstWalker extends TreeParser {
             case STRUUID:
             case MD5:
             case SHA1:
-            case SHA224:
             case SHA256:
             case SHA384:
             case SHA512:
@@ -7889,7 +7884,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                         int alt91=2;
                         int LA91_0 = input.LA(1);
 
-                        if ( ((LA91_0>=BROKEN_PLUS && LA91_0<=BROKEN_MINUS)||(LA91_0>=VAR && LA91_0<=NOT_EXISTS)||(LA91_0>=STRING && LA91_0<=BOOLEAN)||LA91_0==LTE||(LA91_0>=BIG_INTEGER && LA91_0<=BIG_DECIMAL)||(LA91_0>=LOGICAL_OR && LA91_0<=GROUP_CONCAT)||LA91_0==DOUBLE||LA91_0==251||LA91_0==254||(LA91_0>=257 && LA91_0<=263)) ) {
+                        if ( ((LA91_0>=BROKEN_PLUS && LA91_0<=BROKEN_MINUS)||(LA91_0>=VAR && LA91_0<=NOT_EXISTS)||(LA91_0>=STRING && LA91_0<=BOOLEAN)||LA91_0==LTE||(LA91_0>=BIG_INTEGER && LA91_0<=BIG_DECIMAL)||(LA91_0>=LOGICAL_OR && LA91_0<=SHA1)||(LA91_0>=SHA256 && LA91_0<=GROUP_CONCAT)||LA91_0==DOUBLE||LA91_0==251||LA91_0==254||(LA91_0>=257 && LA91_0<=263)) ) {
                             alt91=1;
                         }
 
@@ -7953,7 +7948,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                         int alt92=2;
                         int LA92_0 = input.LA(1);
 
-                        if ( ((LA92_0>=BROKEN_PLUS && LA92_0<=BROKEN_MINUS)||(LA92_0>=VAR && LA92_0<=NOT_EXISTS)||(LA92_0>=STRING && LA92_0<=BOOLEAN)||LA92_0==LTE||(LA92_0>=BIG_INTEGER && LA92_0<=BIG_DECIMAL)||(LA92_0>=LOGICAL_OR && LA92_0<=GROUP_CONCAT)||LA92_0==DOUBLE||LA92_0==251||LA92_0==254||(LA92_0>=257 && LA92_0<=263)) ) {
+                        if ( ((LA92_0>=BROKEN_PLUS && LA92_0<=BROKEN_MINUS)||(LA92_0>=VAR && LA92_0<=NOT_EXISTS)||(LA92_0>=STRING && LA92_0<=BOOLEAN)||LA92_0==LTE||(LA92_0>=BIG_INTEGER && LA92_0<=BIG_DECIMAL)||(LA92_0>=LOGICAL_OR && LA92_0<=SHA1)||(LA92_0>=SHA256 && LA92_0<=GROUP_CONCAT)||LA92_0==DOUBLE||LA92_0==251||LA92_0==254||(LA92_0>=257 && LA92_0<=263)) ) {
                             alt92=1;
                         }
 
@@ -8266,7 +8261,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                     int alt93=2;
                     int LA93_0 = input.LA(1);
 
-                    if ( ((LA93_0>=BROKEN_PLUS && LA93_0<=BROKEN_MINUS)||(LA93_0>=VAR && LA93_0<=NOT_EXISTS)||(LA93_0>=STRING && LA93_0<=BOOLEAN)||LA93_0==LTE||(LA93_0>=BIG_INTEGER && LA93_0<=BIG_DECIMAL)||(LA93_0>=LOGICAL_OR && LA93_0<=GROUP_CONCAT)||LA93_0==DOUBLE||LA93_0==251||LA93_0==254||(LA93_0>=257 && LA93_0<=263)) ) {
+                    if ( ((LA93_0>=BROKEN_PLUS && LA93_0<=BROKEN_MINUS)||(LA93_0>=VAR && LA93_0<=NOT_EXISTS)||(LA93_0>=STRING && LA93_0<=BOOLEAN)||LA93_0==LTE||(LA93_0>=BIG_INTEGER && LA93_0<=BIG_DECIMAL)||(LA93_0>=LOGICAL_OR && LA93_0<=SHA1)||(LA93_0>=SHA256 && LA93_0<=GROUP_CONCAT)||LA93_0==DOUBLE||LA93_0==251||LA93_0==254||(LA93_0>=257 && LA93_0<=263)) ) {
                         alt93=1;
                     }
                     switch (alt93) {
@@ -8347,7 +8342,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                     int alt94=2;
                     int LA94_0 = input.LA(1);
 
-                    if ( ((LA94_0>=BROKEN_PLUS && LA94_0<=BROKEN_MINUS)||(LA94_0>=VAR && LA94_0<=NOT_EXISTS)||(LA94_0>=STRING && LA94_0<=BOOLEAN)||LA94_0==LTE||(LA94_0>=BIG_INTEGER && LA94_0<=BIG_DECIMAL)||(LA94_0>=LOGICAL_OR && LA94_0<=GROUP_CONCAT)||LA94_0==DOUBLE||LA94_0==251||LA94_0==254||(LA94_0>=257 && LA94_0<=263)) ) {
+                    if ( ((LA94_0>=BROKEN_PLUS && LA94_0<=BROKEN_MINUS)||(LA94_0>=VAR && LA94_0<=NOT_EXISTS)||(LA94_0>=STRING && LA94_0<=BOOLEAN)||LA94_0==LTE||(LA94_0>=BIG_INTEGER && LA94_0<=BIG_DECIMAL)||(LA94_0>=LOGICAL_OR && LA94_0<=SHA1)||(LA94_0>=SHA256 && LA94_0<=GROUP_CONCAT)||LA94_0==DOUBLE||LA94_0==251||LA94_0==254||(LA94_0>=257 && LA94_0<=263)) ) {
                         alt94=1;
                     }
                     switch (alt94) {
@@ -8730,7 +8725,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "builtInCall"
-    // IbmSparqlAstWalker.g:810:1: builtInCall returns [Expression e] : ( ^( STR st= expression ) | ^( LANG lg= expression ) | ^( LANGMATCHES lm1= expression lm2= expression ) | ^( DATATYPE dt= expression ) | ^( BOUND v= var ) | ^( IRI e6= expression ) | ^( URI e7= expression ) | ^( BNODE e8= expression ) | BNODE | ^( RAND NIL ) | ^( ABS e9= expression ) | ^( CEIL e10= expression ) | ^( FLOOR e11= expression ) | ^( ROUND e12= expression ) | ^( CONCAT e13= expressionList ) | ^( SUBSTR e14= expression e15= expression (e16= expression )? ) | ^( STRLEN e15= expression ) | ^( UCASE e16= expression ) | ^( REPLACE e1= expression e2= expression e3= expression (e4= expression )? ) | ^( LCASE e17= expression ) | ^( ENCODE_FOR_URI e18= expression ) | ^( CONTAINS e19= expression e20= expression ) | ^( STRSTARTS e21= expression e22= expression ) | ^( STRENDS e23= expression e24= expression ) | ^( STRBEFORE e241= expression e242= expression ) | ^( STRAFTER e243= expression e244= expression ) | ^( YEAR e25= expression ) | ^( MONTH e26= expression ) | ^( DAY e27= expression ) | ^( HOURS e28= expression ) | ^( MINUTES e29= expression ) | ^( SECONDS e30= expression ) | ^( TIMEZONE e31= expression ) | ^( TZ e32= expression ) | NOW | UUID | STRUUID | ^( MD5 e33= expression ) | ^( SHA1 e34= expression ) | ^( SHA224 e35= expression ) | ^( SHA256 e36= expression ) | ^( SHA384 e37= expression ) | ^( SHA512 e38= expression ) | ^( COALESCE e39= expressionList ) | ^( IF e40= expression e41= expression e42= expression ) | ^( STRLANG e45= expression e46= expression ) | ^( STRDT e47= expression e48= expression ) | ^( SAMETERM sam1= expression sam2= expression ) | ^( ISIRI isi= expression ) | ^( ISURI isu= expression ) | ^( ISBLANK isb= expression ) | ^( ISLITERAL isl= expression ) | ^( ISNUMERIC e55= expression ) | r= regexExpression | p= existsFunc | p= notExistsFunc );
+    // IbmSparqlAstWalker.g:810:1: builtInCall returns [Expression e] : ( ^( STR st= expression ) | ^( LANG lg= expression ) | ^( LANGMATCHES lm1= expression lm2= expression ) | ^( DATATYPE dt= expression ) | ^( BOUND v= var ) | ^( IRI e6= expression ) | ^( URI e7= expression ) | ^( BNODE e8= expression ) | BNODE | ^( RAND NIL ) | ^( ABS e9= expression ) | ^( CEIL e10= expression ) | ^( FLOOR e11= expression ) | ^( ROUND e12= expression ) | ^( CONCAT e13= expressionList ) | ^( SUBSTR e14= expression e15= expression (e16= expression )? ) | ^( STRLEN e15= expression ) | ^( UCASE e16= expression ) | ^( REPLACE e1= expression e2= expression e3= expression (e4= expression )? ) | ^( LCASE e17= expression ) | ^( ENCODE_FOR_URI e18= expression ) | ^( CONTAINS e19= expression e20= expression ) | ^( STRSTARTS e21= expression e22= expression ) | ^( STRENDS e23= expression e24= expression ) | ^( STRBEFORE e241= expression e242= expression ) | ^( STRAFTER e243= expression e244= expression ) | ^( YEAR e25= expression ) | ^( MONTH e26= expression ) | ^( DAY e27= expression ) | ^( HOURS e28= expression ) | ^( MINUTES e29= expression ) | ^( SECONDS e30= expression ) | ^( TIMEZONE e31= expression ) | ^( TZ e32= expression ) | NOW | UUID | STRUUID | ^( MD5 e33= expression ) | ^( SHA1 e34= expression ) | ^( SHA256 e36= expression ) | ^( SHA384 e37= expression ) | ^( SHA512 e38= expression ) | ^( COALESCE e39= expressionList ) | ^( IF e40= expression e41= expression e42= expression ) | ^( STRLANG e45= expression e46= expression ) | ^( STRDT e47= expression e48= expression ) | ^( SAMETERM sam1= expression sam2= expression ) | ^( ISIRI isi= expression ) | ^( ISURI isu= expression ) | ^( ISBLANK isb= expression ) | ^( ISLITERAL isl= expression ) | ^( ISNUMERIC e55= expression ) | r= regexExpression | p= existsFunc | p= notExistsFunc );
     public final Expression builtInCall() throws RecognitionException {
         Expression e = null;
 
@@ -8820,8 +8815,6 @@ public class IbmSparqlAstWalker extends TreeParser {
 
         Expression e34 = null;
 
-        Expression e35 = null;
-
         Expression e36 = null;
 
         Expression e37 = null;
@@ -8867,8 +8860,8 @@ public class IbmSparqlAstWalker extends TreeParser {
         		ArrayList args = new ArrayList();
         	
         try {
-            // IbmSparqlAstWalker.g:814:2: ( ^( STR st= expression ) | ^( LANG lg= expression ) | ^( LANGMATCHES lm1= expression lm2= expression ) | ^( DATATYPE dt= expression ) | ^( BOUND v= var ) | ^( IRI e6= expression ) | ^( URI e7= expression ) | ^( BNODE e8= expression ) | BNODE | ^( RAND NIL ) | ^( ABS e9= expression ) | ^( CEIL e10= expression ) | ^( FLOOR e11= expression ) | ^( ROUND e12= expression ) | ^( CONCAT e13= expressionList ) | ^( SUBSTR e14= expression e15= expression (e16= expression )? ) | ^( STRLEN e15= expression ) | ^( UCASE e16= expression ) | ^( REPLACE e1= expression e2= expression e3= expression (e4= expression )? ) | ^( LCASE e17= expression ) | ^( ENCODE_FOR_URI e18= expression ) | ^( CONTAINS e19= expression e20= expression ) | ^( STRSTARTS e21= expression e22= expression ) | ^( STRENDS e23= expression e24= expression ) | ^( STRBEFORE e241= expression e242= expression ) | ^( STRAFTER e243= expression e244= expression ) | ^( YEAR e25= expression ) | ^( MONTH e26= expression ) | ^( DAY e27= expression ) | ^( HOURS e28= expression ) | ^( MINUTES e29= expression ) | ^( SECONDS e30= expression ) | ^( TIMEZONE e31= expression ) | ^( TZ e32= expression ) | NOW | UUID | STRUUID | ^( MD5 e33= expression ) | ^( SHA1 e34= expression ) | ^( SHA224 e35= expression ) | ^( SHA256 e36= expression ) | ^( SHA384 e37= expression ) | ^( SHA512 e38= expression ) | ^( COALESCE e39= expressionList ) | ^( IF e40= expression e41= expression e42= expression ) | ^( STRLANG e45= expression e46= expression ) | ^( STRDT e47= expression e48= expression ) | ^( SAMETERM sam1= expression sam2= expression ) | ^( ISIRI isi= expression ) | ^( ISURI isu= expression ) | ^( ISBLANK isb= expression ) | ^( ISLITERAL isl= expression ) | ^( ISNUMERIC e55= expression ) | r= regexExpression | p= existsFunc | p= notExistsFunc )
-            int alt99=56;
+            // IbmSparqlAstWalker.g:814:2: ( ^( STR st= expression ) | ^( LANG lg= expression ) | ^( LANGMATCHES lm1= expression lm2= expression ) | ^( DATATYPE dt= expression ) | ^( BOUND v= var ) | ^( IRI e6= expression ) | ^( URI e7= expression ) | ^( BNODE e8= expression ) | BNODE | ^( RAND NIL ) | ^( ABS e9= expression ) | ^( CEIL e10= expression ) | ^( FLOOR e11= expression ) | ^( ROUND e12= expression ) | ^( CONCAT e13= expressionList ) | ^( SUBSTR e14= expression e15= expression (e16= expression )? ) | ^( STRLEN e15= expression ) | ^( UCASE e16= expression ) | ^( REPLACE e1= expression e2= expression e3= expression (e4= expression )? ) | ^( LCASE e17= expression ) | ^( ENCODE_FOR_URI e18= expression ) | ^( CONTAINS e19= expression e20= expression ) | ^( STRSTARTS e21= expression e22= expression ) | ^( STRENDS e23= expression e24= expression ) | ^( STRBEFORE e241= expression e242= expression ) | ^( STRAFTER e243= expression e244= expression ) | ^( YEAR e25= expression ) | ^( MONTH e26= expression ) | ^( DAY e27= expression ) | ^( HOURS e28= expression ) | ^( MINUTES e29= expression ) | ^( SECONDS e30= expression ) | ^( TIMEZONE e31= expression ) | ^( TZ e32= expression ) | NOW | UUID | STRUUID | ^( MD5 e33= expression ) | ^( SHA1 e34= expression ) | ^( SHA256 e36= expression ) | ^( SHA384 e37= expression ) | ^( SHA512 e38= expression ) | ^( COALESCE e39= expressionList ) | ^( IF e40= expression e41= expression e42= expression ) | ^( STRLANG e45= expression e46= expression ) | ^( STRDT e47= expression e48= expression ) | ^( SAMETERM sam1= expression sam2= expression ) | ^( ISIRI isi= expression ) | ^( ISURI isu= expression ) | ^( ISBLANK isb= expression ) | ^( ISLITERAL isl= expression ) | ^( ISNUMERIC e55= expression ) | r= regexExpression | p= existsFunc | p= notExistsFunc )
+            int alt99=55;
             alt99 = dfa99.predict(input);
             switch (alt99) {
                 case 1 :
@@ -9171,7 +9164,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                     int alt97=2;
                     int LA97_0 = input.LA(1);
 
-                    if ( ((LA97_0>=BROKEN_PLUS && LA97_0<=BROKEN_MINUS)||(LA97_0>=VAR && LA97_0<=NOT_EXISTS)||(LA97_0>=STRING && LA97_0<=BOOLEAN)||LA97_0==LTE||(LA97_0>=BIG_INTEGER && LA97_0<=BIG_DECIMAL)||(LA97_0>=LOGICAL_OR && LA97_0<=GROUP_CONCAT)||LA97_0==DOUBLE||LA97_0==251||LA97_0==254||(LA97_0>=257 && LA97_0<=263)) ) {
+                    if ( ((LA97_0>=BROKEN_PLUS && LA97_0<=BROKEN_MINUS)||(LA97_0>=VAR && LA97_0<=NOT_EXISTS)||(LA97_0>=STRING && LA97_0<=BOOLEAN)||LA97_0==LTE||(LA97_0>=BIG_INTEGER && LA97_0<=BIG_DECIMAL)||(LA97_0>=LOGICAL_OR && LA97_0<=SHA1)||(LA97_0>=SHA256 && LA97_0<=GROUP_CONCAT)||LA97_0==DOUBLE||LA97_0==251||LA97_0==254||(LA97_0>=257 && LA97_0<=263)) ) {
                         alt97=1;
                     }
                     switch (alt97) {
@@ -9268,7 +9261,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                     int alt98=2;
                     int LA98_0 = input.LA(1);
 
-                    if ( ((LA98_0>=BROKEN_PLUS && LA98_0<=BROKEN_MINUS)||(LA98_0>=VAR && LA98_0<=NOT_EXISTS)||(LA98_0>=STRING && LA98_0<=BOOLEAN)||LA98_0==LTE||(LA98_0>=BIG_INTEGER && LA98_0<=BIG_DECIMAL)||(LA98_0>=LOGICAL_OR && LA98_0<=GROUP_CONCAT)||LA98_0==DOUBLE||LA98_0==251||LA98_0==254||(LA98_0>=257 && LA98_0<=263)) ) {
+                    if ( ((LA98_0>=BROKEN_PLUS && LA98_0<=BROKEN_MINUS)||(LA98_0>=VAR && LA98_0<=NOT_EXISTS)||(LA98_0>=STRING && LA98_0<=BOOLEAN)||LA98_0==LTE||(LA98_0>=BIG_INTEGER && LA98_0<=BIG_DECIMAL)||(LA98_0>=LOGICAL_OR && LA98_0<=SHA1)||(LA98_0>=SHA256 && LA98_0<=GROUP_CONCAT)||LA98_0==DOUBLE||LA98_0==251||LA98_0==254||(LA98_0>=257 && LA98_0<=263)) ) {
                         alt98=1;
                     }
                     switch (alt98) {
@@ -9676,31 +9669,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 40 :
-                    // IbmSparqlAstWalker.g:895:4: ^( SHA224 e35= expression )
+                    // IbmSparqlAstWalker.g:895:4: ^( SHA256 e36= expression )
                     {
-                    match(input,SHA224,FOLLOW_SHA224_in_builtInCall6711); if (state.failed) return e;
+                    match(input,SHA256,FOLLOW_SHA256_in_builtInCall6711); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
                     pushFollow(FOLLOW_expression_in_builtInCall6715);
-                    e35=expression();
-
-                    state._fsp--;
-                    if (state.failed) return e;
-
-                    match(input, Token.UP, null); if (state.failed) return e;
-                    if ( state.backtracking==0 ) {
-                       e = new BuiltinFunctionExpression(Expression.EBuiltinType.SHA224, e35); 			
-                    }
-
-                    }
-                    break;
-                case 41 :
-                    // IbmSparqlAstWalker.g:897:4: ^( SHA256 e36= expression )
-                    {
-                    match(input,SHA256,FOLLOW_SHA256_in_builtInCall6727); if (state.failed) return e;
-
-                    match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6731);
                     e36=expression();
 
                     state._fsp--;
@@ -9713,13 +9687,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 42 :
-                    // IbmSparqlAstWalker.g:899:4: ^( SHA384 e37= expression )
+                case 41 :
+                    // IbmSparqlAstWalker.g:897:4: ^( SHA384 e37= expression )
                     {
-                    match(input,SHA384,FOLLOW_SHA384_in_builtInCall6743); if (state.failed) return e;
+                    match(input,SHA384,FOLLOW_SHA384_in_builtInCall6727); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6747);
+                    pushFollow(FOLLOW_expression_in_builtInCall6731);
                     e37=expression();
 
                     state._fsp--;
@@ -9732,13 +9706,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 43 :
-                    // IbmSparqlAstWalker.g:901:4: ^( SHA512 e38= expression )
+                case 42 :
+                    // IbmSparqlAstWalker.g:899:4: ^( SHA512 e38= expression )
                     {
-                    match(input,SHA512,FOLLOW_SHA512_in_builtInCall6759); if (state.failed) return e;
+                    match(input,SHA512,FOLLOW_SHA512_in_builtInCall6743); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6763);
+                    pushFollow(FOLLOW_expression_in_builtInCall6747);
                     e38=expression();
 
                     state._fsp--;
@@ -9751,13 +9725,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 44 :
-                    // IbmSparqlAstWalker.g:903:4: ^( COALESCE e39= expressionList )
+                case 43 :
+                    // IbmSparqlAstWalker.g:901:4: ^( COALESCE e39= expressionList )
                     {
-                    match(input,COALESCE,FOLLOW_COALESCE_in_builtInCall6775); if (state.failed) return e;
+                    match(input,COALESCE,FOLLOW_COALESCE_in_builtInCall6759); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expressionList_in_builtInCall6779);
+                    pushFollow(FOLLOW_expressionList_in_builtInCall6763);
                     e39=expressionList();
 
                     state._fsp--;
@@ -9770,23 +9744,23 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 45 :
-                    // IbmSparqlAstWalker.g:905:4: ^( IF e40= expression e41= expression e42= expression )
+                case 44 :
+                    // IbmSparqlAstWalker.g:903:4: ^( IF e40= expression e41= expression e42= expression )
                     {
-                    match(input,IF,FOLLOW_IF_in_builtInCall6791); if (state.failed) return e;
+                    match(input,IF,FOLLOW_IF_in_builtInCall6775); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6795);
+                    pushFollow(FOLLOW_expression_in_builtInCall6779);
                     e40=expression();
 
                     state._fsp--;
                     if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6799);
+                    pushFollow(FOLLOW_expression_in_builtInCall6783);
                     e41=expression();
 
                     state._fsp--;
                     if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6803);
+                    pushFollow(FOLLOW_expression_in_builtInCall6787);
                     e42=expression();
 
                     state._fsp--;
@@ -9799,18 +9773,18 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 46 :
-                    // IbmSparqlAstWalker.g:907:4: ^( STRLANG e45= expression e46= expression )
+                case 45 :
+                    // IbmSparqlAstWalker.g:905:4: ^( STRLANG e45= expression e46= expression )
                     {
-                    match(input,STRLANG,FOLLOW_STRLANG_in_builtInCall6815); if (state.failed) return e;
+                    match(input,STRLANG,FOLLOW_STRLANG_in_builtInCall6799); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6819);
+                    pushFollow(FOLLOW_expression_in_builtInCall6803);
                     e45=expression();
 
                     state._fsp--;
                     if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6823);
+                    pushFollow(FOLLOW_expression_in_builtInCall6807);
                     e46=expression();
 
                     state._fsp--;
@@ -9823,18 +9797,18 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 47 :
-                    // IbmSparqlAstWalker.g:909:4: ^( STRDT e47= expression e48= expression )
+                case 46 :
+                    // IbmSparqlAstWalker.g:907:4: ^( STRDT e47= expression e48= expression )
                     {
-                    match(input,STRDT,FOLLOW_STRDT_in_builtInCall6835); if (state.failed) return e;
+                    match(input,STRDT,FOLLOW_STRDT_in_builtInCall6819); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6839);
+                    pushFollow(FOLLOW_expression_in_builtInCall6823);
                     e47=expression();
 
                     state._fsp--;
                     if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6843);
+                    pushFollow(FOLLOW_expression_in_builtInCall6827);
                     e48=expression();
 
                     state._fsp--;
@@ -9847,18 +9821,18 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 48 :
-                    // IbmSparqlAstWalker.g:911:4: ^( SAMETERM sam1= expression sam2= expression )
+                case 47 :
+                    // IbmSparqlAstWalker.g:909:4: ^( SAMETERM sam1= expression sam2= expression )
                     {
-                    match(input,SAMETERM,FOLLOW_SAMETERM_in_builtInCall6855); if (state.failed) return e;
+                    match(input,SAMETERM,FOLLOW_SAMETERM_in_builtInCall6839); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6859);
+                    pushFollow(FOLLOW_expression_in_builtInCall6843);
                     sam1=expression();
 
                     state._fsp--;
                     if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6863);
+                    pushFollow(FOLLOW_expression_in_builtInCall6847);
                     sam2=expression();
 
                     state._fsp--;
@@ -9871,13 +9845,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 49 :
-                    // IbmSparqlAstWalker.g:913:4: ^( ISIRI isi= expression )
+                case 48 :
+                    // IbmSparqlAstWalker.g:911:4: ^( ISIRI isi= expression )
                     {
-                    match(input,ISIRI,FOLLOW_ISIRI_in_builtInCall6875); if (state.failed) return e;
+                    match(input,ISIRI,FOLLOW_ISIRI_in_builtInCall6859); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6879);
+                    pushFollow(FOLLOW_expression_in_builtInCall6863);
                     isi=expression();
 
                     state._fsp--;
@@ -9890,13 +9864,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 50 :
-                    // IbmSparqlAstWalker.g:915:4: ^( ISURI isu= expression )
+                case 49 :
+                    // IbmSparqlAstWalker.g:913:4: ^( ISURI isu= expression )
                     {
-                    match(input,ISURI,FOLLOW_ISURI_in_builtInCall6891); if (state.failed) return e;
+                    match(input,ISURI,FOLLOW_ISURI_in_builtInCall6875); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6895);
+                    pushFollow(FOLLOW_expression_in_builtInCall6879);
                     isu=expression();
 
                     state._fsp--;
@@ -9904,18 +9878,18 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     match(input, Token.UP, null); if (state.failed) return e;
                     if ( state.backtracking==0 ) {
-                       args.add(isu); e = new BuiltinFunctionExpression(Expression.EBuiltinType.ISURI, args); 		
+                       args.add(isu); e = new BuiltinFunctionExpression(Expression.EBuiltinType.ISIRI, args); 		
                     }
 
                     }
                     break;
-                case 51 :
-                    // IbmSparqlAstWalker.g:917:4: ^( ISBLANK isb= expression )
+                case 50 :
+                    // IbmSparqlAstWalker.g:915:4: ^( ISBLANK isb= expression )
                     {
-                    match(input,ISBLANK,FOLLOW_ISBLANK_in_builtInCall6907); if (state.failed) return e;
+                    match(input,ISBLANK,FOLLOW_ISBLANK_in_builtInCall6891); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6911);
+                    pushFollow(FOLLOW_expression_in_builtInCall6895);
                     isb=expression();
 
                     state._fsp--;
@@ -9928,13 +9902,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 52 :
-                    // IbmSparqlAstWalker.g:919:4: ^( ISLITERAL isl= expression )
+                case 51 :
+                    // IbmSparqlAstWalker.g:917:4: ^( ISLITERAL isl= expression )
                     {
-                    match(input,ISLITERAL,FOLLOW_ISLITERAL_in_builtInCall6923); if (state.failed) return e;
+                    match(input,ISLITERAL,FOLLOW_ISLITERAL_in_builtInCall6907); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6927);
+                    pushFollow(FOLLOW_expression_in_builtInCall6911);
                     isl=expression();
 
                     state._fsp--;
@@ -9947,13 +9921,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 53 :
-                    // IbmSparqlAstWalker.g:921:4: ^( ISNUMERIC e55= expression )
+                case 52 :
+                    // IbmSparqlAstWalker.g:919:4: ^( ISNUMERIC e55= expression )
                     {
-                    match(input,ISNUMERIC,FOLLOW_ISNUMERIC_in_builtInCall6939); if (state.failed) return e;
+                    match(input,ISNUMERIC,FOLLOW_ISNUMERIC_in_builtInCall6923); if (state.failed) return e;
 
                     match(input, Token.DOWN, null); if (state.failed) return e;
-                    pushFollow(FOLLOW_expression_in_builtInCall6943);
+                    pushFollow(FOLLOW_expression_in_builtInCall6927);
                     e55=expression();
 
                     state._fsp--;
@@ -9966,10 +9940,10 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 54 :
-                    // IbmSparqlAstWalker.g:923:4: r= regexExpression
+                case 53 :
+                    // IbmSparqlAstWalker.g:921:4: r= regexExpression
                     {
-                    pushFollow(FOLLOW_regexExpression_in_builtInCall6956);
+                    pushFollow(FOLLOW_regexExpression_in_builtInCall6940);
                     r=regexExpression();
 
                     state._fsp--;
@@ -9980,10 +9954,10 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 55 :
-                    // IbmSparqlAstWalker.g:924:4: p= existsFunc
+                case 54 :
+                    // IbmSparqlAstWalker.g:922:4: p= existsFunc
                     {
-                    pushFollow(FOLLOW_existsFunc_in_builtInCall6965);
+                    pushFollow(FOLLOW_existsFunc_in_builtInCall6949);
                     p=existsFunc();
 
                     state._fsp--;
@@ -9994,10 +9968,10 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
                     break;
-                case 56 :
-                    // IbmSparqlAstWalker.g:925:4: p= notExistsFunc
+                case 55 :
+                    // IbmSparqlAstWalker.g:923:4: p= notExistsFunc
                     {
-                    pushFollow(FOLLOW_notExistsFunc_in_builtInCall6974);
+                    pushFollow(FOLLOW_notExistsFunc_in_builtInCall6958);
                     p=notExistsFunc();
 
                     state._fsp--;
@@ -10023,7 +9997,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "regexExpression"
-    // IbmSparqlAstWalker.g:928:1: regexExpression returns [Expression e] : ^( REGEX e1= expression e2= expression (e3= expression )? ) ;
+    // IbmSparqlAstWalker.g:926:1: regexExpression returns [Expression e] : ^( REGEX e1= expression e2= expression (e3= expression )? ) ;
     public final Expression regexExpression() throws RecognitionException {
         Expression e = null;
 
@@ -10035,34 +10009,34 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:929:2: ( ^( REGEX e1= expression e2= expression (e3= expression )? ) )
-            // IbmSparqlAstWalker.g:929:6: ^( REGEX e1= expression e2= expression (e3= expression )? )
+            // IbmSparqlAstWalker.g:927:2: ( ^( REGEX e1= expression e2= expression (e3= expression )? ) )
+            // IbmSparqlAstWalker.g:927:6: ^( REGEX e1= expression e2= expression (e3= expression )? )
             {
-            match(input,REGEX,FOLLOW_REGEX_in_regexExpression6997); if (state.failed) return e;
+            match(input,REGEX,FOLLOW_REGEX_in_regexExpression6981); if (state.failed) return e;
 
             match(input, Token.DOWN, null); if (state.failed) return e;
-            pushFollow(FOLLOW_expression_in_regexExpression7001);
+            pushFollow(FOLLOW_expression_in_regexExpression6985);
             e1=expression();
 
             state._fsp--;
             if (state.failed) return e;
-            pushFollow(FOLLOW_expression_in_regexExpression7005);
+            pushFollow(FOLLOW_expression_in_regexExpression6989);
             e2=expression();
 
             state._fsp--;
             if (state.failed) return e;
-            // IbmSparqlAstWalker.g:929:44: (e3= expression )?
+            // IbmSparqlAstWalker.g:927:44: (e3= expression )?
             int alt100=2;
             int LA100_0 = input.LA(1);
 
-            if ( ((LA100_0>=BROKEN_PLUS && LA100_0<=BROKEN_MINUS)||(LA100_0>=VAR && LA100_0<=NOT_EXISTS)||(LA100_0>=STRING && LA100_0<=BOOLEAN)||LA100_0==LTE||(LA100_0>=BIG_INTEGER && LA100_0<=BIG_DECIMAL)||(LA100_0>=LOGICAL_OR && LA100_0<=GROUP_CONCAT)||LA100_0==DOUBLE||LA100_0==251||LA100_0==254||(LA100_0>=257 && LA100_0<=263)) ) {
+            if ( ((LA100_0>=BROKEN_PLUS && LA100_0<=BROKEN_MINUS)||(LA100_0>=VAR && LA100_0<=NOT_EXISTS)||(LA100_0>=STRING && LA100_0<=BOOLEAN)||LA100_0==LTE||(LA100_0>=BIG_INTEGER && LA100_0<=BIG_DECIMAL)||(LA100_0>=LOGICAL_OR && LA100_0<=SHA1)||(LA100_0>=SHA256 && LA100_0<=GROUP_CONCAT)||LA100_0==DOUBLE||LA100_0==251||LA100_0==254||(LA100_0>=257 && LA100_0<=263)) ) {
                 alt100=1;
             }
             switch (alt100) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:929:44: e3= expression
+                    // IbmSparqlAstWalker.g:927:44: e3= expression
                     {
-                    pushFollow(FOLLOW_expression_in_regexExpression7009);
+                    pushFollow(FOLLOW_expression_in_regexExpression6993);
                     e3=expression();
 
                     state._fsp--;
@@ -10094,7 +10068,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "existsFunc"
-    // IbmSparqlAstWalker.g:933:1: existsFunc returns [Pattern p] : ^( EXISTS g= groupGraphPattern[false] ) ;
+    // IbmSparqlAstWalker.g:931:1: existsFunc returns [Pattern p] : ^( EXISTS g= groupGraphPattern[false] ) ;
     public final Pattern existsFunc() throws RecognitionException {
         Pattern p = null;
 
@@ -10102,13 +10076,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:934:2: ( ^( EXISTS g= groupGraphPattern[false] ) )
-            // IbmSparqlAstWalker.g:934:6: ^( EXISTS g= groupGraphPattern[false] )
+            // IbmSparqlAstWalker.g:932:2: ( ^( EXISTS g= groupGraphPattern[false] ) )
+            // IbmSparqlAstWalker.g:932:6: ^( EXISTS g= groupGraphPattern[false] )
             {
-            match(input,EXISTS,FOLLOW_EXISTS_in_existsFunc7041); if (state.failed) return p;
+            match(input,EXISTS,FOLLOW_EXISTS_in_existsFunc7025); if (state.failed) return p;
 
             match(input, Token.DOWN, null); if (state.failed) return p;
-            pushFollow(FOLLOW_groupGraphPattern_in_existsFunc7045);
+            pushFollow(FOLLOW_groupGraphPattern_in_existsFunc7029);
             g=groupGraphPattern(false);
 
             state._fsp--;
@@ -10134,7 +10108,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "notExistsFunc"
-    // IbmSparqlAstWalker.g:938:1: notExistsFunc returns [Pattern p] : ^( NOT_EXISTS g= groupGraphPattern[false] ) ;
+    // IbmSparqlAstWalker.g:936:1: notExistsFunc returns [Pattern p] : ^( NOT_EXISTS g= groupGraphPattern[false] ) ;
     public final Pattern notExistsFunc() throws RecognitionException {
         Pattern p = null;
 
@@ -10142,13 +10116,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:939:2: ( ^( NOT_EXISTS g= groupGraphPattern[false] ) )
-            // IbmSparqlAstWalker.g:939:6: ^( NOT_EXISTS g= groupGraphPattern[false] )
+            // IbmSparqlAstWalker.g:937:2: ( ^( NOT_EXISTS g= groupGraphPattern[false] ) )
+            // IbmSparqlAstWalker.g:937:6: ^( NOT_EXISTS g= groupGraphPattern[false] )
             {
-            match(input,NOT_EXISTS,FOLLOW_NOT_EXISTS_in_notExistsFunc7076); if (state.failed) return p;
+            match(input,NOT_EXISTS,FOLLOW_NOT_EXISTS_in_notExistsFunc7060); if (state.failed) return p;
 
             match(input, Token.DOWN, null); if (state.failed) return p;
-            pushFollow(FOLLOW_groupGraphPattern_in_notExistsFunc7080);
+            pushFollow(FOLLOW_groupGraphPattern_in_notExistsFunc7064);
             g=groupGraphPattern(false);
 
             state._fsp--;
@@ -10174,7 +10148,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "aggregate"
-    // IbmSparqlAstWalker.g:943:1: aggregate returns [AggregateExpression a] : ( ^( COUNT ( DISTINCT )? (e1= expression | '*' ) ) | ^( SUM ( DISTINCT )? e2= expression ) | ^( MIN ( DISTINCT )? e3= expression ) | ^( MAX ( DISTINCT )? e4= expression ) | ^( AVG ( DISTINCT )? e5= expression ) | ^( SAMPLE ( DISTINCT )? e6= expression ) | ^( GROUP_CONCAT ( DISTINCT )? e7= expression ( ^( SEPARATOR s= string ) )? ) );
+    // IbmSparqlAstWalker.g:941:1: aggregate returns [AggregateExpression a] : ( ^( COUNT ( DISTINCT )? (e1= expression | '*' ) ) | ^( SUM ( DISTINCT )? e2= expression ) | ^( MIN ( DISTINCT )? e3= expression ) | ^( MAX ( DISTINCT )? e4= expression ) | ^( AVG ( DISTINCT )? e5= expression ) | ^( SAMPLE ( DISTINCT )? e6= expression ) | ^( GROUP_CONCAT ( DISTINCT )? e7= expression ( ^( SEPARATOR s= string ) )? ) );
     public final AggregateExpression aggregate() throws RecognitionException {
         AggregateExpression a = null;
 
@@ -10199,7 +10173,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         		a = new AggregateExpression(); 
         	
         try {
-            // IbmSparqlAstWalker.g:947:2: ( ^( COUNT ( DISTINCT )? (e1= expression | '*' ) ) | ^( SUM ( DISTINCT )? e2= expression ) | ^( MIN ( DISTINCT )? e3= expression ) | ^( MAX ( DISTINCT )? e4= expression ) | ^( AVG ( DISTINCT )? e5= expression ) | ^( SAMPLE ( DISTINCT )? e6= expression ) | ^( GROUP_CONCAT ( DISTINCT )? e7= expression ( ^( SEPARATOR s= string ) )? ) )
+            // IbmSparqlAstWalker.g:945:2: ( ^( COUNT ( DISTINCT )? (e1= expression | '*' ) ) | ^( SUM ( DISTINCT )? e2= expression ) | ^( MIN ( DISTINCT )? e3= expression ) | ^( MAX ( DISTINCT )? e4= expression ) | ^( AVG ( DISTINCT )? e5= expression ) | ^( SAMPLE ( DISTINCT )? e6= expression ) | ^( GROUP_CONCAT ( DISTINCT )? e7= expression ( ^( SEPARATOR s= string ) )? ) )
             int alt110=7;
             switch ( input.LA(1) ) {
             case COUNT:
@@ -10247,16 +10221,16 @@ public class IbmSparqlAstWalker extends TreeParser {
 
             switch (alt110) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:948:3: ^( COUNT ( DISTINCT )? (e1= expression | '*' ) )
+                    // IbmSparqlAstWalker.g:946:3: ^( COUNT ( DISTINCT )? (e1= expression | '*' ) )
                     {
-                    match(input,COUNT,FOLLOW_COUNT_in_aggregate7115); if (state.failed) return a;
+                    match(input,COUNT,FOLLOW_COUNT_in_aggregate7099); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.COUNT);  	
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:949:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:947:4: ( DISTINCT )?
                     int alt101=2;
                     int LA101_0 = input.LA(1);
 
@@ -10265,9 +10239,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt101) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:949:5: DISTINCT
+                            // IbmSparqlAstWalker.g:947:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7127); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7111); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10277,11 +10251,11 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    // IbmSparqlAstWalker.g:950:4: (e1= expression | '*' )
+                    // IbmSparqlAstWalker.g:948:4: (e1= expression | '*' )
                     int alt102=2;
                     int LA102_0 = input.LA(1);
 
-                    if ( ((LA102_0>=BROKEN_PLUS && LA102_0<=BROKEN_MINUS)||(LA102_0>=VAR && LA102_0<=NOT_EXISTS)||(LA102_0>=STRING && LA102_0<=BOOLEAN)||LA102_0==LTE||(LA102_0>=BIG_INTEGER && LA102_0<=BIG_DECIMAL)||(LA102_0>=LOGICAL_OR && LA102_0<=GROUP_CONCAT)||LA102_0==DOUBLE||LA102_0==254||(LA102_0>=257 && LA102_0<=263)) ) {
+                    if ( ((LA102_0>=BROKEN_PLUS && LA102_0<=BROKEN_MINUS)||(LA102_0>=VAR && LA102_0<=NOT_EXISTS)||(LA102_0>=STRING && LA102_0<=BOOLEAN)||LA102_0==LTE||(LA102_0>=BIG_INTEGER && LA102_0<=BIG_DECIMAL)||(LA102_0>=LOGICAL_OR && LA102_0<=SHA1)||(LA102_0>=SHA256 && LA102_0<=GROUP_CONCAT)||LA102_0==DOUBLE||LA102_0==254||(LA102_0>=257 && LA102_0<=263)) ) {
                         alt102=1;
                     }
                     else if ( (LA102_0==251) ) {
@@ -10310,9 +10284,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt102) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:950:6: e1= expression
+                            // IbmSparqlAstWalker.g:948:6: e1= expression
                             {
-                            pushFollow(FOLLOW_expression_in_aggregate7184);
+                            pushFollow(FOLLOW_expression_in_aggregate7168);
                             e1=expression();
 
                             state._fsp--;
@@ -10324,9 +10298,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                             }
                             break;
                         case 2 :
-                            // IbmSparqlAstWalker.g:951:6: '*'
+                            // IbmSparqlAstWalker.g:949:6: '*'
                             {
-                            match(input,251,FOLLOW_251_in_aggregate7194); if (state.failed) return a;
+                            match(input,251,FOLLOW_251_in_aggregate7178); if (state.failed) return a;
 
                             }
                             break;
@@ -10339,16 +10313,16 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:954:5: ^( SUM ( DISTINCT )? e2= expression )
+                    // IbmSparqlAstWalker.g:952:5: ^( SUM ( DISTINCT )? e2= expression )
                     {
-                    match(input,SUM,FOLLOW_SUM_in_aggregate7214); if (state.failed) return a;
+                    match(input,SUM,FOLLOW_SUM_in_aggregate7198); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.SUM);  	
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:955:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:953:4: ( DISTINCT )?
                     int alt103=2;
                     int LA103_0 = input.LA(1);
 
@@ -10357,9 +10331,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt103) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:955:5: DISTINCT
+                            // IbmSparqlAstWalker.g:953:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7226); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7210); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10369,7 +10343,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    pushFollow(FOLLOW_expression_in_aggregate7243);
+                    pushFollow(FOLLOW_expression_in_aggregate7227);
                     e2=expression();
 
                     state._fsp--;
@@ -10383,16 +10357,16 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // IbmSparqlAstWalker.g:958:4: ^( MIN ( DISTINCT )? e3= expression )
+                    // IbmSparqlAstWalker.g:956:4: ^( MIN ( DISTINCT )? e3= expression )
                     {
-                    match(input,MIN,FOLLOW_MIN_in_aggregate7256); if (state.failed) return a;
+                    match(input,MIN,FOLLOW_MIN_in_aggregate7240); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.MIN);  	
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:959:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:957:4: ( DISTINCT )?
                     int alt104=2;
                     int LA104_0 = input.LA(1);
 
@@ -10401,9 +10375,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt104) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:959:5: DISTINCT
+                            // IbmSparqlAstWalker.g:957:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7269); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7253); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10413,7 +10387,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    pushFollow(FOLLOW_expression_in_aggregate7285);
+                    pushFollow(FOLLOW_expression_in_aggregate7269);
                     e3=expression();
 
                     state._fsp--;
@@ -10427,16 +10401,16 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // IbmSparqlAstWalker.g:962:4: ^( MAX ( DISTINCT )? e4= expression )
+                    // IbmSparqlAstWalker.g:960:4: ^( MAX ( DISTINCT )? e4= expression )
                     {
-                    match(input,MAX,FOLLOW_MAX_in_aggregate7298); if (state.failed) return a;
+                    match(input,MAX,FOLLOW_MAX_in_aggregate7282); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.MAX);  	
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:963:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:961:4: ( DISTINCT )?
                     int alt105=2;
                     int LA105_0 = input.LA(1);
 
@@ -10445,9 +10419,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt105) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:963:5: DISTINCT
+                            // IbmSparqlAstWalker.g:961:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7311); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7295); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10457,7 +10431,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    pushFollow(FOLLOW_expression_in_aggregate7328);
+                    pushFollow(FOLLOW_expression_in_aggregate7312);
                     e4=expression();
 
                     state._fsp--;
@@ -10471,16 +10445,16 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 5 :
-                    // IbmSparqlAstWalker.g:966:4: ^( AVG ( DISTINCT )? e5= expression )
+                    // IbmSparqlAstWalker.g:964:4: ^( AVG ( DISTINCT )? e5= expression )
                     {
-                    match(input,AVG,FOLLOW_AVG_in_aggregate7341); if (state.failed) return a;
+                    match(input,AVG,FOLLOW_AVG_in_aggregate7325); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.AVG);  	
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:967:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:965:4: ( DISTINCT )?
                     int alt106=2;
                     int LA106_0 = input.LA(1);
 
@@ -10489,9 +10463,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt106) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:967:5: DISTINCT
+                            // IbmSparqlAstWalker.g:965:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7354); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7338); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10501,7 +10475,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    pushFollow(FOLLOW_expression_in_aggregate7371);
+                    pushFollow(FOLLOW_expression_in_aggregate7355);
                     e5=expression();
 
                     state._fsp--;
@@ -10515,16 +10489,16 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 6 :
-                    // IbmSparqlAstWalker.g:970:4: ^( SAMPLE ( DISTINCT )? e6= expression )
+                    // IbmSparqlAstWalker.g:968:4: ^( SAMPLE ( DISTINCT )? e6= expression )
                     {
-                    match(input,SAMPLE,FOLLOW_SAMPLE_in_aggregate7384); if (state.failed) return a;
+                    match(input,SAMPLE,FOLLOW_SAMPLE_in_aggregate7368); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.SAMPLE);  
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:971:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:969:4: ( DISTINCT )?
                     int alt107=2;
                     int LA107_0 = input.LA(1);
 
@@ -10533,9 +10507,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt107) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:971:5: DISTINCT
+                            // IbmSparqlAstWalker.g:969:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7396); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7380); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10545,7 +10519,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    pushFollow(FOLLOW_expression_in_aggregate7413);
+                    pushFollow(FOLLOW_expression_in_aggregate7397);
                     e6=expression();
 
                     state._fsp--;
@@ -10559,16 +10533,16 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 7 :
-                    // IbmSparqlAstWalker.g:974:5: ^( GROUP_CONCAT ( DISTINCT )? e7= expression ( ^( SEPARATOR s= string ) )? )
+                    // IbmSparqlAstWalker.g:972:5: ^( GROUP_CONCAT ( DISTINCT )? e7= expression ( ^( SEPARATOR s= string ) )? )
                     {
-                    match(input,GROUP_CONCAT,FOLLOW_GROUP_CONCAT_in_aggregate7427); if (state.failed) return a;
+                    match(input,GROUP_CONCAT,FOLLOW_GROUP_CONCAT_in_aggregate7411); if (state.failed) return a;
 
                     if ( state.backtracking==0 ) {
                        a.setAggregationType(AggregateExpression.EType.GROUP_CONCAT); 
                     }
 
                     match(input, Token.DOWN, null); if (state.failed) return a;
-                    // IbmSparqlAstWalker.g:975:4: ( DISTINCT )?
+                    // IbmSparqlAstWalker.g:973:4: ( DISTINCT )?
                     int alt108=2;
                     int LA108_0 = input.LA(1);
 
@@ -10577,9 +10551,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt108) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:975:5: DISTINCT
+                            // IbmSparqlAstWalker.g:973:5: DISTINCT
                             {
-                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7439); if (state.failed) return a;
+                            match(input,DISTINCT,FOLLOW_DISTINCT_in_aggregate7423); if (state.failed) return a;
                             if ( state.backtracking==0 ) {
                                a.isDistinct(true);	
                             }
@@ -10589,7 +10563,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
                     }
 
-                    pushFollow(FOLLOW_expression_in_aggregate7454);
+                    pushFollow(FOLLOW_expression_in_aggregate7438);
                     e7=expression();
 
                     state._fsp--;
@@ -10597,7 +10571,7 @@ public class IbmSparqlAstWalker extends TreeParser {
                     if ( state.backtracking==0 ) {
                        a.setArgs(e7);		
                     }
-                    // IbmSparqlAstWalker.g:977:4: ( ^( SEPARATOR s= string ) )?
+                    // IbmSparqlAstWalker.g:975:4: ( ^( SEPARATOR s= string ) )?
                     int alt109=2;
                     int LA109_0 = input.LA(1);
 
@@ -10606,12 +10580,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     switch (alt109) {
                         case 1 :
-                            // IbmSparqlAstWalker.g:977:5: ^( SEPARATOR s= string )
+                            // IbmSparqlAstWalker.g:975:5: ^( SEPARATOR s= string )
                             {
-                            match(input,SEPARATOR,FOLLOW_SEPARATOR_in_aggregate7465); if (state.failed) return a;
+                            match(input,SEPARATOR,FOLLOW_SEPARATOR_in_aggregate7449); if (state.failed) return a;
 
                             match(input, Token.DOWN, null); if (state.failed) return a;
-                            pushFollow(FOLLOW_string_in_aggregate7469);
+                            pushFollow(FOLLOW_string_in_aggregate7453);
                             s=string();
 
                             state._fsp--;
@@ -10647,7 +10621,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "iRIFunction"
-    // IbmSparqlAstWalker.g:981:1: iRIFunction returns [FunctionCall f] : ^( FUNCTION i= iRIref (a= argList )? ) ;
+    // IbmSparqlAstWalker.g:979:1: iRIFunction returns [FunctionCall f] : ^( FUNCTION i= iRIref (a= argList )? ) ;
     public final FunctionCall iRIFunction() throws RecognitionException {
         FunctionCall f = null;
 
@@ -10657,13 +10631,13 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:982:2: ( ^( FUNCTION i= iRIref (a= argList )? ) )
-            // IbmSparqlAstWalker.g:982:6: ^( FUNCTION i= iRIref (a= argList )? )
+            // IbmSparqlAstWalker.g:980:2: ( ^( FUNCTION i= iRIref (a= argList )? ) )
+            // IbmSparqlAstWalker.g:980:6: ^( FUNCTION i= iRIref (a= argList )? )
             {
-            match(input,FUNCTION,FOLLOW_FUNCTION_in_iRIFunction7498); if (state.failed) return f;
+            match(input,FUNCTION,FOLLOW_FUNCTION_in_iRIFunction7482); if (state.failed) return f;
 
             match(input, Token.DOWN, null); if (state.failed) return f;
-            pushFollow(FOLLOW_iRIref_in_iRIFunction7508);
+            pushFollow(FOLLOW_iRIref_in_iRIFunction7492);
             i=iRIref();
 
             state._fsp--;
@@ -10671,18 +10645,18 @@ public class IbmSparqlAstWalker extends TreeParser {
             if ( state.backtracking==0 ) {
                f = new FunctionCall(i); 
             }
-            // IbmSparqlAstWalker.g:984:5: (a= argList )?
+            // IbmSparqlAstWalker.g:982:5: (a= argList )?
             int alt111=2;
             int LA111_0 = input.LA(1);
 
-            if ( ((LA111_0>=BROKEN_PLUS && LA111_0<=NIL)||(LA111_0>=VAR && LA111_0<=NOT_EXISTS)||(LA111_0>=STRING && LA111_0<=BOOLEAN)||LA111_0==LTE||(LA111_0>=BIG_INTEGER && LA111_0<=BIG_DECIMAL)||LA111_0==DISTINCT||(LA111_0>=LOGICAL_OR && LA111_0<=GROUP_CONCAT)||LA111_0==DOUBLE||LA111_0==251||LA111_0==254||(LA111_0>=257 && LA111_0<=263)) ) {
+            if ( ((LA111_0>=BROKEN_PLUS && LA111_0<=NIL)||(LA111_0>=VAR && LA111_0<=NOT_EXISTS)||(LA111_0>=STRING && LA111_0<=BOOLEAN)||LA111_0==LTE||(LA111_0>=BIG_INTEGER && LA111_0<=BIG_DECIMAL)||LA111_0==DISTINCT||(LA111_0>=LOGICAL_OR && LA111_0<=SHA1)||(LA111_0>=SHA256 && LA111_0<=GROUP_CONCAT)||LA111_0==DOUBLE||LA111_0==251||LA111_0==254||(LA111_0>=257 && LA111_0<=263)) ) {
                 alt111=1;
             }
             switch (alt111) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:984:6: a= argList
+                    // IbmSparqlAstWalker.g:982:6: a= argList
                     {
-                    pushFollow(FOLLOW_argList_in_iRIFunction7520);
+                    pushFollow(FOLLOW_argList_in_iRIFunction7504);
                     a=argList();
 
                     state._fsp--;
@@ -10714,7 +10688,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "rDFLiteral"
-    // IbmSparqlAstWalker.g:988:1: rDFLiteral returns [StringLiteral sl] : s= string (l= LANGTAG | ( '^^' i= iRIref ) )? ;
+    // IbmSparqlAstWalker.g:986:1: rDFLiteral returns [StringLiteral sl] : s= string (l= LANGTAG | ( '^^' i= iRIref ) )? ;
     public final StringLiteral rDFLiteral() throws RecognitionException {
         StringLiteral sl = null;
 
@@ -10725,10 +10699,10 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:989:2: (s= string (l= LANGTAG | ( '^^' i= iRIref ) )? )
-            // IbmSparqlAstWalker.g:989:6: s= string (l= LANGTAG | ( '^^' i= iRIref ) )?
+            // IbmSparqlAstWalker.g:987:2: (s= string (l= LANGTAG | ( '^^' i= iRIref ) )? )
+            // IbmSparqlAstWalker.g:987:6: s= string (l= LANGTAG | ( '^^' i= iRIref ) )?
             {
-            pushFollow(FOLLOW_string_in_rDFLiteral7552);
+            pushFollow(FOLLOW_string_in_rDFLiteral7536);
             s=string();
 
             state._fsp--;
@@ -10736,7 +10710,7 @@ public class IbmSparqlAstWalker extends TreeParser {
             if ( state.backtracking==0 ) {
                sl = new StringLiteral(s);     
             }
-            // IbmSparqlAstWalker.g:990:3: (l= LANGTAG | ( '^^' i= iRIref ) )?
+            // IbmSparqlAstWalker.g:988:3: (l= LANGTAG | ( '^^' i= iRIref ) )?
             int alt112=3;
             int LA112_0 = input.LA(1);
 
@@ -10748,9 +10722,9 @@ public class IbmSparqlAstWalker extends TreeParser {
             }
             switch (alt112) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:990:5: l= LANGTAG
+                    // IbmSparqlAstWalker.g:988:5: l= LANGTAG
                     {
-                    l=(XTree)match(input,LANGTAG,FOLLOW_LANGTAG_in_rDFLiteral7567); if (state.failed) return sl;
+                    l=(XTree)match(input,LANGTAG,FOLLOW_LANGTAG_in_rDFLiteral7551); if (state.failed) return sl;
                     if ( state.backtracking==0 ) {
                        sl.setLanguage((l!=null?l.getText():null));        
                     }
@@ -10758,13 +10732,13 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:991:5: ( '^^' i= iRIref )
+                    // IbmSparqlAstWalker.g:989:5: ( '^^' i= iRIref )
                     {
-                    // IbmSparqlAstWalker.g:991:5: ( '^^' i= iRIref )
-                    // IbmSparqlAstWalker.g:991:7: '^^' i= iRIref
+                    // IbmSparqlAstWalker.g:989:5: ( '^^' i= iRIref )
+                    // IbmSparqlAstWalker.g:989:7: '^^' i= iRIref
                     {
-                    match(input,264,FOLLOW_264_in_rDFLiteral7581); if (state.failed) return sl;
-                    pushFollow(FOLLOW_iRIref_in_rDFLiteral7585);
+                    match(input,264,FOLLOW_264_in_rDFLiteral7565); if (state.failed) return sl;
+                    pushFollow(FOLLOW_iRIref_in_rDFLiteral7569);
                     i=iRIref();
 
                     state._fsp--;
@@ -10797,7 +10771,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "numericLiteral"
-    // IbmSparqlAstWalker.g:995:1: numericLiteral returns [Constant n] : (n1= numericLiteralUnsigned | n2= numericLiteralPositive | n3= numericLiteralNegative );
+    // IbmSparqlAstWalker.g:993:1: numericLiteral returns [Constant n] : (n1= numericLiteralUnsigned | n2= numericLiteralPositive | n3= numericLiteralNegative );
     public final Constant numericLiteral() throws RecognitionException {
         Constant n = null;
 
@@ -10809,14 +10783,14 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:996:2: (n1= numericLiteralUnsigned | n2= numericLiteralPositive | n3= numericLiteralNegative )
+            // IbmSparqlAstWalker.g:994:2: (n1= numericLiteralUnsigned | n2= numericLiteralPositive | n3= numericLiteralNegative )
             int alt113=3;
             alt113 = dfa113.predict(input);
             switch (alt113) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:996:6: n1= numericLiteralUnsigned
+                    // IbmSparqlAstWalker.g:994:6: n1= numericLiteralUnsigned
                     {
-                    pushFollow(FOLLOW_numericLiteralUnsigned_in_numericLiteral7616);
+                    pushFollow(FOLLOW_numericLiteralUnsigned_in_numericLiteral7600);
                     n1=numericLiteralUnsigned();
 
                     state._fsp--;
@@ -10828,9 +10802,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:997:5: n2= numericLiteralPositive
+                    // IbmSparqlAstWalker.g:995:5: n2= numericLiteralPositive
                     {
-                    pushFollow(FOLLOW_numericLiteralPositive_in_numericLiteral7626);
+                    pushFollow(FOLLOW_numericLiteralPositive_in_numericLiteral7610);
                     n2=numericLiteralPositive();
 
                     state._fsp--;
@@ -10842,9 +10816,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // IbmSparqlAstWalker.g:998:5: n3= numericLiteralNegative
+                    // IbmSparqlAstWalker.g:996:5: n3= numericLiteralNegative
                     {
-                    pushFollow(FOLLOW_numericLiteralNegative_in_numericLiteral7636);
+                    pushFollow(FOLLOW_numericLiteralNegative_in_numericLiteral7620);
                     n3=numericLiteralNegative();
 
                     state._fsp--;
@@ -10870,7 +10844,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "numericLiteralUnsigned"
-    // IbmSparqlAstWalker.g:1001:1: numericLiteralUnsigned returns [Constant c] : ( ^( BIG_INTEGER i= INTEGER ) | ^( BIG_DECIMAL d1= DECIMAL ) | ^( DOUBLE d2= DOUBLE ) );
+    // IbmSparqlAstWalker.g:999:1: numericLiteralUnsigned returns [Constant c] : ( ^( BIG_INTEGER i= INTEGER ) | ^( BIG_DECIMAL d1= DECIMAL ) | ^( DOUBLE d2= DOUBLE ) );
     public final Constant numericLiteralUnsigned() throws RecognitionException {
         Constant c = null;
 
@@ -10879,7 +10853,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         XTree d2=null;
 
         try {
-            // IbmSparqlAstWalker.g:1002:2: ( ^( BIG_INTEGER i= INTEGER ) | ^( BIG_DECIMAL d1= DECIMAL ) | ^( DOUBLE d2= DOUBLE ) )
+            // IbmSparqlAstWalker.g:1000:2: ( ^( BIG_INTEGER i= INTEGER ) | ^( BIG_DECIMAL d1= DECIMAL ) | ^( DOUBLE d2= DOUBLE ) )
             int alt114=3;
             switch ( input.LA(1) ) {
             case BIG_INTEGER:
@@ -10907,12 +10881,12 @@ public class IbmSparqlAstWalker extends TreeParser {
 
             switch (alt114) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1002:6: ^( BIG_INTEGER i= INTEGER )
+                    // IbmSparqlAstWalker.g:1000:6: ^( BIG_INTEGER i= INTEGER )
                     {
-                    match(input,BIG_INTEGER,FOLLOW_BIG_INTEGER_in_numericLiteralUnsigned7658); if (state.failed) return c;
+                    match(input,BIG_INTEGER,FOLLOW_BIG_INTEGER_in_numericLiteralUnsigned7642); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    i=(XTree)match(input,INTEGER,FOLLOW_INTEGER_in_numericLiteralUnsigned7663); if (state.failed) return c;
+                    i=(XTree)match(input,INTEGER,FOLLOW_INTEGER_in_numericLiteralUnsigned7647); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -10922,12 +10896,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1003:5: ^( BIG_DECIMAL d1= DECIMAL )
+                    // IbmSparqlAstWalker.g:1001:5: ^( BIG_DECIMAL d1= DECIMAL )
                     {
-                    match(input,BIG_DECIMAL,FOLLOW_BIG_DECIMAL_in_numericLiteralUnsigned7679); if (state.failed) return c;
+                    match(input,BIG_DECIMAL,FOLLOW_BIG_DECIMAL_in_numericLiteralUnsigned7663); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    d1=(XTree)match(input,DECIMAL,FOLLOW_DECIMAL_in_numericLiteralUnsigned7683); if (state.failed) return c;
+                    d1=(XTree)match(input,DECIMAL,FOLLOW_DECIMAL_in_numericLiteralUnsigned7667); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -10937,12 +10911,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // IbmSparqlAstWalker.g:1004:5: ^( DOUBLE d2= DOUBLE )
+                    // IbmSparqlAstWalker.g:1002:5: ^( DOUBLE d2= DOUBLE )
                     {
-                    match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralUnsigned7698); if (state.failed) return c;
+                    match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralUnsigned7682); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    d2=(XTree)match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralUnsigned7703); if (state.failed) return c;
+                    d2=(XTree)match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralUnsigned7687); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -10966,7 +10940,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "numericLiteralPositive"
-    // IbmSparqlAstWalker.g:1007:1: numericLiteralPositive returns [Constant c] : ( ^( BIG_INTEGER i= INTEGER_POSITIVE ) | ^( BIG_DECIMAL d1= DECIMAL_POSITIVE ) | ^( DOUBLE d2= DOUBLE_POSITIVE ) );
+    // IbmSparqlAstWalker.g:1005:1: numericLiteralPositive returns [Constant c] : ( ^( BIG_INTEGER i= INTEGER_POSITIVE ) | ^( BIG_DECIMAL d1= DECIMAL_POSITIVE ) | ^( DOUBLE d2= DOUBLE_POSITIVE ) );
     public final Constant numericLiteralPositive() throws RecognitionException {
         Constant c = null;
 
@@ -10975,7 +10949,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         XTree d2=null;
 
         try {
-            // IbmSparqlAstWalker.g:1008:2: ( ^( BIG_INTEGER i= INTEGER_POSITIVE ) | ^( BIG_DECIMAL d1= DECIMAL_POSITIVE ) | ^( DOUBLE d2= DOUBLE_POSITIVE ) )
+            // IbmSparqlAstWalker.g:1006:2: ( ^( BIG_INTEGER i= INTEGER_POSITIVE ) | ^( BIG_DECIMAL d1= DECIMAL_POSITIVE ) | ^( DOUBLE d2= DOUBLE_POSITIVE ) )
             int alt115=3;
             switch ( input.LA(1) ) {
             case BIG_INTEGER:
@@ -11003,12 +10977,12 @@ public class IbmSparqlAstWalker extends TreeParser {
 
             switch (alt115) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1008:6: ^( BIG_INTEGER i= INTEGER_POSITIVE )
+                    // IbmSparqlAstWalker.g:1006:6: ^( BIG_INTEGER i= INTEGER_POSITIVE )
                     {
-                    match(input,BIG_INTEGER,FOLLOW_BIG_INTEGER_in_numericLiteralPositive7733); if (state.failed) return c;
+                    match(input,BIG_INTEGER,FOLLOW_BIG_INTEGER_in_numericLiteralPositive7717); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    i=(XTree)match(input,INTEGER_POSITIVE,FOLLOW_INTEGER_POSITIVE_in_numericLiteralPositive7738); if (state.failed) return c;
+                    i=(XTree)match(input,INTEGER_POSITIVE,FOLLOW_INTEGER_POSITIVE_in_numericLiteralPositive7722); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -11018,12 +10992,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1009:5: ^( BIG_DECIMAL d1= DECIMAL_POSITIVE )
+                    // IbmSparqlAstWalker.g:1007:5: ^( BIG_DECIMAL d1= DECIMAL_POSITIVE )
                     {
-                    match(input,BIG_DECIMAL,FOLLOW_BIG_DECIMAL_in_numericLiteralPositive7751); if (state.failed) return c;
+                    match(input,BIG_DECIMAL,FOLLOW_BIG_DECIMAL_in_numericLiteralPositive7735); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    d1=(XTree)match(input,DECIMAL_POSITIVE,FOLLOW_DECIMAL_POSITIVE_in_numericLiteralPositive7755); if (state.failed) return c;
+                    d1=(XTree)match(input,DECIMAL_POSITIVE,FOLLOW_DECIMAL_POSITIVE_in_numericLiteralPositive7739); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -11033,12 +11007,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // IbmSparqlAstWalker.g:1010:5: ^( DOUBLE d2= DOUBLE_POSITIVE )
+                    // IbmSparqlAstWalker.g:1008:5: ^( DOUBLE d2= DOUBLE_POSITIVE )
                     {
-                    match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralPositive7768); if (state.failed) return c;
+                    match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralPositive7752); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    d2=(XTree)match(input,DOUBLE_POSITIVE,FOLLOW_DOUBLE_POSITIVE_in_numericLiteralPositive7773); if (state.failed) return c;
+                    d2=(XTree)match(input,DOUBLE_POSITIVE,FOLLOW_DOUBLE_POSITIVE_in_numericLiteralPositive7757); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -11062,7 +11036,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "numericLiteralNegative"
-    // IbmSparqlAstWalker.g:1013:1: numericLiteralNegative returns [Constant c] : ( ^( BIG_INTEGER i= INTEGER_NEGATIVE ) | ^( BIG_DECIMAL d1= DECIMAL_NEGATIVE ) | ^( DOUBLE d2= DOUBLE_NEGATIVE ) );
+    // IbmSparqlAstWalker.g:1011:1: numericLiteralNegative returns [Constant c] : ( ^( BIG_INTEGER i= INTEGER_NEGATIVE ) | ^( BIG_DECIMAL d1= DECIMAL_NEGATIVE ) | ^( DOUBLE d2= DOUBLE_NEGATIVE ) );
     public final Constant numericLiteralNegative() throws RecognitionException {
         Constant c = null;
 
@@ -11071,7 +11045,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         XTree d2=null;
 
         try {
-            // IbmSparqlAstWalker.g:1014:2: ( ^( BIG_INTEGER i= INTEGER_NEGATIVE ) | ^( BIG_DECIMAL d1= DECIMAL_NEGATIVE ) | ^( DOUBLE d2= DOUBLE_NEGATIVE ) )
+            // IbmSparqlAstWalker.g:1012:2: ( ^( BIG_INTEGER i= INTEGER_NEGATIVE ) | ^( BIG_DECIMAL d1= DECIMAL_NEGATIVE ) | ^( DOUBLE d2= DOUBLE_NEGATIVE ) )
             int alt116=3;
             switch ( input.LA(1) ) {
             case BIG_INTEGER:
@@ -11099,12 +11073,12 @@ public class IbmSparqlAstWalker extends TreeParser {
 
             switch (alt116) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1014:6: ^( BIG_INTEGER i= INTEGER_NEGATIVE )
+                    // IbmSparqlAstWalker.g:1012:6: ^( BIG_INTEGER i= INTEGER_NEGATIVE )
                     {
-                    match(input,BIG_INTEGER,FOLLOW_BIG_INTEGER_in_numericLiteralNegative7798); if (state.failed) return c;
+                    match(input,BIG_INTEGER,FOLLOW_BIG_INTEGER_in_numericLiteralNegative7782); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    i=(XTree)match(input,INTEGER_NEGATIVE,FOLLOW_INTEGER_NEGATIVE_in_numericLiteralNegative7803); if (state.failed) return c;
+                    i=(XTree)match(input,INTEGER_NEGATIVE,FOLLOW_INTEGER_NEGATIVE_in_numericLiteralNegative7787); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -11114,12 +11088,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1015:5: ^( BIG_DECIMAL d1= DECIMAL_NEGATIVE )
+                    // IbmSparqlAstWalker.g:1013:5: ^( BIG_DECIMAL d1= DECIMAL_NEGATIVE )
                     {
-                    match(input,BIG_DECIMAL,FOLLOW_BIG_DECIMAL_in_numericLiteralNegative7816); if (state.failed) return c;
+                    match(input,BIG_DECIMAL,FOLLOW_BIG_DECIMAL_in_numericLiteralNegative7800); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    d1=(XTree)match(input,DECIMAL_NEGATIVE,FOLLOW_DECIMAL_NEGATIVE_in_numericLiteralNegative7820); if (state.failed) return c;
+                    d1=(XTree)match(input,DECIMAL_NEGATIVE,FOLLOW_DECIMAL_NEGATIVE_in_numericLiteralNegative7804); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -11129,12 +11103,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // IbmSparqlAstWalker.g:1016:5: ^( DOUBLE d2= DOUBLE_NEGATIVE )
+                    // IbmSparqlAstWalker.g:1014:5: ^( DOUBLE d2= DOUBLE_NEGATIVE )
                     {
-                    match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralNegative7833); if (state.failed) return c;
+                    match(input,DOUBLE,FOLLOW_DOUBLE_in_numericLiteralNegative7817); if (state.failed) return c;
 
                     match(input, Token.DOWN, null); if (state.failed) return c;
-                    d2=(XTree)match(input,DOUBLE_NEGATIVE,FOLLOW_DOUBLE_NEGATIVE_in_numericLiteralNegative7838); if (state.failed) return c;
+                    d2=(XTree)match(input,DOUBLE_NEGATIVE,FOLLOW_DOUBLE_NEGATIVE_in_numericLiteralNegative7822); if (state.failed) return c;
 
                     match(input, Token.UP, null); if (state.failed) return c;
                     if ( state.backtracking==0 ) {
@@ -11158,12 +11132,12 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "booleanLiteral"
-    // IbmSparqlAstWalker.g:1019:1: booleanLiteral returns [Boolean b] : ( ^( BOOLEAN TRUE ) | ^( BOOLEAN FALSE ) );
+    // IbmSparqlAstWalker.g:1017:1: booleanLiteral returns [Boolean b] : ( ^( BOOLEAN TRUE ) | ^( BOOLEAN FALSE ) );
     public final Boolean booleanLiteral() throws RecognitionException {
         Boolean b = null;
 
         try {
-            // IbmSparqlAstWalker.g:1020:2: ( ^( BOOLEAN TRUE ) | ^( BOOLEAN FALSE ) )
+            // IbmSparqlAstWalker.g:1018:2: ( ^( BOOLEAN TRUE ) | ^( BOOLEAN FALSE ) )
             int alt117=2;
             int LA117_0 = input.LA(1);
 
@@ -11204,12 +11178,12 @@ public class IbmSparqlAstWalker extends TreeParser {
             }
             switch (alt117) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1020:6: ^( BOOLEAN TRUE )
+                    // IbmSparqlAstWalker.g:1018:6: ^( BOOLEAN TRUE )
                     {
-                    match(input,BOOLEAN,FOLLOW_BOOLEAN_in_booleanLiteral7862); if (state.failed) return b;
+                    match(input,BOOLEAN,FOLLOW_BOOLEAN_in_booleanLiteral7846); if (state.failed) return b;
 
                     match(input, Token.DOWN, null); if (state.failed) return b;
-                    match(input,TRUE,FOLLOW_TRUE_in_booleanLiteral7864); if (state.failed) return b;
+                    match(input,TRUE,FOLLOW_TRUE_in_booleanLiteral7848); if (state.failed) return b;
 
                     match(input, Token.UP, null); if (state.failed) return b;
                     if ( state.backtracking==0 ) {
@@ -11219,12 +11193,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1021:6: ^( BOOLEAN FALSE )
+                    // IbmSparqlAstWalker.g:1019:6: ^( BOOLEAN FALSE )
                     {
-                    match(input,BOOLEAN,FOLLOW_BOOLEAN_in_booleanLiteral7879); if (state.failed) return b;
+                    match(input,BOOLEAN,FOLLOW_BOOLEAN_in_booleanLiteral7863); if (state.failed) return b;
 
                     match(input, Token.DOWN, null); if (state.failed) return b;
-                    match(input,FALSE,FOLLOW_FALSE_in_booleanLiteral7881); if (state.failed) return b;
+                    match(input,FALSE,FOLLOW_FALSE_in_booleanLiteral7865); if (state.failed) return b;
 
                     match(input, Token.UP, null); if (state.failed) return b;
                     if ( state.backtracking==0 ) {
@@ -11248,7 +11222,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "string"
-    // IbmSparqlAstWalker.g:1024:1: string returns [String s] : ( ^( STRING s1= STRING_LITERAL1 ) | ^( STRING s2= STRING_LITERAL2 ) | ^( STRING s3= STRING_LITERAL_LONG1 ) | ^( STRING s4= STRING_LITERAL_LONG2 ) );
+    // IbmSparqlAstWalker.g:1022:1: string returns [String s] : ( ^( STRING s1= STRING_LITERAL1 ) | ^( STRING s2= STRING_LITERAL2 ) | ^( STRING s3= STRING_LITERAL_LONG1 ) | ^( STRING s4= STRING_LITERAL_LONG2 ) );
     public final String string() throws RecognitionException {
         String s = null;
 
@@ -11258,7 +11232,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         XTree s4=null;
 
         try {
-            // IbmSparqlAstWalker.g:1025:2: ( ^( STRING s1= STRING_LITERAL1 ) | ^( STRING s2= STRING_LITERAL2 ) | ^( STRING s3= STRING_LITERAL_LONG1 ) | ^( STRING s4= STRING_LITERAL_LONG2 ) )
+            // IbmSparqlAstWalker.g:1023:2: ( ^( STRING s1= STRING_LITERAL1 ) | ^( STRING s2= STRING_LITERAL2 ) | ^( STRING s3= STRING_LITERAL_LONG1 ) | ^( STRING s4= STRING_LITERAL_LONG2 ) )
             int alt118=4;
             int LA118_0 = input.LA(1);
 
@@ -11313,12 +11287,12 @@ public class IbmSparqlAstWalker extends TreeParser {
             }
             switch (alt118) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1025:4: ^( STRING s1= STRING_LITERAL1 )
+                    // IbmSparqlAstWalker.g:1023:4: ^( STRING s1= STRING_LITERAL1 )
                     {
-                    match(input,STRING,FOLLOW_STRING_in_string7904); if (state.failed) return s;
+                    match(input,STRING,FOLLOW_STRING_in_string7888); if (state.failed) return s;
 
                     match(input, Token.DOWN, null); if (state.failed) return s;
-                    s1=(XTree)match(input,STRING_LITERAL1,FOLLOW_STRING_LITERAL1_in_string7908); if (state.failed) return s;
+                    s1=(XTree)match(input,STRING_LITERAL1,FOLLOW_STRING_LITERAL1_in_string7892); if (state.failed) return s;
 
                     match(input, Token.UP, null); if (state.failed) return s;
                     if ( state.backtracking==0 ) {
@@ -11328,12 +11302,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1026:4: ^( STRING s2= STRING_LITERAL2 )
+                    // IbmSparqlAstWalker.g:1024:4: ^( STRING s2= STRING_LITERAL2 )
                     {
-                    match(input,STRING,FOLLOW_STRING_in_string7925); if (state.failed) return s;
+                    match(input,STRING,FOLLOW_STRING_in_string7909); if (state.failed) return s;
 
                     match(input, Token.DOWN, null); if (state.failed) return s;
-                    s2=(XTree)match(input,STRING_LITERAL2,FOLLOW_STRING_LITERAL2_in_string7929); if (state.failed) return s;
+                    s2=(XTree)match(input,STRING_LITERAL2,FOLLOW_STRING_LITERAL2_in_string7913); if (state.failed) return s;
 
                     match(input, Token.UP, null); if (state.failed) return s;
                     if ( state.backtracking==0 ) {
@@ -11343,12 +11317,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 3 :
-                    // IbmSparqlAstWalker.g:1027:4: ^( STRING s3= STRING_LITERAL_LONG1 )
+                    // IbmSparqlAstWalker.g:1025:4: ^( STRING s3= STRING_LITERAL_LONG1 )
                     {
-                    match(input,STRING,FOLLOW_STRING_in_string7946); if (state.failed) return s;
+                    match(input,STRING,FOLLOW_STRING_in_string7930); if (state.failed) return s;
 
                     match(input, Token.DOWN, null); if (state.failed) return s;
-                    s3=(XTree)match(input,STRING_LITERAL_LONG1,FOLLOW_STRING_LITERAL_LONG1_in_string7950); if (state.failed) return s;
+                    s3=(XTree)match(input,STRING_LITERAL_LONG1,FOLLOW_STRING_LITERAL_LONG1_in_string7934); if (state.failed) return s;
 
                     match(input, Token.UP, null); if (state.failed) return s;
                     if ( state.backtracking==0 ) {
@@ -11358,12 +11332,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 4 :
-                    // IbmSparqlAstWalker.g:1028:4: ^( STRING s4= STRING_LITERAL_LONG2 )
+                    // IbmSparqlAstWalker.g:1026:4: ^( STRING s4= STRING_LITERAL_LONG2 )
                     {
-                    match(input,STRING,FOLLOW_STRING_in_string7962); if (state.failed) return s;
+                    match(input,STRING,FOLLOW_STRING_in_string7946); if (state.failed) return s;
 
                     match(input, Token.DOWN, null); if (state.failed) return s;
-                    s4=(XTree)match(input,STRING_LITERAL_LONG2,FOLLOW_STRING_LITERAL_LONG2_in_string7966); if (state.failed) return s;
+                    s4=(XTree)match(input,STRING_LITERAL_LONG2,FOLLOW_STRING_LITERAL_LONG2_in_string7950); if (state.failed) return s;
 
                     match(input, Token.UP, null); if (state.failed) return s;
                     if ( state.backtracking==0 ) {
@@ -11387,7 +11361,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "iRIref"
-    // IbmSparqlAstWalker.g:1031:1: iRIref returns [IRI r] : ( ^( IRI i= IRI_REF ) | p= prefixedName );
+    // IbmSparqlAstWalker.g:1029:1: iRIref returns [IRI r] : ( ^( IRI i= IRI_REF ) | p= prefixedName );
     public final IRI iRIref() throws RecognitionException {
         IRI r = null;
 
@@ -11396,7 +11370,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
         try {
-            // IbmSparqlAstWalker.g:1032:2: ( ^( IRI i= IRI_REF ) | p= prefixedName )
+            // IbmSparqlAstWalker.g:1030:2: ( ^( IRI i= IRI_REF ) | p= prefixedName )
             int alt119=2;
             int LA119_0 = input.LA(1);
 
@@ -11415,12 +11389,12 @@ public class IbmSparqlAstWalker extends TreeParser {
             }
             switch (alt119) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1032:4: ^( IRI i= IRI_REF )
+                    // IbmSparqlAstWalker.g:1030:4: ^( IRI i= IRI_REF )
                     {
-                    match(input,IRI,FOLLOW_IRI_in_iRIref7990); if (state.failed) return r;
+                    match(input,IRI,FOLLOW_IRI_in_iRIref7974); if (state.failed) return r;
 
                     match(input, Token.DOWN, null); if (state.failed) return r;
-                    i=(XTree)match(input,IRI_REF,FOLLOW_IRI_REF_in_iRIref7994); if (state.failed) return r;
+                    i=(XTree)match(input,IRI_REF,FOLLOW_IRI_REF_in_iRIref7978); if (state.failed) return r;
 
                     match(input, Token.UP, null); if (state.failed) return r;
                     if ( state.backtracking==0 ) {
@@ -11430,9 +11404,9 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1033:6: p= prefixedName
+                    // IbmSparqlAstWalker.g:1031:6: p= prefixedName
                     {
-                    pushFollow(FOLLOW_prefixedName_in_iRIref8006);
+                    pushFollow(FOLLOW_prefixedName_in_iRIref7990);
                     p=prefixedName();
 
                     state._fsp--;
@@ -11458,7 +11432,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "prefixedName"
-    // IbmSparqlAstWalker.g:1036:1: prefixedName returns [String s] : ( ^( PREFIXED_NAME n1= PNAME_LN ) | ^( PREFIXED_NS n2= PNAME_NS ) );
+    // IbmSparqlAstWalker.g:1034:1: prefixedName returns [String s] : ( ^( PREFIXED_NAME n1= PNAME_LN ) | ^( PREFIXED_NS n2= PNAME_NS ) );
     public final String prefixedName() throws RecognitionException {
         String s = null;
 
@@ -11466,7 +11440,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         XTree n2=null;
 
         try {
-            // IbmSparqlAstWalker.g:1037:2: ( ^( PREFIXED_NAME n1= PNAME_LN ) | ^( PREFIXED_NS n2= PNAME_NS ) )
+            // IbmSparqlAstWalker.g:1035:2: ( ^( PREFIXED_NAME n1= PNAME_LN ) | ^( PREFIXED_NS n2= PNAME_NS ) )
             int alt120=2;
             int LA120_0 = input.LA(1);
 
@@ -11485,12 +11459,12 @@ public class IbmSparqlAstWalker extends TreeParser {
             }
             switch (alt120) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1037:4: ^( PREFIXED_NAME n1= PNAME_LN )
+                    // IbmSparqlAstWalker.g:1035:4: ^( PREFIXED_NAME n1= PNAME_LN )
                     {
-                    match(input,PREFIXED_NAME,FOLLOW_PREFIXED_NAME_in_prefixedName8028); if (state.failed) return s;
+                    match(input,PREFIXED_NAME,FOLLOW_PREFIXED_NAME_in_prefixedName8012); if (state.failed) return s;
 
                     match(input, Token.DOWN, null); if (state.failed) return s;
-                    n1=(XTree)match(input,PNAME_LN,FOLLOW_PNAME_LN_in_prefixedName8032); if (state.failed) return s;
+                    n1=(XTree)match(input,PNAME_LN,FOLLOW_PNAME_LN_in_prefixedName8016); if (state.failed) return s;
 
                     match(input, Token.UP, null); if (state.failed) return s;
                     if ( state.backtracking==0 ) {
@@ -11500,12 +11474,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1038:4: ^( PREFIXED_NS n2= PNAME_NS )
+                    // IbmSparqlAstWalker.g:1036:4: ^( PREFIXED_NS n2= PNAME_NS )
                     {
-                    match(input,PREFIXED_NS,FOLLOW_PREFIXED_NS_in_prefixedName8041); if (state.failed) return s;
+                    match(input,PREFIXED_NS,FOLLOW_PREFIXED_NS_in_prefixedName8025); if (state.failed) return s;
 
                     match(input, Token.DOWN, null); if (state.failed) return s;
-                    n2=(XTree)match(input,PNAME_NS,FOLLOW_PNAME_NS_in_prefixedName8045); if (state.failed) return s;
+                    n2=(XTree)match(input,PNAME_NS,FOLLOW_PNAME_NS_in_prefixedName8029); if (state.failed) return s;
 
                     match(input, Token.UP, null); if (state.failed) return s;
                     if ( state.backtracking==0 ) {
@@ -11529,7 +11503,7 @@ public class IbmSparqlAstWalker extends TreeParser {
 
 
     // $ANTLR start "blankNode"
-    // IbmSparqlAstWalker.g:1041:1: blankNode returns [BlankNode bn] : (b= BLANK_NODE_LABEL | ^( ANNON t= OPEN_SQ_BRACKET ) );
+    // IbmSparqlAstWalker.g:1039:1: blankNode returns [BlankNode bn] : (b= BLANK_NODE_LABEL | ^( ANNON t= OPEN_SQ_BRACKET ) );
     public final BlankNode blankNode() throws RecognitionException {
         BlankNode bn = null;
 
@@ -11537,7 +11511,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         XTree t=null;
 
         try {
-            // IbmSparqlAstWalker.g:1042:2: (b= BLANK_NODE_LABEL | ^( ANNON t= OPEN_SQ_BRACKET ) )
+            // IbmSparqlAstWalker.g:1040:2: (b= BLANK_NODE_LABEL | ^( ANNON t= OPEN_SQ_BRACKET ) )
             int alt121=2;
             int LA121_0 = input.LA(1);
 
@@ -11556,9 +11530,9 @@ public class IbmSparqlAstWalker extends TreeParser {
             }
             switch (alt121) {
                 case 1 :
-                    // IbmSparqlAstWalker.g:1042:6: b= BLANK_NODE_LABEL
+                    // IbmSparqlAstWalker.g:1040:6: b= BLANK_NODE_LABEL
                     {
-                    b=(XTree)match(input,BLANK_NODE_LABEL,FOLLOW_BLANK_NODE_LABEL_in_blankNode8069); if (state.failed) return bn;
+                    b=(XTree)match(input,BLANK_NODE_LABEL,FOLLOW_BLANK_NODE_LABEL_in_blankNode8053); if (state.failed) return bn;
                     if ( state.backtracking==0 ) {
                        bn = new BlankNode(b.getText()); 
                     }
@@ -11566,12 +11540,12 @@ public class IbmSparqlAstWalker extends TreeParser {
                     }
                     break;
                 case 2 :
-                    // IbmSparqlAstWalker.g:1043:6: ^( ANNON t= OPEN_SQ_BRACKET )
+                    // IbmSparqlAstWalker.g:1041:6: ^( ANNON t= OPEN_SQ_BRACKET )
                     {
-                    match(input,ANNON,FOLLOW_ANNON_in_blankNode8080); if (state.failed) return bn;
+                    match(input,ANNON,FOLLOW_ANNON_in_blankNode8064); if (state.failed) return bn;
 
                     match(input, Token.DOWN, null); if (state.failed) return bn;
-                    t=(XTree)match(input,OPEN_SQ_BRACKET,FOLLOW_OPEN_SQ_BRACKET_in_blankNode8084); if (state.failed) return bn;
+                    t=(XTree)match(input,OPEN_SQ_BRACKET,FOLLOW_OPEN_SQ_BRACKET_in_blankNode8068); if (state.failed) return bn;
 
                     match(input, Token.UP, null); if (state.failed) return bn;
                     if ( state.backtracking==0 ) {
@@ -11753,7 +11727,7 @@ public class IbmSparqlAstWalker extends TreeParser {
         "\13\uffff}>";
     static final String[] DFA96_transitionS = {
             "\1\10\2\3\1\4\1\uffff\1\1\6\uffff\1\5\1\7\15\uffff\2\6\102\uffff"+
-            "\5\1\1\2\60\1\7\11\3\uffff\1\6",
+            "\5\1\1\2\36\1\1\uffff\21\1\7\11\3\uffff\1\6",
             "",
             "\1\12",
             "",
@@ -11764,8 +11738,8 @@ public class IbmSparqlAstWalker extends TreeParser {
             "",
             "",
             "\2\1\27\uffff\6\1\6\uffff\2\1\12\uffff\1\3\1\1\1\uffff\2\1"+
-            "\75\uffff\102\1\3\uffff\1\1\71\uffff\1\1\2\uffff\1\1\2\uffff"+
-            "\7\1"
+            "\75\uffff\51\1\1\uffff\30\1\3\uffff\1\1\71\uffff\1\1\2\uffff"+
+            "\1\1\2\uffff\7\1"
     };
 
     static final short[] DFA96_eot = DFA.unpackEncodedString(DFA96_eotS);
@@ -11802,27 +11776,27 @@ public class IbmSparqlAstWalker extends TreeParser {
         }
     }
     static final String DFA99_eotS =
-        "\72\uffff";
+        "\71\uffff";
     static final String DFA99_eofS =
-        "\72\uffff";
+        "\71\uffff";
     static final String DFA99_minS =
-        "\1\47\7\uffff\1\2\61\uffff";
+        "\1\47\7\uffff\1\2\60\uffff";
     static final String DFA99_maxS =
-        "\1\u00b6\7\uffff\1\u0107\61\uffff";
+        "\1\u00b6\7\uffff\1\u0107\60\uffff";
     static final String DFA99_acceptS =
         "\1\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\uffff\1\12\1\13\1\14\1\15"+
         "\1\16\1\17\1\20\1\21\1\22\1\23\1\24\1\25\1\26\1\27\1\30\1\31\1\32"+
         "\1\33\1\34\1\35\1\36\1\37\1\40\1\41\1\42\1\43\1\44\1\45\1\46\1\47"+
         "\1\50\1\51\1\52\1\53\1\54\1\55\1\56\1\57\1\60\1\61\1\62\1\63\1\64"+
-        "\1\65\1\66\1\67\1\70\1\10\1\11";
+        "\1\65\1\66\1\67\1\10\1\11";
     static final String DFA99_specialS =
-        "\72\uffff}>";
+        "\71\uffff}>";
     static final String[] DFA99_transitionS = {
-            "\1\67\131\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1"+
+            "\1\66\131\uffff\1\1\1\2\1\3\1\4\1\5\1\6\1\7\1\10\1\11\1\12\1"+
             "\13\1\14\1\15\1\16\1\20\1\21\1\23\1\24\1\25\1\26\1\27\1\30\1"+
             "\31\1\32\1\33\1\34\1\35\1\36\1\37\1\40\1\41\1\42\1\43\1\44\1"+
-            "\45\1\46\1\47\1\50\1\51\1\52\1\53\1\54\1\55\1\56\1\57\1\60\1"+
-            "\61\1\62\1\63\1\64\1\65\1\17\1\22\1\66",
+            "\45\1\46\1\uffff\1\47\1\50\1\51\1\52\1\53\1\54\1\55\1\56\1\57"+
+            "\1\60\1\61\1\62\1\63\1\64\1\17\1\22\1\65",
             "",
             "",
             "",
@@ -11830,10 +11804,10 @@ public class IbmSparqlAstWalker extends TreeParser {
             "",
             "",
             "",
-            "\1\70\1\71\5\uffff\3\71\26\uffff\6\71\4\uffff\1\71\1\uffff"+
-            "\2\71\13\uffff\1\71\1\uffff\2\71\26\uffff\2\71\45\uffff\103"+
-            "\71\2\uffff\1\71\71\uffff\1\71\2\uffff\1\71\2\uffff\7\71",
-            "",
+            "\1\67\1\70\5\uffff\3\70\26\uffff\6\70\4\uffff\1\70\1\uffff"+
+            "\2\70\13\uffff\1\70\1\uffff\2\70\26\uffff\2\70\45\uffff\51\70"+
+            "\1\uffff\31\70\2\uffff\1\70\71\uffff\1\70\2\uffff\1\70\2\uffff"+
+            "\7\70",
             "",
             "",
             "",
@@ -11914,7 +11888,7 @@ public class IbmSparqlAstWalker extends TreeParser {
             this.transition = DFA99_transition;
         }
         public String getDescription() {
-            return "810:1: builtInCall returns [Expression e] : ( ^( STR st= expression ) | ^( LANG lg= expression ) | ^( LANGMATCHES lm1= expression lm2= expression ) | ^( DATATYPE dt= expression ) | ^( BOUND v= var ) | ^( IRI e6= expression ) | ^( URI e7= expression ) | ^( BNODE e8= expression ) | BNODE | ^( RAND NIL ) | ^( ABS e9= expression ) | ^( CEIL e10= expression ) | ^( FLOOR e11= expression ) | ^( ROUND e12= expression ) | ^( CONCAT e13= expressionList ) | ^( SUBSTR e14= expression e15= expression (e16= expression )? ) | ^( STRLEN e15= expression ) | ^( UCASE e16= expression ) | ^( REPLACE e1= expression e2= expression e3= expression (e4= expression )? ) | ^( LCASE e17= expression ) | ^( ENCODE_FOR_URI e18= expression ) | ^( CONTAINS e19= expression e20= expression ) | ^( STRSTARTS e21= expression e22= expression ) | ^( STRENDS e23= expression e24= expression ) | ^( STRBEFORE e241= expression e242= expression ) | ^( STRAFTER e243= expression e244= expression ) | ^( YEAR e25= expression ) | ^( MONTH e26= expression ) | ^( DAY e27= expression ) | ^( HOURS e28= expression ) | ^( MINUTES e29= expression ) | ^( SECONDS e30= expression ) | ^( TIMEZONE e31= expression ) | ^( TZ e32= expression ) | NOW | UUID | STRUUID | ^( MD5 e33= expression ) | ^( SHA1 e34= expression ) | ^( SHA224 e35= expression ) | ^( SHA256 e36= expression ) | ^( SHA384 e37= expression ) | ^( SHA512 e38= expression ) | ^( COALESCE e39= expressionList ) | ^( IF e40= expression e41= expression e42= expression ) | ^( STRLANG e45= expression e46= expression ) | ^( STRDT e47= expression e48= expression ) | ^( SAMETERM sam1= expression sam2= expression ) | ^( ISIRI isi= expression ) | ^( ISURI isu= expression ) | ^( ISBLANK isb= expression ) | ^( ISLITERAL isl= expression ) | ^( ISNUMERIC e55= expression ) | r= regexExpression | p= existsFunc | p= notExistsFunc );";
+            return "810:1: builtInCall returns [Expression e] : ( ^( STR st= expression ) | ^( LANG lg= expression ) | ^( LANGMATCHES lm1= expression lm2= expression ) | ^( DATATYPE dt= expression ) | ^( BOUND v= var ) | ^( IRI e6= expression ) | ^( URI e7= expression ) | ^( BNODE e8= expression ) | BNODE | ^( RAND NIL ) | ^( ABS e9= expression ) | ^( CEIL e10= expression ) | ^( FLOOR e11= expression ) | ^( ROUND e12= expression ) | ^( CONCAT e13= expressionList ) | ^( SUBSTR e14= expression e15= expression (e16= expression )? ) | ^( STRLEN e15= expression ) | ^( UCASE e16= expression ) | ^( REPLACE e1= expression e2= expression e3= expression (e4= expression )? ) | ^( LCASE e17= expression ) | ^( ENCODE_FOR_URI e18= expression ) | ^( CONTAINS e19= expression e20= expression ) | ^( STRSTARTS e21= expression e22= expression ) | ^( STRENDS e23= expression e24= expression ) | ^( STRBEFORE e241= expression e242= expression ) | ^( STRAFTER e243= expression e244= expression ) | ^( YEAR e25= expression ) | ^( MONTH e26= expression ) | ^( DAY e27= expression ) | ^( HOURS e28= expression ) | ^( MINUTES e29= expression ) | ^( SECONDS e30= expression ) | ^( TIMEZONE e31= expression ) | ^( TZ e32= expression ) | NOW | UUID | STRUUID | ^( MD5 e33= expression ) | ^( SHA1 e34= expression ) | ^( SHA256 e36= expression ) | ^( SHA384 e37= expression ) | ^( SHA512 e38= expression ) | ^( COALESCE e39= expressionList ) | ^( IF e40= expression e41= expression e42= expression ) | ^( STRLANG e45= expression e46= expression ) | ^( STRDT e47= expression e48= expression ) | ^( SAMETERM sam1= expression sam2= expression ) | ^( ISIRI isi= expression ) | ^( ISURI isu= expression ) | ^( ISBLANK isb= expression ) | ^( ISLITERAL isl= expression ) | ^( ISNUMERIC e55= expression ) | r= regexExpression | p= existsFunc | p= notExistsFunc );";
         }
     }
     static final String DFA113_eotS =
@@ -11972,7 +11946,7 @@ public class IbmSparqlAstWalker extends TreeParser {
             this.transition = DFA113_transition;
         }
         public String getDescription() {
-            return "995:1: numericLiteral returns [Constant n] : (n1= numericLiteralUnsigned | n2= numericLiteralPositive | n3= numericLiteralNegative );";
+            return "993:1: numericLiteral returns [Constant n] : (n1= numericLiteralUnsigned | n2= numericLiteralPositive | n3= numericLiteralNegative );";
         }
     }
  
@@ -12015,7 +11989,7 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_fexp_in_selectClause778 = new BitSet(new long[]{0x0000000400400008L,0x0000000000000080L});
     public static final BitSet FOLLOW_251_in_selectClause818 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_AS_in_expVar849 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_var_in_expVar853 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_var_in_expVar853 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expVar857 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_EXP_in_fexp875 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_fexp879 = new BitSet(new long[]{0x0000000000000008L});
@@ -12053,17 +12027,17 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_limitOffsetClauses_in_solutionModifier1639 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_GROUP_BY_in_groupClause1665 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_groupCondition_in_groupClause1669 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_builtInCall_in_groupCondition1702 = new BitSet(new long[]{0x000010A400000002L,0x0000000000000000L,0x007FFFFFFFFFFFFEL});
-    public static final BitSet FOLLOW_functionCall_in_groupCondition1721 = new BitSet(new long[]{0x000010A400000002L,0x0000000000000000L,0x007FFFFFFFFFFFFEL});
+    public static final BitSet FOLLOW_builtInCall_in_groupCondition1702 = new BitSet(new long[]{0x000010A400000002L,0x0000000000000000L,0x007FFFDFFFFFFFFEL});
+    public static final BitSet FOLLOW_functionCall_in_groupCondition1721 = new BitSet(new long[]{0x000010A400000002L,0x0000000000000000L,0x007FFFDFFFFFFFFEL});
     public static final BitSet FOLLOW_CONDITION_in_groupCondition1739 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_groupCondition1743 = new BitSet(new long[]{0x0000000400000008L});
     public static final BitSet FOLLOW_var_in_groupCondition1748 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_var_in_groupCondition1765 = new BitSet(new long[]{0x000010A400000002L,0x0000000000000000L,0x007FFFFFFFFFFFFEL});
+    public static final BitSet FOLLOW_var_in_groupCondition1765 = new BitSet(new long[]{0x000010A400000002L,0x0000000000000000L,0x007FFFDFFFFFFFFEL});
     public static final BitSet FOLLOW_HAVING_in_havingClause1839 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_havingCondition_in_havingClause1844 = new BitSet(new long[]{0x000000E000000008L,0x0000000000000000L,0x007FFFFFFFFFFFFEL});
+    public static final BitSet FOLLOW_havingCondition_in_havingClause1844 = new BitSet(new long[]{0x000000E000000008L,0x0000000000000000L,0x007FFFDFFFFFFFFEL});
     public static final BitSet FOLLOW_constraint_in_havingCondition1872 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ORDER_BY_in_orderClause1901 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_orderCondition_in_orderClause1908 = new BitSet(new long[]{0x000000E400000008L,0x0000000000600000L,0x007FFFFFFFFFFFFEL});
+    public static final BitSet FOLLOW_orderCondition_in_orderClause1908 = new BitSet(new long[]{0x000000E400000008L,0x0000000000600000L,0x007FFFDFFFFFFFFEL});
     public static final BitSet FOLLOW_ASC_in_orderCondition1935 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_brackettedExpression_in_orderCondition1939 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_DESC_in_orderCondition1951 = new BitSet(new long[]{0x0000000000000004L});
@@ -12139,7 +12113,7 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_varOrIRIref_in_serviceGraphPattern3266 = new BitSet(new long[]{0x0000000009000000L,0x0030000000000000L});
     public static final BitSet FOLLOW_groupGraphPattern_in_serviceGraphPattern3270 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_BIND_in_bind3303 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_var_in_bind3307 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_var_in_bind3307 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_bind3313 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_UNION_in_groupMinusOrUnionGraphPattern3345 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_groupGraphPattern_in_groupMinusOrUnionGraphPattern3366 = new BitSet(new long[]{0x0000000009000000L,0x0030000000000000L});
@@ -12153,14 +12127,14 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_builtInCall_in_constraint3546 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_functionCall_in_constraint3559 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_FUNCTION_in_functionCall3581 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_iRIref_in_functionCall3585 = new BitSet(new long[]{0x6800C0FC00000E00L,0xF000000000000010L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_iRIref_in_functionCall3585 = new BitSet(new long[]{0x6800C0FC00000E00L,0xF000000000000010L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_argList_in_functionCall3589 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NIL_in_argList3618 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DISTINCT_in_argList3631 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_argList3636 = new BitSet(new long[]{0x6800C0FC00000602L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_argList3649 = new BitSet(new long[]{0x6800C0FC00000602L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_DISTINCT_in_argList3631 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_argList3636 = new BitSet(new long[]{0x6800C0FC00000602L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_argList3649 = new BitSet(new long[]{0x6800C0FC00000602L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_NIL_in_expressionList3684 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_expressionList3707 = new BitSet(new long[]{0x6800C0FC00000602L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expressionList3707 = new BitSet(new long[]{0x6800C0FC00000602L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_constructTriples_in_constructTemplate3727 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_triples_in_constructTriples3748 = new BitSet(new long[]{0x00000000C0000002L});
     public static final BitSet FOLLOW_triples2_in_constructTriples3759 = new BitSet(new long[]{0x00000000C0000002L});
@@ -12249,52 +12223,52 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_blankNode_in_graphTerm4902 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_NIL_in_graphTerm4915 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_LOGICAL_OR_in_expression4946 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression4958 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_expression4979 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression4958 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression4979 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_LOGICAL_AND_in_expression5004 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5016 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_expression5037 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5016 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5037 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_259_in_expression5064 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5078 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5078 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5089 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_260_in_expression5109 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5123 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5123 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5134 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_LT_in_expression5154 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5169 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5169 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5184 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_261_in_expression5204 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5219 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5219 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5230 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_LTE_in_expression5250 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5264 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5264 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5275 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_262_in_expression5295 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5309 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5309 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5320 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_IN_in_expression5340 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5367 = new BitSet(new long[]{0x6800C0FC00000E00L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5367 = new BitSet(new long[]{0x6800C0FC00000E00L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expressionList_in_expression5380 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NOT_in_expression5426 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5433 = new BitSet(new long[]{0x6800C0FC00000E00L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5433 = new BitSet(new long[]{0x6800C0FC00000E00L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expressionList_in_expression5441 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_257_in_expression5475 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5502 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5502 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5514 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_BROKEN_PLUS_in_expression5537 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5556 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5556 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5567 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_263_in_expression5587 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5613 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5613 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5625 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_BROKEN_MINUS_in_expression5642 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5660 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5660 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5671 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_251_in_expression5691 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5718 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5718 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5729 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_254_in_expression5749 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_expression5776 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_expression5776 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_expression5786 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_258_in_expression5806 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_expression5810 = new BitSet(new long[]{0x0000000000000008L});
@@ -12315,7 +12289,7 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_LANG_in_builtInCall6015 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6019 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_LANGMATCHES_in_builtInCall6032 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6036 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6036 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6040 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_DATATYPE_in_builtInCall6053 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6057 = new BitSet(new long[]{0x0000000000000008L});
@@ -12341,36 +12315,36 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_CONCAT_in_builtInCall6229 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expressionList_in_builtInCall6233 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_SUBSTR_in_builtInCall6246 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6250 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6254 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6250 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6254 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6278 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRLEN_in_builtInCall6301 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6305 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_UCASE_in_builtInCall6317 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6321 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_REPLACE_in_builtInCall6333 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6337 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6341 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6345 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6337 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6341 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6345 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6369 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_LCASE_in_builtInCall6387 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6391 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_ENCODE_FOR_URI_in_builtInCall6403 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6407 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_CONTAINS_in_builtInCall6419 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6423 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6423 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6427 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRSTARTS_in_builtInCall6439 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6443 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6443 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6447 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRENDS_in_builtInCall6459 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6463 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6463 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6467 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRBEFORE_in_builtInCall6479 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6483 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6483 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6487 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRAFTER_in_builtInCall6499 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6503 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6503 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
     public static final BitSet FOLLOW_expression_in_builtInCall6507 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_YEAR_in_builtInCall6519 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6523 = new BitSet(new long[]{0x0000000000000008L});
@@ -12395,124 +12369,122 @@ public class IbmSparqlAstWalker extends TreeParser {
     public static final BitSet FOLLOW_expression_in_builtInCall6683 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_SHA1_in_builtInCall6695 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6699 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SHA224_in_builtInCall6711 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_SHA256_in_builtInCall6711 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6715 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SHA256_in_builtInCall6727 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_SHA384_in_builtInCall6727 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6731 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SHA384_in_builtInCall6743 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_SHA512_in_builtInCall6743 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6747 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SHA512_in_builtInCall6759 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6763 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_COALESCE_in_builtInCall6775 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expressionList_in_builtInCall6779 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_IF_in_builtInCall6791 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6795 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6799 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6803 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRLANG_in_builtInCall6815 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6819 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6823 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRDT_in_builtInCall6835 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6839 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_builtInCall6843 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SAMETERM_in_builtInCall6855 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6859 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_COALESCE_in_builtInCall6759 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expressionList_in_builtInCall6763 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_IF_in_builtInCall6775 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_builtInCall6779 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6783 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6787 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRLANG_in_builtInCall6799 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_builtInCall6803 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6807 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRDT_in_builtInCall6819 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_builtInCall6823 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6827 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SAMETERM_in_builtInCall6839 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_builtInCall6843 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_builtInCall6847 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_ISIRI_in_builtInCall6859 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6863 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ISIRI_in_builtInCall6875 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ISURI_in_builtInCall6875 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6879 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ISURI_in_builtInCall6891 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ISBLANK_in_builtInCall6891 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6895 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ISBLANK_in_builtInCall6907 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ISLITERAL_in_builtInCall6907 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6911 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ISLITERAL_in_builtInCall6923 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_ISNUMERIC_in_builtInCall6923 = new BitSet(new long[]{0x0000000000000004L});
     public static final BitSet FOLLOW_expression_in_builtInCall6927 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_ISNUMERIC_in_builtInCall6939 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_builtInCall6943 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_regexExpression_in_builtInCall6956 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_existsFunc_in_builtInCall6965 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_notExistsFunc_in_builtInCall6974 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_REGEX_in_regexExpression6997 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_expression_in_regexExpression7001 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_regexExpression7005 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_regexExpression7009 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_EXISTS_in_existsFunc7041 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_groupGraphPattern_in_existsFunc7045 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_NOT_EXISTS_in_notExistsFunc7076 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_groupGraphPattern_in_notExistsFunc7080 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_COUNT_in_aggregate7115 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7127 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7184 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_251_in_aggregate7194 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SUM_in_aggregate7214 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7226 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7243 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_MIN_in_aggregate7256 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7269 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7285 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_MAX_in_aggregate7298 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7311 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7328 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_AVG_in_aggregate7341 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7354 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7371 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_SAMPLE_in_aggregate7384 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7396 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7413 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_GROUP_CONCAT_in_aggregate7427 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DISTINCT_in_aggregate7439 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_expression_in_aggregate7454 = new BitSet(new long[]{0x0000000000000008L,0x0000000000000000L,0x4000000000000000L});
-    public static final BitSet FOLLOW_SEPARATOR_in_aggregate7465 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_string_in_aggregate7469 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_FUNCTION_in_iRIFunction7498 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_iRIref_in_iRIFunction7508 = new BitSet(new long[]{0x6800C0FC00000E08L,0xF000000000000010L,0x3FFFFFFFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
-    public static final BitSet FOLLOW_argList_in_iRIFunction7520 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_string_in_rDFLiteral7552 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000000L,0x8000000000000000L,0x0000000000000000L,0x0000000000000100L});
-    public static final BitSet FOLLOW_LANGTAG_in_rDFLiteral7567 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_264_in_rDFLiteral7581 = new BitSet(new long[]{0x0000001800000000L,0x0000000000000000L,0x0000000000000040L});
-    public static final BitSet FOLLOW_iRIref_in_rDFLiteral7585 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_numericLiteralUnsigned_in_numericLiteral7616 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_numericLiteralPositive_in_numericLiteral7626 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_numericLiteralNegative_in_numericLiteral7636 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_BIG_INTEGER_in_numericLiteralUnsigned7658 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_INTEGER_in_numericLiteralUnsigned7663 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BIG_DECIMAL_in_numericLiteralUnsigned7679 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DECIMAL_in_numericLiteralUnsigned7683 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralUnsigned7698 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralUnsigned7703 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BIG_INTEGER_in_numericLiteralPositive7733 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_INTEGER_POSITIVE_in_numericLiteralPositive7738 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BIG_DECIMAL_in_numericLiteralPositive7751 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DECIMAL_POSITIVE_in_numericLiteralPositive7755 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralPositive7768 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOUBLE_POSITIVE_in_numericLiteralPositive7773 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BIG_INTEGER_in_numericLiteralNegative7798 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_INTEGER_NEGATIVE_in_numericLiteralNegative7803 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BIG_DECIMAL_in_numericLiteralNegative7816 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DECIMAL_NEGATIVE_in_numericLiteralNegative7820 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralNegative7833 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_DOUBLE_NEGATIVE_in_numericLiteralNegative7838 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BOOLEAN_in_booleanLiteral7862 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_TRUE_in_booleanLiteral7864 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BOOLEAN_in_booleanLiteral7879 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_FALSE_in_booleanLiteral7881 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_in_string7904 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL1_in_string7908 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_in_string7925 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL2_in_string7929 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_regexExpression_in_builtInCall6940 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_existsFunc_in_builtInCall6949 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_notExistsFunc_in_builtInCall6958 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_REGEX_in_regexExpression6981 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_expression_in_regexExpression6985 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_regexExpression6989 = new BitSet(new long[]{0x6800C0FC00000608L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_regexExpression6993 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_EXISTS_in_existsFunc7025 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_groupGraphPattern_in_existsFunc7029 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_NOT_EXISTS_in_notExistsFunc7060 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_groupGraphPattern_in_notExistsFunc7064 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_COUNT_in_aggregate7099 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7111 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7168 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_251_in_aggregate7178 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SUM_in_aggregate7198 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7210 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7227 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_MIN_in_aggregate7240 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7253 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7269 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_MAX_in_aggregate7282 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7295 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7312 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_AVG_in_aggregate7325 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7338 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7355 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_SAMPLE_in_aggregate7368 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7380 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7397 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_GROUP_CONCAT_in_aggregate7411 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DISTINCT_in_aggregate7423 = new BitSet(new long[]{0x6800C0FC00000600L,0xF000000000000000L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_expression_in_aggregate7438 = new BitSet(new long[]{0x0000000000000008L,0x0000000000000000L,0x4000000000000000L});
+    public static final BitSet FOLLOW_SEPARATOR_in_aggregate7449 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_string_in_aggregate7453 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_FUNCTION_in_iRIFunction7482 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_iRIref_in_iRIFunction7492 = new BitSet(new long[]{0x6800C0FC00000E08L,0xF000000000000010L,0x3FFFFFDFFFFFFFFFL,0x4800000000000002L,0x00000000000000FEL});
+    public static final BitSet FOLLOW_argList_in_iRIFunction7504 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_string_in_rDFLiteral7536 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000000L,0x8000000000000000L,0x0000000000000000L,0x0000000000000100L});
+    public static final BitSet FOLLOW_LANGTAG_in_rDFLiteral7551 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_264_in_rDFLiteral7565 = new BitSet(new long[]{0x0000001800000000L,0x0000000000000000L,0x0000000000000040L});
+    public static final BitSet FOLLOW_iRIref_in_rDFLiteral7569 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_numericLiteralUnsigned_in_numericLiteral7600 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_numericLiteralPositive_in_numericLiteral7610 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_numericLiteralNegative_in_numericLiteral7620 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_BIG_INTEGER_in_numericLiteralUnsigned7642 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_INTEGER_in_numericLiteralUnsigned7647 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BIG_DECIMAL_in_numericLiteralUnsigned7663 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DECIMAL_in_numericLiteralUnsigned7667 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralUnsigned7682 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralUnsigned7687 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BIG_INTEGER_in_numericLiteralPositive7717 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_INTEGER_POSITIVE_in_numericLiteralPositive7722 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BIG_DECIMAL_in_numericLiteralPositive7735 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DECIMAL_POSITIVE_in_numericLiteralPositive7739 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralPositive7752 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOUBLE_POSITIVE_in_numericLiteralPositive7757 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BIG_INTEGER_in_numericLiteralNegative7782 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_INTEGER_NEGATIVE_in_numericLiteralNegative7787 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BIG_DECIMAL_in_numericLiteralNegative7800 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DECIMAL_NEGATIVE_in_numericLiteralNegative7804 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_DOUBLE_in_numericLiteralNegative7817 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_DOUBLE_NEGATIVE_in_numericLiteralNegative7822 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BOOLEAN_in_booleanLiteral7846 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_TRUE_in_booleanLiteral7848 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BOOLEAN_in_booleanLiteral7863 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_FALSE_in_booleanLiteral7865 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_in_string7888 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL1_in_string7892 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_in_string7909 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL2_in_string7913 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_in_string7930 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_STRING_LITERAL_LONG1_in_string7934 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_STRING_in_string7946 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_LONG1_in_string7950 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_STRING_in_string7962 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_STRING_LITERAL_LONG2_in_string7966 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_IRI_in_iRIref7990 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_IRI_REF_in_iRIref7994 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_prefixedName_in_iRIref8006 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PREFIXED_NAME_in_prefixedName8028 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_PNAME_LN_in_prefixedName8032 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_PREFIXED_NS_in_prefixedName8041 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_PNAME_NS_in_prefixedName8045 = new BitSet(new long[]{0x0000000000000008L});
-    public static final BitSet FOLLOW_BLANK_NODE_LABEL_in_blankNode8069 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_ANNON_in_blankNode8080 = new BitSet(new long[]{0x0000000000000004L});
-    public static final BitSet FOLLOW_OPEN_SQ_BRACKET_in_blankNode8084 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_STRING_LITERAL_LONG2_in_string7950 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_IRI_in_iRIref7974 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_IRI_REF_in_iRIref7978 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_prefixedName_in_iRIref7990 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PREFIXED_NAME_in_prefixedName8012 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_PNAME_LN_in_prefixedName8016 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_PREFIXED_NS_in_prefixedName8025 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_PNAME_NS_in_prefixedName8029 = new BitSet(new long[]{0x0000000000000008L});
+    public static final BitSet FOLLOW_BLANK_NODE_LABEL_in_blankNode8053 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_ANNON_in_blankNode8064 = new BitSet(new long[]{0x0000000000000004L});
+    public static final BitSet FOLLOW_OPEN_SQ_BRACKET_in_blankNode8068 = new BitSet(new long[]{0x0000000000000008L});
     public static final BitSet FOLLOW_NIL_in_synpred1_IbmSparqlAstWalker3016 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_NIL_in_synpred2_IbmSparqlAstWalker3038 = new BitSet(new long[]{0x0000000000000002L});
 

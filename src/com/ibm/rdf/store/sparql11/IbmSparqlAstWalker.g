@@ -892,8 +892,6 @@ builtInCall	returns [Expression e]
 			{ $e = new BuiltinFunctionExpression(Expression.EBuiltinType.MD5, e33); 			}
 	|	^(SHA1 e34=expression)
 			{ $e = new BuiltinFunctionExpression(Expression.EBuiltinType.SHA1, e34); 			}
-	|	^(SHA224 e35=expression)
-			{ $e = new BuiltinFunctionExpression(Expression.EBuiltinType.SHA224, e35); 			}
 	|	^(SHA256 e36=expression)
 			{ $e = new BuiltinFunctionExpression(Expression.EBuiltinType.SHA256, e36); 			}
 	|	^(SHA384 e37=expression)
@@ -913,7 +911,7 @@ builtInCall	returns [Expression e]
 	|	^(ISIRI isi=expression)
 			{ args.add(isi); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.ISIRI, args); 		}
 	|	^(ISURI isu=expression)
-			{ args.add(isu); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.ISURI, args); 		}
+			{ args.add(isu); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.ISIRI, args); 		}
 	|	^(ISBLANK isb=expression)
 			{ args.add(isb); $e = new BuiltinFunctionExpression(Expression.EBuiltinType.ISBLANK, args); 	}
 	|	^(ISLITERAL isl=expression)

@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparql.g 2014-07-16 17:10:17
+// $ANTLR 3.3 Nov 30, 2010 12:50:56 IbmSparql.g 2014-07-17 09:07:57
  
 package com.ibm.rdf.store.sparql11;
 
@@ -7484,7 +7484,7 @@ public class IbmSparqlParser extends Parser {
 
 
             // AST REWRITE
-            // elements: triplesBlock, groupGraphPatternSubInt
+            // elements: groupGraphPatternSubInt, triplesBlock
             // token labels: 
             // rule labels: retval
             // token list labels: 
