@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
 
 /**
  *
@@ -13,7 +15,7 @@ import com.ibm.rdf.store.runtime.service.types.TypeMap;
 public class VariableExpression extends Expression {
 	private Expression expression;
 	private String variable;
-	
+
 	public VariableExpression(String v) {
 		super(EExpressionType.VAR);
 		variable = v;
@@ -23,17 +25,17 @@ public class VariableExpression extends Expression {
 		super(EExpressionType.VAR);
 		expression = e;
 	}
-	
+
 	public VariableExpression(Expression e, String v) {
 		super(EExpressionType.VAR);
 		expression = e;
 		variable = v;
 	}
-	
+
 	public String getVariable() {
 		return variable;
 	}
-	
+
 	public void setVariable(String v) {
 		variable = v;
 	}
@@ -41,11 +43,11 @@ public class VariableExpression extends Expression {
 	public Expression getExpression() {
 		return expression;
 	}
-	
+
 	public void setExpression(Expression e) {
 		expression = e;
 	}
-	
+
 	@Override
 	public Short getReturnType() {
 		if (expression != null) {
@@ -54,20 +56,20 @@ public class VariableExpression extends Expression {
 			return TypeMap.NONE_ID;
 		}
 	}
-	
+
 	public short getTypeEquality(Variable v) {
 		return TypeMap.NONE_ID;
 	}
-	
-	
-	public TypeMap.TypeCategory getTypeRestriction(Variable v){
-		if(!this.gatherVariables().contains(v))return TypeMap.TypeCategory.NONE;
-		else if(expression!=null)
+
+	public TypeMap.TypeCategory getTypeRestriction(Variable v) {
+		if (!this.gatherVariables().contains(v))
+			return TypeMap.TypeCategory.NONE;
+		else if (expression != null)
 			return expression.getTypeRestriction(v);
-			else
-				return TypeMap.TypeCategory.NONE;
+		else
+			return TypeMap.TypeCategory.NONE;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -114,7 +116,7 @@ public class VariableExpression extends Expression {
 		}
 		return "(" + expression.toString() + " AS " + variable + ")";
 	}
-	
+
 	@Override
 	public String getStringWithVarName() {
 		if ((expression == null) && (variable == null)) {
@@ -126,11 +128,16 @@ public class VariableExpression extends Expression {
 		if (expression == null) {
 			return variable;
 		}
-		return "(" + expression.getStringWithVarName() + " AS " + variable + ")";
+		return "(" + expression.getStringWithVarName() + " AS " + variable
+				+ ")";
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.rdf.store.sparql11.model.Expression#renamePrefixes(java.lang.String, java.util.Map, java.util.Map)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ibm.rdf.store.sparql11.model.Expression#renamePrefixes(java.lang.
+	 * String, java.util.Map, java.util.Map)
 	 */
 	@Override
 	public void renamePrefixes(String base, Map<String, String> declared,
@@ -139,7 +146,7 @@ public class VariableExpression extends Expression {
 			expression.renamePrefixes(base, declared, internal);
 		}
 	}
-	
+
 	@Override
 	public void reverseIRIs() {
 		if (expression != null) {
@@ -147,8 +154,9 @@ public class VariableExpression extends Expression {
 		}
 	}
 
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ibm.rdf.store.sparql11.model.Expression#gatherBlankNodes()
 	 */
 	@Override
@@ -160,7 +168,9 @@ public class VariableExpression extends Expression {
 		return bnodes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ibm.rdf.store.sparql11.model.Expression#gatherVariables()
 	 */
 	@Override
@@ -184,35 +194,60 @@ public class VariableExpression extends Expression {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.rdf.store.sparql11.model.Expression#traverse(com.ibm.rdf.store.sparql11.model.IExpressionTraversalListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ibm.rdf.store.sparql11.model.Expression#traverse(com.ibm.rdf.store
+	 * .sparql11.model.IExpressionTraversalListener)
 	 */
 	@Override
 	public void traverse(IExpressionTraversalListener l) {
 		l.startExpression(this);
 		l.endExpression(this);
 	}
-	
+
 	@Override
-	public boolean containsEBV(){		
-		if(expression == null){
+	public boolean containsEBV() {
+		if (expression == null) {
 			return true;
-		}
-		else return false;
+		} else
+			return false;
 	}
-	
+
 	@Override
-	public boolean containsBound(){
-		return false;
-	}
-	
-	@Override
-	public boolean containsNotBound(){
+	public boolean containsBound() {
 		return false;
 	}
 
 	@Override
-	public boolean containsCast(Variable v) {		
+	public boolean containsNotBound() {
 		return false;
+	}
+
+	@Override
+	public boolean containsCast(Variable v) {
+		return false;
+	}
+
+	@Override
+	public String visit(FilterContext context, Store store) {
+		String v = getVariable();
+		if (context.getVarMap().keySet().contains(v)) {
+			String e = null;
+			if (getExpression() != null) {
+				try {
+					e = getExpression().visit(context, store);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			if (e != null) {
+				return "(" + e + ") AS " + context.getVarMap().get(v).fst;
+			}
+			return (context.getVarMap().get(v)).fst;
+		} else {
+			return "";
+		}
 	}
 }

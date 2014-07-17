@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.runtime.service.types.TypeMap.TypeCategory;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 public class OneOfExpression extends Expression {
@@ -106,6 +108,11 @@ public class OneOfExpression extends Expression {
 	public String getStringWithVarName() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String visit(FilterContext context, Store store) {
+		throw new UnsupportedOperationException("OneOf expressins are not supported");
 	}
 
 }

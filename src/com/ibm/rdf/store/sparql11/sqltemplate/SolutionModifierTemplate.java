@@ -91,7 +91,7 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 				while (orderConditions.hasNext()) {
 					OrderCondition o = orderConditions.next();
 					mainTemplate.populateVarMap(o.getExpression());
-					String str = expGenerator.getSQLExpression(o.getExpression(), context);
+					String str = expGenerator.getSQLExpression(o.getExpression(), context, store);
 					orders.add(str + " " + o.getType());
 				}
 				mappings.add(new SQLMapping("orderBy", orders, null));
@@ -136,7 +136,7 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 				Pair<String,String> varTyp = mainTemplate.varMap.get(((VariableExpression) e).getVariable()); 
 				ret.add(varTyp.snd);
 			}
-			ret.add(expGenerator.getSQLExpression(e, context));
+			ret.add(expGenerator.getSQLExpression(e, context, store));
 			
 		}
 		mappings.add(new SQLMapping(mappingVal, ret, null));

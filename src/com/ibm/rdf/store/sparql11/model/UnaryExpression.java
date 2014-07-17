@@ -4,7 +4,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.antlr.stringtemplate.StringTemplate;
+
+import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.rdf.store.sparql11.model.Expression.EUnaryOp;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
 
 /**
  * unary expression
@@ -13,7 +18,12 @@ public class UnaryExpression extends Expression {
 
 	private Expression expression;
 	private EUnaryOp operator;
-	
+
+	private static final String UNARY = "unary_expression";
+	private static final String UNARY_NOT = "unary_not";
+	private static final String UNARY_MINUS = "unary_minus";
+	private static final String NOT_EBV = "NOT_RDF_EBV";
+
 	/**
 	 * @param type
 	 */
@@ -30,23 +40,26 @@ public class UnaryExpression extends Expression {
 	public EUnaryOp getOperator() {
 		return operator;
 	}
-	
+
 	@Override
 	public Short getReturnType() {
 		return expression.getReturnType();
 	}
 
-	public TypeMap.TypeCategory getTypeRestriction(Variable v){
-		if(!this.gatherVariables().contains(v))return TypeMap.TypeCategory.NONE;
-		else return expression.getTypeRestriction(v);
+	public TypeMap.TypeCategory getTypeRestriction(Variable v) {
+		if (!this.gatherVariables().contains(v))
+			return TypeMap.TypeCategory.NONE;
+		else
+			return expression.getTypeRestriction(v);
 	}
-	
+
 	public short getTypeEquality(Variable v) {
-		if(!this.gatherVariables().contains(v))return TypeMap.NONE_ID;
-		else return expression.getTypeEquality(v);
+		if (!this.gatherVariables().contains(v))
+			return TypeMap.NONE_ID;
+		else
+			return expression.getTypeEquality(v);
 	}
-	
-	
+
 	@Override
 	public String toString() {
 		return operator.toString() + " " + expression.toString();
@@ -56,7 +69,7 @@ public class UnaryExpression extends Expression {
 	public String getStringWithVarName() {
 		return operator.toString() + " " + expression.getStringWithVarName();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -87,21 +100,27 @@ public class UnaryExpression extends Expression {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.rdf.store.sparql11.model.Expression#renamePrefixes(java.lang.String, java.util.Map, java.util.Map)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ibm.rdf.store.sparql11.model.Expression#renamePrefixes(java.lang.
+	 * String, java.util.Map, java.util.Map)
 	 */
 	@Override
 	public void renamePrefixes(String base, Map<String, String> declared,
 			Map<String, String> internal) {
 		expression.renamePrefixes(base, declared, internal);
 	}
-	
+
 	@Override
 	public void reverseIRIs() {
 		expression.reverseIRIs();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ibm.rdf.store.sparql11.model.Expression#gatherBlankNodes()
 	 */
 	@Override
@@ -109,7 +128,9 @@ public class UnaryExpression extends Expression {
 		return expression.gatherBlankNodes();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ibm.rdf.store.sparql11.model.Expression#gatherVariables()
 	 */
 	@Override
@@ -122,8 +143,12 @@ public class UnaryExpression extends Expression {
 		return Collections.emptySet();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.rdf.store.sparql11.model.Expression#traverse(com.ibm.rdf.store.sparql11.model.IExpressionTraversalListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ibm.rdf.store.sparql11.model.Expression#traverse(com.ibm.rdf.store
+	 * .sparql11.model.IExpressionTraversalListener)
 	 */
 	@Override
 	public void traverse(IExpressionTraversalListener l) {
@@ -131,30 +156,79 @@ public class UnaryExpression extends Expression {
 		expression.traverse(l);
 		l.endExpression(this);
 	}
-	
-	public boolean containsEBV(){
-		
-		if(expression instanceof VariableExpression && 
-				((VariableExpression)expression).getExpression()==null){
+
+	public boolean containsEBV() {
+
+		if (expression instanceof VariableExpression
+				&& ((VariableExpression) expression).getExpression() == null) {
 			return true;
-		}
-		else return false;
+		} else
+			return false;
 	}
-	
-	public boolean containsBound(){
-		
+
+	public boolean containsBound() {
+
 		return expression.containsBound();
 	}
-	
-	public boolean containsNotBound(){
-		if(operator==EUnaryOp.NOT)
+
+	public boolean containsNotBound() {
+		if (operator == EUnaryOp.NOT)
 			return expression.containsBound();
-		else 
+		else
 			return expression.containsNotBound();
 	}
-	
-	public boolean containsCast(Variable v) {		
-		if(expression.containsCast(v))return true;
+
+	public boolean containsCast(Variable v) {
+		if (expression.containsCast(v))
+			return true;
 		return false;
+	}
+
+	@Override
+	public String visit(FilterContext context, Store store) {
+		String s = getExpression().visit(context, store);
+		if (s.equals(""))
+			return s;
+
+		StringTemplate t = null;
+		if (getOperator() == EUnaryOp.MINUS) {
+			t = store.getInstanceOf(UNARY_MINUS);
+		} else if ((getExpression() instanceof VariableExpression && ((VariableExpression) getExpression())
+				.getExpression() == null)) {
+			t = store.getInstanceOf(EBV);
+			String fType = null;
+			String fTerm = null;
+			for (Variable v : getExpression().gatherVariables()) {
+				fType = context.getVarMap().get(v.getName()).snd;
+				fTerm = context.getVarMap().get(v.getName()).fst;
+			}
+			if (fType == null)
+				fType = TypeMap.IRI_ID + "";
+			t.setAttribute("fterm", fTerm);
+			t.setAttribute("ftype", fType);
+			t.setAttribute("nrstart", TypeMap.DATATYPE_NUMERICS_IDS_START);
+			t.setAttribute("nrend", TypeMap.DATATYPE_NUMERICS_IDS_END);
+			t.setAttribute("tstring", TypeMap.STRING_ID);
+			t.setAttribute("pstring", TypeMap.SIMPLE_LITERAL_ID);
+			t.setAttribute("tboolean", TypeMap.BOOLEAN_ID);
+			s = t.toString();
+
+			if (getOperator() == EUnaryOp.NOT) {
+				t = store.getInstanceOf(NOT_EBV);
+				t.setAttribute("ebv", s);
+				t.setAttribute("type", fType);
+				t.setAttribute("unknownTypesStart", TypeMap.USER_ID_START);
+				t.setAttribute("unknownTypesEnd", TypeMap.NONE_ID);
+				return t.toString();
+			}
+		}
+
+		if (getOperator() == EUnaryOp.NOT) {
+			t = store.getInstanceOf(UNARY_NOT);
+		}
+
+		t.setAttribute("expression", s);
+
+		return t.toString();
 	}
 }

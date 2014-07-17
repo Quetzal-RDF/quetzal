@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
 
 /**
  * a "long" expression is something like a + b + c - d - e or something like a * b * c / d / e. The parameter type T is simply the type of the intermediate operators
@@ -174,6 +176,11 @@ public class LongExpression<T> extends Expression {
 		for(Expression e: subExpressions) 
 			if(e.containsCast(v)) return true;
 		return false;
+	}
+
+	@Override
+	public String visit(FilterContext context, Store store) {
+		throw new UnsupportedOperationException("Long expressions aren't supported in SQL");
 	}
 	
 }

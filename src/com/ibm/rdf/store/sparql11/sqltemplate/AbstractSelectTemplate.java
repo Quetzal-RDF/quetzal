@@ -299,7 +299,7 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 			SPARQLToSQLExpression.gatherAggregates(e, aggregateExpressions);
 		}
 		
-		String str = expGenerator.getSQLExpression(e, context);
+		String str = expGenerator.getSQLExpression(e, context, store);
 
 		
 		if (e.getReturnType() == TypeMap.BOOLEAN_ID) {

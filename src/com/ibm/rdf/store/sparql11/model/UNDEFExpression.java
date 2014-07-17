@@ -4,8 +4,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.rdf.store.runtime.service.types.TypeMap.TypeCategory;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
 
 public class UNDEFExpression extends Expression {
 	
@@ -89,6 +91,11 @@ public class UNDEFExpression extends Expression {
 
 	public String toDataString() {
 		return "NULL";
+	}
+
+	@Override
+	public String visit(FilterContext context, Store store) {
+	     return "'" + toDataString() + "'";
 	}
 
 }

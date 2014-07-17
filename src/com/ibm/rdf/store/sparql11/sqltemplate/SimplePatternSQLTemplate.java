@@ -44,7 +44,7 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 				if (entryTerm.getConstant().getLiteral() != null && entryTerm.getConstant().getLiteral().getType() != null) {
 					String str = entryTerm.getConstant().getLiteral().getType().getValue();
 					short s = TypeMap.getDatatypeType(str);
-					entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(s, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE));
+					entrySQLConstraint.add(Expression.getTypeTest(s, tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE, store));
 				} else {
 					// KAVITHA: Turns out that when a constant appears in a graph we don't need to look for its value, but rather match its exact type
 					//entrySQLConstraint.add(SPARQLToSQLExpression.getTypeTest(entryTerm.getConstant().toDataType(), Constants.NAME_COLUMN_PREFIX_TYPE));
@@ -95,7 +95,7 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 				vType = bp.getVar().getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
 				ret.add(e.getReturnType() +" AS " + vType);				
 			}
-			String expression = expGenerator.getSQLExpression(bp.getExpression(), new FilterContext(variableMap, wrapper.getPropertyValueTypes(), planNode), store);
+			String expression = expGenerator.getSQLForExpression(bp.getExpression(), new FilterContext(variableMap, wrapper.getPropertyValueTypes(), planNode), store);
 
 			variableMap.put(bp.getVar().getName(), Pair.make(expression, vType));			
 		}

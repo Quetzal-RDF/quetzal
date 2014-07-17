@@ -375,7 +375,7 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 		for(Expression e :planNode.getApplicableFilters(wrapper.getPlan())){
 			if( ! planNode.getAvailableVariables().containsAll(e.gatherVariables())) continue ;			
 			if(applyFilterInPrimary(e)){
-				String eSql = expGenerator.getSQLExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
+				String eSql = expGenerator.getSQLForExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
 				filterSQLConstraint.add(eSql);
 			}
 		}
@@ -388,7 +388,7 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 			if( ! planNode.getAvailableVariables().containsAll(e.gatherVariables()))continue ;			
 			
 			if(!applyFilterInPrimary(e)){
-				String eSql = expGenerator.getSQLExpression(e, new FilterContext(sVarMap, wrapper.getPropertyValueTypes(), planNode), store);
+				String eSql = expGenerator.getSQLForExpression(e, new FilterContext(sVarMap, wrapper.getPropertyValueTypes(), planNode), store);
 				filterSQLConstraint.add(eSql);
 			}
 		}

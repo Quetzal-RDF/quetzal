@@ -4,86 +4,87 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
 
 /**
  * Expression consisting of a single literal.
  */
 public class ConstantExpression extends Expression {
 	private Constant constant;
-	
+
 	ConstantExpression() {
 		super(EExpressionType.CONSTANT);
 	}
-	
+
 	public ConstantExpression(StringLiteral literal) {
 		super(EExpressionType.CONSTANT);
 		constant = new Constant(literal);
-		
+
 	}
-	
+
 	public ConstantExpression(IRI i) {
 		super(EExpressionType.CONSTANT);
 		constant = new Constant(i);
-		
+
 	}
-	
+
 	public ConstantExpression(String s, Number n) {
 		super(EExpressionType.CONSTANT);
 		constant = new Constant(s, n);
-		
+
 	}
 
 	public ConstantExpression(Boolean b) {
 		super(EExpressionType.CONSTANT);
 		constant = new Constant(b);
-		
+
 	}
-	
-	public ConstantExpression(Constant c) { 
+
+	public ConstantExpression(Constant c) {
 		super(EExpressionType.CONSTANT);
-		constant = c;				
+		constant = c;
 	}
-	
+
 	public ConstantExpression(Number n) {
 		super(EExpressionType.CONSTANT);
 		constant = new Constant(n);
 	}
 
-	public Constant getConstant() { return constant; }
-
-	
-	
-	public Short getReturnType() {
-		return constant == null? TypeMap.NONE_ID: constant.toDataType();
+	public Constant getConstant() {
+		return constant;
 	}
-	
-	public TypeMap.TypeCategory getTypeRestriction(Variable v){
+
+	public Short getReturnType() {
+		return constant == null ? TypeMap.NONE_ID : constant.toDataType();
+	}
+
+	public TypeMap.TypeCategory getTypeRestriction(Variable v) {
 		return TypeMap.TypeCategory.NONE;
 	}
-	
+
 	public short getTypeEquality(Variable v) {
 		return TypeMap.NONE_ID;
 	}
-	
-	
+
 	public String toString() {
-		return constant == null? "NULL": constant.toString();
+		return constant == null ? "NULL" : constant.toString();
 	}
-	
+
 	@Override
 	public String getStringWithVarName() {
-		return constant == null? "NULL": constant.toString();
+		return constant == null ? "NULL" : constant.toString();
 	}
-	
+
 	public String toTypedString() {
-		return constant == null? "NULL": constant.toTypedString();
+		return constant == null ? "NULL" : constant.toTypedString();
 	}
-	
+
 	public String toDataString() {
-		return constant == null? "NULL": constant.toDataString();
+		return constant == null ? "NULL" : constant.toDataString();
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,34 +111,42 @@ public class ConstantExpression extends Expression {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.rdf.store.sparql11.model.Expression#renamePrefixes(java.lang.String, java.util.Map, java.util.Map)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ibm.rdf.store.sparql11.model.Expression#renamePrefixes(java.lang.
+	 * String, java.util.Map, java.util.Map)
 	 */
 	@Override
-	public void renamePrefixes(String base, Map<String, String> declared, Map<String, String> internal) {
+	public void renamePrefixes(String base, Map<String, String> declared,
+			Map<String, String> internal) {
 		if (constant == null) {
 			return;
 		}
 		EConstantType type = constant.getConstType();
-		if(type == EConstantType.IRI) {
+		if (type == EConstantType.IRI) {
 			constant.getIRI().rename(base, declared, internal);
-		} else if ((type == EConstantType.LITERAL) && (constant.getLiteral().getType() != null)) {
+		} else if ((type == EConstantType.LITERAL)
+				&& (constant.getLiteral().getType() != null)) {
 			constant.getLiteral().getType().rename(base, declared, internal);
 		}
 	}
-	
+
 	@Override
 	public void reverseIRIs() {
 		if (constant == null) {
 			return;
 		}
 		EConstantType type = constant.getConstType();
-		if(type == EConstantType.IRI) {
+		if (type == EConstantType.IRI) {
 			constant.getIRI().reverse();
-		} 
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ibm.rdf.store.sparql11.model.Expression#gatherBlankNodes()
 	 */
 	@Override
@@ -145,7 +154,9 @@ public class ConstantExpression extends Expression {
 		return new HashSet<BlankNodeVariable>();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ibm.rdf.store.sparql11.model.Expression#gatherVariables()
 	 */
 	@Override
@@ -158,28 +169,50 @@ public class ConstantExpression extends Expression {
 		return new HashSet<Variable>();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ibm.rdf.store.sparql11.model.Expression#traverse(com.ibm.rdf.store.sparql11.model.IExpressionTraversalListener)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ibm.rdf.store.sparql11.model.Expression#traverse(com.ibm.rdf.store
+	 * .sparql11.model.IExpressionTraversalListener)
 	 */
 	@Override
 	public void traverse(IExpressionTraversalListener l) {
 		l.startExpression(this);
 		l.endExpression(this);
 	}
-	
-	public boolean containsEBV(){		
+
+	public boolean containsEBV() {
 		return true;
 	}
-	
-	public boolean containsBound(){		
+
+	public boolean containsBound() {
 		return false;
 	}
-	
-	public boolean containsNotBound(){
+
+	public boolean containsNotBound() {
 		return false;
 	}
-	
-	public boolean containsCast(Variable v){
+
+	public boolean containsCast(Variable v) {
 		return false;
+	}
+
+	@Override
+	public String visit(FilterContext context, Store store) {
+		return "'" + getSID(toDataString(), store.getMaxStringLen()) + "'";
+	}
+	
+	public String getSQLConstantExpressionAsType(FilterContext context,
+			Store store) {
+		assert this instanceof ConstantExpression;
+		if (getReturnType() >= TypeMap.DATATYPE_NUMERICS_IDS_START
+				&& getReturnType() <= TypeMap.DATATYPE_NUMERICS_IDS_END) {
+			return getSID(toDataString(), store.getMaxStringLen());
+		}
+		if (getReturnType() == TypeMap.DATE_ID) {
+			return " DATE '" + toDataString() + "'";
+		}
+		return visit(context, store);
 	}
 }

@@ -515,7 +515,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 			if (applyFilterInPrimary(e)) {
 				continue;
 			}
-			String eSql = expGenerator.getSQLExpression(e,  new FilterContext(totalMap, wrapper.getPropertyValueTypes(), planNode), store);
+			String eSql = expGenerator.getSQLForExpression(e,  new FilterContext(totalMap, wrapper.getPropertyValueTypes(), planNode), store);
 			filterSQLConstraint.add(eSql);
 			
 		}
@@ -532,7 +532,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 				continue;
 			}
 
-			String eSql = expGenerator.getSQLExpression(e, new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode), store);
+			String eSql = expGenerator.getSQLForExpression(e, new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode), store);
 			filterSQLConstraint.add(eSql);
 		}
 		return filterSQLConstraint;

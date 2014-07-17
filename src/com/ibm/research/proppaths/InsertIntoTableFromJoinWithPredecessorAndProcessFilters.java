@@ -146,7 +146,7 @@ public class InsertIntoTableFromJoinWithPredecessorAndProcessFilters extends Ins
 					} else {
 						sql.append("\n AND ");
 					}
-					String sqlExp =  gen.getSQLExpression(exp, new FilterContext(varMap, new HashMap<String, Db2Type>(), null), store);
+					String sqlExp =  gen.getSQLForExpression(exp, new FilterContext(varMap, new HashMap<String, Db2Type>(), null), store);
 					sql.append("(").append(sqlExp).append(")");
 				}
 			} catch (SQLWriterException e) {

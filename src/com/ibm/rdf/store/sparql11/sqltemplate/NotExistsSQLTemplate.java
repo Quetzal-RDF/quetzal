@@ -118,7 +118,7 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 			if (right.getApplicableFilters(wrapper.getPlan(), available) != null) {
 				for (Expression e : right.getApplicableFilters(wrapper.getPlan(), available)) {
 					assert available.containsAll(e.gatherVariables());
-					String eSql = expGenerator.getSQLExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
+					String eSql = expGenerator.getSQLForExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
 					notExistsConstraint.add(eSql);
 				}
 			}
@@ -127,7 +127,7 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 		
 			if (planNode.getFilters() != null) {
 				for (Expression e : planNode.getFilters()) {
-					String eSql = expGenerator.getSQLExpression(e, context, store);
+					String eSql = expGenerator.getSQLForExpression(e, context, store);
 					filterConstraints.add(eSql);
 				}
 			}

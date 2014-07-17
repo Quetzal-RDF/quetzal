@@ -157,7 +157,7 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 				
 				for (int j = 0; j < listOfValues.size(); j++) {
 					Expression e = listOfValues.get(j);
-					String eSql = expGenerator.getSQLExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
+					String eSql = expGenerator.getSQLForExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
 					row.add(eSql);
 					if (variableIndexesNotIRIBound.contains(j)) {
 						row.add(e.getReturnType().toString());

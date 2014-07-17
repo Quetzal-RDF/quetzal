@@ -69,7 +69,7 @@ public abstract class AbstractSQLTemplate {
 					filterSQLConstraint.add("1=0");
 				}
 			} else {
-				String eSql = expGenerator.getSQLExpression(e,context, store);
+				String eSql = expGenerator.getSQLForExpression(e,context, store);
 				filterSQLConstraint.add(eSql);
 			}
 			
