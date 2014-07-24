@@ -44,19 +44,18 @@ public class RabinHashFamily implements IHashingFamily {
 
 	public void computeHash(String value) {
 		hashValues.clear();
+		Object obj = hashes.elementAt(0).prepare(value);
+		
 		for (int hashID = 0; hashID < fSize; hashID++) {
 			IHashFunction<String> h = hashes.elementAt(hashID);
 
-			int hashValue = Math.abs((int) (h.hash(value)) % targetRange);
+			int hashValue = Math.abs((int) (h.hashAfterPrepare(obj)) % targetRange);
 			hashValues.add(hashValue);
 		}
 	}
 
 	public int hash(String value, int hashID) {
-		IHashFunction<String> h = hashes.elementAt(hashID);
-
-		int hashValue = Math.abs((int) (h.hash(value)) % targetRange);
-		return hashValue;
+		return hashValues.get(hashID);
 	}
 
 	// Required for Single triple operations.
