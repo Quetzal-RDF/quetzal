@@ -38,7 +38,7 @@ public class AssignHashesToPredicates {
 		
 		int numFns = numTotalFunctions;
 		if (useColoring) {
-			numFns = numTotalFunctions - 2;
+			numFns = numTotalFunctions - (colorsPair.snd.isEmpty() ? 1: 2);
 			numFns = numFns < 0 ? 0 : numFns;
 		}
 		
@@ -69,6 +69,8 @@ public class AssignHashesToPredicates {
 		// Write coloring function
 		dataset.writeColoringFunctionToDataset(isDirect, f.colors);
 					
+		System.err.println(f.hashes.fSize);
+		
 		if (f.hashes != null) {
 			// Write hashing function
 			dataset.writeHashingFunctionToDataset(f.colors.fst.keySet(), isDirect, f.hashes);
@@ -94,7 +96,7 @@ public class AssignHashesToPredicates {
 			bf.append(" ");
 			if (useColoring) {
 				bf.append(f.colors.fst.get(s)).append(" ");
-				if (numTotalFunctions > 1) {
+				if (! f.colors.snd.isEmpty()) {
 					bf.append(f.colors.snd.get(s)).append(" ");
 				}
 			}

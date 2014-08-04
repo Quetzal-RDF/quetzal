@@ -12,10 +12,10 @@ function hash_string(str,entry,  result,stuff,str2) {
 	cmd |& getline result;
 	if (str != result) {
 		str = fixBrackets(str);
-	    print result "\t" str "\t" type_code(entry) "\t" |& table;
+	    print result "\t" str "\t" type_code(entry) |& table;
 	    return result;
 	} else {
-		return result;
+	    return result;
 	}
     }
 }

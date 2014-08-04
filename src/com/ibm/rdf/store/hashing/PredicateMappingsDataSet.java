@@ -189,6 +189,7 @@ public class PredicateMappingsDataSet {
 			Iterator<String> predicateIterator = predicates.iterator();
 			while (predicateIterator.hasNext()) {
 				String entry = predicateIterator.next();
+				family.computeHash(entry);
 				int[] hashes = family.getHash(entry);
 				for (int i = 0; i < numberOfHashFunctions; i++) {
 					Triple triple = new Triple(NodeFactory.createURI(entry),

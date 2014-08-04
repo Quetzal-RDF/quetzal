@@ -298,7 +298,7 @@ function load_parallel_tables() {
 	
 	    if [[ $4 == "postgresql" ]]; then
 		cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_$3 FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_$3 FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 		elif  [[ $4 == "shark" ]]; then
 		cat >> $NT_FILE.db2_cmds <<EOF
@@ -398,7 +398,7 @@ function loadIntoPostgresql() {
     if [[ -e $LOAD_DIR/long-strings.load ]]; then
 	LOAD_PATH=`realpath $LOAD_DIR/long-strings.load`
 	cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_LSTR FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_LSTR FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
     fi
 
@@ -406,19 +406,19 @@ EOF
 
     cat >> $NT_FILE.db2_cmds <<EOF
 
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DT FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DT FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 
     LOAD_PATH=`realpath $LOAD_DIR/direct-predicate-info.load`
 
     cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DIRECT_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DIRECT_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 
     LOAD_PATH=`realpath $LOAD_DIR/reverse-predicate-info.load`
 
     cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_REVERSE_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_REVERSE_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 }
 
