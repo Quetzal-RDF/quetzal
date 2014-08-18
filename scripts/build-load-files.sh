@@ -223,7 +223,7 @@ else
 fi
 
 # intial pre-defined types file
-java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader > $NT_FILE_1.types    
+java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader > $NT_FILE_1.types    
 
 # set length for long strings
 if [[ $LONG_FRAC -gt 0 ]]; then
@@ -255,7 +255,7 @@ else
     LOCALE_FILE=/dev/null
 fi
 
-java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader $DATATYPE_FILE $LOCALE_FILE > $NT_FILE.types
+java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader $DATATYPE_FILE $LOCALE_FILE > $NT_FILE.types
     
 # build load files
 process process_load_files

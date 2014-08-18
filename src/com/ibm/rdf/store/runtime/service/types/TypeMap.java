@@ -157,7 +157,7 @@ public class TypeMap {
 	private static final LangMap[] langArray;
 	public static final short LANG_IDS_START = 1000;
 	public static final short LANG_IDS_END = 5000;
-	public static final short SUB_LANG_RANGE = 100;
+	public static final short SUB_LANG_RANGE = 10;
 	@SuppressWarnings("unchecked")
 	public static final Pair<String, String[]>[] languages = new Pair[] {
 			Pair.make("BG", new String[] { "BG" }),
