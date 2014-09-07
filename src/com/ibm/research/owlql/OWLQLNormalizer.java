@@ -416,18 +416,20 @@ public class OWLQLNormalizer {
 			OWLSymmetricObjectPropertyAxiom sopa = (OWLSymmetricObjectPropertyAxiom) ax;
 			return toQLNormalForm(sopa.asSubPropertyAxioms(), tmpNonQLAxioms, !bestEffort);
 			
-		} else if (ax.getAxiomType().equals(AxiomType.OBJECT_PROPERTY_DOMAIN)
-				|| (ax.getAxiomType().equals(AxiomType.DATA_PROPERTY_DOMAIN))) {
-			OWLPropertyDomainAxiom<OWLPropertyExpression> pda = (OWLPropertyDomainAxiom<OWLPropertyExpression>) ax;
-			OWLPropertyExpression prop = pda.getProperty();
-			OWLClassExpression sub;
-			if (ax.getAxiomType().equals(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
-				sub = fac.getOWLObjectSomeValuesFrom((OWLObjectPropertyExpression) prop, fac.getOWLThing());
-			} else {
-				sub = fac.getOWLDataSomeValuesFrom((OWLDataPropertyExpression) prop, fac.getTopDatatype());
-			}
-			OWLSubClassOfAxiom subclassAx = fac.getOWLSubClassOfAxiom(sub, pda.getDomain());
-			ret = toQLNormalForm(subclassAx, tmpNonQLAxioms);
+		} else if (ax.getAxiomType().equals(AxiomType.OBJECT_PROPERTY_DOMAIN)) {
+	            OWLPropertyDomainAxiom<OWLObjectPropertyExpression> pda = (OWLPropertyDomainAxiom<OWLObjectPropertyExpression>) ax;
+	            OWLObjectPropertyExpression prop = pda.getProperty();
+	            OWLClassExpression sub;
+	            sub = fac.getOWLObjectSomeValuesFrom((OWLObjectPropertyExpression) prop, fac.getOWLThing());
+	            OWLSubClassOfAxiom subclassAx = fac.getOWLSubClassOfAxiom(sub, pda.getDomain());
+	            ret = toQLNormalForm(subclassAx, tmpNonQLAxioms);
+	        } else if (ax.getAxiomType().equals(AxiomType.DATA_PROPERTY_DOMAIN)) {
+	            OWLPropertyDomainAxiom<OWLDataPropertyExpression> pda = (OWLPropertyDomainAxiom<OWLDataPropertyExpression>) ax;
+	            OWLDataPropertyExpression prop = pda.getProperty();
+	            OWLClassExpression sub;
+	            sub = fac.getOWLDataSomeValuesFrom((OWLDataPropertyExpression) prop, fac.getTopDatatype());
+	            OWLSubClassOfAxiom subclassAx = fac.getOWLSubClassOfAxiom(sub, pda.getDomain());
+	            ret = toQLNormalForm(subclassAx, tmpNonQLAxioms);
 		} else if ( ax.getAxiomType().equals(AxiomType.OBJECT_PROPERTY_RANGE)) {
 			OWLObjectPropertyRangeAxiom prax = (OWLObjectPropertyRangeAxiom) ax;
 			OWLObjectPropertyExpression prop = prax.getProperty();
