@@ -106,8 +106,10 @@ indexLidElemRS = CREATE UNIQUE INDEX lid_elem_%s ON %s(list_id, elem) COMPRESS Y
 indexDS = CREATE UNIQUE INDEX lid_gid_%s ON %s(list_id, gid, elem, typ) COMPRESS YES ALLOW REVERSE SCANS
 
 defaultLongStrings = CREATE TABLE %s ( \
-	short_string VARCHAR (34) NOT NULL, long_string VARCHAR(%s) NOT NULL, typ SMALLINT NOT NULL, overflow VARCHAR(10000),\
-	PRIMARY KEY(short_string,typ)) VALUE COMPRESSION COMPRESS YES NOT LOGGED INITIALLY
+	short_string VARCHAR (34) NOT NULL, \
+        long_string CLOB, typ SMALLINT NOT NULL, \
+	PRIMARY KEY(short_string,typ)) \
+        VALUE COMPRESSION COMPRESS YES NOT LOGGED INITIALLY
 
 indexLS = CREATE UNIQUE INDEX lstr_%s ON %s(short_string, typ) COMPRESS YES ALLOW REVERSE SCANS
 

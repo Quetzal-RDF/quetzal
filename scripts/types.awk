@@ -26,9 +26,9 @@ function is_date(type) {
 
 BEGIN {
     if (dbEngine == "postgresql") {
-	date_cmd = "date --utc --file=- --iso-8601=ns"
+	date_cmd = "date --utc --file=- --iso-8601=ns 2>&1"
     } else {
-	date_cmd = "date --utc --file=- +\"%F-%H.%M.%S.%N\""
+	date_cmd = "date --utc --file=- +\"%F-%H.%M.%S.%N\" 2>&1"
     }
     PROCINFO[date_cmd, "pty"] = 1;
 }
@@ -39,10 +39,12 @@ function as_date(entry, cmd, a) {
 	raw_date = getString(a);
 	print raw_date |& date_cmd;
 	date_cmd |& getline date;
-	if (dbEngine == "postgresql") {
-	    return gensub(/,/, ".", "g", date);
-	} else {
-	    return substr(date, 1, length(date)-3);
+	if (index(date, "invalid date") == 0) {
+	    if (dbEngine == "postgresql") {
+		return gensub(/,/, ".", "g", date);
+	    } else {
+		return substr(date, 1, length(date)-3);
+	    }
 	}
     }
 }

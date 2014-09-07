@@ -113,7 +113,7 @@ indexLidElemRS = CREATE  INDEX lid_elem_%s ON TABLE %s(list_id, elem) AS 'COMPAC
 indexDS = CREATE  INDEX lid_gid_%s ON TABLE %s(list_id, gid, elem, typ) AS 'COMPACT' WITH DEFERRED REBUILD
 
 defaultLongStrings = CREATE TABLE %s( \
-	short_string STRING , long_string STRING , typ SMALLINT , overflow STRING) \
+	short_string STRING , long_string STRING , typ SMALLINT \
 	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
 	TBLPROPERTIES ("shark.cache" = "true")
 

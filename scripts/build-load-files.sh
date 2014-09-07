@@ -223,7 +223,7 @@ else
 fi
 
 # intial pre-defined types file
-java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader > $NT_FILE_1.types    
+java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader > $NT_FILE_1.types    
 
 # set length for long strings
 if [[ $LONG_FRAC -gt 0 ]]; then
@@ -255,7 +255,7 @@ else
     LOCALE_FILE=/dev/null
 fi
 
-java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader $DATATYPE_FILE $LOCALE_FILE > $NT_FILE.types
+java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader $DATATYPE_FILE $LOCALE_FILE > $NT_FILE.types
     
 # build load files
 process process_load_files
@@ -298,7 +298,7 @@ function load_parallel_tables() {
 	
 	    if [[ $4 == "postgresql" ]]; then
 		cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_$3 FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_$3 FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 		elif  [[ $4 == "shark" ]]; then
 		cat >> $NT_FILE.db2_cmds <<EOF
@@ -398,7 +398,7 @@ function loadIntoPostgresql() {
     if [[ -e $LOAD_DIR/long-strings.load ]]; then
 	LOAD_PATH=`realpath $LOAD_DIR/long-strings.load`
 	cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_LSTR FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_LSTR FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
     fi
 
@@ -406,19 +406,19 @@ EOF
 
     cat >> $NT_FILE.db2_cmds <<EOF
 
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DT FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DT FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 
     LOAD_PATH=`realpath $LOAD_DIR/direct-predicate-info.load`
 
     cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DIRECT_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_DIRECT_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 
     LOAD_PATH=`realpath $LOAD_DIR/reverse-predicate-info.load`
 
     cat >> $NT_FILE.db2_cmds <<EOF
-COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_REVERSE_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
+\COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_REVERSE_PREDS FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
 }
 
