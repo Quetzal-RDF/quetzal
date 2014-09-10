@@ -5,6 +5,12 @@ import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.ibm.rdf.store.sparql11.TestRunner.DB2Engine;
+import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
+import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;
+import com.ibm.rdf.store.sparql11.TestRunner.PSQLEngine;
+import com.ibm.rdf.store.sparql11.TestRunner.PSQLTestData;
+import com.ibm.rdf.store.sparql11.TestRunner.SharkEngine;
 import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 
@@ -27,6 +33,78 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
    protected final static int[] sp2b100MAnswers = new int[]
                                                    { 1, 9050604, 1466402, 10143, 0, -1, 2016996, 2016996, 9812030, 14645, 493, 4, 656, 10, 1, 1, 0                         };
 
+
+
+	public static class DockerDB2 extends SP2QueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = DB2TestData.getStore(
+				System.getenv("JDBC_URL"), System.getenv("KB"),
+				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
+				System.getenv("DB_SCHEMA"), false);
+		static int[] answers;
+		static {
+			String kbSize = System.getenv("KB_SIZE");
+			
+			if (kbSize.equals("1m")) {
+				answers = sp2b1MAnswers;
+			} else if (kbSize.equals("10m")) {
+				answers = sp2b10MAnswers;
+			} else if (kbSize.equals("100m")) {
+				answers = sp2b100MAnswers;
+			} 
+		}
+
+		public DockerDB2() {
+				
+			super(new DB2Engine(), data, answers, System.getenv("QUERY_DIR"));
+		}
+	}
+	
+	public static class DockerPostgresql extends SP2QueryUtilityTest<PSQLTestData> {
+		private static final PSQLTestData data = PSQLTestData.getStore(
+				System.getenv("JDBC_URL"), System.getenv("KB"),
+				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
+				System.getenv("DB_SCHEMA"), false);
+		static int[] answers;
+		static {
+			String kbSize = System.getenv("KB_SIZE");
+			
+			if (kbSize.equals("1m")) {
+				answers = sp2b1MAnswers;
+			} else if (kbSize.equals("10m")) {
+				answers = sp2b10MAnswers;
+			} else if (kbSize.equals("100m")) {
+				answers = sp2b100MAnswers;
+			} 
+		}
+
+		public DockerPostgresql() {
+				
+			super(new PSQLEngine(), data, answers, System.getenv("QUERY_DIR"));
+		}
+	}
+	
+	public static class DockerShark extends SP2QueryUtilityTest<SharkTestData> {
+		private static final SharkTestData data = SharkTestData.getStore(
+				System.getenv("JDBC_URL"), System.getenv("KB"),
+				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
+				System.getenv("DB_SCHEMA"), false);
+		static int[] answers;
+		static {
+			String kbSize = System.getenv("KB_SIZE");
+			if (kbSize.equals("1m")) {
+				answers = sp2b1MAnswers;
+			} else if (kbSize.equals("10m")) {
+				answers = sp2b10MAnswers;
+			} else if (kbSize.equals("100m")) {
+				answers = sp2b100MAnswers;
+			} 
+		}
+
+		public DockerShark() {
+				
+			super(new SharkEngine(), data, answers, System.getenv("QUERY_DIR"));
+		}
+	}
    public static class DB2SP2B10MHelix1 extends SP2QueryUtilityTest<DB2TestData>
       {
       private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://helix1.pok.ibm.com:50001/sp2b10m", "sp2b10m", "db2inst1",
