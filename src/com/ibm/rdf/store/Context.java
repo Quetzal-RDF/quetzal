@@ -5,7 +5,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.hp.hpl.jena.sparql.util.Symbol;
-
+/**
+ * 
+ **
+ */
 public class Context {
 
 	public final static String rdfStoreSpace = "http://rdfstore.ibm.com/IM/symbol#";
