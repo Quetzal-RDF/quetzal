@@ -1,0 +1,6 @@
+FROM ibmresearch/quetzal
+
+MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
+
+RUN ls ./sparqltosqlbase/bin
+
