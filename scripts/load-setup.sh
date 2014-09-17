@@ -18,6 +18,9 @@ CREATE_ONLY=0
 JAVA_OPTS=$_JAVA_OPTIONS
 TABLES="both"
 REUSE=0
+ENTITY_IN_SECONDARY=1
+PROPERTY_IN_SECONDARY=1
+SCHEMA_EXPERIMENTS=1
 
 case "`uname`" in
 	CYGWIN*) IS_CYGWIN=1;
@@ -93,12 +96,6 @@ while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
     elif [[ $1 == "--drop" ]]; then
 	DROP=1
 	shift
-    elif [[ $1 == "--entity-in-secondary" ]]; then
-	ENTITY_IN_SECONDARY=1
-	shift
-    elif [[ $1 == "--property-in-secondary" ]]; then
-	PROPERTY_IN_SECONDARY=1
-	shift
     elif [[ $1 == "--no-lids" ]]; then
 	NO_LIDS=1
 	shift
@@ -112,11 +109,6 @@ while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
     elif [[ $1 == "--reversed" ]]; then
         shift
 	REVERSED=1
-    elif [[ $1 == "--schema-experiments" ]]; then
-        shift
-	ENTITY_IN_SECONDARY=1
-	PROPERTY_IN_SECONDARY=1
-        SCHEMA_EXPERIMENTS=1
     elif [[ $1 == "--create-load-files-only" ]]; then
         shift
 	CREATE_ONLY=1
