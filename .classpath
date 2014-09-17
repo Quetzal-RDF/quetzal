@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jena-arq-2.11.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/icu4j-3.4.4.jar"/>
