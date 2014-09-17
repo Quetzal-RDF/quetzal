@@ -225,10 +225,12 @@ public class BuiltinFunctionExpression extends Expression {
 		if (builtinType != other.builtinType)
 			return false;
 		if (patternArgs == null) {
-			if (other.patternArgs != null)
+			if (other.patternArgs != null) {
 				return false;
-		} else if (!patternArgs.equals(other.patternArgs))
+			}
+		} else if (!patternArgs.equals(other.patternArgs)) {
 			return false;
+		}
 		return true;
 	}
 
