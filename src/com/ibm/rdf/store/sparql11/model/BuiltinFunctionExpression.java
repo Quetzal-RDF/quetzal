@@ -224,11 +224,11 @@ public class BuiltinFunctionExpression extends Expression {
 			return false;
 		if (builtinType != other.builtinType)
 			return false;
-		if (patternArgs == null)
+		if (patternArgs == null) {
 			if (other.patternArgs != null)
 				return false;
-			else if (!patternArgs.equals(other.patternArgs))
-				return false;
+		} else if (!patternArgs.equals(other.patternArgs))
+			return false;
 		return true;
 	}
 
