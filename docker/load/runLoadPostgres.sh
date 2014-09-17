@@ -1,5 +1,10 @@
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
+if [[$CREATE_DB=="true"]]; then
+    psql --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
+    createdb -O quetzal quetzal
+fi
+
 if ls /data/*.nt; then
     export DATAFILE=`ls /data/*.nt`
     export FILETYPE=nt
@@ -10,11 +15,11 @@ fi
 
 export DB2_HOST=$POSTGRES_PORT_5432_TCP_ADDR
 export DB2_PORT=$POSTGRES_PORT_5432_TCP_PORT
-export DB2_DB=default
-export DB2_USER=postgres
-export DB2_PASSWORD=postgres
+export DB2_DB=quetzal
+export DB2_USER=quetzal
+export DB2_PASSWORD=quetzalcoatl
 export DB2_SCHEMA=default
-export KNOWLEDGE_BASE=default
+export KNOWLEDGE_BASE=kb
 
 mkdir /data/tmp
 

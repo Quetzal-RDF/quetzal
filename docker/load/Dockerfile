@@ -7,7 +7,11 @@ MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
 # to that directory.
 VOLUME /data
 
+RUN ls ./sparqltosqlbase
+
 WORKDIR /data
 
-ENTRYPOINT ["~/sparqltosqlbase/docker/runLoadPostgres"] 
+RUN ls /sparqltosqlbase/docker/
+
+ENTRYPOINT ["/bin/bash ~/sparqltosqlbase/docker/runLoadPostgres.sh"] 
 
