@@ -1,6 +1,7 @@
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
+
 if [[ x$CREATE_DB == "xtrue" ]]; then
     psql --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
     createdb -O quetzal quetzal
