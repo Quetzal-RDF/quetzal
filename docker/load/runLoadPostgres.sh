@@ -1,7 +1,7 @@
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
-ls -ld .
+ls -l .
 
 if [[ x$CREATE_DB == "xtrue" ]]; then
     psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
