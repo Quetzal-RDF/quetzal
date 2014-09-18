@@ -7,11 +7,11 @@ if [[ x$CREATE_DB == "xtrue" ]]; then
     psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE DATABASE quetzal WITH OWNER=quetzal;"
 fi
 
-if ls /data/*.nt; then
-    export DATAFILE=`ls /data/*.nt`
+if ls *.nt; then
+    export DATAFILE=`ls *.nt`
     export FILETYPE=nt
 else
-    export DATAFILE=`ls /data/*.nq`
+    export DATAFILE=`ls *.nq`
     export FILETYPE=nq
 fi
 
