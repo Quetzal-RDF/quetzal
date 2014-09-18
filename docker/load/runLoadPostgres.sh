@@ -24,8 +24,8 @@ export KNOWLEDGE_BASE=kb
 
 mkdir /data/tmp
 
-bash ../../scripts/build-load-files --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /sparqltosqlbase/scripts/build-load-files --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
 
-bash ../../scripts/load-load-files --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /sparqltosqlbase/scripts/load-load-files --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
 
 rm -rf /data/tmp
