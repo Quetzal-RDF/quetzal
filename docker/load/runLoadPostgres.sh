@@ -28,9 +28,11 @@ export DB2_PORT=$POSTGRES_PORT_5432_TCP_PORT
 export DB2_DB=quetzal
 export DB2_USER=quetzal
 export DB2_PASSWORD=quetzalcoatl
-export DB2_SCHEMA=default
+export DB2_SCHEMA=quetzal
 export KNOWLEDGE_BASE=kb
 
+echo $FILETYPE
+echo $DATAFILE
 
 bash /sparqltosqlbase/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
 
