@@ -6,13 +6,7 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 
 VOLUME /data
 
-RUN chown postgres /data
-
-RUN chown -R postgres /sparqltosqlbase
-
 WORKDIR /data
-
-USER postgres
 
 # This image does nothing much other than set a volume where the data directory # is: i.e., where the nt file sits.  For now the assumption is that
 # its unzipped and it exists in the /data dir.  All temporary files get written 

@@ -3,6 +3,13 @@ export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
 ls -l .
 
+mkdir /data/tmp
+
+chown -R postgres /data
+chown -R postgres /sparqltosqlbase
+
+su - postgres
+
 if [[ x$CREATE_DB == "xtrue" ]]; then
     psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
     psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE DATABASE quetzal WITH OWNER=quetzal;"
@@ -24,7 +31,6 @@ export DB2_PASSWORD=quetzalcoatl
 export DB2_SCHEMA=default
 export KNOWLEDGE_BASE=kb
 
-mkdir /data/tmp
 
 bash /sparqltosqlbase/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
 
