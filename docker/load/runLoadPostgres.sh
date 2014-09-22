@@ -32,8 +32,8 @@ export DB2_SCHEMA=default
 export KNOWLEDGE_BASE=kb
 
 
-bash /sparqltosqlbase/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /sparqltosqlbase/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
 
-bash /sparqltosqlbase/scripts/load-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /sparqltosqlbase/scripts/load-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --tmpdir /data/tmp $FILETYPE $DATAFILE
 
 rm -rf /data/tmp
