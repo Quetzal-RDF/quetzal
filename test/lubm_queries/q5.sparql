@@ -1,0 +1,32 @@
+prefix ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+select distinct * 
+where
+{
+{ ?x a ub:AssociateProfessor . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:FullProfessor . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:AssistantProfessor . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:Lecturer . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:UndergraduateStudent . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:GraduateStudent . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:TeachingAssistant . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:ResearchAssistant . ?x ub:memberOf <http://www.Department0.University0.edu> } union
+
+{ ?x a ub:AssociateProfessor . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:FullProfessor . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:AssistantProfessor . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:Lecturer . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:UndergraduateStudent . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:GraduateStudent . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:TeachingAssistant . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+{ ?x a ub:ResearchAssistant . ?x ub:worksFor <http://www.Department0.University0.edu> } union
+
+{ ?x a ub:AssociateProfessor . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:FullProfessor . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:AssistantProfessor . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:Lecturer . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:UndergraduateStudent . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:GraduateStudent . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:TeachingAssistant . ?x ub:headOf <http://www.Department0.University0.edu> } union
+{ ?x a ub:ResearchAssistant . ?x ub:headOf <http://www.Department0.University0.edu> }
+
+}

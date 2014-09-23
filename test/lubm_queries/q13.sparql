@@ -1,0 +1,57 @@
+prefix ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+
+select *  where
+{
+{ ?x a ub:AssociateProfessor . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:FullProfessor . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:AssistantProfessor . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:Lecturer . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:UndergraduateStudent . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:GraduateStudent . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:TeachingAssistant . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:ResearchAssistant . ?x ub:doctoralDegreeFrom <http://www.University0.edu> . }
+
+union
+
+{ ?x a ub:AssociateProfessor . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:FullProfessor . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:AssistantProfessor . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:Lecturer . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:UndergraduateStudent . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:GraduateStudent . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:TeachingAssistant . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:ResearchAssistant . ?x ub:mastersDegreeFrom <http://www.University0.edu> . }
+
+union
+
+{ ?x a ub:AssociateProfessor . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:FullProfessor . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:AssistantProfessor . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:Lecturer . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:UndergraduateStudent . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:GraduateStudent . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:TeachingAssistant . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+union
+{ ?x a ub:ResearchAssistant . ?x ub:undergraduateDegreeFrom <http://www.University0.edu> . }
+
+}

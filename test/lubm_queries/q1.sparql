@@ -1,0 +1,3 @@
+prefix ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+select ?x
+where { ?x <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ub:GraduateStudent . ?x ub:takesCourse <http://www.Department0.University0.edu/GraduateCourse0> }
