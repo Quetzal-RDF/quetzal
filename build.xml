@@ -11,8 +11,8 @@
     <property name="project_loc:rdfstore-data" value="../rdfstore-data"/>
     <property name="junit.output.dir" value="junit"/>
     <property name="debuglevel" value="source,lines,vars"/>
-    <property name="target" value="1.6"/>
-    <property name="source" value="1.6"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
     <path id="JUnit 3.libraryclasspath">
         <pathelement location="${ECLIPSE_HOME}/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
     </path>
@@ -43,7 +43,6 @@
         <pathelement location="lib/hive-metastore-0.11.0-shark-0.9.1.jar"/>
         <pathelement location="lib/hive-service-0.11.0-shark-0.9.1.jar"/>
         <pathelement location="lib/hive-shims-0.11.0-shark-0.9.1.jar"/>
-        <pathelement location="lib/libfb303-0.9.0.jar"/>
         <pathelement location="lib/libthrift-0.9.0.jar"/>
         <pathelement location="lib/hadoop-common-2.2.0.jar"/>
         <pathelement location="lib/hash.jar"/>
@@ -110,6 +109,22 @@
             <classpath refid="sparqltosqlbase.classpath"/>
         </java>
     </target>
+    <target name="DB2Freebase">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.FreebaseQueryUtilityTest.DB2Freebase" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="DB2LUBM100KHelix1">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DB2LUBM100KHelix1" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
     <target name="DB2LUBM100MHelix1">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
@@ -135,11 +150,11 @@
             <classpath refid="sparqltosqlbase.classpath"/>
         </junit>
     </target>
-    <target name="DB2Freebase">
+    <target name="DockerPostgresqlLUBM">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
             <formatter type="xml"/>
-            <test name="com.ibm.rdf.store.sparql11.FreebaseQueryUtilityTest.DB2Freebase" todir="${junit.output.dir}"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DockerPostgresql" todir="${junit.output.dir}"/>
             <classpath refid="sparqltosqlbase.classpath"/>
         </junit>
     </target>
