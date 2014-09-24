@@ -152,7 +152,7 @@
     </target>
     <target name="DockerPostgresqlLUBM">
         <mkdir dir="${junit.output.dir}"/>
-        <junit fork="yes" printsummary="withOutAndErr">
+        <junit fork="yes">
         	<formatter type="xml"/>
             <formatter type="plain"/>
             <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DockerPostgresql" todir="${junit.output.dir}"/>
