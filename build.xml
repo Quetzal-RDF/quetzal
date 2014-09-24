@@ -153,7 +153,8 @@
     <target name="DockerPostgresqlLUBM">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes" printsummary="withOutAndErr">
-            <formatter type="xml"/>
+        	<formatter type="xml"/>
+            <formatter type="plain"/>
             <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DockerPostgresql" todir="${junit.output.dir}"/>
             <classpath refid="sparqltosqlbase.classpath"/>
         </junit>
