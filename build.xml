@@ -154,7 +154,7 @@
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="yes">
         	<formatter type="xml"/>
-            <formatter type="plain"/>
+            <formatter type="plain" usefile="false"/>
             <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DockerPostgresql" todir="${junit.output.dir}"/>
             <classpath refid="sparqltosqlbase.classpath"/>
         </junit>
