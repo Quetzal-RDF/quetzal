@@ -16,5 +16,5 @@ ENV KB_SIZE 100k
 
 ENV QUERY_BASE /sparqltosqlbase/test/
 
-RUN ant DockerPostgresqlLUBM
+ENTRYPOINT ["ant", "DockerPostgresqlLUBM"]
 
