@@ -92,7 +92,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 
 		public DockerPostgresql() {
-			super(new PSQLEngine(), data, System.getenv("QUERY_BASE") + "/" + System.getenv("QUERY_KB"),
+			super(new PSQLEngine(), data, System.getenv("QUERY_BASE"),
 					answers);
 		}
 	}
