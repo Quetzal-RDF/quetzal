@@ -61,7 +61,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 				answers = lubm100mAnswers;
 			} else if (kbSize.equals("1B")) {
 				answers = lubm8000uAnswers;
-			}
+			} 
 		}
 
 		public DockerDB2() {
@@ -92,8 +92,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 
 		public DockerPostgresql() {
-				
-			super(new PSQLEngine(), data, System.getenv("QUERY_DIR"),
+			super(new PSQLEngine(), data, System.getenv("QUERY_BASE") + "/" + System.getenv("QUERY_KB"),
 					answers);
 		}
 	}

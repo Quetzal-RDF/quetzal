@@ -14,7 +14,7 @@ ENV DB_SCHEMA quetzal
 
 ENV KB_SIZE 100k
 
-ENV QUERY_DIR /sparqltosqlbase/test/$QUERY_DIR
+ENV QUERY_BASE /sparqltosqlbase/test/
 
 RUN ant DockerPostgresqlLUBM
 
