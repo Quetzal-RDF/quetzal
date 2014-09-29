@@ -73,7 +73,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	
 	public static class DockerPostgresql extends LUBMQueryUtilityTest<PSQLTestData> {
 		private static final PSQLTestData data = PSQLTestData.getStore(
-				System.getenv("JDBC_URL"), System.getenv("KB"),
+				System.getenv("DB_PORT"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
 		static int[] answers;
