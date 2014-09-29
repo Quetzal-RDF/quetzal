@@ -30,8 +30,7 @@
         <pathelement location="lib/commons-cli-1.2.jar"/>
         <pathelement location="lib/jena-core-2.11.0.jar"/>
         <pathelement location="lib/jena-iri-1.0.0.jar"/>
-	<pathelement location="lib/postgresql-9.3-1102.jdbc41.jar"/>
-        <pathelement location="lib/postgresql-9.2-1003.jdbc4.jar"/>
+	    <pathelement location="lib/postgresql-9.3-1102.jdbc41.jar"/>
         <pathelement location="lib/xercesImpl-2.7.1.jar"/>
         <pathelement location="lib/commons-dbutils-1.5.jar"/>
         <pathelement location="lib/owlapi-distribution-3.4.5.jar"/>
