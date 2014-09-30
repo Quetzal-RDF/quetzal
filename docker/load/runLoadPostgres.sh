@@ -1,5 +1,13 @@
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
+if [[ x$POSTGRES_PORT_5432_TCP_ADDR == "x" ]]; then
+    export POSTGRES_PORT_5432_TCP_ADDR="localhost"
+fi
+
+if [[ x$POSTGRES_PORT_5432_TCP_PORT == "x" ]]; then
+    export POSTGRES_PORT_5432_TCP_PORT="5432"
+fi
+
 if [[ x$CREATE_DB == "xtrue" ]]; then
     psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
     psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE DATABASE quetzal WITH OWNER=quetzal;"
