@@ -14,7 +14,7 @@ ENV DB_SCHEMA quetzal
 
 ENV KB_SIZE 100k
 
-ENV QUERY_BASE /sparqltosqlbase/test/
+ENV QUERY_BASE /sparqltosqlbase/test/lubm/
 
 ENTRYPOINT ["ant", "DockerPostgresqlLUBM"]
 
