@@ -1,22 +1,20 @@
-FROM ubuntu
+FROM ibmresearch/quetzal
 
 MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
 
-RUN apt-get update && apt-get install -y default-jdk
+WORKDIR /sparqltosqlbase
 
-RUN apt-get update && apt-get install -y ant
+ENV JDBC_URL $POSTGRES_PORT_5432_TCP_ADDR
+ENV KB kb
+ENV DB_USER quetzal
+ENV DB_PASSWORD quetzalcoatl
+ENV DB_SCHEMA quetzal
+# enter the size of the kb to check answers.  Predefined sizes are:
+# for LUBM: 100k, 10m, 100m, 1B
 
-RUN apt-get update && apt-get install -y git
+ENV KB_SIZE 100k
 
-RUN mkdir -p /root/.ssh
+ENV QUERY_DIR /sparqltosqlbase/test/$QUERY_DIR
 
-ADD id_rsa /root/.ssh/id_rsa
-
-RUN chmod 700 /root/.ssh/id_rsa
-
-RUN echo "Host github.rtp.raleigh.ibm.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
-
-RUN git clone git@github.rtp.raleigh.ibm.com:sparqltosqlgp/sparqltosqlbase.git
-
-RUN cd ./sparqltosqlbase && ant
+RUN ant DockerPostgresqlLUBM
 
