@@ -1,10 +1,10 @@
 if [[ $1 == "LUBM" ]]; then
     export QUERY_BASE=/sparqltosqlbase/test/lubm
-    KB_SIZE=$2
+    export KB_SIZE=$2
     ant Docker$3LUBM
 elif [[ $1 == "SP2B" ]]; then
     export QUERY_BASE=/sparqltosqlbase/test/lubm
-    KB_SIZE=$2
+    export KB_SIZE=$2
     ant $2
     ant Docker$3LUBM
 elif [[ $1 == "--help" ]]; then
