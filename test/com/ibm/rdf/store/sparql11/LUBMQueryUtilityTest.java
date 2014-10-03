@@ -384,15 +384,15 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
-	public static class DB2LUBM100MRC2 extends
+	public static class DB2LUBM100M_SL extends
 			LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
-				"jdbc:db2://9.47.202.45:50001/lubm", "lubm100m", "db2inst2",
+				"jdbc:db2://localhost:9996/lubm", "lubm100m", "db2inst2",
 				"db2admin", "db2inst2", false);
 
-		public DB2LUBM100MRC2() {
+		public DB2LUBM100M_SL() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
+					"test/lubm_queries/",
 					lubm100mAnswers);
 		}
 	}
