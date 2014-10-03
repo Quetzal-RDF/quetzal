@@ -61,7 +61,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 				answers = lubm100mAnswers;
 			} else if (kbSize.equals("1B")) {
 				answers = lubm8000uAnswers;
-			}
+			} 
 		}
 
 		public DockerDB2() {
@@ -73,9 +73,10 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	
 	public static class DockerPostgresql extends LUBMQueryUtilityTest<PSQLTestData> {
 		private static final PSQLTestData data = PSQLTestData.getStore(
-				System.getenv("JDBC_URL"), System.getenv("KB"),
+				"jdbc:postgresql://" + System.getenv("POSTGRES_PORT_5432_TCP_ADDR") + ":"+ System.getenv("POSTGRES_PORT_5432_TCP_PORT") + "/quetzal", System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
+		
 		static int[] answers;
 		static {
 			String kbSize = System.getenv("KB_SIZE");
@@ -92,8 +93,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 
 		public DockerPostgresql() {
-				
-			super(new PSQLEngine(), data, System.getenv("QUERY_DIR"),
+			super(new PSQLEngine(), data, System.getenv("QUERY_BASE"),
 					answers);
 		}
 	}

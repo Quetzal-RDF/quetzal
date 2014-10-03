@@ -1,8 +1,10 @@
+mkdir /data/tmp
+
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
 if [[ x$CREATE_DB == "xtrue" ]]; then
-    psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
-    psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT --command "CREATE DATABASE quetzal WITH OWNER=quetzal;"
+    psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT -U postgres --command "CREATE USER quetzal WITH SUPERUSER PASSWORD 'quetzalcoatl';"
+    psql -h $POSTGRES_PORT_5432_TCP_ADDR -p $POSTGRES_PORT_5432_TCP_PORT -U postgres --command "CREATE DATABASE quetzal WITH OWNER=quetzal;"
 fi
 
 if ls *.nt; then
