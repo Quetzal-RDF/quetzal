@@ -5,7 +5,7 @@ import org.antlr.stringtemplate.StringTemplate;
 import com.ibm.rdf.store.config.Statistics;
 
 public interface Store {
-
+	public static final int SHARK_REDUCERS = 400;
 	public enum Backend {
 		db2, postgresql, shark
 	}
