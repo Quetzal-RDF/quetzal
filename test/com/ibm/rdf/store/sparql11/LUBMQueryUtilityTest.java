@@ -142,19 +142,19 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// SharkTestData.getStore("jdbc:hive2://9.12.196.243:10000/default",
 	// "uobm1a", "root", "nkoutche",
 	// "default", false);
-	public static class SharkLUBM100KOnVM_9_12_196_243 extends
+	public static class SharkLUBM100KOnVM_9_51_154_25 extends
 			LUBMQueryUtilityTest<SharkTestData> {
 		private static final SharkTestData data = SharkTestData.getStore(
-				"jdbc:hive2://9.12.196.243:10000/default", "lubm100k", "root",
-				"nkoutche", "default", false);
-
-		public SharkLUBM100KOnVM_9_12_196_243() {
+				"jdbc:hive2://9.51.154.25:10000/default", "lubm100k", "root",
+				"KX2ETEp6", "default", false);
+		
+		public SharkLUBM100KOnVM_9_51_154_25() {
 			super(new SharkEngine(), data,
 					"../rdfstore-data/lubm_queries_QL_reversed/",
 					lubm100kAnswers);
 		}
 	}
-
+		
 	public static class DB2LUBM100KHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
