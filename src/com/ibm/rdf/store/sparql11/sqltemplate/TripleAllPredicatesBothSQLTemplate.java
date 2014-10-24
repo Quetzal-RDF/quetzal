@@ -78,8 +78,11 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		SQLMapping vMapping=new SQLMapping("val_constraint", getValueSQLConstraint(), null);
 		mappings.add(vMapping);
 	
-		SQLMapping predicateMapping=new SQLMapping("predicate_constraint", getPropSQLConstraint(), null);
-		mappings.add(predicateMapping);
+		List<String> propSqlConstraint = getPropSQLConstraint();
+		if (! propSqlConstraint.isEmpty()) {
+			SQLMapping predicateMapping=new SQLMapping("predicate_constraint", propSqlConstraint, null);
+			mappings.add(predicateMapping);
+		}
 		
 		List<String> projectSqlParams = getProjectedSQLClause();
 		if(projectSqlParams.size()==0)projectSqlParams.add("*");
@@ -111,9 +114,10 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		mappings.add(pMapping);
 		
 		List<String> pfilterConstraint = getPFilterSQLConstraint();
-		SQLMapping pfilterMapping = new SQLMapping("pfilter_constraint", pfilterConstraint,null);
-		mappings.add(pfilterMapping);
-		
+		if (!pfilterConstraint.isEmpty()) {
+			SQLMapping pfilterMapping = new SQLMapping("pfilter_constraint", pfilterConstraint,null);
+			mappings.add(pfilterMapping);
+		}
 		
 		List<String> predicateColumns = getPredColumnsSQLParams();
 		SQLMapping predicateColumnsSQLParams = new SQLMapping("columns", predicateColumns,null);
