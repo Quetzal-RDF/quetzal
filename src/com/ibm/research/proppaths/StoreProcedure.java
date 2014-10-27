@@ -2,7 +2,6 @@ package com.ibm.research.proppaths;
 
 import java.util.List;
 
-import com.ibm.pdq.runtime.internal.db.JdbcData.InputParameterType;
 import com.ibm.wala.util.collections.Pair;
 
 

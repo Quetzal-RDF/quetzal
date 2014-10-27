@@ -472,7 +472,7 @@ public class RelationalExpression extends Expression {
 		StringTemplate t = null;
 
 		Short rexpType = constantExpression.getReturnType();
-		String constantTypeString = null;
+		String constantTypeString = constantExpression.visit(context, store);
 		/*
 		 * if (otherExpression instanceof BuiltinFunctionExpression) { if
 		 * (((BuiltinFunctionExpression) otherExpression).getBuiltinType() ==
@@ -605,25 +605,35 @@ public class RelationalExpression extends Expression {
 		return t.toString();
 	}
 
-	private StringTemplate handleBooleanConstant(
+	private String handleBooleanConstant(
 			ERelationalOp relationalOperator, Expression otherExpression,
 			String constantTypeString, FilterContext context, Store store) {
 		String left = otherExpression.visit(context, store);
-		StringTemplate t;
-		if (constantTypeString.equalsIgnoreCase("'true'")
-				|| constantTypeString.equals("'1'")) {
-			if (relationalOperator == ERelationalOp.EQUAL)
-				t = store.getInstanceOf(IS_TRUE);
-			else
-				t = store.getInstanceOf(IS_NOT_TRUE);
+		boolean isBooleanExpr = otherExpression.getReturnType() == TypeMap.BOOLEAN_ID;
+		boolean sense = constantTypeString.equalsIgnoreCase("'true'")
+				|| constantTypeString.equals("'1'");
+		if (isBooleanExpr) {
+			if (sense == (relationalOperator == ERelationalOp.EQUAL)) {
+				return left;
+			} else {
+				return "not( " + left + ")";
+			}
 		} else {
-			if (relationalOperator == ERelationalOp.EQUAL)
-				t = store.getInstanceOf(IS_FALSE);
-			else
-				t = store.getInstanceOf(IS_NOT_FALSE);
+			StringTemplate t;
+			if (sense) {
+				if (relationalOperator == ERelationalOp.EQUAL)
+					t = store.getInstanceOf(IS_TRUE);
+				else
+					t = store.getInstanceOf(IS_NOT_TRUE);
+			} else {
+				if (relationalOperator == ERelationalOp.EQUAL)
+					t = store.getInstanceOf(IS_FALSE);
+				else
+					t = store.getInstanceOf(IS_NOT_FALSE);
+			}
+			t.setAttribute("value", left);
+			return t.toString();
 		}
-		t.setAttribute("value", left);
-		return t;
 	}
 
 	private StringTemplate getTemplate(

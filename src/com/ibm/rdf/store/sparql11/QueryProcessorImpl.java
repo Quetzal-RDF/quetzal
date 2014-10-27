@@ -344,7 +344,7 @@ public class QueryProcessorImpl implements QueryProcessor
             SQLGenerator gen = new SQLGenerator(null, query, store, ctx);
             sql = gen.toSQL();
             }
-
+         
          optimizerTime = System.currentTimeMillis();
 
          translatorTime = System.currentTimeMillis();
@@ -356,6 +356,26 @@ public class QueryProcessorImpl implements QueryProcessor
             {
         	if (st == null) {
         		 st = connection.createStatement();
+        	}
+        	if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+        		int reducers = Store.SHARK_REDUCERS;
+       		 	String prop = System.getProperty("mapred.reduce.tasks");
+       		 	if (prop!=null) {
+       		 		try {
+       		 			reducers = Integer.parseInt(prop);
+       		 			if (reducers<=0) {
+       		 				System.err.println("WARNING: Invalid number of reducers specified as value of 'mapred.reduce.tasks': "+reducers);
+       		 				System.err.println("WARNING: The default value will be used: "+ Store.SHARK_REDUCERS);
+       		 				reducers = Store.SHARK_REDUCERS;
+       		 			}
+       		 		} catch (NumberFormatException ex ) {
+       		 			System.err.println("WARNING: Invalid number of reducers specified as value of 'mapred.reduce.tasks': "+reducers);
+       		 			System.err.println("WARNING: The default value will be used: "+ Store.SHARK_REDUCERS);
+       		 		}
+       		 	}
+       		 	
+       		 	int count = st.executeUpdate("SET mapred.reduce.tasks = "+reducers);
+       		 	logger.info("'SET mapred.reduce.tasks = "+reducers+"' executed successfully: "+count);
         	}
             rs = st.executeQuery(sql);
 

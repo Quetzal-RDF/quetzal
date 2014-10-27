@@ -285,7 +285,7 @@ public class TestRunner<D> {
       {
       long time = System.currentTimeMillis();
       int nOR = engine.execute(data, file, false);
-      if (answers != null && answers[queryNum] >= -1)
+      if (answers != null && answers.length > queryNum && answers[queryNum] >= -1)
          {
          Assert.assertEquals(answers[queryNum], nOR);
          }

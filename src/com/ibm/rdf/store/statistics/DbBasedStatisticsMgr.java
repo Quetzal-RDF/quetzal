@@ -14,7 +14,6 @@ import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.config.Constants;
 import com.ibm.rdf.store.config.Statistics;
 import com.ibm.rdf.store.config.StatisticsImpl;
-import com.ibm.rdf.store.jena.RdfStoreException;
 import com.ibm.rdf.store.jena.impl.DB2CloseObjects;
 import com.ibm.rdf.store.runtime.service.sql.SQLExceptionWrapper;
 import com.ibm.rdf.store.runtime.service.sql.SQLExecutor;
@@ -60,6 +59,24 @@ public class DbBasedStatisticsMgr
 
    public void populateStatsSchema()
       {
+	   if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+			  int reducers = Store.SHARK_REDUCERS;
+			  String prop = System.getProperty("mapred.reduce.tasks");
+			  if (prop!=null) {
+				  try {
+					  reducers = Integer.parseInt(prop);
+					  if (reducers<=0) {
+						  System.err.println("WARNING: Invalid number of reducers specified as value of 'mapred.reduce.tasks': "+reducers);
+						  System.err.println("WARNING: The default value will be used: "+ Store.SHARK_REDUCERS);
+						  reducers = Store.SHARK_REDUCERS;
+					  }
+				  } catch (NumberFormatException ex ) {
+					  System.err.println("WARNING: Invalid number of reducers specified as value of 'mapred.reduce.tasks': "+reducers);
+					  System.err.println("WARNING: The default value will be used: "+ Store.SHARK_REDUCERS);
+				  }
+			  }
+	 		  SQLExecutor.executeUpdate(con,"SET mapred.reduce.tasks = "+ reducers);
+	   }
       populateBasicStats();
       populateTopKStats();
       }
@@ -234,7 +251,7 @@ public class DbBasedStatisticsMgr
       // Total number of triples = Total number of values in DPH
       // + ( Total records in DS - Unique lids in DS)
       nrTriples += new SQLExecutor().executeQuery(con,
-            "SELECT (COUNT(*) - COUNT(DISTINCT list_id)) AS COUNT FROM " + store.getDirectSecondary(),
+            "SELECT (-COUNT(DISTINCT list_id) + COUNT(*) ) AS COUNT FROM " + store.getDirectSecondary(),
             new SingleRowResultSetProcessor<Integer>()
                {
                   public Integer processRow(Connection conn, ResultSet rs) throws SQLException

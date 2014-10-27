@@ -19,13 +19,13 @@ public abstract class FreebaseQueryUtilityTest<D> extends TestRunner<D> {
 	public static class DB2Freebase extends
 			FreebaseQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
-				"jdbc:db2://localhost:49999/sl", "fb",
-				"db2inst1", "db2inst1", "db2inst1", false);
+				"jdbc:db2://localhost:9997/lubm", "qdata",
+				"db2inst2", "db2admin", "db2inst2", false);
 
 		public DB2Freebase() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/freebase/",
-					answers);
+					"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/freebase/",
+					new int[]{ 2, 2, 2, 0, 2, 0});
 		}
 	}
 
@@ -38,7 +38,7 @@ public abstract class FreebaseQueryUtilityTest<D> extends TestRunner<D> {
 
 	@Test
 	public void testQueryQ2() throws Exception {
-		String file = queryDir + "q2a.sparql";
+		String file = queryDir + "q2.sparql";
 		System.err.println("Testing:" + file);
 		executeQuery(file, 1);
 	}
