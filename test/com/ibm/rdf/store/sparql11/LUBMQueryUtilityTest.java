@@ -181,12 +181,12 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
-	// @RandomizedRepeat(1)
+	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	@RandomizedRepeat(8)
 	public static class PSQLLUBM100MHelix1 extends
 			LUBMQueryUtilityTest<PSQLTestData> {
 		private static final PSQLTestData data = PSQLTestData.getStore(
-				"jdbc:postgresql://helix1.pok.ibm.com:24973/lubm100m",
+				"jdbc:postgresql://helix1.pok.ibm.com:5432/lubm100m",
 				"lubm100m", "akement", "passw0rd", "db2inst2", false);
 
 		public PSQLLUBM100MHelix1() {
