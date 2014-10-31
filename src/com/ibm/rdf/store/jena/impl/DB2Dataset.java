@@ -26,6 +26,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.Quad;
+import com.hp.hpl.jena.sparql.core.Transactional;
 import com.hp.hpl.jena.sparql.util.Context;
 import com.hp.hpl.jena.sparql.util.Symbol;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
@@ -36,7 +37,7 @@ import com.ibm.rdf.store.hashing.HashingHelper;
 import com.ibm.rdf.store.jena.RdfStoreException;
 import com.ibm.rdf.store.jena.impl.update.InsertAndUpdateStatements;
 
-public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph
+public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Transactional
    {
 
    private Connection       connection;
@@ -48,7 +49,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph
    private boolean          closed      = false;
    private Context          jenaContext = null;
 
-   public DB2Dataset(Model model)
+   public DB2Dataset(Model model) 
       {
       defaultModel = model;
       DB2Graph g = (DB2Graph) model.getGraph();
@@ -71,33 +72,33 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph
    @Override
    public void abort()
       {
-      throw new RdfStoreException("Unsupported operation");
+	   // do nothing
 
       }
 
    @Override
    public void begin(ReadWrite arg0)
       {
-      throw new RdfStoreException("Unsupported operation");
+      // do nothing
 
       }
 
    @Override
    public void end()
       {
-      throw new RdfStoreException("Unsupported operation");
+      // do nothing
       }
 
    @Override
    public boolean isInTransaction()
       {
-      throw new RdfStoreException("Unsupported operation");
+      return false;
       }
 
    @Override
    public boolean supportsTransactions()
       {
-      return false;
+      return true;
       }
 
    // Checking if Model already exist in the store.

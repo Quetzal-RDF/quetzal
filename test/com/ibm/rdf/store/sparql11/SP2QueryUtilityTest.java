@@ -27,11 +27,11 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
       }
 
    protected final static int[] sp2b1MAnswers   = new int[]
-                                                   { 1, 32770, 52676, 379, 0, 2586733, 35241, 35241, 62795, 292, 400, 4, 572, 10, 1, 1, 0                                  };
+                                                   { 1, 32770, 52676, 379, 0, 2586733, 35241, 35241, 62795, 292, 400, 4, 572, 10, 1, 1, 0};
    protected final static int[] sp2b10MAnswers  = new int[]
                                                    { 1, 613729, 323456, 2209, 0, -1, 404903, 404903, -1, -1, 493, 4, 656, 10, 1, 1, 0 };
    protected final static int[] sp2b100MAnswers = new int[]
-                                                   { 1, 9050604, 1466402, 10143, 0, -1, 2016996, 2016996, 9812030, 14645, 493, 4, 656, 10, 1, 1, 0                         };
+                                                   { 1, 9050604, 1466402, 10143, 0, -1, 2016996, 2016996, 9812030, 14645, 493, 4, 656, 10, 1, 1, 0};
 
 
 
@@ -118,7 +118,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B10MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/sp2b10m", "sp2b10m", "akement",
+      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b10m", "sp2b10m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B10MHelix1()
@@ -163,7 +163,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B1MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/sp2b1m", "sp2b1m", "akement",
+      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b1m", "sp2b1m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B1MHelix1()

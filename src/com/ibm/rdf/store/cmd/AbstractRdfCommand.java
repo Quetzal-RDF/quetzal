@@ -45,7 +45,7 @@ public abstract class AbstractRdfCommand
             }
          if (!(args[i].startsWith("-")))
             {
-            throw new IllegalArgumentException("argument doesn't start with a '-'");
+            throw new IllegalArgumentException("argument doesn't start with a '-'" + args[i]);
             }
          params.put(args[i], args[i + 1]);
          }
