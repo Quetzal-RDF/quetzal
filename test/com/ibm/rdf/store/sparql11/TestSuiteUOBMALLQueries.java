@@ -7,12 +7,12 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses(
    { 
    UOBMQueryUtilityTest.PSQLUOBM30MALLPropPathsExpHelix1.class,  //currently failing
-   UOBMQueryUtilityTest.DB2UOBM30MALLPropPathsExpVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30MALLPropPathsExp.class,
 
    //property path tests
     
    UOBMQueryUtilityTest.PSQLUOBM30MALLPropPathsHelix.class, // currently failing
-   UOBMQueryUtilityTest.DB2UOBM30ALLPropPathsVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30ALLPropPaths.class,
    })
 public class TestSuiteUOBMALLQueries<D>
    {

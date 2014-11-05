@@ -58,16 +58,5 @@ public abstract class BofABenchTest<D extends DB2TestData> extends TestRunner<D>
 		int result = executeQuery(file, 3);
 		System.out.println(file + " has : " + result + " rows");
 	}
-	
-	
-	public static class Driver extends BofABenchTest<DB2TestData> {
-		public Driver() {
-			super(new DB2Engine(), junitHackData, junitHackDirectory, BofAanswers);
-		}
-	}
-	
-	public static void main(String[] args) {
-		main(Driver.class, "lubm100m_r", args);
-	}
 
 }

@@ -6,14 +6,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
 import junit.framework.Assert;
-
-import org.junit.runner.JUnitCore;
-import org.junit.runner.notification.Failure;
+import junit.framework.TestCase;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -560,18 +557,4 @@ public class TestRunner<D> {
   
 
    }
-   protected static DB2TestData junitHackData;
-
-   protected static String      junitHackDirectory;
-
-   protected static void main(Class<?> testClass, String dataset, String[] args)
-      {
-      junitHackData = DB2TestData.getStore(args[0], dataset, args[1], args[2], args[3], false);
-      junitHackDirectory = args[4];
-      for (Failure f : JUnitCore.runClasses(testClass).getFailures())
-         {
-         System.err.println(f);
-         }
-      }
-
-   }
+}

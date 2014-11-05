@@ -16,30 +16,18 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
 import com.ibm.rdf.store.sparql11.model.FunctionCall;
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.wala.util.collections.HashMapFactory;
 
-public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
+public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	private final String queryDir;
 	protected final static Logger logger = LoggerFactory
 			.getLogger(LUBMQueryUtilityTest.class);
 
-	public static final int[] lubm100kAnswers = { 4, 0, 6, 34, 719, 7790, 67,
-			7790, 208, 4, 0, 0, 1, 5916 };
-	public static final int[] lubm10mAnswers = { 4, 212, 6, 34, 719, 838892,
-			67, 7790, 21872, 4, 0, 0, 380, 636529 };
-	public static final int[] lubm100mAnswers = { 4, 1831, 6, 34, 719, 7508706,
-			67, 7790, 195954, 4, 0, 0, 3409, 5695568 };
-	// 8000 universities is roughly 1 billion triples
-	static final int[] lubm8000uAnswers = { 4, 2528, 6, 34, 719, 83557706, 67,
-			7790, 2178420, 4, 0, 0, 37118, 64400587 };
-	
-
-	protected LUBMQueryUtilityTest(DatabaseEngine<D> engine, D data,
-			String queryDir, int[] ans) {
+	public LUBMQueryUtilityTest(DatabaseEngine<D> engine, D data,
+			int[] ans, String queryDir) {
 		super(data, engine, ans);
 		this.queryDir = queryDir;
 	}
@@ -54,20 +42,20 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 			String kbSize = System.getenv("KB_SIZE");
 			
 			if (kbSize.equals("100k")) {
-				answers = lubm100kAnswers;
+				answers = TestConstants.lubm100kAnswers;
 			} else if (kbSize.equals("10m")) {
-				answers = lubm10mAnswers;
+				answers = TestConstants.lubm10mAnswers;
 			} else if (kbSize.equals("100m")) {
-				answers = lubm100mAnswers;
+				answers = TestConstants.lubm100mAnswers;
 			} else if (kbSize.equals("1B")) {
-				answers = lubm8000uAnswers;
+				answers = TestConstants.lubm8000uAnswers;
 			} 
 		}
 
 		public DockerDB2() {
 				
-			super(new DB2Engine(), data, System.getenv("QUERY_DIR"),
-					answers);
+			super(new DB2Engine(), data, answers,
+					System.getenv("QUERY_DIR"));
 		}
 	}
 	
@@ -82,19 +70,19 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 			String kbSize = System.getenv("KB_SIZE");
 			
 			if (kbSize.equals("100k")) {
-				answers = lubm100kAnswers;
+				answers = TestConstants.lubm100kAnswers;
 			} else if (kbSize.equals("10m")) {
-				answers = lubm10mAnswers;
+				answers = TestConstants.lubm10mAnswers;
 			} else if (kbSize.equals("100m")) {
-				answers = lubm100mAnswers;
+				answers = TestConstants.lubm100mAnswers;
 			} else if (kbSize.equals("1B")) {
-				answers = lubm8000uAnswers;
+				answers = TestConstants.lubm8000uAnswers;
 			}
 		}
 
 		public DockerPostgresql() {
-			super(new PSQLEngine(), data, System.getenv("QUERY_BASE"),
-					answers);
+			super(new PSQLEngine(), data, answers,
+					System.getenv("QUERY_BASE"));
 		}
 	}
 	
@@ -108,20 +96,20 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 			String kbSize = System.getenv("KB_SIZE");
 			
 			if (kbSize.equals("100k")) {
-				answers = lubm100kAnswers;
+				answers = TestConstants.lubm100kAnswers;
 			} else if (kbSize.equals("10m")) {
-				answers = lubm10mAnswers;
+				answers = TestConstants.lubm10mAnswers;
 			} else if (kbSize.equals("100m")) {
-				answers = lubm100mAnswers;
+				answers = TestConstants.lubm100mAnswers;
 			} else if (kbSize.equals("1B")) {
-				answers = lubm8000uAnswers;
+				answers = TestConstants.lubm8000uAnswers;
 			}
 		}
 
 		public DockerShark() {
 				
-			super(new SharkEngine(), data, System.getenv("QUERY_DIR"),
-					answers);
+			super(new SharkEngine(), data, answers,
+					System.getenv("QUERY_DIR"));
 		}
 	}
 
@@ -133,8 +121,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBM10MHelix1() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed_proppath/",
-					lubm10mAnswers);
+					TestConstants.lubm10mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed_proppath/");
 		}
 	}
 
@@ -150,8 +138,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		
 		public SharkLUBM100KOnVM_9_51_154_25() {
 			super(new SharkEngine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm100kAnswers);
+					TestConstants.lubm100kAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 		
@@ -163,8 +151,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBM100KHelix1() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm100kAnswers);
+					TestConstants.lubm100kAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -176,8 +164,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public PSQLLUBM10MHelix1() {
 			super(new PSQLEngine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm10mAnswers);
+					TestConstants.lubm10mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -191,8 +179,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public PSQLLUBM100MHelix1() {
 			super(new PSQLEngine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -207,8 +195,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 				"sherlives", "db2inst1", false);
 
 		public PSQLLUBM100MSL() {
-			super(new PSQLEngine(), data, System.getProperty("rdfstore_data")
-					+ "/lubm_queries_QL_reversed/", lubm100mAnswers);
+			super(new PSQLEngine(), data, TestConstants.lubm100mAnswers, System.getProperty("rdfstore_data")
+							+ "/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -222,8 +210,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public PSQLLUBMPropPathHelix1() {
 			super(new PSQLEngine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed_proppath/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed_proppath/");
 		}
 
 		/*
@@ -240,7 +228,7 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		private static String queryDir = "../rdfstore-data/uobm_queries_proppaths/";
 
 		public PSQLLUBMCastTestHelix1() {
-			super(new PSQLEngine(), data, queryDir, new int[] { -2 });
+			super(new PSQLEngine(), data, new int[] { -2 }, queryDir);
 		}
 
 		@Test
@@ -317,8 +305,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBMHelix1() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -332,8 +320,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBMPropPathHelix1() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed_proppath/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed_proppath/");
 		}
 	}
 
@@ -347,8 +335,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBM10MHelix2() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm10mAnswers);
+					TestConstants.lubm10mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -357,13 +345,13 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	public static class DB2LUBM100MHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
-				"jdbc:db2://helix1.pok.ibm.com:50001/lubm100m", "lubm100m",
-				"db2inst1", "db2inst1", "db2inst2", false);
+				"jdbc:db2://helix1.pok.ibm.com:50001/lubm", "lubm_100m_r",
+				"db2inst1", "db2admin", "db2inst1", false);
 
 		public DB2LUBM100MHelix1() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -377,8 +365,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public Reversed100MSL() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -392,8 +380,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBM100M_SL() {
 			super(new DB2Engine(), data,
-					"test/lubm_queries/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"test/lubm_queries/");
 		}
 	}
 
@@ -406,8 +394,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public DB2LUBM10MRC2() {
 			super(new DB2Engine(), data,
-					"../rdfstore-data/lubm_queries_QL_reversed/",
-					lubm10mAnswers);
+					TestConstants.lubm10mAnswers,
+					"../rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -452,8 +440,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 		public Reversed100M_WithOWLQLCompilation() {
 			super(new DB2Engine(compiler), data,
-					"../rdfstore-data/lubm_queries_original_rev/",
-					lubm100mAnswers);
+					TestConstants.lubm100mAnswers,
+					"../rdfstore-data/lubm_queries_original_rev/");
 		}
 
 		private static String primReverse(String query) throws IOException,
@@ -679,17 +667,6 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		String file = queryDir + "q14.sparql";
 		System.err.println("Testing:" + file);
 		executeQuery(file, 13);
-	}
-
-	public static class Driver extends LUBMQueryUtilityTest<DB2TestData> {
-		public Driver() {
-			super(new DB2Engine(), junitHackData, junitHackDirectory,
-					lubm100mAnswers);
-		}
-	}
-
-	public static void main(String[] args) {
-		main(Driver.class, "lubm100m_r", args);
 	}
 
 }

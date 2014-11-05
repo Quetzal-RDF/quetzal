@@ -1,21 +1,11 @@
 package com.ibm.rdf.store.sparql11;
 
 import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
-import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-import com.ibm.rdf.store.sparql11.TestRunner.PSQLTestData;
-
-public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
+public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConstants {
 	protected final String queryDir;
-	static final int[] answers_original = {0, 0, 25, 533, 0, 5112, 1, 29, 34, -2, 47, 0, 0, 376};
-	static final int[] answers_proppaths = {2343, 38135, 25, 533, 322, 5112, 1, 29, 34, 27355, 47, 0, 0, 376, 353, 0, 9931, -2,  28898, -2, 354, 1152768, 23, 322,0,0, 9, 1162699};
-	static final int[] answers_proppaths_expansion = { 2343, 38135, 25, 533, 322, 5112, 1, 29, 34, 27355, 47, 0, 0, 376, 353,  0, 9931, -2,  28898, -2, 354,  1152768, 23, 322,0,0, 9, 1162699};
-	static final int[] answers_proppaths_expansion_uobm1 = { 2352, 37808, 22, 533, 322, 184, 4, 36, 26, -2, 90, 0, 0, -2, 350,  0, 350, -2,  1017, -2, 351,  1152768, 23, 322,0,0, 6, -2};
-	
-	
 	protected UOBMQueryUtilityTest(DatabaseEngine<D> engine, String queryDir, D data, int[] answers) {
 		super(data, engine, answers);
 		this.queryDir = queryDir;
@@ -30,13 +20,13 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 	}*/
 
 	public static class UOBM30 extends UOBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/uobm",
-				"uobm30", "db2inst2","db2admin","db2inst2",false);
+		private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/uobm",
+				"uobm30", "db2inst1","db2admin","db2inst1",false);
 		public UOBM30() {
-			super(new DB2Engine(),"../rdfstore-data/uobm_queries_original/", data, answers_original);
+			super(new DB2Engine(),"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/uobm_queries_original/", data, uobm_30_answers_original);
 		}
 	}
-	public static class DB2UOBM30ALLPropPathsVM9_47_202_45 extends DB2UOBM30PropPathsVM9_47_202_45  {
+	public static class DB2UOBM30ALLPropPaths extends DB2UOBM30PropPaths  {
 		@Test 
 		public void testQ10() {
 			test(9);
@@ -54,12 +44,21 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 			test(27);
 		}
 	}
-	public static class DB2UOBM30PropPathsVM9_47_202_45 extends UOBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/uobm",
-				"uobm30", "db2inst2","db2admin","db2inst2",false);
-		public DB2UOBM30PropPathsVM9_47_202_45() {
-			super(new DB2Engine(),"../rdfstore-data/uobm_queries_proppaths/", data, answers_proppaths);
+	public static class DB2UOBM30PropPaths extends UOBMQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/uobm",
+				"uobm30", "db2inst1","db2admin","db2inst1",false);
+		public DB2UOBM30PropPaths() {
+			super(new DB2Engine(),"../rdfstore-data/uobm_queries_proppaths/", data, uobm_30_answers_proppaths);
 		}
+		
+		public DB2UOBM30PropPaths(
+				com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine<com.ibm.rdf.store.sparql11.TestRunner.DB2TestData> engine,
+				String queryDir,
+				com.ibm.rdf.store.sparql11.TestRunner.DB2TestData data,
+				int[] answers) {
+			super(engine, queryDir, data, answers);
+		}
+
 		@Test 
 		public void testQ15() {
 			test(14);
@@ -141,7 +140,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 		private static final PSQLTestData data =PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/uobm", "uobm", "akement", "passw0rd",
                 "db2inst1", false);
 		public PSQLUOBM30PropPathsHelix() {
-			super(new PSQLEngine(),"../rdfstore-data/uobm_queries_proppaths/", data, answers_proppaths);
+			super(new PSQLEngine(),"../rdfstore-data/uobm_queries_proppaths/", data, uobm_30_answers_proppaths);
 		}
 		@Test 
 		public void testQ15() {
@@ -226,7 +225,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 			//	"uobm30", "db2inst2","db2admin","db2inst2",false);
 		public SharkUOBM1MPropPathsExpVM_9_12_196_243() {
 			super(new SharkEngine(),"../rdfstore-data/uobm_queries_proppaths_expansion/", data, 
-					answers_proppaths_expansion_uobm1);
+					uobm_1_answers_proppaths_expansion);
 		}
 		@Test 
 		public void testQ15() {
@@ -293,7 +292,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 			//	"uobm30", "db2inst2","db2admin","db2inst2",false);
 		public PSQLUOBM30MPropPathsExpHelix1() {
 			super(new PSQLEngine(),"../rdfstore-data/uobm_queries_proppaths_expansion/", data, 
-					answers_proppaths_expansion);
+					uobm_30_answers_proppaths_expansion);
 		}
 		@Test 
 		public void testQ15() {
@@ -352,7 +351,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 			test(27);
 		}*/
 	}
-	public static class DB2UOBM30MALLPropPathsExpVM9_47_202_45  extends DB2UOBM30MPropPathsExpVM9_47_202_45 {
+	public static class DB2UOBM30MALLPropPathsExp  extends DB2UOBM30MPropPathsExp {
 		@Test 
 		public void testQ10() {
 			test(9);
@@ -370,29 +369,32 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 			test(27);
 		}
 	}
-	public static class DB2UOBM1MPropPathsExpVM9_47_202_45 extends AbstractDB2UOBM30MPropPathsExpVM9_47_202_45 {
-		private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/uobm",
-				"uobm1u", "db2inst2","db2admin","db2inst2",false);
-		public DB2UOBM1MPropPathsExpVM9_47_202_45() {
+	public static class DB2UOBM1MPropPathsExp extends AbstractDB2UOBM30MPropPathsExp {
+		private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/uobm",
+				"uobm1u", "db2inst1","db2admin","db2inst1",false);
+		public DB2UOBM1MPropPathsExp() {
 			super(new DB2Engine(),"../rdfstore-data/uobm_queries_proppaths_expansion/", data, 
-					answers_proppaths_expansion_uobm1);
+					uobm_1_answers_proppaths_expansion);
 		}
 		
 	}
-	public static class DB2UOBM30MPropPathsExpVM9_47_202_45 extends AbstractDB2UOBM30MPropPathsExpVM9_47_202_45 {
-		public DB2UOBM30MPropPathsExpVM9_47_202_45() {
+	public static class DB2UOBM30MPropPathsExp extends AbstractDB2UOBM30MPropPathsExp {
+		public DB2UOBM30MPropPathsExp() {
 			super();
 		}
 	}
-	public static abstract class AbstractDB2UOBM30MPropPathsExpVM9_47_202_45 extends UOBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/uobm",
-				"uobm30", "db2inst2","db2admin","db2inst2",false);
-		public AbstractDB2UOBM30MPropPathsExpVM9_47_202_45() {
+	
+	public static abstract class AbstractDB2UOBM30MPropPathsExp extends UOBMQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/uobm",
+				"uobm30", "db2inst1","db2admin","db2inst1",false);
+
+		
+		public AbstractDB2UOBM30MPropPathsExp() {
 			this(new DB2Engine(),"../rdfstore-data/uobm_queries_proppaths_expansion/", data, 
-					answers_proppaths_expansion);
+					uobm_30_answers_proppaths_expansion);
 		}
 		
-		public AbstractDB2UOBM30MPropPathsExpVM9_47_202_45(
+		public AbstractDB2UOBM30MPropPathsExp(
 				com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine<com.ibm.rdf.store.sparql11.TestRunner.DB2TestData> engine,
 				String queryDir,
 				com.ibm.rdf.store.sparql11.TestRunner.DB2TestData data,

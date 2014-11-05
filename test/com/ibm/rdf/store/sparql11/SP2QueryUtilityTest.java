@@ -26,16 +26,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
       this.queryDir = queryDir;
       }
 
-   protected final static int[] sp2b1MAnswers   = new int[]
-                                                   { 1, 32770, 52676, 379, 0, 2586733, 35241, 35241, 62795, 292, 400, 4, 572, 10, 1, 1, 0                                  };
-   protected final static int[] sp2b10MAnswers  = new int[]
-                                                   { 1, 613729, 323456, 2209, 0, -1, 404903, 404903, -1, -1, 493, 4, 656, 10, 1, 1, 0 };
-   protected final static int[] sp2b100MAnswers = new int[]
-                                                   { 1, 9050604, 1466402, 10143, 0, -1, 2016996, 2016996, 9812030, 14645, 493, 4, 656, 10, 1, 1, 0                         };
-
-
-
-	public static class DockerDB2 extends SP2QueryUtilityTest<DB2TestData> {
+   public static class DockerDB2 extends SP2QueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
 				System.getenv("JDBC_URL"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
@@ -45,11 +36,11 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 			String kbSize = System.getenv("KB_SIZE");
 			
 			if (kbSize.equals("1m")) {
-				answers = sp2b1MAnswers;
+				answers = TestConstants.sp2b1MAnswers;
 			} else if (kbSize.equals("10m")) {
-				answers = sp2b10MAnswers;
+				answers = TestConstants.sp2b10MAnswers;
 			} else if (kbSize.equals("100m")) {
-				answers = sp2b100MAnswers;
+				answers = TestConstants.sp2b100MAnswers;
 			} 
 		}
 
@@ -69,11 +60,11 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 			String kbSize = System.getenv("KB_SIZE");
 			
 			if (kbSize.equals("1m")) {
-				answers = sp2b1MAnswers;
+				answers = TestConstants.sp2b1MAnswers;
 			} else if (kbSize.equals("10m")) {
-				answers = sp2b10MAnswers;
+				answers = TestConstants.sp2b10MAnswers;
 			} else if (kbSize.equals("100m")) {
-				answers = sp2b100MAnswers;
+				answers = TestConstants.sp2b100MAnswers;
 			} 
 		}
 
@@ -92,11 +83,11 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 		static {
 			String kbSize = System.getenv("KB_SIZE");
 			if (kbSize.equals("1m")) {
-				answers = sp2b1MAnswers;
+				answers = TestConstants.sp2b1MAnswers;
 			} else if (kbSize.equals("10m")) {
-				answers = sp2b10MAnswers;
+				answers = TestConstants.sp2b10MAnswers;
 			} else if (kbSize.equals("100m")) {
-				answers = sp2b100MAnswers;
+				answers = TestConstants.sp2b100MAnswers;
 			} 
 		}
 
@@ -105,14 +96,14 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 			super(new SharkEngine(), data, answers, System.getenv("QUERY_DIR"));
 		}
 	}
-   public static class DB2SP2B10MHelix1 extends SP2QueryUtilityTest<DB2TestData>
+   public static class DB2SP2B100MHelix1 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://helix1.pok.ibm.com:50001/sp2b10m", "sp2b10m", "db2inst1",
-                                                  "db2inst1", "db2inst1", false);
+      private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://helix1.pok.ibm.com:50001/sp2b", "sp2b_100m_r", "db2inst1",
+                                                  "db2admin", "db2inst1", false);
 
-      public DB2SP2B10MHelix1()
+      public DB2SP2B100MHelix1()
          {
-         super(new DB2Engine(), data, sp2b10MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new DB2Engine(), data, TestConstants.sp2b100MAnswers, System.getProperty("sp2b.queries.rev"));
          }
       }
 
@@ -123,7 +114,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
       public PSQLSP2B10MHelix1()
          {
-         super(new PSQLEngine(), data, sp2b10MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new PSQLEngine(), data, TestConstants.sp2b10MAnswers, "../rdfstore-data/sp2b_queries_rev/");
          }
       }
 
@@ -134,7 +125,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
       public PSQLSP2B100MHelix1()
          {
-         super(new PSQLEngine(), data, sp2b100MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new PSQLEngine(), data, TestConstants.sp2b100MAnswers, "../rdfstore-data/sp2b_queries_rev/");
          }
       }
 
@@ -145,7 +136,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public DB2SP2B1MHelix1()
       {
-      super(new DB2Engine(), data, sp2b1MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+      super(new DB2Engine(), data, TestConstants.sp2b1MAnswers, "../rdfstore-data/sp2b_queries_rev/");
       }
    }
 
@@ -157,7 +148,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
         public SharkSP2B1MVM9_12_196_243()
          {
-         super(new SharkEngine(), data, sp2b1MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new SharkEngine(), data, TestConstants.sp2b1MAnswers, "../rdfstore-data/sp2b_queries_rev/");
          }
       }
 
@@ -168,7 +159,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
       public PSQLSP2B1MHelix1()
          {
-         super(new PSQLEngine(), data, sp2b1MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new PSQLEngine(), data, TestConstants.sp2b1MAnswers, "../rdfstore-data/sp2b_queries_rev/");
          }
       }
 
@@ -194,14 +185,14 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
          }
       }
 
-   public static class SP2B100M_R_AMAZON extends SP2QueryUtilityTest<DB2TestData>
+   public static class SP2B100M_SL extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://localhost:50000/testrev", "sp2b5m_r", "db2inst1", "ihaterc2",
-                                                  "db2inst1", false);
+      private static final DB2TestData data = getStore("jdbc:db2://localhost:9997/lubm", "sp2b100m", "db2inst2", "db2admin",
+                                                  "db2inst2", false);
 
-      public SP2B100M_R_AMAZON()
+      public SP2B100M_SL()
          {
-         super(new DB2Engine(), data, sp2b100MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new DB2Engine(), data, TestConstants.sp2b100MAnswers, "test/sp2b_queries/");
          }
       }
 
@@ -212,7 +203,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
       public SP2B100M_R_RC2()
          {
-         super(new DB2Engine(), data, sp2b100MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new DB2Engine(), data, TestConstants.sp2b100MAnswers, "../rdfstore-data/sp2b_queries_rev/");
          }
       }
 
@@ -375,19 +366,4 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
       System.err.println("Testing:" + file);
       executeQuery(file, 16);
       }
-
-   @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
-   @RandomizedRepeat(5)
-   public static class Driver extends SP2QueryUtilityTest<DB2TestData>
-      {
-      public Driver()
-         {
-         super(new DB2Engine(), junitHackData, sp2b100MAnswers, junitHackDirectory);
-         }
-      }
-
-   public static void main(String[] args)
-      {
-      main(Driver.class, "sp2b100m_r", args);
-      }
-   }
+}

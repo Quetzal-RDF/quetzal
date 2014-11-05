@@ -14,14 +14,10 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 	private static final String reverseQueryDir = "../rdfstore-data/jazz_queries_rev/";
 	private static final String normalQueryDir = "../rdfstore-data/jazz_queries/";
 	
-	static final int[] jazzAnswers = {5, 5, 5, 5, 5, 5, 5, 5, 5, 10, 
-		5, 5, -2, 1024, 1024, 1024, 1024, 1024, 1024, 1024, 
-		100, 100, 100, -2, 100, 2048, 2048, 2048, 2048};
-
 	private final String queryDir;
 
 	protected JazzQueryUtilityTest(DatabaseEngine<D> engine, D data, boolean reverse) {
-		super(data, engine, jazzAnswers);
+		super(data, engine, TestConstants.jazzAnswers);
 		queryDir = reverse? reverseQueryDir: normalQueryDir;
 	}
 
