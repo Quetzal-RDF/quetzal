@@ -317,6 +317,7 @@ public class TestRunner<D> {
    public static abstract class AbstractEngine<D extends TestData> implements DatabaseEngine<D>
       {
       protected OWLQLSPARQLCompiler compiler;
+      //protected boolean isWrapperEnabled = true;
       protected boolean isWrapperEnabled = true;
 
       public AbstractEngine()
