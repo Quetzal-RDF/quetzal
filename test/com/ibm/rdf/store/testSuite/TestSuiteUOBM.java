@@ -12,14 +12,14 @@ import com.ibm.rdf.store.sparql11.UOBMQueryUtilityTest;
 @Suite.SuiteClasses(
    { 
    UOBMQueryUtilityTest.PSQLUOBM30MPropPathsExpHelix1.class, 
-   UOBMQueryUtilityTest.DB2UOBM30MPropPathsExpVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30MPropPathsExp.class,
    
    //property path tests
    // LUBMQueryUtilityTest.PSQLLUBMPropPathHelix1.class
    //LUBMQueryUtilityTest.DB2LUBMPropPathHelix1.class, 
    
    UOBMQueryUtilityTest.PSQLUOBM30PropPathsHelix.class, 
-   UOBMQueryUtilityTest.DB2UOBM30PropPathsVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30PropPaths.class,
    })
 public class TestSuiteUOBM
    {

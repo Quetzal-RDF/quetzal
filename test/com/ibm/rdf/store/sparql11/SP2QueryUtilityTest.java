@@ -3,16 +3,6 @@ package com.ibm.rdf.store.sparql11;
 import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import com.ibm.rdf.store.sparql11.TestRunner.DB2Engine;
-import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;
-import com.ibm.rdf.store.sparql11.TestRunner.PSQLEngine;
-import com.ibm.rdf.store.sparql11.TestRunner.PSQLTestData;
-import com.ibm.rdf.store.sparql11.TestRunner.SharkEngine;
-import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
-import com.ibm.rdf.store.testing.RandomizedRepeat;
 
 //@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 //@RandomizedRepeat(1)

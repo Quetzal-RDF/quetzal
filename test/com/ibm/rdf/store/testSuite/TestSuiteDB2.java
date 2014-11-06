@@ -14,7 +14,7 @@ import com.ibm.rdf.store.sparql11.UOBMQueryUtilityTest;
    JazzQueryUtilityTest.DB2JazzHelix1.class,
    LUBMQueryUtilityTest.DB2LUBMHelix1.class,
    SP2QueryUtilityTest.DB2SP2B1MHelix1.class,
-   UOBMQueryUtilityTest.DB2UOBM30MPropPathsExpVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30MPropPathsExp.class,
    })
 public class TestSuiteDB2
    {

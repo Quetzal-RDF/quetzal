@@ -20,14 +20,14 @@ import com.ibm.rdf.store.sparql11.UOBMQueryUtilityTest;
    SP2QueryUtilityTest.PSQLSP2B1MHelix1.class,
    SP2QueryUtilityTest.DB2SP2B1MHelix1.class,
    UOBMQueryUtilityTest.PSQLUOBM30MPropPathsExpHelix1.class,  //currently failing
-   UOBMQueryUtilityTest.DB2UOBM30MPropPathsExpVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30MPropPathsExp.class,
    
    //property path tests
    // LUBMQueryUtilityTest.PSQLLUBMPropPathHelix1.class
    //LUBMQueryUtilityTest.DB2LUBMPropPathHelix1.class, 
    
    UOBMQueryUtilityTest.PSQLUOBM30PropPathsHelix.class, // currently failing
-   UOBMQueryUtilityTest.DB2UOBM30PropPathsVM9_47_202_45.class,
+   UOBMQueryUtilityTest.DB2UOBM30PropPaths.class,
  
    //
    })
