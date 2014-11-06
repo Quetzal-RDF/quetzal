@@ -44,10 +44,7 @@ import com.ibm.rdf.store.sparql11.model.VariableExpression;
 
 public class Query extends com.hp.hpl.jena.query.Query {
 
-	// In Ocatavian's new parser, i could get difference betweem
-	// patternVars & optPatternVars
-	// Also it is a <Set> not a <Map>... why is it Map
-	//
+
 
 	private String sparql;
 	private SelectQuery selectQuery;

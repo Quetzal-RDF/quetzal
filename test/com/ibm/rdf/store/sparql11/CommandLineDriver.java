@@ -5,11 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import junit.framework.TestCase;
-
-import org.junit.runner.JUnitCore;
-import org.junit.runner.notification.Failure;
-
 import com.ibm.rdf.store.sparql11.TestRunner.DB2Engine;
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
 import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;

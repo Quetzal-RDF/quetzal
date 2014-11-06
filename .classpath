@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jena-arq-2.11.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jena-arq-2.11.0.jar" sourcepath="/Users/ksrinivs/Downloads/jena-2.12.1"/>
 	<classpathentry exported="true" kind="lib" path="lib/icu4j-3.4.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdq.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/db2jcc4.jar"/>
@@ -14,7 +14,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jena-core-2.11.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jena-iri-1.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/postgresql-9.2-1003.jdbc4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl-2.7.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-dbutils-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/owlapi-distribution-3.4.5.jar"/>
@@ -32,5 +31,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/hash.jar" sourcepath="/Hash"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry exported="true" kind="lib" path="lib/postgresql-9.3-1102.jdbc41.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

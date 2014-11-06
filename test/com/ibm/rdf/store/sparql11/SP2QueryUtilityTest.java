@@ -109,7 +109,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B10MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/sp2b10m", "sp2b10m", "akement",
+      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b10m", "sp2b10m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B10MHelix1()
@@ -154,7 +154,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B1MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/sp2b1m", "sp2b1m", "akement",
+      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b1m", "sp2b1m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B1MHelix1()
