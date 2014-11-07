@@ -369,7 +369,7 @@ public class QueryProcessorImpl implements QueryProcessor
        		 				reducers = Store.SHARK_REDUCERS;
        		 			}
        		 		} catch (NumberFormatException ex ) {
-       		 			System.err.println("WARNING: Invalid number of reducers specified as value of 'mapred.reduce.tasks': "+reducers);
+       		 			System.err.println("WARNING: Invalid number of reducers specified as value of 'mapred.reduce.tasks': "+prop);
        		 			System.err.println("WARNING: The default value will be used: "+ Store.SHARK_REDUCERS);
        		 		}
        		 	}
