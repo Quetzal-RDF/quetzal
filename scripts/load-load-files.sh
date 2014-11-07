@@ -80,7 +80,7 @@ if [[ $CREATE_ONLY == 0 ]]; then
 	psql --dbname=$DB2_DB --host=$DB2_HOST --port=$DB2_PORT --username=$DB2_USER --file=$NT_FILE.db2_script --no-password --single-transaction 
     fi	 
     if [[ $DB_ENGINE == "shark" ]]; then
-	beeline -u "jdbc:hive2://"$DB2_HOST":"$DB2_PORT"/"$DB2_DB -n $DB2_USER -p $DB2_PASSWORD < $NT_FILE.db2_script
+	$SHARK_HOME/bin/beeline -u "jdbc:hive2://"$DB2_HOST":"$DB2_PORT"/"$DB2_DB -n $DB2_USER -p $DB2_PASSWORD < $NT_FILE.db2_script
     fi	    
     java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.cmd.UpdateRdfStoreStats $KNOWLEDGE_BASE $OPTS
 fi
