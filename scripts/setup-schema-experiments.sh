@@ -77,9 +77,13 @@ function for_each_main_prop() {
 # create indexes
 if [[ $FILE_TYPE == "quad" ]]; then
     if [[ $DB_ENGINE == "db2" ]]; then
-	GRAPH=", \"GID\" ASC"
+		GRAPH=", \"GID\" ASC"
     else
-	GRAPH=", GID ASC"
+    	if [[ $DB_ENGINE == "shark" ]]; then
+			GRAPH=", GID"
+		else 
+			GRAPH=", GID ASC"
+		fi
     fi
 else
  GRAPH=

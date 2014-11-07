@@ -293,7 +293,6 @@ public class TestRunner<D> {
 
    public static class DB2Engine extends AbstractEngine<DB2TestData>
       {
-      boolean                     isWrapperEnable = true;
       private OWLQLSPARQLCompiler compiler;
 
       public DB2Engine()

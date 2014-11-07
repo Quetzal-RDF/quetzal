@@ -107,7 +107,18 @@ public class DbBasedStatisticsMgr
       }
       query.append(getQueryForTopSubjects());   
       System.out.println("Query: "+query);
-      SQLExecutor.executeUpdate(con, query.toString());
+      try {
+    	  SQLExecutor.executeUpdate(con, query.toString());
+      } catch (RuntimeException e) {
+    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+				   && (e.getCause() instanceof SQLException)
+					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
+					e.printStackTrace();
+					
+			} else {
+				throw e;
+			}
+      }
 
       // Top Objects
       query = new StringBuffer();
@@ -117,7 +128,18 @@ public class DbBasedStatisticsMgr
     	  query.append(topKInsert);
       }
       query.append(getQueryForTopObjects());
-      SQLExecutor.executeUpdate(con, query.toString());
+      try {
+    	  SQLExecutor.executeUpdate(con, query.toString());
+      } catch (RuntimeException e) {
+    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+				   && (e.getCause() instanceof SQLException)
+					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
+					e.printStackTrace();
+					
+			} else {
+				throw e;
+			}
+      }
 
       // Top Predicates
       query = new StringBuffer();
@@ -127,7 +149,18 @@ public class DbBasedStatisticsMgr
     	  query.append(topKInsert);
       }
       query.append(getQueryForTopPredicates());
-      SQLExecutor.executeUpdate(con, query.toString());
+      try {
+    	  SQLExecutor.executeUpdate(con, query.toString());
+      } catch (RuntimeException e) {
+    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+				   && (e.getCause() instanceof SQLException)
+					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
+					e.printStackTrace();
+					
+			} else {
+				throw e;
+			}
+      }
 
       // Top Graphs
       query = new StringBuffer();
@@ -142,7 +175,18 @@ public class DbBasedStatisticsMgr
             + " order by "
             +(sharkEngine? " count ": " count(*) ")
             +(sharkEngine? " limit 5000": "fetch first 5000 rows only"));
-      SQLExecutor.executeUpdate(con, query.toString());
+      try {
+    	  SQLExecutor.executeUpdate(con, query.toString());
+      } catch (RuntimeException e) {
+    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+				   && (e.getCause() instanceof SQLException)
+					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
+					e.printStackTrace();
+					
+			} else {
+				throw e;
+			}
+      }
 
       // Number of triples
       query = new StringBuffer();

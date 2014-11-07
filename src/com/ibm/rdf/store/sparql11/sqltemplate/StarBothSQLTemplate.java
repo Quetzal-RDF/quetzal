@@ -338,7 +338,7 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 				}
 				if(!valueHasConstraintWitPredecessor){
 					if(varMap.containsKey(valueVariable.getName())){
-						valueSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_VALUE,predicate)+ varMap.get(valueVariable.getName()).fst);
+						valueSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_VALUE,predicate)+ "=" + varMap.get(valueVariable.getName()).fst);
 					}
 				}
 				String pValueType = null;
