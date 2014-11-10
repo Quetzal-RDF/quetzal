@@ -247,7 +247,7 @@ public class VariableExpression extends Expression {
 			}
 			return (context.getVarMap().get(v)).fst;
 		} else {
-			return "";
+			return getVariable().toString();
 		}
 	}
 }

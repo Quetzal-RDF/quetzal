@@ -93,6 +93,10 @@ public abstract class SimplePatternBothSQLTemplate extends SimplePatternSQLTempl
 	}
 	
 	protected boolean applyFilterInPrimary(Expression e) {
+		if (e.containsNotBound()) {
+			return false;				// KAVITHA: OPTIONAL variables may not be bound to the variable in 
+										// primary, so wait for secondary to get the two
+		}
 		Set<Variable> bindDependsOn = getBindDependsOnVariables();
 		Set<Variable> bindProjects = getBindProjectedVariables();
 		for (Variable v: e.gatherVariables()) {
