@@ -31,10 +31,8 @@ public class RelationalExpression extends Expression {
 	private static final String IS_FALSE = "RDF_IS_FALSE";
 	private static final String IS_NOT_TRUE = "RDF_IS_NOT_TRUE";
 	private static final String IS_NOT_FALSE = "RDF_IS_NOT_TRUE";
-	private static String TIMESTAMP_STR = "DATETIME";
+	private static String TIMESTAMP_STR = "TIMESTAMP";
 	private static String DATE_STR = "DATE";
-	private static final String CAST_FUNCTION_START = "cast_function_start";
-	private static final String CAST_FUNCTION_END = "cast_function_end";
 	private static String TYPE_CHECK_WITH_CAST = "TYPE_CHECK_WITH_CAST";
 	private static String TYPE_CHECK_CASE = "TYPE_CHECK_CASE";
 	private static String TYPE_CHECK = "TYPE_CHECK";
@@ -577,9 +575,8 @@ public class RelationalExpression extends Expression {
 		StringTemplate t = getTemplate(needsCaseAndTypeCheck, castType,
 				getTypeToCastTo(rexpType), store);
 
-		if (castType != null) {
-			t.setAttribute(CAST_FUNCTION_START, "XMLCAST ( XMLTEXT ");
-			t.setAttribute(CAST_FUNCTION_END, ")");
+		if (castType != null && castType == TIMESTAMP_STR) {
+			t.setAttribute("rhsNeedsCast", "true");
 		}
 		// KAVITHA: user defined types are not comparable, and only the equals
 		// operator applies to them. If you see these, set the type constraint

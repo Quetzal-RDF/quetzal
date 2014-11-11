@@ -148,7 +148,7 @@ aggregate_function_with_type_check(function,var, typecheck)  ::= <<
 
 RDF_ISNUMERIC(arg)  ::= <<  CAST(<arg> AS FLOAT)  IS NOT NULL >>
 
-TYPE_CHECK_WITH_CAST(left, right, cast, cast_function_start, cast_function_end, operator, typeTest)  ::= <<  
+TYPE_CHECK_WITH_CAST(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
 (<typeTest>  AND (CASE WHEN <typeTest> then CAST ( <left>  AS <cast>) else null end) <operator> <right>) >>
 
 LOCATE(string_var, pattern)  ::= << 

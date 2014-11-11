@@ -129,7 +129,7 @@ public class StarPrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 				Variable valueVariable = valTerm.getVariable();
 				Db2Type pType=predicateTable.getType(qt.getPredicate().getIRI().getValue());
 				wrapper.addProperyValueType(valueVariable.getName(), pType);
-				if(projectedInPrimary.contains(valueVariable))return null;
+				if(projectedInPrimary.contains(valueVariable))continue;
 				projectedInPrimary.add(valueVariable);
 				valSqlToSparql.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_VALUE,predicate)+" AS "+valueVariable.getName());
 				String valType = null;
