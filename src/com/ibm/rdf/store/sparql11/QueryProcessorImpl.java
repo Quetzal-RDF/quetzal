@@ -29,6 +29,7 @@ import com.ibm.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
 import com.ibm.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.rdf.store.sparql11.stopt.Planner;
 import com.ibm.rdf.store.sparql11.stopt.STPlan;
+import com.ibm.rdf.store.utilities.DistinctOrderByRewriter;
 import com.ibm.rdf.store.utilities.MinusRewriter;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.proppaths.CTENameMgr;
@@ -212,7 +213,11 @@ public class QueryProcessorImpl implements QueryProcessor
                ;
             while (new MinusRewriter.FilterAsMinusRewriter(query).rewrite())
                ;
-
+           
+            if (DistinctOrderByRewriter.shouldRewrite(query)) {
+            	query = DistinctOrderByRewriter.rewrite(query);
+            }
+            
             System.out.println("Query after negation rewrites:" + query);
             
             STPlan plan;
