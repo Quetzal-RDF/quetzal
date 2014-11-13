@@ -148,8 +148,8 @@ aggregate_function_with_type_check(function,var, typecheck)  ::= <<
 
 RDF_ISNUMERIC(arg)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:number($arg) return $res' PASSING <arg> as "arg") AS VARCHAR(256)) != 'NaN' >>
 
-TYPE_CHECK_WITH_CAST(left, right, cast, cast_function_start, cast_function_end, operator, typeTest)  ::= <<  
-(<typeTest>  AND (CASE WHEN <typeTest> then XMLCAST ( XMLTEXT( <left> ) AS <cast>) else null end) <operator> <right>) >>
+TYPE_CHECK_WITH_CAST(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then XMLCAST ( XMLTEXT( <left> ) AS <cast>) else null end) <operator>  <if(rhsNeedsCast)> XMLCAST ( XMLTEXT( <endif><right> <if(rhsNeedsCast)> ) AS <cast>)<endif> ) >>
 
 LOCATE(string_var, pattern)  ::= << 
 NOT(LOCATE('<pattern>', <string_var>) = 0)

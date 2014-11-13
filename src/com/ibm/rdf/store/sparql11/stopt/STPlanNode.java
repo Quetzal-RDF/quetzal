@@ -706,17 +706,42 @@ public void setMaterialzedTable(String materialzedTable) {
 	// is in a certain position
 	public void needsTypeCheck(Variable v, Expression e) {
 		if (producedVariables.contains(v))  {
-			if (type != STEPlanNodeType.TRIPLE) {
+			if (type != STEPlanNodeType.TRIPLE && type != STEPlanNodeType.STAR) {
 				putIntoTypeCheck(v, e);
 				return;
 			}
-			if (v == getTriple().getObject().getVariable()) {
+			if (isVariableAnObject(v)) {
 					// Optimization possible: We may not need a type check if all the predicates have no mixed types
 					// but not sure this handles special types anyway
 					// if object is not being constrained by the expression due to some filter, we are good to ignore a case test
 					checkNeedsCase(v, e);
 			}
 		} 
+	}
+	
+	// Helper method, determines if a variable appears in the object position
+	private boolean isVariableAnObject(Variable v) {
+		switch(type) {
+			case TRIPLE :
+				return isVariableAnObjectInTriple(v, getTriple());
+			case STAR:
+				Set<QueryTriple> qt = new HashSet<QueryTriple>();
+				qt.addAll(getStarTriples());
+				if (starOptionalTriples != null) {
+					qt.addAll(getStarOptionalTriples());
+				}
+				for (QueryTriple t : qt) {
+					if (isVariableAnObjectInTriple(v, t)) {
+						return true;
+					}
+				}
+		}
+		return false;
+	}
+
+	private boolean isVariableAnObjectInTriple(Variable v, QueryTriple qt) {
+		return qt.getObject().getVariable() == v;
+		
 	}
 
 	private void checkNeedsCase(Variable v, Expression e) {
