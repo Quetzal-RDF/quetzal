@@ -207,6 +207,7 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 					map.add(vPredName+" AS "+v.getName());
 					if(!iriBoundVariables.contains(v)){
 						vTypePredName = wrapper.getPlanNodeVarMapping(predecessor,v.getName()) + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
+						map.add(vTypePredName);
 					}
 					varMap.put(v.getName(), Pair.make(vPredName, vTypePredName));
 				}
@@ -234,6 +235,7 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 					map.add(v.getName()+" AS "+v.getName());
 					if(!iriBoundVariables.contains(v)){
 						vType = v.getName() + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
+						map.add(vType);
 					}
 					sVarMap.put(v.getName(), Pair.make(v.getName(), vType));
 				}

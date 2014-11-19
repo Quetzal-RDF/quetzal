@@ -287,46 +287,27 @@ public class FunctionCallExpression extends Expression {
 			t.setAttribute("boolean", TypeMap.BOOLEAN_ID);
 
 			return t.toString();
-		} else if (funcName.getValue().equals(TypeMap.INTEGER_IRI)) {
-			Set<Short> validTypes = HashSetFactory.make();
-			getValidNumericTypes(validTypes);
-
+		} else if (funcName.getValue().equals(TypeMap.INTEGER_IRI)) {			
 			return handleNumericAndDateTimeCasts(context, function, args,
-					validTypes, store.getDatatype("xs_integer"), INTEGER_STR,
+					null, store.getDatatype("xs_integer"), INTEGER_STR,
 					store);
 		} else if (funcName.getValue().equals(TypeMap.DOUBLE_IRI)) {
-			Set<Short> validTypes = HashSetFactory.make();
-			getValidNumericTypes(validTypes);
-
 			return handleNumericAndDateTimeCasts(context, function, args,
-					validTypes, store.getDatatype("xs_double"), DOUBLE_STR,
+					null, store.getDatatype("xs_double"), DOUBLE_STR,
 					store);
 		} else if (funcName.getValue().equals(TypeMap.FLOAT_IRI)) {
-			Set<Short> validTypes = HashSetFactory.make();
-			getValidNumericTypes(validTypes);
 
 			return handleNumericAndDateTimeCasts(context, function, args,
-					validTypes, store.getDatatype("xs_float"), FLOAT_STR, store);
+					null, store.getDatatype("xs_float"), FLOAT_STR, store);
 		} else if (funcName.getValue().equals(TypeMap.DECIMAL_IRI)) {
-			Set<Short> validTypes = HashSetFactory.make();
-			getValidNumericTypes(validTypes);
-
 			return handleNumericAndDateTimeCasts(context, function, args,
-					validTypes, store.getDatatype("xs_decimal"), DECIMAL_STR,
+					null, store.getDatatype("xs_decimal"), DECIMAL_STR,
 					store);
 		}
 		return "";
 	}
 
-	private void getValidNumericTypes(Set<Short> validTypes) {
-		validTypes.add(TypeMap.FLOAT_ID);
-		validTypes.add(TypeMap.SIMPLE_LITERAL_ID);
-		validTypes.add(TypeMap.STRING_ID);
-		validTypes.add(TypeMap.DECIMAL_ID);
-		validTypes.add(TypeMap.INTEGER_ID);
-		validTypes.add(TypeMap.DOUBLE_ID);
-		validTypes.add(TypeMap.BOOLEAN_ID);
-	}
+
 
 	private String handleNumericAndDateTimeCasts(FilterContext context,
 			FunctionCall function, List<String> args, Set<Short> validTypes,
@@ -350,10 +331,16 @@ public class FunctionCallExpression extends Expression {
 			if (typ == null) {
 				typ = Integer.toString(TypeMap.IRI_ID);
 			}
-			for (Short type : validTypes) {
-				typesToCheck.add(typ + "=" + Integer.toString(type));
-				typesToCheck.add(typ + "=" + Integer.toString(type));
-				typesToCheck.add(typ + "=" + Integer.toString(type));
+			if (validTypes != null) {
+				for (Short type : validTypes) {
+					typesToCheck.add(typ + "=" + Integer.toString(type));
+				}
+			} else {
+				// if validTypes is null then this is a numeric, so just test a range
+				typesToCheck.add("(" + typ + " >= " + TypeMap.DATATYPE_NUMERICS_IDS_START + " AND " + typ + " <= " + TypeMap.DATATYPE_NUMERICS_IDS_END + ")");
+				typesToCheck.add(typ + "=" + TypeMap.SIMPLE_LITERAL_ID);
+				typesToCheck.add(typ + "=" + TypeMap.STRING_ID);
+				typesToCheck.add(typ + "=" + TypeMap.BOOLEAN_ID);
 			}
 			t.setAttribute("value", arg);
 		} else {
