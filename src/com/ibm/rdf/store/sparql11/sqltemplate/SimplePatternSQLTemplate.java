@@ -212,4 +212,8 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 		}
 		return graphSQLConstraint;
 	}
+	
+	protected String getTypeConstraintForIRIs(String typeCol) {
+		return "(" + typeCol + " = " + TypeMap.IRI_ID + " OR " + typeCol + " = " + TypeMap.BLANK_NODE_ID + ")";
+	}
 }

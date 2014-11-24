@@ -212,7 +212,7 @@ public class TriplePrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean typConstraint = false;
 			if(hasSqlType && wrapper.getIRIBoundVariables().contains(entryVariable)){
-				entrySQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + " <= " + TypeMap.IRI_ID);
+				entrySQLConstraint.add(getTypeConstraintForIRIs(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE));
 			}
 			else if(hasSqlType && !wrapper.getIRIBoundVariables().contains(entryVariable)){
 				typConstraint = true;
@@ -254,8 +254,7 @@ public class TriplePrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			STPlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			boolean typConstraint = false;
 			if(hasSqlType && wrapper.getIRIBoundVariables().contains(valueVariable)){
-				valueSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_TYPE)+ 
-						" <= " + TypeMap.IRI_ID);
+				valueSQLConstraint.add(getTypeConstraintForIRIs(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_TYPE)));
 			}
 			if(hasSqlType && !wrapper.getIRIBoundVariables().contains(valueVariable)){
 				typConstraint = true;
