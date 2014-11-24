@@ -29,6 +29,8 @@ public interface Store {
 		
 	}
 	
+	public boolean hasGraphs();
+	
 	public String getStoreName();
 
    public String getStoreBackend();

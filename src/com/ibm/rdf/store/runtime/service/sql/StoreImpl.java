@@ -43,6 +43,7 @@ public class StoreImpl implements Store {
 	private Statistics perGraphStatistics;
 	private Statistics overallStatistics;
 	private final Context context;
+	private boolean hasGraphs;
 
 	private int longString;
 	private int entry_ID;
@@ -355,6 +356,14 @@ public class StoreImpl implements Store {
 	@Override
 	public StringTemplate getInstanceOf(String template) {
 		return group.getInstanceOf(template);
+	}
+
+	public boolean hasGraphs() {
+		return hasGraphs;
+	}
+
+	public void setHasGraphs(boolean hasGraphs) {
+		this.hasGraphs = hasGraphs;
 	}
 
 }

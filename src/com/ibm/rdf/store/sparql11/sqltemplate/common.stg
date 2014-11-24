@@ -47,11 +47,11 @@ solnModifier(project,target,sql_id, groupBy, having, orderBy, limit, offset)  ::
 simple_ph_exp1(project,target, entry_constraint, graph_constraint, predicate_constraint, sep, val_constraint, filter_constraint, sql_id)  ::= << 
  QS<sql_id> AS (SELECT <project; separator=",">
  FROM <target; separator=",">
- WHERE <if(entry_constraint)> <entry_constraint; separator=" AND "> <endif>
- 	   <if(predicate_constraint)> <if(entry_constraint)> AND <endif>  (<predicate_constraint; separator=sep>)<endif>
-	   <if(val_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <endif> <val_constraint; separator=" AND "> <endif>
-	   <if(filter_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <endif> <filter_constraint; separator=" AND \n"> <endif>
-	   <if(graph_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <elseif(filter_constraint)> AND <endif> <graph_constraint; separator=" AND "> <endif> )
+ 	   <if(entry_constraint)> WHERE <entry_constraint; separator=" AND "> <endif>
+ 	   <if(predicate_constraint)> <if(entry_constraint)> AND <else> WHERE <endif>   (<predicate_constraint; separator=sep>)<endif>
+	   <if(val_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <else> WHERE <endif> <val_constraint; separator=" AND "> <endif>
+	   <if(filter_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <else> WHERE <endif> <filter_constraint; separator=" AND \n"> <endif>
+	   <if(graph_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <elseif(filter_constraint)> AND <else> WHERE <endif> <graph_constraint; separator=" AND "> <endif> )
 >>
 
 limit(project,target,sql_id, limit)  ::= << 
