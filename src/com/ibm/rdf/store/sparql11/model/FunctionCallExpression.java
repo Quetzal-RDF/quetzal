@@ -29,11 +29,15 @@ public class FunctionCallExpression extends Expression {
 	private static final String RDF_STRENDS_LS_LIKE = "RDF_STRENDS_LS_LIKE";
 	private static final String LS_TABLE = "long_strings_table";
 	private static String TIMESTAMP_STR = "DATETIME";
+	private static String DATE_STR="DATE";
 	private static String FLOAT_STR = "FLOAT";
 	private static String DOUBLE_STR = "DOUBLE";
 	private static String INTEGER_STR = "INTEGER";
 	private static String DECIMAL_STR = "DECIMAL";
-	private static final String XSD_DATETIME_NUMERICS_CAST = "XSD_DATETIME_NUMERICS_CAST";
+	private static final String XSD_DATETIME_CAST = "XSD_DATETIME_CAST";
+	private static final String XSD_DATE_CAST = "XSD_DATE_CAST";
+
+	private static final String XSD_NUMERICS_CAST = "XSD_NUMERICS_CAST";
 	private static final String XSD_BOOLEAN_CAST = "XSD_BOOLEAN_CAST";
 
 	/**
@@ -312,7 +316,15 @@ public class FunctionCallExpression extends Expression {
 	private String handleNumericAndDateTimeCasts(FilterContext context,
 			FunctionCall function, List<String> args, Set<Short> validTypes,
 			String xmlType, String DBType, Store store) {
-		StringTemplate t = store.getInstanceOf(XSD_DATETIME_NUMERICS_CAST);
+		
+		StringTemplate t = null;
+		if (DBType.equals(TIMESTAMP_STR)) {
+			t = store.getInstanceOf(XSD_DATETIME_CAST);
+		} else if (DBType.equals(DATE_STR)){
+			t = store.getInstanceOf(XSD_DATE_CAST);
+		} else {
+			t = store.getInstanceOf(XSD_NUMERICS_CAST);
+		}
 		Expression argExp = function.getArguments().get(0);
 		String arg = null;
 		if (args.size() > 0) {
@@ -346,7 +358,7 @@ public class FunctionCallExpression extends Expression {
 		} else {
 			short ret = argExp.getReturnType();
 
-			if (!validTypes.contains(ret)) {
+			if (validTypes != null && !validTypes.contains(ret)) {
 				typesToCheck.add(" 0 = 1 ");
 			}
 			t.setAttribute("value", arg);

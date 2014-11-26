@@ -127,6 +127,12 @@ CASE
  	else null end
 >>
 
+TYPE_CHECK_WITH_CAST_TIMESTAMP(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then <left>::<cast> else null end) <operator> <right>) >>
+
+TYPE_CHECK_WITH_CAST_DATE(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then <left>::<cast> else null end) <operator> <right>) >>
+
 TYPE_CHECK_WITH_CAST(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
 (<typeTest>  AND (CASE WHEN <typeTest> then <left>::<cast> else null end) <operator> <right>) >>
 
@@ -134,7 +140,25 @@ LOCATE(string_var, pattern)  ::= <<
 NOT(POSITION('<pattern>' in <string_var>) = 0)
 >>
 
-XSD_DATETIME_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+XSD_DATETIME_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> iscastable(<value>, '<xmlType>') THEN <value>::<DBType>
+	else null end
+)
+>>
+
+XSD_DATE_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> iscastable(<value>, '<xmlType>') THEN <value>::<DBType>
+	else null end
+)
+>>
+
+XSD_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
 (
 CASE 
     WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  

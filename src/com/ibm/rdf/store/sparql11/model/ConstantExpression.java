@@ -211,7 +211,7 @@ public class ConstantExpression extends Expression {
 			return getSID(toDataString(), store.getMaxStringLen());
 		}
 		if (getReturnType() == TypeMap.DATE_ID) {
-			return " DATE '" + toDataString() + "'";
+			return "'" + toDataString() + "'";
 		}
 		return visit(context, store);
 	}
