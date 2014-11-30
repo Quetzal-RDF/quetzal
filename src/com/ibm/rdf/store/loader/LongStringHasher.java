@@ -20,7 +20,7 @@ public class LongStringHasher {
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		String line;
 		while ((line = input.readLine()) != null) {
-			if (line.length() > cutoff) {
+			if (line.getBytes().length > cutoff) {
 				System.out.println(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(line));
 			} else {
 				System.out.println(line);

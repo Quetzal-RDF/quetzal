@@ -1,5 +1,6 @@
 package com.ibm.rdf.store.hashing;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
@@ -68,8 +69,9 @@ public class HashingHelper {
 	 * @param longString The long string to hash to a shorter string.
 	 * @return The resulting shorter string.
 	 * @throws HashingException If critical failure occurs.
+	 * @throws UnsupportedEncodingException 
 	 */
-	public static String hashLongString(String longString) throws HashingException {
+	public static String hashLongString(String longString) throws HashingException, UnsupportedEncodingException {
 		try {
 			return hash(longString, Constants.LONG_STRINGS_HASHING_METHOD);
 		} catch (NoSuchAlgorithmException e) {
@@ -77,13 +79,13 @@ public class HashingHelper {
 		}
 	}
 	
-	private static byte[] checksum(String msg, String method) throws NoSuchAlgorithmException {
+	private static byte[] checksum(String msg, String method) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		java.security.MessageDigest complete = java.security.MessageDigest.getInstance(method);
-		complete.update(msg.getBytes());
+		complete.update(msg.getBytes("UTF-8"));
 		return complete.digest();
 	}
 	
-	private static String hash(String msg, String method) throws NoSuchAlgorithmException {
+	private static String hash(String msg, String method) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		byte[] b = checksum(msg, method);
 		String result = "";
 		for (int i = 0; i < b.length; i++) {

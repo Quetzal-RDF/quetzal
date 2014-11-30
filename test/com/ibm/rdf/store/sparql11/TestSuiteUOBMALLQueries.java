@@ -9,10 +9,10 @@ import org.junit.runners.Suite;
    UOBMQueryUtilityTest.PSQLUOBM30MALLPropPathsExpHelix1.class,  //currently failing
    UOBMQueryUtilityTest.DB2UOBM30MALLPropPathsExp.class,
 
-   //property path tests
-    
+   //property path tests   
    UOBMQueryUtilityTest.PSQLUOBM30MALLPropPathsHelix.class, // currently failing
    UOBMQueryUtilityTest.DB2UOBM30ALLPropPaths.class,
+  
    })
 public class TestSuiteUOBMALLQueries<D>
    {

@@ -204,7 +204,9 @@ public class Planner {
 		
 		STPlan plan(Query q);
 
-		STPlanNode plan(Node parentNode, Pattern p,	Set<Variable> availableVars, Set<Variable> liveVariables, NumberedGraph<STPlanNode> g);
+		STPlanNode plan(Node parentNode, Pattern p, Set<Variable> availableVars, Set<Variable> liveVariables, NumberedGraph<STPlanNode> g);
+
+		STPlanNode plan(Node parentNode, boolean noFinalJoin, Pattern p, Set<Variable> availableVars, Set<Variable> liveVariables, NumberedGraph<STPlanNode> g);
 	}
 
 	public abstract class AbstractNode implements Node {
@@ -1195,17 +1197,30 @@ public class Planner {
 						return Kind.MINUS;
 					}
 
+					private boolean tryNoFinalJoin(Set<Variable> rhsLive) {
+						Pattern toSubtract = ((PatternSet)p).getPatterns().get(0);
+						
+						rhsLive = HashSetFactory.make(rhsLive);
+						rhsLive.retainAll(availableVars);
+						
+						Set<Variable> rhsVars = toSubtract.gatherVariables();
+
+						return rhsVars.containsAll(rhsLive);
+					}
+					
 					@Override
 					public STPlanNode augmentPlan(Query q, STPlanNode currentHead,
 							NumberedGraph<STPlanNode> g, List<Expression> filters, Set<Variable> availableVars, Set<Variable> liveVars) {
 						assert currentHead != null;
 						
 						Pattern toSubtract = ((PatternSet)p).getPatterns().get(0);
+												
 						Set<Variable> myVars = HashSetFactory.make(availableVars);
 						myVars.removeAll(unscoped);
 						Set<Variable> rhsLive = HashSetFactory.make(liveVars);
 						rhsLive.addAll(allDeps);
-						STPlanNode subtractNode = walker.plan(this, toSubtract, HashSetFactory.make(myVars), rhsLive, g);
+						
+						STPlanNode subtractNode = walker.plan(this, tryNoFinalJoin(rhsLive), toSubtract, HashSetFactory.make(myVars), rhsLive, g);
 
 						STPlanNode x = planFactory.createSTPlanNode(STEPlanNodeType.MINUS, myVars, p);
 
@@ -1227,7 +1242,7 @@ public class Planner {
 
 					@Override
 					public Pair<Double, Double> getCost(NumberedGraph<STPlanNode> g) {
-						STPlanNode dp = walker.plan(this,
+						STPlanNode dp = walker.plan(this, tryNoFinalJoin(liveVars),
 								((PatternSet)p).getPatterns().get(0), HashSetFactory.make(availableVars),
 								HashSetFactory.make(liveVars), SlowSparseNumberedGraph.<STPlanNode> make());
 						assert dp.cost != null : ((PatternSet)p).getPatterns().get(0);
@@ -2462,12 +2477,27 @@ public class Planner {
 
 		@Override
 		public STPlanNode plan(Node parentNode, final Pattern p, Set<Variable> availableVars, Set<Variable> liveVariables, NumberedGraph<STPlanNode> g) {
+			return plan(parentNode, false, p, availableVars, liveVariables, g);
+		}
+		
+		@Override
+		public STPlanNode plan(Node parentNode, boolean noFinalJoin, final Pattern p, Set<Variable> availableVars, Set<Variable> liveVariables, NumberedGraph<STPlanNode> g) {
 			List<Pattern> region = new ArrayList<Pattern>();
 			gatherRegion(p, region);
 
 			// System.err.println("planning region " + region);
-			
-			return planner.plan(parentNode, p, region, this, availableVars, liveVariables, g);
+			if (! noFinalJoin) {
+				return planner.plan(parentNode, p, region, this, availableVars, liveVariables, g);
+			} else {
+				STPlanNode path = planner.plan(parentNode, p, region, this, availableVars, liveVariables, g);
+				STPlanNode reuse = planner.plan(parentNode, p, region, this, HashSetFactory.<Variable>make(), liveVariables, g);
+				if (reuse != null && path != null) {
+					if (reuse.cost.fst < path.cost.fst) {
+						return reuse;
+					}
+				}
+				return path;
+			}
 		}
 		@Override
 		public void gatherRegion(Pattern p, List<Pattern> region) {

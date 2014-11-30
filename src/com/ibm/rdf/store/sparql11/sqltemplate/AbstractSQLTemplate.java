@@ -1,5 +1,6 @@
 package com.ibm.rdf.store.sparql11.sqltemplate;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.Set;
 import com.ibm.rdf.store.Context;
 import com.ibm.rdf.store.Store;
 import com.ibm.rdf.store.config.Constants;
+import com.ibm.rdf.store.hashing.HashingException;
+import com.ibm.rdf.store.hashing.HashingHelper;
 import com.ibm.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.rdf.store.sparql11.model.Expression;
@@ -131,5 +134,15 @@ public abstract class AbstractSQLTemplate {
 		return entryConstraintWithPredecessor;
 	}
 
+	public static String getSID(String value, int maxLength) {
+		if (value.length() > maxLength) {
+			try {
+				return Constants.PREFIX_SHORT_STRING
+						+ HashingHelper.hashLongString(value);
+			} catch (HashingException | UnsupportedEncodingException e) {
+			}
+		}
+		return value;
+	}
 	
 }

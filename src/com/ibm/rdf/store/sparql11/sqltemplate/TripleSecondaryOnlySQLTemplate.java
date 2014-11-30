@@ -349,18 +349,6 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		return propSQLConstraint;
 	}
 	
-
-	public static String getSID(String value, int maxLength) {
-		if (value.length() > maxLength) {
-			try {
-				return Constants.PREFIX_SHORT_STRING
-						+ HashingHelper.hashLongString(value);
-			} catch (HashingException e) {
-			}
-		}
-		return value;
-	}
-
 	@Override
 	protected List<String> mapGraphForProject(){
 		BinaryUnion<Variable,IRI> graphRestriction = planNode.getGraphRestriction();

@@ -101,7 +101,7 @@ public class SQLExecutor {
 				sql = getSql(sql, params);
 				stmt = conn.prepareStatement(sql);	
 			}
-			System.out.println("SQL:\n"+ sql);
+			//System.out.println("SQL:\n"+ sql);
 			rs = stmt.executeQuery();
 			boolean hasResults = false;
 			hasResults = rs.next();

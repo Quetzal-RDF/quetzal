@@ -1,5 +1,6 @@
 package com.ibm.rdf.store.sparql11.sqltemplate;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -333,17 +334,6 @@ public class StarPrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 	private String printPredicateString(String predicateString) {
 		return getSID(predicateString, store
 				.getMaxStringLen());
-	}
-
-	public static String getSID(String value, int maxLength) {
-		if (value.length() > maxLength) {
-			try {
-				return Constants.PREFIX_SHORT_STRING
-						+ HashingHelper.hashLongString(value);
-			} catch (HashingException e) {
-			}
-		}
-		return value;
 	}
 
 	@Override

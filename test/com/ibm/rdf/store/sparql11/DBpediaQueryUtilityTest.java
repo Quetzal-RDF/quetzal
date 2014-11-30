@@ -5,10 +5,10 @@ import org.junit.runner.RunWith;
 
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 
-public abstract class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
+public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	private final String queryDir;
 	
-	protected DBpediaQueryUtilityTest(DatabaseEngine<D> engine, D data, int[] answers, String queryDir) {
+	public DBpediaQueryUtilityTest(DatabaseEngine<D> engine, D data, int[] answers, String queryDir) {
 		super(data, engine, answers);
 		this.queryDir = queryDir;
 	}

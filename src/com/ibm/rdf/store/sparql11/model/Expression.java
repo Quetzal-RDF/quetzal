@@ -1,5 +1,6 @@
 package com.ibm.rdf.store.sparql11.model;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1110,7 +1111,7 @@ public abstract class Expression implements ExpressionVisitor {
 			try {
 				return Constants.PREFIX_SHORT_STRING
 						+ HashingHelper.hashLongString(value);
-			} catch (HashingException e) {
+			} catch (HashingException | UnsupportedEncodingException e) {
 			}
 		}
 		return value;

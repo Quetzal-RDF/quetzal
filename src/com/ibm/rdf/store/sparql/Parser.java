@@ -2,6 +2,7 @@ package com.ibm.rdf.store.sparql;
 
 
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import antlr.RecognitionException;
@@ -53,7 +54,7 @@ public class Parser {
 			q.getPattern().setPatternVariables(null,Constants.MAXIMUM_COMPLEX_UDF);
 			try {
 				NormalizePattern(q.getPattern());
-			} catch (HashingException e) {
+			} catch (HashingException | UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.exit(1);
@@ -85,7 +86,7 @@ public class Parser {
 		return null;
 	}
 	
-	private static void NormalizePattern(Pattern p) throws HashingException{
+	private static void NormalizePattern(Pattern p) throws HashingException, UnsupportedEncodingException{
 		if(p instanceof GraphGraphPattern){
 			String normGraphID;
 			VarOrTerm graphID=((GraphGraphPattern) p).getTerm();

@@ -218,8 +218,6 @@ public class QueryProcessorImpl implements QueryProcessor
             	query = DistinctOrderByRewriter.rewrite(query);
             }
             
-            System.out.println("Query after negation rewrites:" + query);
-            
             STPlan plan;
             if (USE_NEW_PLANNER)
             {
@@ -228,7 +226,6 @@ public class QueryProcessorImpl implements QueryProcessor
                boolean hasNoPropertyPath = rewrite.rewrite(query, true, null, null);
                logger.debug("Rewritten query (after property path rewrite): {}", query);
                STPlan greedyPlan = (new Planner()).plan(query, store, stats);
-               logger.debug("Plan : {}", greedyPlan);
                plan = greedyPlan;
                if (plan.getPlanRoot() == null)
                   {
@@ -312,7 +309,6 @@ public class QueryProcessorImpl implements QueryProcessor
                   }
 
                time = System.currentTimeMillis() - time;
-               System.out.println("Plan:" + plan);
                /*
                 * if (TEST_LP_PLANNER) { LPSolver lpsolv = new LPSolver(DefaultPatternComponentFactory.getInstance()); try { greedyPlan =
                 * GreedyPlanConverter.convert(greedyPlan); STPlan lpplan = lpsolv.plan(store,stats, query, greedyPlan); if
@@ -353,7 +349,7 @@ public class QueryProcessorImpl implements QueryProcessor
          optimizerTime = System.currentTimeMillis();
 
          translatorTime = System.currentTimeMillis();
-         logger.info("SPARQL -> " + sparql + "\nGenerated SQL -> " + sql);
+         System.err.println("SPARQL -> " + sparql + "\nGenerated SQL -> " + sql);
 
          
          // connection = null;

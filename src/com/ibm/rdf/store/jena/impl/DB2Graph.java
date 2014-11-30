@@ -1,5 +1,6 @@
 package com.ibm.rdf.store.jena.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -81,7 +82,7 @@ public class DB2Graph extends GraphBase implements GraphWithPerform
             {
             string = Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(string);
             }
-         catch (HashingException e)
+         catch (HashingException | UnsupportedEncodingException e)
             {
             log.error("Hashing Exception");
             }
