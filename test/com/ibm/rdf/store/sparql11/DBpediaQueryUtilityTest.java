@@ -12,7 +12,7 @@ public abstract class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	private final String queryDir;
 	
 	protected static final int[] dbpedia10mAnswers = {9, 1, 119, 3, 90, 310, 2, 129, 3, 1, 1, 98, 2, 6, 39, 2, 2, 1, 20, 99780, 2};
-	protected static final int[] dbpedia100mAnswers = {0, 1, 32, 0, 5, 55716, 2, 4354, 5, 1, 1, 1, 7, 2, 2,1,338676,856,0,4};
+	protected static final int[] dbpedia100mAnswers = {0, 1, 32, 0, 5, 55716, 2, 4349, 5, 1, 1, 1, 7, 2, 2,1,338676,856,0,4};
 	
 	protected DBpediaQueryUtilityTest(DatabaseEngine<D> engine, D data, int[] answers, String queryDir) {
 		super(data, engine, answers);
@@ -31,7 +31,7 @@ public abstract class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
 	public static class RDFStoreDBpedia37 extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://localhost:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://localhost:8997/dbp", "dbp37_r", "db2inst1", "db2admin", "db2inst1", false);
 		public RDFStoreDBpedia37() {
 			super(new DB2Engine(), data, dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
 		}

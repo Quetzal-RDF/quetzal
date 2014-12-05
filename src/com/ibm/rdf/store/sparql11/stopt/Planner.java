@@ -2268,10 +2268,10 @@ public class Planner {
 			for (Key k : neededKeys) {
 				if (k instanceof QueryTriple) {
 					QueryTriple qtk = (QueryTriple) k;
-					if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk)) {		
+					if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk) && qtk.gatherVariables().containsAll(node.getAvailableVariables())) {		
 						Map<Variable, Variable> variableMappings = triple.getVariableMappings(qtk);
 						if (!addGraphRestriction(variableMappings, triple, qtk)) {
-							return false;
+							continue;
 						}
 						boolean hasConsistentMappings = true;
 						

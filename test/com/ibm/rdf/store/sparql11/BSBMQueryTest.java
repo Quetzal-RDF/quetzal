@@ -29,7 +29,7 @@ public class BSBMQueryTest extends TestRunner<DB2TestData> {
 
 	@Test
 	public void testQuery1() throws Exception {
-		this.executeQuery(queryFile + "bsbmq1.sparql");
+		this.executeQuery(queryFile + "bsbmq5.sparql");
 	}
 
 }
