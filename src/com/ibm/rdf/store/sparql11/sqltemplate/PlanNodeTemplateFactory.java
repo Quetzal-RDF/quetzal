@@ -2,6 +2,8 @@ package com.ibm.rdf.store.sparql11.sqltemplate;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import com.ibm.rdf.store.Context;
@@ -24,29 +26,31 @@ public class PlanNodeTemplateFactory {
 	public static final boolean noDuplicationOfMultiValues = false;
 	
 	public static AbstractSQLTemplate createSQLTemplate(STPlanNode planNode, STPlan plan, Store store, Context ctx, STPlanWrapper wrapper) throws SQLWriterException{
-		if(planNode.type == STEPlanNodeType.TRIPLE)
+		if(planNode.getType() == STEPlanNodeType.TRIPLE)
 			return createTripleSQLTemplate(planNode, store, ctx, plan, wrapper);
-		else if(planNode.type == STEPlanNodeType.LEFT)
+		else if(planNode.getType() == STEPlanNodeType.LEFT)
 			return createLEFTSQLTemplate(planNode, store, ctx, plan, wrapper);
-		else if(planNode.type == STEPlanNodeType.UNION)
+		else if(planNode.getType() == STEPlanNodeType.UNION)
 			return createUnionSQLTemplate(planNode, store, ctx, plan, wrapper);
-		else if(planNode.type == STEPlanNodeType.MINUS)
+		else if(planNode.getType() == STEPlanNodeType.MINUS)
 			return createMinusSQLTemplate(planNode, store, ctx, plan, wrapper);
-		else if(planNode.type == STEPlanNodeType.STAR)
+		else if(planNode.getType() == STEPlanNodeType.STAR)
 			return createStarSQLTemplate(planNode, store, ctx, plan, wrapper);
-		else if(planNode.type == STEPlanNodeType.NOT_EXISTS || planNode.type == STEPlanNodeType.EXISTS){
+		else if(planNode.getType() == STEPlanNodeType.NOT_EXISTS || planNode.getType() == STEPlanNodeType.EXISTS){
 			return createNotExistsSQLTemplate(planNode, store, ctx, plan, wrapper);
-		} else if (planNode.type == STEPlanNodeType.JOIN) {
+		} else if (planNode.getType() == STEPlanNodeType.JOIN) {
 			return createJoinSQLTemplate(planNode, store, ctx, plan, wrapper);
-		} else if(planNode.type == STEPlanNodeType.MATERIALIZED_TABLE){
+		}  else if (planNode.getType() == STEPlanNodeType.PRODUCT) {
+			return createProductSQLTemplate(planNode, store, ctx, plan, wrapper);
+		} 	else if(planNode.getType() == STEPlanNodeType.MATERIALIZED_TABLE){
 			return createMaterializedTableSQLTemplate(planNode, store, ctx, plan, wrapper);
-		} else if(planNode.type == STEPlanNodeType.VALUES){
+		} else if(planNode.getType() == STEPlanNodeType.VALUES){
 			return createValuesSQLTemplate(planNode, store, ctx, plan, wrapper);
-		} else if (planNode.type == STEPlanNodeType.SUBSELECT) {
+		} else if (planNode.getType() == STEPlanNodeType.SUBSELECT) {
 			return createSubselectSQLTemplate(planNode, store, ctx, plan, wrapper);
 		}
 		
-		assert planNode.type == STEPlanNodeType.AND : "cannot find template for " + planNode.type;
+		assert planNode.getType() == STEPlanNodeType.AND : "cannot find template for " + planNode.getType();
 		return null;
 	}
 	
@@ -92,11 +96,10 @@ public class PlanNodeTemplateFactory {
 	}
 	
 	static AbstractSQLTemplate createProductSQLTemplate(STPlanNode planNode, Store store, Context ctx, STPlan plan, STPlanWrapper wrapper){
-		/*Iterator<STPlanNode> successors = plan.getPlanTree().getSuccNodes(planNode);
+		Iterator<STPlanNode> successors = plan.getPlanTree().getSuccNodes(planNode);
 		STPlanNode left = successors.next().getTempTableNode(plan);
 		STPlanNode right = successors.next().getTempTableNode(plan);
-		return new ProductSQLTemplate("join", planNode,store, ctx,  wrapper, left, right);*/
-		return null;
+		return new ProductSQLTemplate("product", planNode,store, ctx,  wrapper, left, right);
 	}
 	
 	
@@ -105,6 +108,7 @@ public class PlanNodeTemplateFactory {
 		Iterator<STPlanNode> successors = plan.getPlanTree().getSuccNodes(planNode);
 		STPlanNode left = successors.next().getTempTableNode(plan);
 		STPlanNode right = successors.next().getTempTableNode(plan);
+		
 		return new JoinSQLTemplate("join", planNode,store, ctx,  wrapper, left, right);
 	}
 	

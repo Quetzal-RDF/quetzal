@@ -65,6 +65,13 @@ public class STPlan implements Comparable<STPlan>
       this.planTree = SlowSparseNumberedGraph.make();
       }
    
+   public void findProductsInPlan() {
+	   Iterator<STPlanNode> nodes = planTree.getNodeManager().iterator();
+	   while (nodes.hasNext()) {
+		   nodes.next().setProductFlag(this);
+	   }
+   }
+   
    //
    // Get the pattern of the current STPlan
    //

@@ -138,7 +138,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 	}
 	
 	public static class PSQLUOBM30PropPathsHelix extends UOBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data =PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/uobm", "uobm", "akement", "passw0rd",
+		private static final PSQLTestData data =PSQLTestData.getStore("jdbc:postgresql://localhost:8996/uobm", "uobm_30", "akement", "passw0rd",
                 "db2inst1", false);
 		public PSQLUOBM30PropPathsHelix() {
 			super(new PSQLEngine(),"../rdfstore-data/uobm_queries_proppaths/", data, answers_proppaths);
@@ -287,7 +287,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> {
 	}
 	
 	public static class PSQLUOBM30MPropPathsExpHelix1 extends UOBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/uobm", "uobm", "akement", "passw0rd",
+		private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://localhost:8996/uobm", "uobm_30", "akement", "passw0rd",
                 "db2inst1", false);
 			//getStore("jdbc:db2://9.47.202.45:50001/uobm",
 			//	"uobm30", "db2inst2","db2admin","db2inst2",false);

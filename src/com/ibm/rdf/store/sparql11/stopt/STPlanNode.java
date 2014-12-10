@@ -25,6 +25,7 @@ import com.ibm.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.rdf.store.sparql11.model.Values;
 import com.ibm.rdf.store.sparql11.model.Variable;
 import com.ibm.rdf.store.sparql11.model.VariableExpression;
+import com.ibm.rdf.store.sparql11.stopt.Planner.JoinTypes;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 
@@ -39,7 +40,7 @@ public class STPlanNode
    // variable)
    // - OPTIONAL: a node representing a graph
    //
-   public STEPlanNodeType                                    type;
+   private STEPlanNodeType                                    type;
    
    //
    // If this is a TRIPLE plan node, then the following fields are relevant:
@@ -100,6 +101,8 @@ public class STPlanNode
    
    // Member for graph access
    private BinaryUnion<Variable, IRI> graphRestriction;
+   
+   private boolean isProduct = false;
    
    Map<Variable, TypeCheckInformation> typeCheckVariables = HashMapFactory.make();
    
@@ -276,6 +279,56 @@ public void setMaterialzedTable(String materialzedTable) {
    public STPlanNode getReUseNode() {
 	   return reUseNode;
    }
+   
+   public void setProductFlag(STPlan plan) {
+		if (type != STEPlanNodeType.AND) {
+			return;
+		}
+		List<Expression> allFilters = new LinkedList<Expression>();
+		Iterator<STPlanNode> succs = plan.getPlanTree().getSuccNodes(this);
+		
+		STPlanNode lhs = null;
+		STPlanNode rhs = null;
+		
+		assert succs.hasNext();
+		lhs = succs.next();
+		assert succs.hasNext();
+		rhs = succs.next();
+		
+		if (rhs.getFilters() != null) {
+			allFilters.addAll(rhs.getFilters());
+		}
+		if (lhs.getFilters() != null) {
+			allFilters.addAll(lhs.getFilters());
+		}
+		
+		boolean filtersServeAsAJoin = false;
+		for (Expression e : allFilters) {
+			// check if ANY of the filters act as a join, meaning its variable intersects with the left's available variables AND the right's produced
+			Set<Variable> filterVars = e.gatherVariables();
+			boolean left = false;
+			boolean right = false;
+			for (Variable v : filterVars) {
+				if (lhs.getAvailableVariables().contains(v)) {
+					left = true;
+				}
+				if (rhs.getProducedVariables().contains(v)) {
+					right = true;
+				}
+				if (left && right) {
+					filtersServeAsAJoin = true;
+					break;
+				}
+			}
+		}
+		if (operatorVariables.isEmpty() && !filtersServeAsAJoin) {
+			isProduct = true;
+		} 
+   }
+   
+   public boolean getIsProduct() {
+	   return isProduct;
+   }
 
    public Map<Variable, Variable> getReuseVarMappings() {
 	   return reuseVarMappings;
@@ -286,7 +339,7 @@ public void setMaterialzedTable(String materialzedTable) {
    //
    public STAccessMethod getMethod()
       {
-      switch (this.type)
+      switch (getType())
          {
          case TRIPLE:
          case STAR:
@@ -386,7 +439,7 @@ public void setMaterialzedTable(String materialzedTable) {
    //
    public Pair<Double> getCost()
       {
-      switch (this.type)
+      switch (getType())
          {
          case TRIPLE:
             return this.method.getCost();
@@ -457,6 +510,9 @@ public void setMaterialzedTable(String materialzedTable) {
    
    public STEPlanNodeType getType()
       {
+	   if (isProduct) {
+		   return STEPlanNodeType.PRODUCT;
+	   }
       return type;
       }
    
@@ -552,7 +608,7 @@ public void setMaterialzedTable(String materialzedTable) {
 		   }
 		   return c.getPredecessorDown(p);
 	   }
-
+	   case PRODUCT:
 	   case JOIN:
 	   case REUSE:
 	   case LEFT:
@@ -590,6 +646,7 @@ public void setMaterialzedTable(String materialzedTable) {
 			case AND:
 			case NOT_EXISTS:
 			case EXISTS:
+
 			case LEFT: {
 				int i = 0;
 				Iterator<STPlanNode> ss= p.getPlanTree().getSuccNodes(parent);
@@ -604,7 +661,7 @@ public void setMaterialzedTable(String materialzedTable) {
 					return pred;
 				}
 			}
-			
+			case PRODUCT:
 			case JOIN:
 			case SUBSELECT:
 			case UNION:
@@ -662,11 +719,11 @@ public void setMaterialzedTable(String materialzedTable) {
 	
 	public Set<Expression> gatherAllExpressions() {
 		Set<Expression> exps = HashSetFactory.make();
-		if (type == STEPlanNodeType.VALUES) {
+		if (getType() == STEPlanNodeType.VALUES) {
 			for (List<Expression> l : values.getExpressions()) {
 				exps.addAll((Collection<? extends Expression>) l);
 			}
-		} else if (type == STEPlanNodeType.SUBSELECT) {
+		} else if (getType() == STEPlanNodeType.SUBSELECT) {
 			for (ProjectedVariable pv : ((SubSelectPattern) pattern).getSelectClause().getProjectedVariables()) {
 				if (pv.getExpression() != null) {
 					exps.add(pv.getExpression());
@@ -721,7 +778,7 @@ public void setMaterialzedTable(String materialzedTable) {
 	
 	// Helper method, determines if a variable appears in the object position
 	private boolean isVariableAnObject(Variable v) {
-		switch(type) {
+		switch(getType()) {
 			case TRIPLE :
 				return isVariableAnObjectInTriple(v, getTriple());
 			case STAR:

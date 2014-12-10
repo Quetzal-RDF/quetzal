@@ -357,8 +357,8 @@ public abstract class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	public static class DB2LUBM100MHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
-				"jdbc:db2://helix1.pok.ibm.com:50001/lubm100m", "lubm100m",
-				"db2inst1", "db2inst1", "db2inst2", false);
+				"jdbc:db2://helix1.pok.ibm.com:50001/lubm", "lubm_100m_r",
+				"db2inst1", "db2admin", "db2inst1", false);
 
 		public DB2LUBM100MHelix1() {
 			super(new DB2Engine(), data,

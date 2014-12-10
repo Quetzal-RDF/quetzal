@@ -197,7 +197,7 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 			String constraintV = leftSQLCte + "." + vPredNameLeft + " = " + rightSQLCte +  "." + vPredNameRight;
 			String constraintVTyp = leftSQLCte + "." + vPredNameLeft + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS + " = " + rightSQLCte +  "." + vPredNameRight +Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
 			String undefCostraint = null;
-			assert planNode.type == STEPlanNodeType.VALUES;
+			assert planNode.getType() == STEPlanNodeType.VALUES;
 			
 			if(planNode.getUndefVariables().contains(v)){
 				undefCostraint = rightSQLCte + "." + vPredNameRight + "='NULL'";
