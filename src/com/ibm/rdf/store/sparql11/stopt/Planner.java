@@ -753,7 +753,7 @@ public class Planner {
 					succs.next();
 					STPlanNode right = succs.next();
 					exp = right.getFilters();
-				} else {
+				}  else {
 					exp = currentHead.getFilters();
 				}
 				exp.add(expression);
@@ -1507,7 +1507,6 @@ public class Planner {
 			
 			// This is the case where all variables in the bind expression are already bound by other patterns (including the produced one)
 			// this is a cheap expression to evaluate and produces nothing.  So the cost is minimal (a constant of 1.0).
-			
 			if (availableVars.containsAll(vars)) {
 				result.add(new FilterBindExpressionNode(e, vars, Collections.<Variable>emptySet(), stats, bp));
 			} else if (availableVars.containsAll(requiredVariables)) {
@@ -2232,7 +2231,7 @@ public class Planner {
 			Set<STPlanNode> roots = HashSetFactory.make();
 			while (it.hasNext()) {
 				STPlanNode n = it.next();
-				if (g.getPredNodes(n) == null || !g.getPredNodes(n).hasNext() && n.type != STEPlanNodeType.REUSE) {
+				if (g.getPredNodes(n) == null || !g.getPredNodes(n).hasNext() && n.getType() != STEPlanNodeType.REUSE) {
 					roots.add(n);
 				}
 			}
@@ -2243,7 +2242,7 @@ public class Planner {
 			}
 			System.out.println("Nodes for re-use");
 			for (ReUseNode n: nodesForReUse.values()) {
-				if (n.nodeToReUse.type == STEPlanNodeType.AND) {
+				if (n.nodeToReUse.getType() == STEPlanNodeType.AND) {
 					System.out.println("Can reuse:" + n);
 				}
 			}
@@ -2254,11 +2253,11 @@ public class Planner {
 				
 			boolean canReUse = false;
 
-			if (node.type == STEPlanNodeType.TRIPLE) {
+			if (node.getType() == STEPlanNodeType.TRIPLE) {
 				canReUse = reuseTripleNode(node.getTriple(), neededKeys, nodesForReUse, node,
 						accumulatedMappings);  
 				return;
-			} else if (node.type == STEPlanNodeType.AND) {
+			} else if (node.getType() == STEPlanNodeType.AND) {
 				canReUse = reuseAnd(node, g, nodesForReUse, neededKeys, accumulatedMappings);
 				return;
 			} 
@@ -2333,10 +2332,10 @@ public class Planner {
 			for (Key k : neededKeys) {
 				if (k instanceof QueryTriple) {
 					QueryTriple qtk = (QueryTriple) k;
-					if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk)) {		
+					if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk) && qtk.gatherVariables().containsAll(node.getAvailableVariables())) {		
 						Map<Variable, Variable> variableMappings = triple.getVariableMappings(qtk);
 						if (!addGraphRestriction(variableMappings, triple, qtk)) {
-							return false;
+							continue;
 						}
 						boolean hasConsistentMappings = true;
 						
@@ -2367,7 +2366,7 @@ public class Planner {
 			STPlanNode right = succs.next();
 			
 			// check if we have the right types of successors, and if we can re-use this AND potentially
-			if (! (left.type == STEPlanNodeType.AND || left.type == STEPlanNodeType.STAR || left.type == STEPlanNodeType.TRIPLE)) {
+			if (! (left.getType() == STEPlanNodeType.AND || left.getType() == STEPlanNodeType.STAR || left.getType() == STEPlanNodeType.TRIPLE)) {
 				return false;
 			}
 			
@@ -2377,11 +2376,11 @@ public class Planner {
 			
 			boolean reuseLeft = false;
 			// reuse the code
-			if (left.type == STEPlanNodeType.STAR) {
+			if (left.getType() == STEPlanNodeType.STAR) {
 				reuseLeft = reuseStarNode(neededKeys, nodesForReUse, left, accumulatedMappings);
-			} else if (left.type == STEPlanNodeType.AND) {
+			} else if (left.getType() == STEPlanNodeType.AND) {
 				reuseLeft = reuseAnd(left, g, nodesForReUse, neededKeys, accumulatedMappings);
-			} else if (left.type == STEPlanNodeType.TRIPLE) {
+			} else if (left.getType() == STEPlanNodeType.TRIPLE) {
 				reuseLeft = reuseTripleNode(left.getTriple(), neededKeys, nodesForReUse, left, accumulatedMappings);
 
 			}
@@ -2393,11 +2392,11 @@ public class Planner {
 
 			boolean reuseRight = false;
 			
-			if (right.type == STEPlanNodeType.TRIPLE) {
+			if (right.getType() == STEPlanNodeType.TRIPLE) {
 				reuseRight = reuseTripleNode(right.getTriple(), neededKeys, nodesForReUse, right, accumulatedMappings);
-			} else if (right.type == STEPlanNodeType.STAR) {
+			} else if (right.getType() == STEPlanNodeType.STAR) {
 				reuseRight = reuseStarNode(neededKeys, nodesForReUse, right, accumulatedMappings);
-			} else if (right.type == STEPlanNodeType.AND) {
+			} else if (right.getType() == STEPlanNodeType.AND) {
 				reuseRight = reuseAnd(right, g, nodesForReUse, neededKeys, accumulatedMappings);
 			}
 			
@@ -2419,13 +2418,13 @@ public class Planner {
 				if (n == node) {
 					continue;
 				}
-				assert n.type == STEPlanNodeType.TRIPLE || n.type == STEPlanNodeType.AND || n.type == STEPlanNodeType.STAR;
+				assert n.getType() == STEPlanNodeType.TRIPLE || n.getType() == STEPlanNodeType.AND || n.getType() == STEPlanNodeType.STAR;
 
 
 				assert nodesForReUse.containsKey(n) : "cant reuse node:" + node + " because " + n  + " n is not found ";
 				ReUseNode rn = nodesForReUse.get(n);
 
-				if (n.type == STEPlanNodeType.TRIPLE) {
+				if (n.getType() == STEPlanNodeType.TRIPLE) {
 					QueryTriple qt = n.getTriple();
 					assert rn.getKeys().size() == 1;
 					Key k = rn.getKeys().iterator().next();
@@ -2456,7 +2455,7 @@ public class Planner {
 				getAndSuccessors(g, right, successors);
 			}
 			
-			if (n.type == STEPlanNodeType.AND || n.type == STEPlanNodeType.STAR || n.type == STEPlanNodeType.TRIPLE) {
+			if (n.getType() == STEPlanNodeType.AND || n.getType() == STEPlanNodeType.STAR || n.getType() == STEPlanNodeType.TRIPLE) {
 				successors.add(n);
 			}
 		}
@@ -2522,6 +2521,7 @@ public class Planner {
 			STPlanNode root = plan(null, topPattern, HashSetFactory.<Variable> make(), projectedVars, g);
 			topPlan.planTreeRoot = root;
 			topPlan.setPattern(topPattern);
+			topPlan.findProductsInPlan();
 			return topPlan;
 		}
 
@@ -2666,6 +2666,11 @@ public class Planner {
 			protected STEPlanNodeType type() {
 				return STEPlanNodeType.AND;
 			}	
+		}, PRODUCT {
+			@Override
+			protected STEPlanNodeType type() {
+				return STEPlanNodeType.PRODUCT;
+			}	
 		}, NOT_EXISTS {
 			@Override
 			protected STEPlanNodeType type() {
@@ -2684,6 +2689,11 @@ public class Planner {
 			plan.addEdge(lhs, rhs);
 			return lhs;
 		} else {
+			Set<Variable> operator = HashSetFactory.make(lhs.getAvailableVariables());
+			Set<Variable> x = HashSetFactory.make(rhs.getRequiredVariables());
+			x.addAll(rhs.getProducedVariables());
+			operator.retainAll(x);
+						
 			STPlanNode and = planFactory.createSTPlanNode(
 					type.type(),
 					Collections.<Variable> emptySet(),
@@ -2702,11 +2712,6 @@ public class Planner {
 			
 			and.setProducedVariables(HashSetFactory.make(availableVariables));
 			and.setAvailableVariables(HashSetFactory.make(availableVariables));
-
-			Set<Variable> operator = HashSetFactory.make(lhs.getAvailableVariables());
-			Set<Variable> x = HashSetFactory.make(rhs.getRequiredVariables());
-			x.addAll(rhs.getProducedVariables());
-			operator.retainAll(x);
 			
 			//assert !operator.isEmpty();
 			and.setOperatorsVariables(operator);

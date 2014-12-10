@@ -26,6 +26,7 @@ import com.ibm.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
 import com.ibm.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.rdf.store.sparql11.stopt.STAccessMethod;
 import com.ibm.rdf.store.sparql11.stopt.STEAccessMethodType;
+import com.ibm.rdf.store.sparql11.stopt.STEPlanNodeType;
 import com.ibm.rdf.store.sparql11.stopt.STPlanNode;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
@@ -560,6 +561,26 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		}
 		return true;
 	}
+	
+	private Set<Variable> getAvailableVariablesInSecondary() {
+		STPlanNode predecessor = null;
+		if (wrapper.getPlan().getPlanTree().getPredNodes(planNode).hasNext()) {
+			predecessor = wrapper.getPlan().getPlanTree().getPredNodes(planNode).next();
+		}
+		if (predecessor != null && predecessor.getType() == STEPlanNodeType.PRODUCT) {
+			STPlanNode left = wrapper.getPlan().getPlanTree().getSuccNodes(predecessor).next();
+			
+			Set<Variable> vars = new HashSet<Variable>();
+			for (Variable v : planNode.getAvailableVariables()) {
+				if (left.getProducedVariables().contains(v)) {
+					continue;
+				}
+				vars.add(v);
+			}
+			return vars;
+		}
+		return planNode.getAvailableVariables();
+	}
 
 	List<String> getProjectedSQLClauseInSecondary() throws SQLWriterException {
 		List<String> projectSecondary = new LinkedList<String>();
@@ -575,7 +596,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 			valueTerm = qt.getSubject();
 		}
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
-		Set<Variable> availableVariables = planNode.getAvailableVariables();
+		Set<Variable> availableVariables = getAvailableVariablesInSecondary();
 		boolean applyBindForPrimary = applyBindForPrimary();
 		if (availableVariables != null) {
 			Set<Variable> bindProjectedVariables = getBindProjectedVariables();

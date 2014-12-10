@@ -128,22 +128,22 @@ public class STPlanWrapper {
 	
 	
 	public boolean reuseSqlTemptable(STPlanNode node){
-		if (node.type == STEPlanNodeType.REUSE) {
+		if (node.getType() == STEPlanNodeType.REUSE) {
 			STPlanNode rn = node.getReUseNode();
-			if (rn.type == STEPlanNodeType.AND) {
+			if (rn.getType() == STEPlanNodeType.AND) {
 				Iterator<STPlanNode> it = plan.getPlanTree().getSuccNodes(rn);
 				while (it.hasNext()) {
 					STPlanNode succ = it.next();
-					if (succ.type == STEPlanNodeType.TRIPLE) {
+					if (succ.getType() == STEPlanNodeType.TRIPLE) {
 						reuseTripleNode(node, succ);
-					} else if (succ.type == STEPlanNodeType.STAR) {
+					} else if (succ.getType() == STEPlanNodeType.STAR) {
 						reuseStarNode(node, succ);
 					}
 				}		
 				
-			} else if (rn.type == STEPlanNodeType.TRIPLE) {
+			} else if (rn.getType() == STEPlanNodeType.TRIPLE) {
 				reuseTripleNode(node, rn);
-			} else if (rn.type == STEPlanNodeType.STAR) {
+			} else if (rn.getType() == STEPlanNodeType.STAR) {
 				reuseStarNode(node, rn);
 			}
 			return true;

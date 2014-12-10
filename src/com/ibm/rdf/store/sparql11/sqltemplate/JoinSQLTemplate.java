@@ -30,7 +30,6 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 	@Override
 	Set<SQLMapping> populateMappings() throws SQLWriterException {
 		
-
 		varMap = new HashMap<String, Pair<String, String>>();
 		
 		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
@@ -47,21 +46,25 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 		mappings.add(tMapping);
 		
 		List<String> filterConstraint = getFilterSQLConstraint();
-		SQLMapping filterMapping = new SQLMapping("op_constraint", filterConstraint,null);
-		mappings.add(filterMapping);
-		
 		List<String> joinConstraint = getJoinConstraintMapping();
-		SQLMapping joinMapping = new SQLMapping("op_constraint", joinConstraint,null);
-		mappings.add(joinMapping);
+
+		List<String> combinedConstraints = new LinkedList<String>();
+		if (filterConstraint != null) {
+			combinedConstraints.addAll(filterConstraint);
+		}
+		if (joinConstraint != null) {
+			combinedConstraints.addAll(joinConstraint);
+		}
+		if (!combinedConstraints.isEmpty()) {
+			SQLMapping joinMapping = new SQLMapping("op_constraint", combinedConstraints, null);
+			mappings.add(joinMapping);
+		}
 		
 		return mappings;
 	}
 	
-	List<String> getProjectMapping(){
-		List<String> projectMapping = new LinkedList<String>();
-		Set<Variable> operatorVariables=planNode.getOperatorsVariables();
+	protected void getLeftProjectMapping(List<String> projectMapping) {
 		String leftSQLCte = wrapper.getPlanNodeCTE(left);
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 		Set<Variable> leftAvailable = left.getAvailableVariables();
 		if(leftAvailable != null){
@@ -76,6 +79,13 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 				varMap.put(v.getName(), Pair.make(leftSQLCte+"."+vPredName, vSqlType));
 			}
 		}
+	}
+	
+	protected void getRightProjectMapping(List<String> projectMapping) {
+		Set<Variable> operatorVariables=planNode.getOperatorsVariables();
+		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
+
 		Set<Variable> rightAvailable = right.getAvailableVariables();
 		if(rightAvailable != null){
 			for(Variable v : rightAvailable){
@@ -90,6 +100,12 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 				varMap.put(v.getName(), Pair.make(rightSQLCte+"."+vPredName, vSqlType));
 			}
 		}
+	}
+	
+	List<String> getProjectMapping(){
+		List<String> projectMapping = new LinkedList<String>();
+		getLeftProjectMapping(projectMapping);
+		getRightProjectMapping(projectMapping);
 		return projectMapping;
 	}
 	

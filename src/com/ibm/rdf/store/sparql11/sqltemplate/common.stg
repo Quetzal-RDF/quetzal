@@ -22,6 +22,18 @@ FROM <target; separator=",">
 WHERE  <op_constraint; separator=" AND "> <endif> )
 >>
 
+join(project,target,op_constraint,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <project; separator=",">
+FROM <target; separator=",">
+<if(op_constraint)>
+WHERE  <op_constraint; separator=" AND "> <endif> )
+>>
+
+product(leftProject, rightProject, leftTarget, rightTarget, sql_id)  ::= <<  
+QS<sql_id> AS ( SELECT <leftProject; separator=",">, <rightProject; separator=",">
+FROM <leftTarget>, <rightTarget> )
+>>
+
 star_both(project,s_project,target,s_target, entry_constraint, graph_constraint, predicate_constraint, sep, val_constraint,s_val_constraint, filter_constraint, s_filter_constraint, sql_id, multivalued_ids)  ::= << 
  Q<sql_id> AS (SELECT <project; separator=",">
  FROM <target; separator=",">
