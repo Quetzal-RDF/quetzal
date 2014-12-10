@@ -2,6 +2,7 @@ package com.ibm.rdf.store.disbn;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -172,7 +173,7 @@ public class QueryWorkloadDistributor {
 		case AND:
 			List<Pattern> ps = new LinkedList<Pattern>();
 			ps.addAll( ((PatternSet) p).getPatterns() );
-			ps.sort(new Comparator<Pattern>() {
+			Collections.sort(ps, new Comparator<Pattern>() {
 				public int compare(Pattern o1, Pattern o2) {
 					if (o1.equals(o2)) {
 						return 0;
