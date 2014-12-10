@@ -141,6 +141,17 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
       }
    }
 
+   public static class DB2SP2B100M_SLSSD extends SP2QueryUtilityTest<DB2TestData>
+   {
+   private static final DB2TestData data = getStore("jdbc:db2://localhost:50002/sp2b", "sp2b_100m_r", "db2inst1",
+                                               "db2admin", "db2inst1", false);
+
+   public DB2SP2B100M_SLSSD()
+      {
+      super(new DB2Engine(), data, TestConstants.sp2b100MAnswers, "/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/sp2b_queries_rev/");
+      }
+   }
+
    public static class SharkSP2B1MVM9_12_196_243 extends SP2QueryUtilityTest<SharkTestData>
       {
 	   private static final SharkTestData data =  SharkTestData.getStore("jdbc:hive2://9.12.196.243:10000/default", "sp2b1m", "root", "nkoutche",

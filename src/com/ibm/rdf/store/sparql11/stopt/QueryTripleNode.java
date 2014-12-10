@@ -20,6 +20,7 @@ import com.ibm.rdf.store.sparql11.model.Variable;
 import com.ibm.rdf.store.sparql11.optimizer.SPARQLOptimizerStatistics;
 import com.ibm.rdf.store.sparql11.stopt.Planner.Key;
 import com.ibm.rdf.store.sparql11.stopt.Planner.Kind;
+import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.graph.NumberedGraph;
 
@@ -428,11 +429,11 @@ public class QueryTripleNode {
 	}
 
 	public Set<Variable> getProducedVariables() {
-		return producedVariables;
+		return HashSetFactory.make(producedVariables);
 	}
 
 	public Set<Variable> getRequiredVariables() {
-		return requiredVariables;
+		return HashSetFactory.make(requiredVariables);
 	}
 
 	private static double getCost(String s,

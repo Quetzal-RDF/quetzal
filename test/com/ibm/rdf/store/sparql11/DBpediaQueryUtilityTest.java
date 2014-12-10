@@ -25,9 +25,9 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
 	public static class RDFStoreDBpedia37 extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://localhost:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://localhost:50002/dbp", "dbp37_r", "db2inst1", "db2admin", "db2inst1", false);
 		public RDFStoreDBpedia37() {
-			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
+			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, "/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/dbpedia3.7_queries_rev/");
 		}
 	}
 

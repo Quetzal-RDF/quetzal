@@ -148,14 +148,43 @@ aggregate_function_with_type_check(function,var, typecheck)  ::= <<
 
 RDF_ISNUMERIC(arg)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:number($arg) return $res' PASSING <arg> as "arg") AS VARCHAR(256)) != 'NaN' >>
 
+TYPE_CHECK_WITH_CAST_TIMESTAMP(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then to_timestamp(REPLACE(REPLACE(<left>,'T',' '),'Z',''),'YYYY-MM-DD HH24:MI:SS') else null end) <operator>  
+ to_timestamp(REPLACE(REPLACE(<right>,'T',' '),'Z',''),'YYYY-MM-DD HH24:MI:SS')) 
+>>
+
+TYPE_CHECK_WITH_CAST_DATE(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then to_date(SUBSTR(<left>,1, 10),'YYYY-MM-DD') else null end) <operator>  
+DATE <right>) 
+>>
+
 TYPE_CHECK_WITH_CAST(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
-(<typeTest>  AND (CASE WHEN <typeTest> then XMLCAST ( XMLTEXT( <left> ) AS <cast>) else null end) <operator>  <if(rhsNeedsCast)> XMLCAST ( XMLTEXT( <endif><right> <if(rhsNeedsCast)> ) AS <cast>)<endif> ) >>
+(<typeTest>  AND (CASE WHEN <typeTest> then cast(<left> as <cast>) else null end) <operator>  
+<if(rhsNeedsCast)> cast(<right> as <cast>) <endif><right><endif> ) >>
 
 LOCATE(string_var, pattern)  ::= << 
 NOT(LOCATE('<pattern>', <string_var>) = 0)
 >>
 
-XSD_DATETIME_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+XSD_DATETIME_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> xmlexists('$x[. castable as <xmlType>]' passing <value> as "x") THEN TO_TIMESTAMP(REPLACE(REPLACE(<value>, 'T', ' '), 'Z', ''),'YYYY-MM-DD HH24:MI:SS') 
+	else null end
+)
+>>
+
+XSD_DATE_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> xmlexists('$x[. castable as <xmlType>]' passing <value> as "x") THEN TO_DATE(SUBSTR(<value>, 1, 10),'YYYY-MM-DD HH24:MI:SS') 
+	else null end
+)
+>>
+
+XSD_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
 (
 CASE 
     WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
@@ -163,7 +192,6 @@ CASE
 	else null end
 )
 >>
-
 
 LOCATE_LCASE(string_var, pattern)  ::= << 
 NOT(LOCATE(LCASE('<pattern>'), LCASE(<string_var>)) = 0)

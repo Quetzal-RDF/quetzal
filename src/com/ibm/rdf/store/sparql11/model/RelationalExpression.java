@@ -34,6 +34,9 @@ public class RelationalExpression extends Expression {
 	private static String TIMESTAMP_STR = "TIMESTAMP";
 	private static String DATE_STR = "DATE";
 	private static String TYPE_CHECK_WITH_CAST = "TYPE_CHECK_WITH_CAST";
+	private static String TYPE_CHECK_WITH_CAST_TIMESTAMP = "TYPE_CHECK_WITH_CAST_TIMESTAMP";
+	private static String TYPE_CHECK_WITH_CAST_DATE = "TYPE_CHECK_WITH_CAST_DATE";
+
 	private static String TYPE_CHECK_CASE = "TYPE_CHECK_CASE";
 	private static String TYPE_CHECK = "TYPE_CHECK";
 
@@ -638,7 +641,14 @@ public class RelationalExpression extends Expression {
 			String typeToCastTo, Store store) {
 		if (needsCaseAndTypeCheck.snd == true) {
 			if (castType != null) {
-				StringTemplate t = store.getInstanceOf(TYPE_CHECK_WITH_CAST);
+				StringTemplate t = null;
+				if (castType.equals(TIMESTAMP_STR)) {
+					t = store.getInstanceOf(TYPE_CHECK_WITH_CAST_TIMESTAMP);
+				} else if (castType.equals(DATE_STR)) {
+					t = store.getInstanceOf(TYPE_CHECK_WITH_CAST_DATE);
+				} else {
+					t = store.getInstanceOf(TYPE_CHECK_WITH_CAST);
+				}
 				t.setAttribute("cast", castType);
 				return t;
 			} else {

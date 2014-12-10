@@ -70,6 +70,8 @@ public class Planner {
 	
 	private final boolean CHECK_PRODUCT = true;
 	
+	private final boolean CHECK_MINUS = true;
+	
 	protected int graphCounterId = 0;
 
 	private final PlanNodeCreator planFactory;
@@ -416,7 +418,9 @@ public class Planner {
 	private static Set<Variable> computeLiveVariables(Set<Variable> liveVariables, Set<Key> neededKeys) {
 		Set<Variable> newLiveVariables = HashSetFactory.make(liveVariables);
 		for(Key key : neededKeys) {
-			newLiveVariables.addAll(key.gatherVariables());
+			if (! (key instanceof Pattern && ((Pattern)key).getType() == EPatternSetType.AND)) {
+				newLiveVariables.addAll(key.gatherVariables());
+			}
 		}
 		return newLiveVariables;
 	}
@@ -937,12 +941,10 @@ public class Planner {
 		}
 
 		class SimpleNode extends QueryTripleNode implements Node {
-			private final Set<Variable> liveVars;
 			
 			public SimpleNode(int accessMethod, QueryTriple queryTriple, Set<Variable> liveVars,
 					Pattern p, SPARQLOptimizerStatistics stats, int id) {
 				super(accessMethod, queryTriple, p, stats, id);
-				this.liveVars = liveVars;
 			}
 
 			@Override
@@ -956,6 +958,8 @@ public class Planner {
 				node.cost = getCost(g);
 				assert node.cost.fst > 0.0;
 				node.setFilters(filters);
+				node.setProducedVariables(getProducedVariables());
+				node.setRequiredVariables(getRequiredVariables());
 				Set<Variable> vars = HashSetFactory.make(availableVars);
 				vars.addAll(getProducedVariables());
 				vars.retainAll(liveVars);
@@ -1153,8 +1157,6 @@ public class Planner {
 					switch (y.getType()) {
 					case EXISTS:
 					case NOT_EXISTS:
-						subtrahends.addAll( ((PatternSet)y).getPatterns().get(1).gatherSubPatterns() );
-						break;
 					case MINUS: 
 						subtrahends.addAll( y.gatherSubPatterns() );
 						break;
@@ -1190,21 +1192,26 @@ public class Planner {
 			
 			final Set<Variable> unscoped = p.optionalOnlyVars();
 			
+			System.err.println("checking minus node " + p + "\n" + availableVars + " " + allDeps);
 			if (availableVars.containsAll(allDeps)) {
+				System.err.println("adding node");
 				result.add(new AbstractNode(p) {
 					@Override
 					public Kind kind() {
 						return Kind.MINUS;
 					}
 
-					private boolean tryNoFinalJoin(Set<Variable> rhsLive) {
+					private boolean tryNoFinalJoin(Set<Variable> availableVars, Set<Variable> rhsLive) {
 						Pattern toSubtract = ((PatternSet)p).getPatterns().get(0);
 						
-						rhsLive = HashSetFactory.make(rhsLive);
-						rhsLive.retainAll(availableVars);
+						rhsLive = HashSetFactory.make(availableVars);
+						rhsLive.retainAll(rhsLive);
 						
 						Set<Variable> rhsVars = toSubtract.gatherVariables();
 
+						System.err.println("tryNoFinalJoin" + rhsVars.containsAll(rhsLive) + ":" + rhsLive + " -- " + rhsVars);
+						(new Throwable()).printStackTrace(System.err);
+						
 						return rhsVars.containsAll(rhsLive);
 					}
 					
@@ -1220,7 +1227,7 @@ public class Planner {
 						Set<Variable> rhsLive = HashSetFactory.make(liveVars);
 						rhsLive.addAll(allDeps);
 						
-						STPlanNode subtractNode = walker.plan(this, tryNoFinalJoin(rhsLive), toSubtract, HashSetFactory.make(myVars), rhsLive, g);
+						STPlanNode subtractNode = walker.plan(this, tryNoFinalJoin(availableVars, liveVars), toSubtract, HashSetFactory.make(myVars), rhsLive, g);
 
 						STPlanNode x = planFactory.createSTPlanNode(STEPlanNodeType.MINUS, myVars, p);
 
@@ -1231,6 +1238,7 @@ public class Planner {
 
 						x.setRequiredVariables(allDeps);
 						Set<Variable> produced = HashSetFactory.make(myVars);
+						produced.retainAll(subtractNode.getAvailableVariables());
 						x.setProducedVariables(produced);
 						x.setCost(subtractNode.cost);
 						Set<Variable> av = HashSetFactory.make(availableVars);
@@ -1242,9 +1250,10 @@ public class Planner {
 
 					@Override
 					public Pair<Double, Double> getCost(NumberedGraph<STPlanNode> g) {
-						STPlanNode dp = walker.plan(this, tryNoFinalJoin(liveVars),
+						STPlanNode dp = walker.plan(this, true,
 								((PatternSet)p).getPatterns().get(0), HashSetFactory.make(availableVars),
 								HashSetFactory.make(liveVars), SlowSparseNumberedGraph.<STPlanNode> make());
+						System.err.println(dp);
 						assert dp.cost != null : ((PatternSet)p).getPatterns().get(0);
 						return dp.cost;
 					}
@@ -2107,7 +2116,8 @@ public class Planner {
 				}
 
 				Edge savedProductEdge = null;
-				for (Iterator<Edge> es = orderedEdges.iterator(); es.hasNext();) {
+				Edge savedMinusEdge = null;
+				edges: for (Iterator<Edge> es = orderedEdges.iterator(); es.hasNext();) {
 					Edge e = es.next();
 					if (neededKeys.containsAll(e.snd.getKeys())) {						
 
@@ -2115,13 +2125,13 @@ public class Planner {
 							if (!availableVars.isEmpty()
 								&& Collections.disjoint(availableVars,
 											e.snd.getRequiredVariables())
-											&& Collections.disjoint(availableVars,
-													e.snd.getProducedVariables())) {
+								&& Collections.disjoint(availableVars,
+											e.snd.getProducedVariables())) {
 								if (es.hasNext()) {
 									if (savedProductEdge == null) {
 										savedProductEdge = e;
 									} 
-									continue;
+									continue edges;
 								} else {
 									if (savedProductEdge != null) {
 										e = savedProductEdge;
@@ -2131,6 +2141,38 @@ public class Planner {
 							}
 						}
 
+						if (CHECK_MINUS) {
+							Set<? extends Key> mine = e.snd.getKeys();
+							for(Key k : neededKeys) {
+								if (k instanceof Pattern && 
+									((Pattern)k).getType() == EPatternSetType.MINUS && 
+									!mine.contains(k)) 
+								{
+									Set<Variable> myVars = e.snd.getProducedVariables();
+									myVars.removeAll(availableVars);
+									
+									Set<Variable> minusVars = k.gatherVariables();
+									
+									myVars.removeAll(minusVars);
+									myVars.retainAll(liveVariables);
+									
+									if (!myVars.isEmpty()) {
+										if (es.hasNext()) {
+											if (savedMinusEdge == null) {
+												savedMinusEdge = e;
+											} 
+											continue edges;
+										} else {
+											if (savedMinusEdge != null) {
+												e = savedMinusEdge;
+												savedMinusEdge = null;
+											}
+										}
+									}
+								}
+							}
+						}
+						
 						System.out.println("Removing keys:");
 						System.out.println(e.snd.getKeys());
 						neededKeys.removeAll(e.snd.getKeys());
@@ -2142,7 +2184,7 @@ public class Planner {
 						liveVars = computeLiveVariables(liveVariables, neededKeys);
 				
 						if (g == walker.topPlan()) {
-							//System.err.println("adding " + e + " available: " + availableVars + ", live: " + liveVars);
+							System.err.println("adding " + e + " available: " + availableVars + ", live: " + liveVars);
 						}
 				
 						for (Node s : getApplicableNodes(region, availableVars, liveVars, neededKeys, walker)) {
@@ -2153,6 +2195,14 @@ public class Planner {
 
 						top = e.snd.augmentPlan(q, top, g, filters, oldVars, liveVars);
 						
+						if (savedProductEdge != null) {
+							orderedEdges.add(savedProductEdge);
+						}
+
+						if (savedMinusEdge != null) {
+							orderedEdges.add(savedMinusEdge);
+						}
+
 						continue process;
 					}
 					

@@ -291,6 +291,19 @@ public class TestRunner<D> {
       return nOR;
       }
 
+   protected int executeSparql(String sparql, int answers)
+   {
+   long time = System.currentTimeMillis();
+   int nOR = engine.executeStringQuery(data, sparql);
+   if (answers != -1)
+      {
+      Assert.assertEquals(answers, nOR);
+      }
+   System.err.println("Query time:" + (System.currentTimeMillis() - time) + " ");
+   System.err.println("query has : " + nOR + " rows");
+   return nOR;
+   }
+
    public static class DB2Engine extends AbstractEngine<DB2TestData>
       {
       private OWLQLSPARQLCompiler compiler;
@@ -339,7 +352,8 @@ public class TestRunner<D> {
          {
          if (isWrapperEnabled)
             {
-            com.hp.hpl.jena.query.Query q = QueryFactory.create(query);
+             com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory.create(query);
+            //com.hp.hpl.jena.query.Query q = QueryFactory.create(query);
             return executeWithInternal(data, q);
             }
          else
