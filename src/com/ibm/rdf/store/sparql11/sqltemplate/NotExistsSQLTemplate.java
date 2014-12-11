@@ -112,18 +112,18 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 		}
 
 		try {		
-		
+			FilterContext context = new FilterContext(varMap, wrapper.getPropertyValueTypes(), notExistsConstraint, rightTarget, isNegated, planNode);
+	
 			Set<Variable> available = new HashSet<Variable>(right.getAvailableVariables());
 			available.addAll(left.getAvailableVariables());
 			if (right.getApplicableFilters(wrapper.getPlan(), available) != null) {
 				for (Expression e : right.getApplicableFilters(wrapper.getPlan(), available)) {
 					assert available.containsAll(e.gatherVariables());
-					String eSql = expGenerator.getSQLForExpression(e, new FilterContext(varMap, wrapper.getPropertyValueTypes(), planNode), store);
+					String eSql = expGenerator.getSQLForExpression(e, context, store);
 					notExistsConstraint.add(eSql);
 				}
 			}
 			
-			FilterContext context = new FilterContext(varMap, wrapper.getPropertyValueTypes(), notExistsConstraint, rightTarget, isNegated, planNode);
 		
 			if (planNode.getFilters() != null) {
 				for (Expression e : planNode.getFilters()) {
