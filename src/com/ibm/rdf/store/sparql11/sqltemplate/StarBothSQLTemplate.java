@@ -423,8 +423,12 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 			//The star entry is always a variable
 			//There is only one star term
 			Variable entryTermVar = planNode.getOperatorsVariables().iterator().next(); 
-			if(projectedInSecondary.contains(entryTermVar))return null;
+			if(projectedInSecondary.contains(entryTermVar)) return null;
 			projectedInSecondary.add(entryTermVar);
+			if (sVarMap.containsKey(entryTermVar.getName())) {
+				Pair<String, String> pair = sVarMap.get(entryTermVar.getName());
+				entrySqlToSparql.add(pair.snd+" AS "+pair.snd);
+			}
 			entrySqlToSparql.add(entryTermVar.getName()+" AS "+entryTermVar.getName());
 		}
 
