@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import com.ibm.rdf.store.hashing.ColoringFunction;
+import com.ibm.research.rdf.store.hashing.ColoringFunction;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 public class DbpediaSimulationColoring {

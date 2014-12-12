@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.ibm.rdf.store.sparql11.model.FunctionCall;
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
+import com.ibm.research.rdf.store.sparql11.model.FunctionCall;
 import com.ibm.wala.util.collections.HashMapFactory;
 
 public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
@@ -200,7 +200,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class PSQLLUBMPropPathHelix1 extends
 			LUBMQueryUtilityTest<PSQLTestData> {
@@ -296,7 +296,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBMHelix1 extends LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
@@ -310,7 +310,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBMPropPathHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
@@ -325,7 +325,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBM10MHelix2 extends
 			LUBMQueryUtilityTest<DB2TestData> {
@@ -351,7 +351,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		public DB2LUBM100MHelix1() {
 			super(new DB2Engine(), data,
 					TestConstants.lubm100mAnswers,
-					"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/lubm_queries_QL_reversed/");
+					"/Users/ksrinivs/Documents/workspace/rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 
@@ -370,7 +370,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBM100M_SL extends
 			LUBMQueryUtilityTest<DB2TestData> {
@@ -385,7 +385,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBM10MRC2 extends LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
@@ -399,7 +399,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		}
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class Reversed100M_WithOWLQLCompilation extends
 			LUBMQueryUtilityTest<DB2TestData> {
@@ -531,7 +531,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 	}
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(8)
 	// public static class Reversed100K extends LUBMQueryUtilityTest {
 	// private static final TestRunnerData data =
@@ -544,7 +544,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// lubm10mAnswers);
 	// }
 	// }
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(8)
 	// public static class Reversed100M_RC2_OLDDB2 extends LUBMQueryUtilityTest
 	// {
@@ -559,7 +559,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// }
 	// }
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(8)
 	// public static class XIV8000U extends LUBMQueryUtilityTest {
 	// private static final TestRunnerData data =
@@ -572,7 +572,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// }
 	// }
 
-	// @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(8)
 	// public static class TMS8000U extends LUBMQueryUtilityTest {
 	// private static final TestRunnerData data =

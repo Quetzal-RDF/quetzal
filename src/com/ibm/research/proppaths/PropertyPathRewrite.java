@@ -54,35 +54,35 @@ import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
 import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
-import com.ibm.rdf.store.sparql11.SparqlParserUtilities;
-import com.ibm.rdf.store.sparql11.model.AltPath;
-import com.ibm.rdf.store.sparql11.model.BindPattern;
-import com.ibm.rdf.store.sparql11.model.Constant;
-import com.ibm.rdf.store.sparql11.model.ConstantExpression;
-import com.ibm.rdf.store.sparql11.model.Expression;
-import com.ibm.rdf.store.sparql11.model.Expression.ERelationalOp;
-import com.ibm.rdf.store.sparql11.model.IRI;
-import com.ibm.rdf.store.sparql11.model.InvPath;
-import com.ibm.rdf.store.sparql11.model.NegatedProperySetPath;
-import com.ibm.rdf.store.sparql11.model.OneOrMorePath;
-import com.ibm.rdf.store.sparql11.model.Pattern;
-import com.ibm.rdf.store.sparql11.model.Pattern.EPatternSetType;
-import com.ibm.rdf.store.sparql11.model.Path;
-import com.ibm.rdf.store.sparql11.model.PatternSet;
-import com.ibm.rdf.store.sparql11.model.ProjectedVariable;
-import com.ibm.rdf.store.sparql11.model.PropertyTerm;
-import com.ibm.rdf.store.sparql11.model.QueryTriple;
-import com.ibm.rdf.store.sparql11.model.QueryTripleTerm;
-import com.ibm.rdf.store.sparql11.model.RelationalExpression;
-import com.ibm.rdf.store.sparql11.model.SeqPath;
-import com.ibm.rdf.store.sparql11.model.SimplePath;
-import com.ibm.rdf.store.sparql11.model.SimplePattern;
-import com.ibm.rdf.store.sparql11.model.SubSelectPattern;
-import com.ibm.rdf.store.sparql11.model.Variable;
-import com.ibm.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.rdf.store.sparql11.model.ZeroOrMorePath;
-import com.ibm.rdf.store.sparql11.model.ZeroOrOnePath;
-import com.ibm.rdf.store.sparql11.stopt.Planner;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
+import com.ibm.research.rdf.store.sparql11.model.AltPath;
+import com.ibm.research.rdf.store.sparql11.model.BindPattern;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.IRI;
+import com.ibm.research.rdf.store.sparql11.model.InvPath;
+import com.ibm.research.rdf.store.sparql11.model.NegatedProperySetPath;
+import com.ibm.research.rdf.store.sparql11.model.OneOrMorePath;
+import com.ibm.research.rdf.store.sparql11.model.Path;
+import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.PatternSet;
+import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
+import com.ibm.research.rdf.store.sparql11.model.PropertyTerm;
+import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
+import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
+import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
+import com.ibm.research.rdf.store.sparql11.model.SeqPath;
+import com.ibm.research.rdf.store.sparql11.model.SimplePath;
+import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
+import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
+import com.ibm.research.rdf.store.sparql11.model.ZeroOrMorePath;
+import com.ibm.research.rdf.store.sparql11.model.ZeroOrOnePath;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
+import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
+import com.ibm.research.rdf.store.sparql11.planner.Planner;
 import com.ibm.research.utils.FindAllVariables;
 import com.ibm.research.utils.OCUtils;
 import com.ibm.wala.util.collections.HashMapFactory;
@@ -104,7 +104,7 @@ public class PropertyPathRewrite {
 				//"select * where {?x <http://example.org/rr>+ ?y . ?x <http://example.org/r>+ ?x. ?x <http://example.org/s> <http://example.org/constIRI> . ?x <http://example.org/t>+ <http://example.org/constIRI> . } ";
 				//"select * where { ?x (^<http://example.org/p>|<http://example.org/s>?)/(<http://example.org/q>| <http://example.org/r>)+/!(^<http://example.org/t>| ^<http://example.org/u>|<http://example.org/v> )?y}"; 
 		//Query query = QueryFactory.create(q, Syntax.syntaxSPARQL_11);
-		com.ibm.rdf.store.sparql11.model.Query query =  SparqlParserUtilities.parseSparqlString(q);
+		com.ibm.research.rdf.store.sparql11.model.Query query =  SparqlParserUtilities.parseSparqlString(q);
 		System.out.println("Parsed Query:\n\t"+query);
 		boolean resultQueryWithoutPropertyPath = rewrite.rewrite(query, true, null, null);
 		System.out.println("Rewritten Query:\n\t"+query);
@@ -286,7 +286,7 @@ public class PropertyPathRewrite {
 		
 	}
 	
-	protected class PathRewrite implements com.ibm.rdf.store.sparql11.model.PathVisitor {
+	protected class PathRewrite implements com.ibm.research.rdf.store.sparql11.model.PathVisitor {
 		private Pattern result;
 		private boolean resultHasPropertyPaths;
 		private QueryTripleTerm subject;
@@ -1101,7 +1101,7 @@ public class PropertyPathRewrite {
 	 * @param bestEffort
 	 * @return
 	 */
-	public boolean rewrite(com.ibm.rdf.store.sparql11.model.Query query, boolean bestEffort, Set<Variable> explicitIRIBoundVariables, Set<Variable> explicitNotIRIBoundVariables) {
+	public boolean rewrite(com.ibm.research.rdf.store.sparql11.model.Query query, boolean bestEffort, Set<Variable> explicitIRIBoundVariables, Set<Variable> explicitNotIRIBoundVariables) {
 		/*if (explicitIRIBoundVariables == null) {
 			explicitIRIBoundVariables = Collections.emptySet();
 		}*/
@@ -1307,7 +1307,7 @@ public class PropertyPathRewrite {
 	
 	
 	
-	private Set<String> getAllVariables(com.ibm.rdf.store.sparql11.model.Query q) {
+	private Set<String> getAllVariables(com.ibm.research.rdf.store.sparql11.model.Query q) {
 		Set<String> ret = HashSetFactory.make();
 		if ( q.isSelectQuery()) {
 			for (ProjectedVariable v: q.getSelectQuery().getSelectClause().getProjectedVariables()) {

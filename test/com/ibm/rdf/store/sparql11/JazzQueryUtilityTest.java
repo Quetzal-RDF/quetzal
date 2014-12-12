@@ -21,7 +21,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 		queryDir = reverse? reverseQueryDir: normalQueryDir;
 	}
 
-   // @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+   // @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
    // @RandomizedRepeat(1)
    public static class DB2JazzHelix1 extends JazzQueryUtilityTest<DB2TestData>
       {
@@ -34,7 +34,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
          }
       }
 
-   // @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+   // @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
    // @RandomizedRepeat(1)
    public static class SharkJazzVM_9_12_196_243 extends JazzQueryUtilityTest<SharkTestData>
       {
@@ -46,7 +46,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
          }
       }
 
-   // @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+   // @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
    // @RandomizedRepeat(1)
    public static class PSQLJazzHelix1 extends JazzQueryUtilityTest<PSQLTestData>
       {
@@ -59,7 +59,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
          }
       }
 
-	//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(1)
 	public static class JazzOptimizedStore extends JazzQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.202.45:50001/jazz", "jazz", "db2inst2", "db2admin", "db2inst2", true);
@@ -78,7 +78,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 	}
 	
 
-	//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
 	public static class JazzOptimizedStoreOld extends JazzQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://min-1.watson.ibm.com:50001/jaztypes", "jazzopt", "db2inst1", "db2inst1", "db2inst1", true);

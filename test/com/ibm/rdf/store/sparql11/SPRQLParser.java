@@ -7,13 +7,13 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.ibm.rdf.store.Context;
-import com.ibm.rdf.store.Store;
-import com.ibm.rdf.store.StoreManager;
-import com.ibm.rdf.store.jena.RdfStoreException;
-import com.ibm.rdf.store.jena.RdfStoreFactory;
-import com.ibm.rdf.store.jena.RdfStoreQueryExecutionFactory;
-import com.ibm.rdf.store.jena.RdfStoreQueryFactory;
+import com.ibm.research.rdf.store.Context;
+import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.jena.RdfStoreException;
+import com.ibm.research.rdf.store.jena.RdfStoreFactory;
+import com.ibm.research.rdf.store.jena.RdfStoreQueryExecutionFactory;
+import com.ibm.research.rdf.store.jena.RdfStoreQueryFactory;
 
 public class SPRQLParser {
 	private static Connection conn = null;

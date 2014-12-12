@@ -62,8 +62,8 @@ import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
 import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.hp.hpl.jena.util.FileManager;
-import com.ibm.rdf.store.sparql11.model.Variable;
 import com.ibm.research.owlql.ConjunctiveQuery;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
 /**
  * 
  * @author achille

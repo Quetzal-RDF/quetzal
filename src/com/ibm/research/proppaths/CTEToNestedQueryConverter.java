@@ -82,7 +82,7 @@ import net.sf.jsqlparser.statement.select.ValuesList;
 import net.sf.jsqlparser.statement.select.WithItem;
 
 import com.ibm.db2.jcc.am.jo;
-import com.ibm.rdf.store.Store;
+import com.ibm.research.rdf.store.Store;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;

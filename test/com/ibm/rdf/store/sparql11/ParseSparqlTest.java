@@ -12,7 +12,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.ibm.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
+import com.ibm.research.rdf.store.sparql11.model.Query;
 
 @RunWith(Parameterized.class)
 public class ParseSparqlTest {

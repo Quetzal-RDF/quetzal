@@ -6,8 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.ibm.rdf.store.Store;
-import com.ibm.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 public class InsertValuesIntoTable extends InsertIntoTable {

@@ -4,14 +4,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import com.ibm.rdf.store.sparql11.model.Expression;
-import com.ibm.rdf.store.sparql11.model.Pattern;
-import com.ibm.rdf.store.sparql11.model.Query;
-import com.ibm.rdf.store.sparql11.model.Variable;
-import com.ibm.rdf.store.sparql11.stopt.Planner;
-import com.ibm.rdf.store.sparql11.stopt.STEPlanNodeType;
-import com.ibm.rdf.store.sparql11.stopt.STPlan;
-import com.ibm.rdf.store.sparql11.stopt.STPlanNode;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.planner.Plan;
+import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
+import com.ibm.research.rdf.store.sparql11.planner.PlanNodeType;
+import com.ibm.research.rdf.store.sparql11.planner.Planner;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.graph.NumberedGraph;
@@ -20,16 +20,16 @@ public class PlannerWithMaterializedTableStartingPoint extends Planner {
 
 	public static class MaterializedTableKey implements Planner.Key {
 
-		protected STPlanNode materializedTable;
+		protected PlanNode materializedTable;
 		
 		
-		public MaterializedTableKey(STPlanNode materializedTable) {
+		public MaterializedTableKey(PlanNode materializedTable) {
 			super();
 			this.materializedTable = materializedTable;
-			assert materializedTable.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE) : materializedTable;
+			assert materializedTable.getType().equals(PlanNodeType.MATERIALIZED_TABLE) : materializedTable;
 		}
 		
-		public STPlanNode getMaterializedTable() {
+		public PlanNode getMaterializedTable() {
 			return materializedTable;
 		}
 
@@ -58,10 +58,10 @@ public class PlannerWithMaterializedTableStartingPoint extends Planner {
 		}
 
 		@Override
-		public STPlanNode augmentPlan(Query q, STPlanNode currentHead,
-				NumberedGraph<STPlanNode> g, List<Expression> filters,
+		public PlanNode augmentPlan(Query q, PlanNode currentHead,
+				NumberedGraph<PlanNode> g, List<Expression> filters,
 				Set<Variable> availableVars, Set<Variable> liveVars) {
-			STPlanNode node = materializedTableKey.getMaterializedTable().clone();
+			PlanNode node = materializedTableKey.getMaterializedTable().clone();
 			node.cost = getCost(g);
 			//assert node.cost.fst > 0.0;
 			node.setFilters(filters);
@@ -88,7 +88,7 @@ public class PlannerWithMaterializedTableStartingPoint extends Planner {
 		}
 
 		@Override
-		public Pair<Double, Double> getCost(NumberedGraph<STPlanNode> g) {
+		public Pair<Double, Double> getCost(NumberedGraph<PlanNode> g) {
 			return Pair.make(0.0, 0.0);
 		}
 
@@ -136,17 +136,17 @@ public class PlannerWithMaterializedTableStartingPoint extends Planner {
 	
 	protected MaterializedTableKey materializedTableKey;
 	
-	public PlannerWithMaterializedTableStartingPoint(STPlanNode materializedTable) {
+	public PlannerWithMaterializedTableStartingPoint(PlanNode materializedTable) {
 		super();
 		materializedTableKey = materializedTable!=null? new MaterializedTableKey(materializedTable): null;
 	}
 
-	public PlannerWithMaterializedTableStartingPoint(PlanNodeCreator planFactory, STPlanNode materializedTable) {
+	public PlannerWithMaterializedTableStartingPoint(PlanNodeCreator planFactory, PlanNode materializedTable) {
 		super(planFactory);
 		materializedTableKey =  materializedTable!=null? new MaterializedTableKey(materializedTable): null;
 	}
 
-	public STPlan plan(Query q, ApplicableNodes applicableNodes) {
+	public Plan plan(Query q, ApplicableNodes applicableNodes) {
 		return new RecursiveWalker(
 				new GreedyPlannerWithMaterializedTableStartingPoint(q, applicableNodes, materializedTableKey)).plan(q);
 	}

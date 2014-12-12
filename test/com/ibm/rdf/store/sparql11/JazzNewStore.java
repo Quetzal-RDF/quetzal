@@ -2,12 +2,13 @@ package com.ibm.rdf.store.sparql11;
 
 import java.sql.ResultSet;
 
-import com.ibm.rdf.store.query.QueryProcessor;
-import com.ibm.rdf.store.query.QueryProcessorFactory;
-import com.ibm.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-import com.ibm.rdf.store.sparql11.model.Pattern;
-import com.ibm.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.query.QueryProcessor;
+import com.ibm.research.rdf.store.query.QueryProcessorFactory;
+import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
+import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.Query;
 
 import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.*;
 
