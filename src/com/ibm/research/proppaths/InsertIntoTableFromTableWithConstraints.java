@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ibm.rdf.store.Store;
-import com.ibm.rdf.store.Store.Db2Type;
-import com.ibm.rdf.store.config.Constants;
-import com.ibm.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.rdf.store.sparql11.model.Constant;
-import com.ibm.rdf.store.sparql11.model.Expression;
-import com.ibm.rdf.store.sparql11.model.Variable;
-import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
-import com.ibm.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
-import com.ibm.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Db2Type;
+import com.ibm.research.rdf.store.config.Constants;
+import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.Pair;
 
 public class InsertIntoTableFromTableWithConstraints extends InsertIntoTable

@@ -5,8 +5,8 @@ import java.util.Collections;
 import org.junit.Test;
 
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-import com.ibm.rdf.store.sparql11.model.Query;
-import com.ibm.rdf.store.utilities.MinusRewriter;
+import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.utilities.MinusRewriter;
 
 import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.*;
 

@@ -5,26 +5,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ibm.rdf.store.Store;
-import com.ibm.rdf.store.Store.Db2Type;
-import com.ibm.rdf.store.config.Constants;
-import com.ibm.rdf.store.sparql11.model.Constant;
-import com.ibm.rdf.store.sparql11.model.Expression;
-import com.ibm.rdf.store.sparql11.model.Variable;
-import com.ibm.rdf.store.sparql11.sqlwriter.FilterContext;
-import com.ibm.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
-import com.ibm.rdf.store.sparql11.sqlwriter.SQLWriterException;
-import com.ibm.rdf.store.sparql11.stopt.STEPlanNodeType;
-import com.ibm.rdf.store.sparql11.stopt.STPlanNode;
+import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Db2Type;
+import com.ibm.research.rdf.store.config.Constants;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
+import com.ibm.research.rdf.store.sparql11.planner.PlanNodeType;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
 public class InsertIntoTableFromJoinWithPredecessorAndProcessFilters extends InsertIntoTable {
-	private static String toSQL(STPlanNode node, String sourceTable, 
-			STPlanNode predecessor, Map<Variable, Constant> var2Constant, Set<Variable> explicitIRIBoundVariables,
+	private static String toSQL(PlanNode node, String sourceTable, 
+			PlanNode predecessor, Map<Variable, Constant> var2Constant, Set<Variable> explicitIRIBoundVariables,
 			List<Expression> exps, Store store, boolean isPostGres) {
-		assert node.getType().equals(STEPlanNodeType.TRIPLE) : node;
+		assert node.getType().equals(PlanNodeType.TRIPLE) : node;
 		StringBuffer sql = new StringBuffer();
 		String nodeTable = "node";
 		String predecessorTable = "pred";
@@ -77,7 +77,7 @@ public class InsertIntoTableFromJoinWithPredecessorAndProcessFilters extends Ins
 		sql.append(sourceTable).append(" AS ").append(nodeTable);
 		boolean whereAdded = false;
 		if (predecessor!=null) {
-			assert predecessor.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE) : predecessor;
+			assert predecessor.getType().equals(PlanNodeType.MATERIALIZED_TABLE) : predecessor;
 			Set<Variable> livePredecessorVariables = HashSetFactory.make(predecessor.getAvailableVariables());
 			livePredecessorVariables.retainAll(node.getAvailableVariables());
 			/*if (node.getRequiredVariables().containsAll(livePredecessorVariables)) {
@@ -156,14 +156,14 @@ public class InsertIntoTableFromJoinWithPredecessorAndProcessFilters extends Ins
 		return sql.toString();
 	}
 	
-	protected STPlanNode node;
+	protected PlanNode node;
 	protected String targetTable;
 	protected String sourceTable;
-	protected STPlanNode predecessor;
+	protected PlanNode predecessor;
 	protected Map<Variable, Constant> var2Constant;
 	public InsertIntoTableFromJoinWithPredecessorAndProcessFilters(String targetTable,
-			STPlanNode node, String sourceTable, 
-			STPlanNode predecessor, Map<Variable, Constant> var2Constant,Set<Variable> explicitIRIBoundVariables,
+			PlanNode node, String sourceTable, 
+			PlanNode predecessor, Map<Variable, Constant> var2Constant,Set<Variable> explicitIRIBoundVariables,
 			List<Expression> exps, Store store) {
 		super(targetTable, toSQL(node, sourceTable, predecessor, var2Constant, explicitIRIBoundVariables, exps, store, CodeGenerator.isPostGresBackend(store) ));
 		this.node = node;

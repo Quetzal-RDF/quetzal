@@ -14,45 +14,45 @@ import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.reasoner.rulesys.builtins.IsBNode;
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.ibm.rdf.store.Context;
-import com.ibm.rdf.store.Store;
-import com.ibm.rdf.store.config.Constants;
-import com.ibm.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.rdf.store.sparql11.model.BinaryUnion;
-import com.ibm.rdf.store.sparql11.model.Constant;
-import com.ibm.rdf.store.sparql11.model.ConstantExpression;
-import com.ibm.rdf.store.sparql11.model.Expression;
-import com.ibm.rdf.store.sparql11.model.Expression.ERelationalOp;
-import com.ibm.rdf.store.sparql11.model.IRI;
-import com.ibm.rdf.store.sparql11.model.OneOrMorePath;
-import com.ibm.rdf.store.sparql11.model.Path;
-import com.ibm.rdf.store.sparql11.model.Pattern.EPatternSetType;
-import com.ibm.rdf.store.sparql11.model.PatternSet;
-import com.ibm.rdf.store.sparql11.model.ProjectedVariable;
-import com.ibm.rdf.store.sparql11.model.PropertyTerm;
-import com.ibm.rdf.store.sparql11.model.Query;
-import com.ibm.rdf.store.sparql11.model.QueryPrologue;
-import com.ibm.rdf.store.sparql11.model.QueryTriple;
-import com.ibm.rdf.store.sparql11.model.QueryTripleTerm;
-import com.ibm.rdf.store.sparql11.model.RelationalExpression;
-import com.ibm.rdf.store.sparql11.model.SelectClause;
-import com.ibm.rdf.store.sparql11.model.SelectClause.ESelectModifier;
-import com.ibm.rdf.store.sparql11.model.SelectQuery;
-import com.ibm.rdf.store.sparql11.model.SimplePath;
-import com.ibm.rdf.store.sparql11.model.SimplePattern;
-import com.ibm.rdf.store.sparql11.model.UnaryPathOp;
-import com.ibm.rdf.store.sparql11.model.Variable;
-import com.ibm.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.rdf.store.sparql11.model.ZeroOrMorePath;
-import com.ibm.rdf.store.sparql11.model.ZeroOrOnePath;
-import com.ibm.rdf.store.sparql11.optimizer.SPARQLOptimizerStatistics;
-import com.ibm.rdf.store.sparql11.sqltemplate.SQLGenerator;
-import com.ibm.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
-import com.ibm.rdf.store.sparql11.stopt.QueryTripleNode;
-import com.ibm.rdf.store.sparql11.stopt.STEAccessMethodType;
-import com.ibm.rdf.store.sparql11.stopt.STEPlanNodeType;
-import com.ibm.rdf.store.sparql11.stopt.STPlan;
-import com.ibm.rdf.store.sparql11.stopt.STPlanNode;
+import com.ibm.research.rdf.store.Context;
+import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.config.Constants;
+import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.IRI;
+import com.ibm.research.rdf.store.sparql11.model.OneOrMorePath;
+import com.ibm.research.rdf.store.sparql11.model.Path;
+import com.ibm.research.rdf.store.sparql11.model.PatternSet;
+import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
+import com.ibm.research.rdf.store.sparql11.model.PropertyTerm;
+import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.sparql11.model.QueryPrologue;
+import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
+import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
+import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
+import com.ibm.research.rdf.store.sparql11.model.SelectClause;
+import com.ibm.research.rdf.store.sparql11.model.SelectQuery;
+import com.ibm.research.rdf.store.sparql11.model.SimplePath;
+import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
+import com.ibm.research.rdf.store.sparql11.model.UnaryPathOp;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
+import com.ibm.research.rdf.store.sparql11.model.ZeroOrMorePath;
+import com.ibm.research.rdf.store.sparql11.model.ZeroOrOnePath;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
+import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
+import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
+import com.ibm.research.rdf.store.sparql11.planner.AccessMethodType;
+import com.ibm.research.rdf.store.sparql11.planner.Plan;
+import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
+import com.ibm.research.rdf.store.sparql11.planner.PlanNodeType;
+import com.ibm.research.rdf.store.sparql11.planner.QueryTripleNode;
+import com.ibm.research.rdf.store.sparql11.planner.statistics.SPARQLOptimizerStatistics;
+import com.ibm.research.rdf.store.sparql11.sqltemplate.SQLGenerator;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
 import com.ibm.research.utils.OCUtils;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
@@ -71,7 +71,7 @@ public class CodeGenerator {
 	protected Store store;
 	protected SPARQLOptimizerStatistics stats;
 	protected Context context;
-	protected STPlan plan;
+	protected Plan plan;
 	protected Query query;
 	protected TemporaryTableMgr tmptableMgr;
 	protected StoreProcedureManager procMgr;
@@ -79,25 +79,25 @@ public class CodeGenerator {
 	protected Set<Variable> explicitIRIBoundVariables;
 	protected Map<Variable, Variable> variable2RenamedVariable;
 	
-	protected Set<STPlanNode> liveTempTables;
-	protected Set<STPlanNode> nodesWithAllChildrenMaterialized;
+	protected Set<PlanNode> liveTempTables;
+	protected Set<PlanNode> nodesWithAllChildrenMaterialized;
 	protected SPARQLToSQLExpression expGenerator;// = new SPARQLToSQLExpression();
 	protected int cteCount = 0;
 	protected CTEToNestedQueryConverter converter;
 	/*public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query, TemporaryTableMgr tmptableMgr, StoreProcedureManager procMgr) {
 		this(store,  stats, context, query, new Planner().plan(query, store, stats), tmptableMgr, procMgr, new NewVariableGenerator("var", 0));
 	}*/
-	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query,STPlan plan, TemporaryTableMgr tmptableMgr, StoreProcedureManager procMgr, int cteCount) {
+	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query,Plan plan, TemporaryTableMgr tmptableMgr, StoreProcedureManager procMgr, int cteCount) {
 		this( store,  stats, context, query, plan, tmptableMgr, procMgr, new NewVariableGenerator("var", 0), null, null, cteCount);
 	}
-	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query, STPlanNode materializedTableStartingPoint,
+	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query, PlanNode materializedTableStartingPoint,
 			TemporaryTableMgr tmptableMgr, StoreProcedureManager procMgr,  NewVariableGenerator newvargen, Set<Variable> explicitIRIBoundVariables, 
 			Map<Variable, Variable> variable2RenamedVariable, int cteCount) {
 		this( store,  stats, context, query, new PlannerWithMaterializedTableStartingPoint(materializedTableStartingPoint).plan(query, store, stats),
 				tmptableMgr, procMgr, newvargen, explicitIRIBoundVariables, variable2RenamedVariable, cteCount);
 		
 	}
-	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query,STPlan plan, TemporaryTableMgr tmptableMgr, 
+	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query,Plan plan, TemporaryTableMgr tmptableMgr, 
 			StoreProcedureManager procMgr,  NewVariableGenerator newvargen, Set<Variable> explicitIRIBoundVariables, Map<Variable, Variable> variable2RenamedVariable, int cteCount) {
 		super();
 		this.store = store;
@@ -287,7 +287,7 @@ public class CodeGenerator {
 		return cmds;
 	}
 	
-	protected void computeAllSQLCommand(STPlanNode node, List<SQLCommand> cmds, List<Pair<StoreProcedure, List<SQLCommand>>> dependentProcedures) {
+	protected void computeAllSQLCommand(PlanNode node, List<SQLCommand> cmds, List<Pair<StoreProcedure, List<SQLCommand>>> dependentProcedures) {
 		switch (node.getType()) {
 			case TRIPLE: {
 				if (node.getTriple().getPredicate().isComplexPath()) {
@@ -295,11 +295,11 @@ public class CodeGenerator {
 					|| node.getTriple().getPredicate().getPath().isDirectlyZeroOrOnePath()
 					: "The following triple has not been properly normalized\n\t"+node.getTriple();
 					//STPlanNode predecessorUp = node.getPredecessorUp(plan);
-					STPlanNode predecessor = null;
+					PlanNode predecessor = null;
 					if (!node.getRequiredVariables().isEmpty()) {
 						predecessor = node.getPredecessor(plan);
 						if (predecessor!=null) {
-							if (!predecessor.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE)) {
+							if (!predecessor.getType().equals(PlanNodeType.MATERIALIZED_TABLE)) {
 								// Materialized the predecessor
 								Pair<String, List<SQLCommand>>  pair = tmptableMgr.getTemporaryTable(getTableSignature(predecessor));
 								String predTempTable = pair.fst;
@@ -334,12 +334,12 @@ public class CodeGenerator {
 			default : {
 				boolean allChildrenMaterialized = true;
 				boolean hasChildren = false;
-				for (Iterator<STPlanNode> ss= plan.getPlanTree().getSuccNodes(node); ss.hasNext(); ) {
+				for (Iterator<PlanNode> ss= plan.getPlanTree().getSuccNodes(node); ss.hasNext(); ) {
 					hasChildren = true;
-					STPlanNode child = ss.next();
+					PlanNode child = ss.next();
 					computeAllSQLCommand(child, cmds, dependentProcedures);
 					if (allChildrenMaterialized &&
-						(!child.getPredecessorDown(plan).getType().equals(STEPlanNodeType.MATERIALIZED_TABLE)
+						(!child.getPredecessorDown(plan).getType().equals(PlanNodeType.MATERIALIZED_TABLE)
 						 || nodesWithAllChildrenMaterialized.contains(child))) {
 						allChildrenMaterialized = false;
 					}
@@ -366,7 +366,7 @@ public class CodeGenerator {
 		}
 		return getTableSignature(withTypeInfo, l);
 	}
-	protected String getTableSignature(STPlanNode node) {
+	protected String getTableSignature(PlanNode node) {
 		return getTableSignature(node.getAvailableVariables());
 	}
 	protected String getTableSignature(Variable v) {
@@ -400,8 +400,8 @@ public class CodeGenerator {
 	}
 	
 	
-	protected List<SQLCommand> materialize(STPlanNode node, String tempTable) {
-		assert !node.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE): node;
+	protected List<SQLCommand> materialize(PlanNode node, String tempTable) {
+		assert !node.getType().equals(PlanNodeType.MATERIALIZED_TABLE): node;
 		List<SQLCommand> cmds = releaseAllDescendantsOrSelf(node);
 		node.materialize(tempTable);
 		liveTempTables.add(node);
@@ -412,22 +412,22 @@ public class CodeGenerator {
 	 * @param root
 	 * 
 	 */
-	protected List<SQLCommand> releaseAllDescendantsOrSelf(STPlanNode root) {
+	protected List<SQLCommand> releaseAllDescendantsOrSelf(PlanNode root) {
 		List<SQLCommand> ret = new LinkedList<SQLCommand>();
-		if (root.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE) ) {
+		if (root.getType().equals(PlanNodeType.MATERIALIZED_TABLE) ) {
 			List<SQLCommand> cmds = release(root);
 			if (cmds!=null) {
 				ret.addAll(cmds);
 			}
 		} else {
-			List<STPlanNode> children = new LinkedList<STPlanNode>();
-			for (Iterator<STPlanNode> ss= plan.getPlanTree().getSuccNodes(root); ss.hasNext(); ) {
-				STPlanNode child = ss.next();
+			List<PlanNode> children = new LinkedList<PlanNode>();
+			for (Iterator<PlanNode> ss= plan.getPlanTree().getSuccNodes(root); ss.hasNext(); ) {
+				PlanNode child = ss.next();
 				children.add(child);
 				ret.addAll(releaseAllDescendantsOrSelf(child));
 			}
 			// remove children
-			for (STPlanNode child: children) {
+			for (PlanNode child: children) {
 				plan.getPlanTree().removeEdge(root, child);
 			}
 			//
@@ -439,17 +439,17 @@ public class CodeGenerator {
 	 * For a node n child of an AND or PRODUCT node, release all temp tables for left siblings of n.
 	 * @param root
 	 */
-	protected List<SQLCommand> releaseLeftSiblingsForANDOrPRODUCTParentNode(STPlanNode node) {
+	protected List<SQLCommand> releaseLeftSiblingsForANDOrPRODUCTParentNode(PlanNode node) {
 		List<SQLCommand> ret = new LinkedList<SQLCommand>();
-		STPlanNode parent = getParent(node);
+		PlanNode parent = getParent(node);
 		
 		if (parent != null) {
-			STEPlanNodeType parentType = parent.getType();
-			if (parentType.equals(STEPlanNodeType.AND)) {
+			PlanNodeType parentType = parent.getType();
+			if (parentType.equals(PlanNodeType.AND)) {
 				do  {
-					List<STPlanNode> childrenToRemove = new LinkedList<STPlanNode>();
-					forLoop: for (Iterator<STPlanNode> ss= plan.getPlanTree().getSuccNodes(parent); ss.hasNext(); ) {
-						STPlanNode child = ss.next();
+					List<PlanNode> childrenToRemove = new LinkedList<PlanNode>();
+					forLoop: for (Iterator<PlanNode> ss= plan.getPlanTree().getSuccNodes(parent); ss.hasNext(); ) {
+						PlanNode child = ss.next();
 						if (child!=node) {
 							// left sibling of node
 							ret.addAll(releaseAllDescendantsOrSelf(child));
@@ -459,7 +459,7 @@ public class CodeGenerator {
 						}
 					}
 					// remove children
-					for (STPlanNode child: childrenToRemove) {
+					for (PlanNode child: childrenToRemove) {
 						plan.getPlanTree().removeEdge(parent, child);
 					}
 					node = parent;
@@ -472,8 +472,8 @@ public class CodeGenerator {
 		return ret;
 	}
 	
-	protected STPlanNode getParent(STPlanNode node) {
-		Iterator<STPlanNode> it = plan.getPlanTree().getPredNodes(node);
+	protected PlanNode getParent(PlanNode node) {
+		Iterator<PlanNode> it = plan.getPlanTree().getPredNodes(node);
 		if (it.hasNext()) {
 			return it.next();
 		} else {
@@ -485,9 +485,9 @@ public class CodeGenerator {
 	 * @param materializedNode
 	 * @return
 	 */
-	protected List<SQLCommand> release(STPlanNode materializedNode) {
+	protected List<SQLCommand> release(PlanNode materializedNode) {
 		List<SQLCommand> ret = new LinkedList<SQLCommand>();
-		assert materializedNode.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE): materializedNode;
+		assert materializedNode.getType().equals(PlanNodeType.MATERIALIZED_TABLE): materializedNode;
 		boolean removed = liveTempTables.remove(materializedNode);
 		if (removed) {
 			ret.addAll(tmptableMgr.release(materializedNode.getMaterialzedTable()));
@@ -512,10 +512,10 @@ public class CodeGenerator {
 		
 	}
 	
-	protected boolean trackSubjectObjectPairs(STPlanNode node, STPlanNode predecessor) {
+	protected boolean trackSubjectObjectPairs(PlanNode node, PlanNode predecessor) {
 		boolean trackSubjectObjectPairs = true;
 		QueryTriple t = node.getTriple();
-		assert !STEAccessMethodType.isGraphAccess(node.getMethod().getType()) : node;
+		assert !AccessMethodType.isGraphAccess(node.getMethod().getType()) : node;
 		//Set<Variable> intersectionAvailVarsInNodeAndPredecessor = HashSetFactory.make(node.getAvailableVariables());
 		//intersectionAvailVarsInNodeAndPredecessor.retainAll(predecessor.getAvailableVariables());
 		/*if (STEAccessMethodType.isGraphAccess(node.getMethod().getType())) {
@@ -541,10 +541,10 @@ public class CodeGenerator {
 			}
 			
 			Variable resultVar = 				
-				STEAccessMethodType.isDirectAccess(node.getMethod().getType())?
+				AccessMethodType.isDirectAccess(node.getMethod().getType())?
 						t.getObject().getVariable(): t.getSubject().getVariable();
 			Variable startingPoint = 				
-							STEAccessMethodType.isDirectAccess(node.getMethod().getType())?
+							AccessMethodType.isDirectAccess(node.getMethod().getType())?
 									t.getSubject().getVariable(): t.getObject().getVariable();
 			if (!isNotBoundVariableOrIsBoundVariableToMultipleConstants(startingPoint, node.getPattern().getFilterBindings())) {
 				trackSubjectObjectPairs = false;
@@ -564,18 +564,18 @@ public class CodeGenerator {
 		}
 		return trackSubjectObjectPairs;
 	}
-	protected Pair<String, List<SQLCommand>> evaluateTriplePathNode(STPlanNode predecessor, STPlanNode node, List<Pair<StoreProcedure, List<SQLCommand>>>  dependentProcedures){
-		assert node.getType().equals(STEPlanNodeType.TRIPLE) && node.getTriple().getPredicate().isComplexPath(): node;
+	protected Pair<String, List<SQLCommand>> evaluateTriplePathNode(PlanNode predecessor, PlanNode node, List<Pair<StoreProcedure, List<SQLCommand>>>  dependentProcedures){
+		assert node.getType().equals(PlanNodeType.TRIPLE) && node.getTriple().getPredicate().isComplexPath(): node;
 		assert node.getTriple().getPredicate().getPath().isDirectlyRecursive() ||
 			node.getTriple().getPredicate().getPath().isDirectlyZeroOrOnePath()
 			: "The following triple has not been properly normalized\n\t"+node.getTriple();
-		assert predecessor==null || predecessor.getType().equals(STEPlanNodeType.MATERIALIZED_TABLE): predecessor;
+		assert predecessor==null || predecessor.getType().equals(PlanNodeType.MATERIALIZED_TABLE): predecessor;
 		
 		// assume that constants have been replaced by variable with filter expressions
 		assert node.getTriple().getSubject().isVariable() : "The following triple has not been properly normalized\n\t"+node.getTriple(); 
 		assert node.getTriple().getObject().isVariable() : "The following triple has not been properly normalized\n\t"+node.getTriple(); 
 		//
-		assert !STEAccessMethodType.isGraphAccess(node.getMethod().getType()) : "Graph access not supported for property paths";
+		assert !AccessMethodType.isGraphAccess(node.getMethod().getType()) : "Graph access not supported for property paths";
 		
 		
 		List<SQLCommand> ret = new LinkedList<SQLCommand>();
@@ -608,9 +608,9 @@ public class CodeGenerator {
 			
 			// join with predecessor if needed
 			Map<Variable, Constant> var2Const = null;
-			assert !STEAccessMethodType.isGraphAccess(node.getMethod().getType()): "Graph access not allowed for property paths: "+node;
+			assert !AccessMethodType.isGraphAccess(node.getMethod().getType()): "Graph access not allowed for property paths: "+node;
 			Variable startingPoint = 				 
-				STEAccessMethodType.isDirectAccess(node.getMethod().getType())?
+				AccessMethodType.isDirectAccess(node.getMethod().getType())?
 						t.getSubject().getVariable(): t.getObject().getVariable();
 			var2Const =  HashMapFactory.make();
 			if (node.getAvailableVariables().contains(startingPoint)) {
@@ -648,28 +648,28 @@ public class CodeGenerator {
 			// 4) if '*' modifier, add (X, X) where X is a starting point
 			// 5) Finally, perform natural join with predecessor table
 			String tabTable;
-			STPlanNode newNode = node;
+			PlanNode newNode = node;
 			if (node.getTriple().getPredicate().getPath() instanceof OneOrMorePath) {
 				// replace '+' by '*' to include ancestor (or descendant) and self
 				QueryTriple triple = new QueryTriple(node.getTriple().getSubject(),
 						new PropertyTerm(new ZeroOrMorePath(subPath)), node.getTriple().getObject());
 				triple.setGraphRestriction(node.getTriple().getGraphRestriction());
 				
-				newNode = new STPlanNode(triple, 
-							node.getMethod(), new com.ibm.rdf.store.schema.Pair<Set<Variable>>(node.getProducedVariables(), node.getRequiredVariables()), node.getPattern());
+				newNode = new PlanNode(triple, 
+							node.getMethod(), new com.ibm.research.rdf.store.schema.Pair<Set<Variable>>(node.getProducedVariables(), node.getRequiredVariables()), node.getPattern());
 				if (node.getAvailableVariables()!=null) {
 					newNode.setAvailableVariables(node.getAvailableVariables());
 				}
 			}
 			if (!(subPath.isRecursive() || subPath.hasZeroOrOnePath())) {
 				if ((predecessor!=null
-				|| !STEAccessMethodType.isScanAccess(node.getMethod().getType())) 
+				|| !AccessMethodType.isScanAccess(node.getMethod().getType())) 
 				&&  !t.getPredicate().getPath().isDirectlyZeroOrOnePath() ) {
 				//|| !QueryTripleNode.isNotBoundVariable(node.getTriple().getSubject(), node.getPattern().getFilterBindings())
 				//|| !QueryTripleNode.isNotBoundVariable(node.getTriple().getObject(), node.getPattern().getFilterBindings())) {
 					// Step 1: 
 					Variable resultVariable, startingPoint;
-					if (STEAccessMethodType.isDirectAccess(node.getMethod().getType())) {
+					if (AccessMethodType.isDirectAccess(node.getMethod().getType())) {
 						resultVariable = t.getObject().getVariable();
 						startingPoint = t.getSubject().getVariable();
 					} else {
@@ -724,7 +724,7 @@ public class CodeGenerator {
 					newVariable2RenamedVariable.put(reachableVariable, startingPointVariable);
 					//
 					
-					STPlanNode reachablePlanNode = new STPlanNode(reachableTable, Collections.singleton(reachableVariable));
+					PlanNode reachablePlanNode = new PlanNode(reachableTable, Collections.singleton(reachableVariable));
 				
 					/*Query subQuery = getSubQuery(node, false, tableVariables);
 					Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);*/
@@ -751,7 +751,7 @@ public class CodeGenerator {
 					Query subQuery = getSubQuery(node, false, tableVariables);
 					Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 					//newExplicitIRIBoundVariables.addAll(subQuery.getMainPattern().gatherIRIBoundVariables());
-					CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, (STPlanNode) predecessor, tmptableMgr, procMgr, newvargen, newExplicitIRIBoundVariables,variable2RenamedVariable, cteCount);
+					CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, (PlanNode) predecessor, tmptableMgr, procMgr, newvargen, newExplicitIRIBoundVariables,variable2RenamedVariable, cteCount);
 					assert !newcodegen.isRecursiveQueryOrHasZeroOrOne();
 					Pair<String, List<SQLCommand>> pair = tmptableMgr.getTemporaryTable(getTableSignature( tableVariables));
 					tabTable= pair.fst;
@@ -773,7 +773,7 @@ public class CodeGenerator {
 				Query subQuery = getSubQuery(node, false, tableVariables);
 				Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 				//newExplicitIRIBoundVariables.addAll(subQuery.getMainPattern().gatherIRIBoundVariables());
-				CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, (STPlanNode) null, tmptableMgr, procMgr, newvargen, newExplicitIRIBoundVariables,variable2RenamedVariable, cteCount);
+				CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, (PlanNode) null, tmptableMgr, procMgr, newvargen, newExplicitIRIBoundVariables,variable2RenamedVariable, cteCount);
 				assert newcodegen.isRecursiveQueryOrHasZeroOrOne();
 				Pair<String, List<SQLCommand>> pair = tmptableMgr.getTemporaryTable(getTableSignature(tableVariables));
 				tabTable= pair.fst;
@@ -831,8 +831,8 @@ public class CodeGenerator {
 					QueryTriple triple = new QueryTriple(node.getTriple().getSubject(),
 							new PropertyTerm(new ZeroOrMorePath(new SimplePath(prop))), node.getTriple().getObject());
 					triple.setGraphRestriction(node.getTriple().getGraphRestriction());
-					STPlanNode newNode2 = new STPlanNode(triple, 
-								node.getMethod(), new com.ibm.rdf.store.schema.Pair<Set<Variable>>(node.getProducedVariables(), node.getRequiredVariables()), node.getPattern());
+					PlanNode newNode2 = new PlanNode(triple, 
+								node.getMethod(), new com.ibm.research.rdf.store.schema.Pair<Set<Variable>>(node.getProducedVariables(), node.getRequiredVariables()), node.getPattern());
 					if (node.getAvailableVariables()!=null) {
 						newNode2.setAvailableVariables(node.getAvailableVariables());
 					}
@@ -940,7 +940,7 @@ public class CodeGenerator {
 	
 	// this also produces graph restriction  variable if needed
 	// 
-	private Pair<String, List<SQLCommand>> joinWithPredecessorAndProcessFilters(STPlanNode node, String table,  STPlanNode predecessor, Map<Variable, Constant> var2Constant) {
+	private Pair<String, List<SQLCommand>> joinWithPredecessorAndProcessFilters(PlanNode node, String table,  PlanNode predecessor, Map<Variable, Constant> var2Constant) {
 		List<SQLCommand> cmds = new LinkedList<SQLCommand>();
 		List<Expression> exps = node.getApplicableFilters(plan);
 		if (predecessor == null && (var2Constant==null || var2Constant.isEmpty()) && (exps ==null || exps.isEmpty())
@@ -967,7 +967,7 @@ public class CodeGenerator {
 				}
 			}
 			
-			Variable startingPoint = STEAccessMethodType.isReverseAccess(node.getMethod().getType())? 
+			Variable startingPoint = AccessMethodType.isReverseAccess(node.getMethod().getType())? 
 					node.getTriple().getObject().getVariable(): node.getTriple().getSubject().getVariable();
 			//Variable endingPoint = STEAccessMethodType.isReverseAccess(node.getMethod().getType())? 
 			//		 node.getTriple().getSubject().getVariable() : node.getTriple().getObject().getVariable();
@@ -1020,15 +1020,15 @@ public class CodeGenerator {
 		return !filterBindings.containsKey(v);
 	}
 	
-	private Pair<String, List<SQLCommand>> addConstraints(String table,  STPlanNode node, Variable graphRestriction,  Variable x, Variable y, 
+	private Pair<String, List<SQLCommand>> addConstraints(String table,  PlanNode node, Variable graphRestriction,  Variable x, Variable y, 
 			boolean addAllConstraintsRegardlessOfAccessMethod) {
 		return addConstraints(table, node, graphRestriction, x, y, addAllConstraintsRegardlessOfAccessMethod, null, null);
 	}
 	// add constant constraints on subject or object and subject = object constraint 
-	private Pair<String, List<SQLCommand>> addConstraints(String table,  STPlanNode node, Variable graphRestriction,  Variable x, Variable y, 
+	private Pair<String, List<SQLCommand>> addConstraints(String table,  PlanNode node, Variable graphRestriction,  Variable x, Variable y, 
 			boolean addAllConstraintsRegardlessOfAccessMethod,
 			List<Expression> exps, Map<String, Pair<String, String>> varMap) {
-		assert node.getType().equals(STEPlanNodeType.TRIPLE) : node;
+		assert node.getType().equals(PlanNodeType.TRIPLE) : node;
 		QueryTriple t = node.getTriple();
 		// additional constraints
 		Pair<Variable, Set<Constant>> xConstants = null;
@@ -1036,7 +1036,7 @@ public class CodeGenerator {
 		Pair<Variable, Set<Constant>> graphRestrictionConstants = null;
 		boolean xEqualsY = false;
 		if (!QueryTripleNode.isNotBoundVariable(t.getSubject(), node.getPattern().getFilterBindings())
-		&& ( addAllConstraintsRegardlessOfAccessMethod || !node.getMethod().getType().equals(STEAccessMethodType.DPH_INDEX_SUBJECT)) ) {
+		&& ( addAllConstraintsRegardlessOfAccessMethod || !node.getMethod().getType().equals(AccessMethodType.DPH_INDEX_SUBJECT)) ) {
 		//&& (STEAccessMethodType.isReverseAccess(node.getMethod().getType()) ||  STEAccessMethodType.isScanAccess(node.getMethod().getType()) ) ) {
 			// subject has some constant bindings
 			// and was not the starting point of the exploration or the access method was a scan
@@ -1053,7 +1053,7 @@ public class CodeGenerator {
 		
 		if (x!=null && y!=null && !x.equals(y)) {
 			if (!QueryTripleNode.isNotBoundVariable(t.getObject(), node.getPattern().getFilterBindings())
-			&&  ( addAllConstraintsRegardlessOfAccessMethod || !node.getMethod().getType().equals(STEAccessMethodType.RPH_INDEX_OBJECT))) {
+			&&  ( addAllConstraintsRegardlessOfAccessMethod || !node.getMethod().getType().equals(AccessMethodType.RPH_INDEX_OBJECT))) {
 			//&& (STEAccessMethodType.isDirectAccess(node.getMethod().getType()) ||  STEAccessMethodType.isScanAccess(node.getMethod().getType()) ) ) {
 				// object has some constant bindings
 				// and was not the starting point of the exploration or the access method was a scan
@@ -1235,7 +1235,7 @@ public class CodeGenerator {
 	}
 	
 	// return result table, result variable,  and list of commands
-	private Pair<Pair<String, Variable>, List<SQLCommand>> computeReachableNodes(STPlanNode node, STPlanNode predecessor, int level) {
+	private Pair<Pair<String, Variable>, List<SQLCommand>> computeReachableNodes(PlanNode node, PlanNode predecessor, int level) {
 		assert level == 0 || level <0 || level ==1 : level; //
 		QueryTriple t = node.getTriple();
 
@@ -1251,7 +1251,7 @@ public class CodeGenerator {
 		String  loopSTMTFromDetaToOldDelta;
 		Variable resultVariable;
 		Variable startingPoint;
-		assert !STEAccessMethodType.isGraphAccess(node.getMethod().getType()) : node;
+		assert !AccessMethodType.isGraphAccess(node.getMethod().getType()) : node;
 		// This should be be done through query rewrite
 		/*if (STEAccessMethodType.isGraphAccess(node.getMethod().getType()) 
 		&& QueryTripleNode.isNotBoundVariable(t.getSubject(), node.getPattern().getFilterBindings())
@@ -1276,7 +1276,7 @@ public class CodeGenerator {
 		}*/
 		//
 
-		if (STEAccessMethodType.isDirectAccess(node.getMethod().getType())) {
+		if (AccessMethodType.isDirectAccess(node.getMethod().getType())) {
 			resultVariable = t.getObject().getVariable();
 			startingPoint = t.getSubject().getVariable();
 		} else {
@@ -1320,12 +1320,12 @@ public class CodeGenerator {
 		// starting point 
 		if (t.getPredicate().getPath() instanceof ZeroOrMorePath || (t.getPredicate().getPath() instanceof ZeroOrOnePath)) {
 			boolean includeType = !explicitIRIBoundVariables.contains(resultVariable);
-			if (predecessor==null || !STEAccessMethodType.isPollAccess(node.getMethod().getType()) /*|| STEAccessMethodType.isGraphAccess(node.getMethod().getType())*/) {
-				assert STEAccessMethodType.isIndexAccess(node.getMethod().getType()) || STEAccessMethodType.isScanAccess(node.getMethod().getType())
+			if (predecessor==null || !AccessMethodType.isPollAccess(node.getMethod().getType()) /*|| STEAccessMethodType.isGraphAccess(node.getMethod().getType())*/) {
+				assert AccessMethodType.isIndexAccess(node.getMethod().getType()) || AccessMethodType.isScanAccess(node.getMethod().getType())
 				/*||  STEAccessMethodType.isGraphAccess(node.getMethod().getType())*/ : node;
 				// starting point is the subject only
 				Set<Constant> constants = node.getPattern().getFilterBindings().get(startingPoint);
-				if (constants != null && constants.size()>0 && graphRestrictionVariable == null  &&  !STEAccessMethodType.isScanAccess(node.getMethod().getType())) {
+				if (constants != null && constants.size()>0 && graphRestrictionVariable == null  &&  !AccessMethodType.isScanAccess(node.getMethod().getType())) {
 					//assert STEAccessMethodType.isIndexAccess(node.getMethod().getType()) : node;
 					StringBuffer buf = new StringBuffer();
 					InsertValuesIntoTable ins = new InsertValuesIntoTable(deltaTable, constants, includeType, store);
@@ -1339,7 +1339,7 @@ public class CodeGenerator {
 				} else {
 					
 					//assert STEAccessMethodType.isScanAccess(node.getMethod().getType()): node;
-					if ( STEAccessMethodType.isScanAccess(node.getMethod().getType())) {
+					if ( AccessMethodType.isScanAccess(node.getMethod().getType())) {
 						constants = null;
 						// very expensive scan!!!
 					}
@@ -1363,7 +1363,7 @@ public class CodeGenerator {
 					
 				}
 			}  else {
-				assert STEAccessMethodType.isPollAccess(node.getMethod().getType()) : node;
+				assert AccessMethodType.isPollAccess(node.getMethod().getType()) : node;
 				if (graphRestrictionVariable == null || predecessor.getAvailableVariables().contains(graphRestrictionVariable)) {
 					StringBuffer sql = new StringBuffer();
 					sql.append("SELECT DISTINCT ");
@@ -1425,7 +1425,7 @@ public class CodeGenerator {
 			Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 			//newExplicitIRIBoundVariables.addAll(subQuery.getMainPattern().gatherIRIBoundVariables());
 			CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, 
-					STEAccessMethodType.isPollAccess(node.getMethod().getType())?predecessor:null,
+					AccessMethodType.isPollAccess(node.getMethod().getType())?predecessor:null,
 						tmptableMgr, procMgr, newvargen, newExplicitIRIBoundVariables,variable2RenamedVariable, cteCount);
 			assert !newcodegen.isRecursiveQueryOrHasZeroOrOne();
 			if (isDB2Backend()) {
@@ -1439,7 +1439,7 @@ public class CodeGenerator {
 			cteCount = newcodegen.cteCount;
 		}
 		// iteration step = select ?resultVariable where  { oldDeltaTable subPath ?resultVariable . FILTER (?startingPoint = XYZ) }
-		STPlanNode oldDeltaTableNode = new STPlanNode(oldDeltaTable, Collections.singleton(resultVariable));
+		PlanNode oldDeltaTableNode = new PlanNode(oldDeltaTable, Collections.singleton(resultVariable));
 		
 									
 		QueryTriple triple;
@@ -1596,13 +1596,13 @@ public class CodeGenerator {
 		return ret;
 		
 	}
-	private Query getSubQuery(STPlanNode node,   boolean includeVariableConstantFilters,  Variable... projectedVariables) {
+	private Query getSubQuery(PlanNode node,   boolean includeVariableConstantFilters,  Variable... projectedVariables) {
 		return getSubQuery(node, includeVariableConstantFilters, explicitIRIBoundVariables,  projectedVariables);
 	}
-	private Query getSubQuery(STPlanNode node,   boolean includeVariableConstantFilters, Set<Variable> explicitIRIBoundVariables, Variable... projectedVariables) {
+	private Query getSubQuery(PlanNode node,   boolean includeVariableConstantFilters, Set<Variable> explicitIRIBoundVariables, Variable... projectedVariables) {
 		return getSubQuery(null, null, node, includeVariableConstantFilters, explicitIRIBoundVariables, projectedVariables);
 	}
-	private Query getSubQuery(QueryTriple triple, BinaryUnion<Variable, IRI> graphRestriction,  STPlanNode node,   boolean includeVariableConstantFilters, Set<Variable> explicitIRIBoundVariables,  Variable... projectedVariables) {
+	private Query getSubQuery(QueryTriple triple, BinaryUnion<Variable, IRI> graphRestriction,  PlanNode node,   boolean includeVariableConstantFilters, Set<Variable> explicitIRIBoundVariables,  Variable... projectedVariables) {
 		if (projectedVariables == null || projectedVariables.length==0) {
 			throw new IllegalArgumentException();
 		}
@@ -1662,10 +1662,10 @@ public class CodeGenerator {
 		return subQuery;
 	}
 	
-	protected synchronized String getSQL(STPlanNode node) {
+	protected synchronized String getSQL(PlanNode node) {
 		return getSQL(node, new LinkedList<Variable>(node.getAvailableVariables()));
 	}
-	protected synchronized String getSQL(STPlanNode node, List<Variable> projectedVariables) {
+	protected synchronized String getSQL(PlanNode node, List<Variable> projectedVariables) {
 		assert projectedVariables == null || projectedVariables.isEmpty() || node.getAvailableVariables().containsAll(projectedVariables) : projectedVariables+"\n"+node;
 
 		try {
@@ -1684,7 +1684,7 @@ public class CodeGenerator {
 	 * @param projectedVariables
 	 * @return
 	 */
-	protected synchronized Pair<String, String> getSQLDetailed(STPlanNode node) {
+	protected synchronized Pair<String, String> getSQLDetailed(PlanNode node) {
 		return getSQLDetailed(node, new LinkedList<Variable>(node.getAvailableVariables()));
 	}
 	/**
@@ -1693,7 +1693,7 @@ public class CodeGenerator {
 	 * @param projectedVariables
 	 * @return
 	 */
-	protected synchronized Pair<String, String> getSQLDetailed(STPlanNode node, List<Variable> projectedVariables) {
+	protected synchronized Pair<String, String> getSQLDetailed(PlanNode node, List<Variable> projectedVariables) {
 		assert projectedVariables == null || projectedVariables.isEmpty() || node.getAvailableVariables().containsAll(projectedVariables) : projectedVariables+"\n"+node;
 
 		try {

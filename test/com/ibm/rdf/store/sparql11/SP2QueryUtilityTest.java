@@ -4,7 +4,7 @@ import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import org.junit.Test;
 
-//@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
+//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 //@RandomizedRepeat(1)
 public class SP2QueryUtilityTest<D> extends TestRunner<D>
    {

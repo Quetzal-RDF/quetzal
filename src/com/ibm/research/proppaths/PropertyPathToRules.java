@@ -31,7 +31,6 @@ import com.hp.hpl.jena.sparql.path.P_ZeroOrOne;
 import com.hp.hpl.jena.sparql.path.PathVisitor;
 import com.hp.hpl.jena.sparql.syntax.ElementGroup;
 import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.ibm.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.owlql.rule.AtomicFormula;
 import com.ibm.research.owlql.rule.ConstantExpr;
 import com.ibm.research.owlql.rule.Expr;
@@ -40,6 +39,7 @@ import com.ibm.research.owlql.rule.Predicate;
 import com.ibm.research.owlql.rule.Rule;
 import com.ibm.research.owlql.rule.RuleSystem;
 import com.ibm.research.owlql.rule.VariableExpr;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.utils.OCUtils;
 import com.ibm.wala.util.collections.HashSetFactory;
 
@@ -64,7 +64,7 @@ public class PropertyPathToRules {
 			"?x !(<http://example.org/r>|^<http://example.org/t>| ^a|<http://example.org/s> ) ?y ." +
 				"}"; 
 		// ( iRIref | 'a' )
-		com.ibm.rdf.store.sparql11.model.Query db2rdfQuery =  SparqlParserUtilities.parseSparqlString(q);
+		com.ibm.research.rdf.store.sparql11.model.Query db2rdfQuery =  SparqlParserUtilities.parseSparqlString(q);
 		System.out.println("Query:\n"+db2rdfQuery.toString());
 		
 		//System.exit(0);

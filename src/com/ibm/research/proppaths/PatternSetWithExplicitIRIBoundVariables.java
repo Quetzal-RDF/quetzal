@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import com.ibm.rdf.store.sparql11.model.Pattern;
-import com.ibm.rdf.store.sparql11.model.PatternSet;
-import com.ibm.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.PatternSet;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 public class PatternSetWithExplicitIRIBoundVariables extends PatternSet {

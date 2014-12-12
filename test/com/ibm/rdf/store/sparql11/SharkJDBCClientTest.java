@@ -4,7 +4,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import com.ibm.rdf.store.Store;
+import com.ibm.research.rdf.store.Store;
 
 
 public class SharkJDBCClientTest {

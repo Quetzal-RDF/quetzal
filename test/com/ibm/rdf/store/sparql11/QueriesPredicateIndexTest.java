@@ -11,9 +11,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.ibm.rdf.store.hashing.ColoringFunction;
-import com.ibm.rdf.store.hashing.FindPredicateProxies;
-import com.ibm.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.hashing.ColoringFunction;
+import com.ibm.research.rdf.store.hashing.FindPredicateProxies;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
+import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.graph.labeled.LabeledGraph;
 import com.ibm.wala.util.intset.IntSetUtil;

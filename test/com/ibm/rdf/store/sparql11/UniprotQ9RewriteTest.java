@@ -7,9 +7,10 @@ import java.util.Collections;
 import org.junit.Test;
 
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-import com.ibm.rdf.store.sparql11.model.Query;
-import com.ibm.rdf.store.utilities.MinusRewriter.FilterAsMinusRewriter;
-import com.ibm.rdf.store.utilities.MinusRewriter.OptionalAsFilterRewriter;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
+import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.utilities.MinusRewriter.FilterAsMinusRewriter;
+import com.ibm.research.rdf.store.utilities.MinusRewriter.OptionalAsFilterRewriter;
 
 public abstract class UniprotQ9RewriteTest<D extends DB2TestData> extends TestRunner<D> {
 	private final String queryDir;

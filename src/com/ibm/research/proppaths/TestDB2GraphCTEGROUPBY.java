@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import com.ibm.rdf.store.jena.impl.DB2Graph;
+import com.ibm.research.rdf.store.jena.impl.DB2Graph;
 
 
 // test for qNum = 0

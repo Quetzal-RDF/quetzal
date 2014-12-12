@@ -16,17 +16,18 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.ibm.rdf.store.Context;
-import com.ibm.rdf.store.Store;
-import com.ibm.rdf.store.StoreManager;
-import com.ibm.rdf.store.jena.RdfStoreFactory;
-import com.ibm.rdf.store.jena.RdfStoreQueryExecutionFactory;
-import com.ibm.rdf.store.jena.RdfStoreQueryFactory;
-import com.ibm.rdf.store.query.QueryProcessor;
-import com.ibm.rdf.store.query.QueryProcessorFactory;
-import com.ibm.rdf.store.runtime.service.types.LiteralInfoResultSet;
-import com.ibm.rdf.store.sparql11.model.Query;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
+import com.ibm.research.rdf.store.Context;
+import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.jena.RdfStoreFactory;
+import com.ibm.research.rdf.store.jena.RdfStoreQueryExecutionFactory;
+import com.ibm.research.rdf.store.jena.RdfStoreQueryFactory;
+import com.ibm.research.rdf.store.query.QueryProcessor;
+import com.ibm.research.rdf.store.query.QueryProcessorFactory;
+import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
+import com.ibm.research.rdf.store.sparql11.model.Query;
 
 public class TestRunner<D> {
 
