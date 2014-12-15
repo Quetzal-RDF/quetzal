@@ -22,7 +22,7 @@ if [[ -f $SYSTEM_PREDICATES ]]; then
 fi
 
 if [[ $DROP == 1 ]]; then
-    java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.cmd.DropRdfStore $KNOWLEDGE_BASE $OPTS
+    java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.cmd.DropRdfStore $KNOWLEDGE_BASE $OPTS
 fi
 
 if [[ -e $LOAD_DIR/long-strings.load ]]; then
@@ -43,12 +43,12 @@ cat > $NT_FILE.db2_cmds_tmp <<EOF
 EOF
 fi
 
-java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createTables="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS > $NT_FILE.db2_create_cmds
+java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createTables="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS > $NT_FILE.db2_create_cmds
 
-echo java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createTables="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS
+echo java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createTables="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS
 
 
-java $JAVA_OPTS -Dcom.ibm.rdf.createStore="false" -Dcom.ibm.rdf.createIndex="true" -Dcom.ibm.rdf.store.no_lids=$NO_LIDS -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS > $NT_FILE.db2_index_cmds
+java $JAVA_OPTS -Dcom.ibm.rdf.createStore="false" -Dcom.ibm.rdf.createIndex="true" -Dcom.ibm.research.rdf.store.no_lids=$NO_LIDS -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS > $NT_FILE.db2_index_cmds
 
 if [[ $SCHEMA_EXPERIMENTS == 1 ]]; then
     rm -f $NT_FILE.exp_sql
@@ -82,7 +82,7 @@ if [[ $CREATE_ONLY == 0 ]]; then
     if [[ $DB_ENGINE == "shark" ]]; then
 	$SHARK_HOME/bin/beeline -u "jdbc:hive2://"$DB2_HOST":"$DB2_PORT"/"$DB2_DB -n $DB2_USER -p $DB2_PASSWORD < $NT_FILE.db2_script
     fi	    
-    java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.cmd.UpdateRdfStoreStats $KNOWLEDGE_BASE $OPTS
+    java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.cmd.UpdateRdfStoreStats $KNOWLEDGE_BASE $OPTS
 fi
 
 

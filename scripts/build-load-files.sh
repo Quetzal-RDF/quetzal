@@ -116,28 +116,28 @@ function process_edge_sets() {
 	    
 	    if [[ $CORRELATIONS == 1 ]]; then
 		gawk -b -O -f $DIR/conditional-probabilities.awk $nt_file_1.edge_sets > $nt_file_1.correlations
-		java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.hashing.FindWorkloadProxies $WORKLOAD_DIR $nt_file_1.correlations > $nt_file_1.proxies
+		java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.hashing.FindWorkloadProxies $WORKLOAD_DIR $nt_file_1.correlations > $nt_file_1.proxies
 		gawk -b -O '{ print $2; }' $nt_file_1.proxies | sort $SORT_OPTIONS | uniq > $nt_file_1.predicates_to_index		
 	    else
-		java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.hashing.GetPredicates $WORKLOAD_DIR > $nt_file_1.predicates_to_index
+		java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.hashing.GetPredicates $WORKLOAD_DIR > $nt_file_1.predicates_to_index
 	    fi
 	    
 	    if [[ -f $SYSTEM_PREDICATES ]]; then
 		
 		cat $SYSTEM_PREDICATES $nt_file_1.predicates_to_index > $nt_file_1.priority_predicates
 		
-		java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct $nt_file.priority_predicates
+		java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct $nt_file.priority_predicates
 		
 	    else  
-		java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct $nt_file.predicates_to_index
+		java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct $nt_file.predicates_to_index
 		
 	    fi
 	else
 	    if [[ -f $SYSTEM_PREDICATES ]]; then
-		java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct $SYSTEM_PREDICATES
+		java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct $SYSTEM_PREDICATES
 		
 	    else  
-		java $JAVA_OPTS -cp $CLASSPATH com.ibm.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct
+		java $JAVA_OPTS -cp $CLASSPATH com.ibm.research.rdf.store.hashing.AssignHashesToPredicates $nt_file.edge_sets $HASHES true $direct
 	    fi
 	fi    
     fi
@@ -223,7 +223,7 @@ else
 fi
 
 # intial pre-defined types file
-java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader > $NT_FILE_1.types    
+java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.research.rdf.store.runtime.service.types.TypeMapForLoader > $NT_FILE_1.types    
 
 # set length for long strings
 if [[ $LONG_FRAC -gt 0 ]]; then
@@ -255,7 +255,7 @@ else
     LOCALE_FILE=/dev/null
 fi
 
-java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.rdf.store.runtime.service.types.TypeMapForLoader $DATATYPE_FILE $LOCALE_FILE > $NT_FILE.types
+java $JAVA_OPTS -ea -cp $CLASSPATH com.ibm.research.rdf.store.runtime.service.types.TypeMapForLoader $DATATYPE_FILE $LOCALE_FILE > $NT_FILE.types
     
 # build load files
 process process_load_files

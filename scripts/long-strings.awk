@@ -1,6 +1,6 @@
 BEGIN {
     stringOut = (pawk == "yes")? longStringFile "." part: longStringFile;
-	cmd = "java com.ibm.rdf.store.loader.LongStringHasher " cutoff;
+	cmd = "java com.ibm.research.rdf.store.loader.LongStringHasher " cutoff;
     table = "sort | uniq > " stringOut
 }
 
