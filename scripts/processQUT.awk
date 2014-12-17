@@ -15,7 +15,7 @@ END {
     for (q in queryValues) {
 	split(queryValues[q], arr, ",");
 	sum = 0;
-	for (i=2; i <=8; i++) {
+	for (i=2; i <=numRuns; i++) {
 	    sum += arr[i];
 	} 
 	avg = sum/7;
