@@ -160,6 +160,7 @@ public class TestRunner<D> {
          Properties info = new Properties();
          info.setProperty("user", username);
          info.setProperty("password", password);
+         info.setProperty("socketTimeout", "1200");
          Connection conn = DriverManager.getConnection(jdbcurl, info);
          return conn;
          }
