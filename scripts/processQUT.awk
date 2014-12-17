@@ -13,17 +13,17 @@ BEGIN {
 
 END {
     for (q in queryValues) {
-	split(queryValues[q], arr, ",");
+	n = split(queryValues[q], arr, ",");
 	sum = 0;
-	for (i=2; i <=8; i++) {
+	for (i=2; i <= n; i++) {
 	    sum += arr[i];
 	} 
-	avg = sum/7;
+	avg = sum/(n-1);
 	sumsq = 0;
-	for (i=2; i <=8; i++) {
+	for (i=2; i <= n; i++) {
 	    sumsq = (arr[i] - avg) * (arr[i] - avg);
 	}
-	std = sqrt(sumsq / (7-1));
+	std = sqrt(sumsq / (n-1));
 	print q, avg, std;
     }
 }
