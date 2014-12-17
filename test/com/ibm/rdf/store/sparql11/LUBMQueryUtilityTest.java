@@ -139,7 +139,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		public SharkLUBM100KOnVM_9_51_154_25() {
 			super(new SharkEngine(), data,
 					TestConstants.lubm100kAnswers,
-					"../rdfstore-data/lubm_queries_QL_reversed/");
+					"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 		
@@ -375,13 +375,13 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	public static class DB2LUBM100M_SL extends
 			LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = DB2TestData.getStore(
-				"jdbc:db2://localhost:9996/lubm", "lubm100m", "db2inst2",
-				"db2admin", "db2inst2", false);
+				"jdbc:db2://localhost:50002/lubm", "lubm_100m_r", "db2inst1",
+				"db2admin", "db2inst1", false);
 
 		public DB2LUBM100M_SL() {
 			super(new DB2Engine(), data,
 					TestConstants.lubm100mAnswers,
-					"test/lubm_queries/");
+					"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/lubm_queries_QL_reversed/");
 		}
 	}
 

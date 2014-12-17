@@ -1657,6 +1657,16 @@ public class Planner {
 			return stars;
 		}
 
+		private Set<IRI> getPredicates(Set<QueryTriple> star) {
+			Set<IRI> result = HashSetFactory.make();
+			for(QueryTriple t : star) {
+				if (t.getPredicate().isIRI()) {
+					result.add(t.getPredicate().getIRI());
+				}
+			}
+			return result;
+		}
+		
 		private Set<Node> gatherStars(final List<Pattern> region, Set<Variable> availableVars, final Set<Key> neededKeys, final boolean forward, final Walker walker) {
 			final Map<QueryTriple,Pattern> parents = HashMapFactory.make();
 			
@@ -1664,7 +1674,7 @@ public class Planner {
 			
 			Set<Node> result = HashSetFactory.make();
 			for(final Map.Entry<Pair<QueryTripleTerm,BinaryUnion<Variable,IRI>>, Set<QueryTriple>> star : stars.entrySet()) {
-				if (star.getValue().size() > 1) {
+				if (star.getValue().size() > 1 && getPredicates(star.getValue()).size() > 1) {
 					result.add(new Node() {
 						private final int id = ++graphCounterId;
 

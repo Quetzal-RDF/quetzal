@@ -91,7 +91,7 @@ db2inst1@helix1:~/workspace/rdfstore-base/scripts> bash build-load-files.sh
 # no such KB exists.
 
 db2inst1@helix1:~/workspace/rdfstore-base/scripts> bash load-load-files.sh --db2-config ~/workspace/rdfstore-base/scripts/sample-db-cfg.sh --knowledge-base lubm100k --parallel 4 --drop nt /tmp/LUBM100K/100K_r.nt
-ERROR 2013-10-07 13:40:46,571  (DropRdfStore.java:30)   com.ibm.rdf.store.jena.RdfStoreException: DB255012E: The RDF command failed because the specified RDF store does not exist in the specified schema. Specified RDF store name: lubm100k. Specified schema: db2inst1.
+ERROR 2013-10-07 13:40:46,571  (DropRdfStore.java:30)   com.ibm.research.rdf.store.jena.RdfStoreException: DB255012E: The RDF command failed because the specified RDF store does not exist in the specified schema. Specified RDF store name: lubm100k. Specified schema: db2inst1.
 DB255012E: The RDF command failed because the specified RDF store does not exist in the specified schema. Specified RDF store name: lubm100k. Specified schema: db2inst1.
 createrdfstore completed.
 createrdfstore completed.

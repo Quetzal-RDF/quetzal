@@ -23,7 +23,7 @@ public class SinatraTests extends TestRunner<DB2TestData> {
 
 	//@Test
 	public void testCountTranches() {
-		executeSparql("select ?z where { ?z a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoanTranche>. }", 250);
+		executeSparql("select ?z where { ?z a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoanTranche> . }", 250);
 	}
 	
 	//@Test
@@ -68,6 +68,7 @@ public class SinatraTests extends TestRunner<DB2TestData> {
 	public void testPoolBalancesInAreasWithHighUnemploymentRate() {
 		executeSparql(
 			"select ?p (SUM(?b) AS ?balance) where {" + 
+			" ?p a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoanTranche> . " +
 			" ?l a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoan> ; " + 
 			"    <http://lewtandata.sinatra.ibm.com/ABSNetLoanPool> ?p ; " +
 			"    <http://lewtandata.sinatra.ibm.com/OriginalLoanBalance> ?b ; " +
@@ -86,6 +87,7 @@ public class SinatraTests extends TestRunner<DB2TestData> {
 	public void testPoolBalancesInAreasOfRisingUnemploymentRate() {
 		executeSparql(
 			"select ?p (SUM(?b) AS ?balance) where {" + 
+			" ?p a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoanTranche> . " +
 			" ?l a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoan> ; " + 
 			"    <http://lewtandata.sinatra.ibm.com/ABSNetLoanPool> ?p ; " +
 			"    <http://lewtandata.sinatra.ibm.com/OriginalLoanBalance> ?b ; " +
@@ -99,4 +101,25 @@ public class SinatraTests extends TestRunner<DB2TestData> {
 			" GROUP BY ?p", 
 			1038);
 	}
+
+	@Test
+	public void testPoolFractionInAreasOfRisingUnemploymentRate() {
+		executeSparql(
+			"select ?p (SUM(?b)/SUM(?m) AS ?balance) where {" + 
+			" ?p a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoanTranche> ; " +
+			"    <http://lewtandata.sinatra.ibm.com/OriginalBalance> ?m . " +
+			" ?l a <http://lewtandata.sinatra.ibm.com/type#ABSNetLoan> ; " + 
+			"    <http://lewtandata.sinatra.ibm.com/ABSNetLoanPool> ?p ; " +
+			"    <http://lewtandata.sinatra.ibm.com/OriginalLoanBalance> ?b ; " +
+		    "    <http://lewtandata.sinatra.ibm.com/PropertyZip> ?z ." +
+		    " _:y1 <http://tables.sinatra.ibm.com/FIPS> ?f ; <http://tables.sinatra.ibm.com/UnemploymentRate> ?u1 ; <http://tables.sinatra.ibm.com/Period> ?d1 . " + 
+		    " _:y2 <http://tables.sinatra.ibm.com/FIPS> ?f ; <http://tables.sinatra.ibm.com/UnemploymentRate> ?u2 ; <http://tables.sinatra.ibm.com/Period> ?d2 . " + 
+			" _:x <http://tables.sinatra.ibm.com/ZipCode> ?z ; <http://tables.sinatra.ibm.com/FIPS> ?f . " + 
+			"FILTER (?u1 > ?u2 &&" + 
+			" ?d2 = \"2014-09\"^^<http://www.w3.org/2001/XMLSchema#gMonthYear> &&" +
+			" ?d1 = \"2014-10\"^^<http://www.w3.org/2001/XMLSchema#gMonthYear>) }" +
+			" GROUP BY ?p", 
+			1038);
+	}
+
 }
