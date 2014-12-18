@@ -46,6 +46,7 @@ import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
 import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
+import com.ibm.research.rdf.store.sparql11.planner.Planner.StandardApplicableNodes.SimpleNode;
 import com.ibm.research.rdf.store.sparql11.planner.statistics.SPARQLOptimizerStatistics;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
@@ -70,6 +71,8 @@ public class Planner {
 	
 	private final boolean CHECK_PRODUCT = true;
 	
+	private final boolean CHECK_MINUS;
+	
 	protected int graphCounterId = 0;
 
 	private final PlanNodeCreator planFactory;
@@ -78,11 +81,12 @@ public class Planner {
 	
 	private PredicateTable forwardPreds;
 
-	public Planner(PlanNodeCreator planFactory) {
+	public Planner(PlanNodeCreator planFactory, boolean checkMinus) {
 		this.planFactory = planFactory;
+		this.CHECK_MINUS = checkMinus;
 	}
 
-	public Planner() {
+	public Planner(boolean checkMinus) {
 		this(new PlanNodeCreator() {
 
 			public PlanNode createSTPlanNode(QueryTriple triple,
@@ -112,10 +116,14 @@ public class Planner {
 			}
 			
 			
-		});
+		}, checkMinus);
 	}
 	
-	private class PlannerError extends Error {
+	public Planner() {
+		this(true);
+	}
+	
+	public class PlannerError extends Error {
 
 		private static final long serialVersionUID = 4433645078459226747L;
 
@@ -437,10 +445,12 @@ public class Planner {
 		private void computeProduced() {
 			Set<Variable> oldVars = nodeToReUse.getProducedVariables();
 			for (Variable v : oldVars) {
+				assert variableMappings.containsKey(v) : v;
 				produced.add(variableMappings.get(v));
 			}
 			oldVars = nodeToReUse.getAvailableVariables();
 			for (Variable v : oldVars) {
+				assert variableMappings.containsKey(v) : v;
 				produced.add(variableMappings.get(v));
 			}
 		}
@@ -472,6 +482,7 @@ public class Planner {
 			PlanNode n = planFactory.createSTPlanNode(nodeToReUse, variableMappings);		
 		
 			n.setProducedVariables(produced);
+			n.setOperatorsVariables(produced);
 			Set<Variable> empty = Collections.emptySet();
 			n.setRequiredVariables(empty);
 			Set<Variable> avail = new HashSet<Variable>(availableVars);
@@ -1025,21 +1036,26 @@ public class Planner {
 				filterNode.setFilters(currentHead.getFilters());
 				
 				filterNode.setCost(getCost(g));
-				filterNode.setProducedVariables(currentHead.getProducedVariables());
+				Set<Variable> av = HashSetFactory.make(currentHead.getAvailableVariables());
+				av.retainAll(liveVars);
 				
-
-				filterNode.setAvailableVariables(currentHead.getAvailableVariables());
+				filterNode.setProducedVariables(av);
+				filterNode.setAvailableVariables(av);
 
 				return filterNode;
 			}
 
 			@Override
 			public Pair<Double, Double> getCost(NumberedGraph<PlanNode> g) {
-				PlanNode rp = walker.plan(this,
+				try {
+					PlanNode rp = walker.plan(this,
 						right,
 						HashSetFactory.make(availableVars),
 						Collections.<Variable> emptySet(), new ExtensionGraph<PlanNode>(g));
-				return rp.cost;
+					return rp.cost;
+				} catch (PlannerError e) {
+					return Pair.make(Double.MAX_VALUE, Double.MAX_VALUE);
+				}
 			}
 
 			@Override
@@ -1137,7 +1153,7 @@ public class Planner {
 		@Override
 		void getApplicableNodesForNotExists(Pattern p,
 				final Set<Variable> availableVars, final Set<Variable> liveVars, final Walker walker, List<Pattern> region, Set<Node> result) {
-			final Set<Variable> neededVars = getDependentVariables(region, p);
+			final Set<Variable> neededVars = getDependentVariables(region, ((FilterNotExistsPattern)p).getPatterns().get(1));
 			if (availableVars.containsAll(neededVars)) {
 				result.add(new FilterExistsNotExistsNode(p, true, walker, availableVars, neededVars));
 				result.add(new FilterExistsNotExistsNode(p, true, walker, Collections.<Variable>emptySet(), neededVars));
@@ -1188,8 +1204,24 @@ public class Planner {
 			
 			final Set<Variable> unscoped = p.optionalOnlyVars();
 			
+			System.err.println("allDeps " + allDeps);
+			System.err.println("availableVars " + availableVars);
+			System.err.println("liveVars " + liveVars);
+
+			Set<Variable> willKill = HashSetFactory.make(availableVars);
+			willKill.removeAll(allDeps);
+			boolean tryNoFinalJoin = Collections.disjoint(liveVars, willKill);
+						
 			if (availableVars.containsAll(allDeps)) {
-				result.add(new AbstractNode(p) {
+				System.err.println("tryNoFinalJoin: " + tryNoFinalJoin);
+				class MinusNode extends AbstractNode {
+					final boolean noFinalJoin;
+					
+					public MinusNode(Boolean noFinalJoin, Pattern p) {
+						super(p);
+						this.noFinalJoin = noFinalJoin;
+					}
+
 					@Override
 					public Kind kind() {
 						return Kind.MINUS;
@@ -1201,13 +1233,33 @@ public class Planner {
 						assert currentHead != null;
 						
 						Pattern toSubtract = ((PatternSet)p).getPatterns().get(0);
+						
 						Set<Variable> myVars = HashSetFactory.make(availableVars);
 						myVars.removeAll(unscoped);
-						Set<Variable> rhsLive = HashSetFactory.make(liveVars);
-						rhsLive.addAll(allDeps);
-						PlanNode subtractNode = walker.plan(this, toSubtract, HashSetFactory.make(myVars), rhsLive, g);
-
-						PlanNode x = planFactory.createSTPlanNode(PlanNodeType.MINUS, myVars, p);
+						
+						Set<Variable> rhsAvailable, rhsLive;
+						if (noFinalJoin) {
+							rhsAvailable = HashSetFactory.make();
+							rhsLive = HashSetFactory.make(allDeps);
+						} else {
+							rhsAvailable = HashSetFactory.make(myVars);
+							
+							rhsLive = HashSetFactory.make(liveVars);
+							rhsLive.addAll(allDeps);
+						}
+						
+						PlanNode subtractNode;
+						if (noFinalJoin) {
+							try {
+								subtractNode = walker.plan(this, toSubtract, rhsAvailable, rhsLive, g); 								
+							} catch (PlannerError e) {
+								rhsAvailable = HashSetFactory.make(myVars);
+								subtractNode = walker.plan(this, toSubtract, rhsAvailable, rhsLive, g); 								
+							}
+						} else {
+							subtractNode = walker.plan(this, toSubtract, rhsAvailable, rhsLive, g);
+						}
+						PlanNode x = planFactory.createSTPlanNode(PlanNodeType.MINUS, noFinalJoin? allDeps: myVars, p);
 
 						g.addNode(subtractNode);
 						g.addNode(x);
@@ -1215,7 +1267,7 @@ public class Planner {
 						g.addEdge(x, subtractNode);
 
 						x.setRequiredVariables(allDeps);
-						Set<Variable> produced = HashSetFactory.make(myVars);
+						Set<Variable> produced = HashSetFactory.make(noFinalJoin? allDeps: myVars);
 						x.setProducedVariables(produced);
 						x.setCost(subtractNode.cost);
 						Set<Variable> av = HashSetFactory.make(availableVars);
@@ -1227,11 +1279,15 @@ public class Planner {
 
 					@Override
 					public Pair<Double, Double> getCost(NumberedGraph<PlanNode> g) {
-						PlanNode dp = walker.plan(this,
-								((PatternSet)p).getPatterns().get(0), HashSetFactory.make(availableVars),
-								HashSetFactory.make(liveVars), SlowSparseNumberedGraph.<PlanNode> make());
-						assert dp.cost != null : ((PatternSet)p).getPatterns().get(0);
-						return dp.cost;
+						try {
+							PlanNode dp = walker.plan(this,
+									((PatternSet)p).getPatterns().get(0), HashSetFactory.make(noFinalJoin? Collections.<Variable>emptySet(): availableVars),
+									HashSetFactory.make(liveVars), noFinalJoin? SlowSparseNumberedGraph.duplicate(g): SlowSparseNumberedGraph.<PlanNode> make());
+							assert dp.cost != null : ((PatternSet)p).getPatterns().get(0);
+							return dp.cost;
+						} catch (PlannerError | IllegalArgumentException e) {
+							return Pair.make(Double.MAX_VALUE, Double.MAX_VALUE);
+						}
 					}
 
 					@Override
@@ -1247,7 +1303,12 @@ public class Planner {
 						return vs;
 					}
 
-				});
+				}
+				
+				result.add(new MinusNode(false, p));
+				if (tryNoFinalJoin) {
+					result.add(new MinusNode(true, p));
+				}
 			}
 		}
 
@@ -1955,7 +2016,7 @@ public class Planner {
 			return applicableNodes.computeNeededKeys(region);
 		}
 
-		private void debug(Collection set) {
+		private void debug(Collection<?> set) {
 			for (Object o : set) {
 				System.out.println("Element:" + o);
 			}
@@ -1965,7 +2026,12 @@ public class Planner {
 		@Override
 		public PlanNode plan(Node parentNode, 
 				Pattern topLevelPattern,
-				List<Pattern> region, Walker walker, Set<Variable> availableVars, Set<Variable> liveVariables, final NumberedGraph<PlanNode> g) {
+				List<Pattern> region, 
+				Walker walker, 
+				Set<Variable> availableVars, 
+				Set<Variable> liveVariables, 
+				final NumberedGraph<PlanNode> g) 
+		{
 			if (isDeadPattern(topLevelPattern)) {
 				return null;
 			}
@@ -2000,7 +2066,7 @@ public class Planner {
 			if (availableVars == null || availableVars.isEmpty()) {
 				reUseNodes = traverseGraphForReUse(neededKeys, g);
 			}
-						
+			
 			class Edge extends Pair<Node, Node> {
 				private Edge(Node fst, Node snd) {
 					super(fst, snd);
@@ -2101,10 +2167,15 @@ public class Planner {
 				}
 
 				Edge savedProductEdge = null;
-				for (Iterator<Edge> es = orderedEdges.iterator(); es.hasNext();) {
+				Edge savedMinusEdge = null;
+				edges: for (Iterator<Edge> es = orderedEdges.iterator(); es.hasNext();) {
 					Edge e = es.next();
 					if (neededKeys.containsAll(e.snd.getKeys())) {						
 
+						if ((e.snd instanceof ReUseNode && top != null) || (e.snd.kind() == Kind.MINUS && top == null)) {
+							continue edges;
+						}
+						
 						if (CHECK_PRODUCT) {
 							if (!availableVars.isEmpty()
 								&& Collections.disjoint(availableVars,
@@ -2125,6 +2196,43 @@ public class Planner {
 							}
 						}
 
+						if (CHECK_MINUS) {
+							Set<? extends Key> mine = e.snd.getKeys();
+							keys: for(Key k : neededKeys) {
+								if (k instanceof Pattern && 
+								    ((Pattern)k).getType() == EPatternSetType.MINUS &&
+									!mine.contains(k)) 
+								{
+									Set<Variable> myVars = e.snd.getProducedVariables();
+									myVars.removeAll(availableVars);
+									
+									Set<Variable> minusVars = k.gatherVariables();
+									
+									myVars.removeAll(minusVars);
+									myVars.retainAll(liveVariables);
+									
+									if (!myVars.isEmpty()) {
+										if (es.hasNext()) {
+											if (savedMinusEdge == null) {
+												savedMinusEdge = e;
+											}
+											if (g == walker.topPlan()) {
+												System.err.println("skipping " + e.snd);
+												System.err.println(liveVariables);
+											}
+											continue edges;
+										} else {
+											if (savedMinusEdge != null) {
+												e = savedMinusEdge;
+												savedMinusEdge = null;
+											}
+											break keys;
+										}
+									}
+								}
+							}
+						}
+						
 						System.out.println("Removing keys:");
 						System.out.println(e.snd.getKeys());
 						neededKeys.removeAll(e.snd.getKeys());
@@ -2151,7 +2259,11 @@ public class Planner {
 					}
 					
 				}
-
+				
+				if (g == walker.topPlan()) {
+					System.err.println("fail");
+				}
+				
 				throw new PlannerError("cannot make progress planning " + region + "\n"
 								+ availableVars + " --> " + neededKeys + "\n" 
 								+ "nodes: " + orderedEdges);
@@ -2176,7 +2288,7 @@ public class Planner {
 			Set<PlanNode> roots = HashSetFactory.make();
 			while (it.hasNext()) {
 				PlanNode n = it.next();
-				if (g.getPredNodes(n) == null || !g.getPredNodes(n).hasNext() && n.getType() != PlanNodeType.REUSE) {
+				if ((g.getPredNodes(n) == null || !g.getPredNodes(n).hasNext()) && n.getType() != PlanNodeType.REUSE) {
 					roots.add(n);
 				}
 			}
@@ -2198,7 +2310,9 @@ public class Planner {
 				
 			boolean canReUse = false;
 
-			if (node.getType() == PlanNodeType.TRIPLE) {
+			if (node.getType() == PlanNodeType.STAR) {
+				canReUse = reuseStarNode(neededKeys, nodesForReUse, node, accumulatedMappings);
+			} else if (node.getType() == PlanNodeType.TRIPLE) {
 				canReUse = reuseTripleNode(node.getTriple(), neededKeys, nodesForReUse, node,
 						accumulatedMappings);  
 				return;
@@ -2220,26 +2334,48 @@ public class Planner {
 		private boolean reuseStarNode(Set<Key> neededKeys,
 				Map<PlanNode, ReUseNode> nodesForReUse, PlanNode node,
 				Map<Variable, Variable> accumulatedMappings) {
+			if (! reuseCheckFilters(node)) {			
+				return false;
+			}
+
 			assert node.starTriples != null;
-			Set<Key> keys = HashSetFactory.make();
-			// This is not ideal -- but basically each of the triples in the star needs to be processed
-			// but the 'keys' need to be 'collected' across the nodes.  yucky hack.
-			boolean canUse = true;
-			for (QueryTriple q : node.starTriples) {
-				canUse = canUse && reuseTripleNode(q, neededKeys, nodesForReUse, node, accumulatedMappings);
-				if (canUse) {
-					assert nodesForReUse.containsKey(node);
-					keys.addAll(nodesForReUse.get(node).getKeys());
-				} else {
-					nodesForReUse.remove(node);
-					return false;
+			
+			Map<Variable, Variable> accMappingsCopy = new HashMap<Variable, Variable>(accumulatedMappings);
+			Set<Variable> allVars = node.getAvailableVariables();
+			Set<Key> keys = HashSetFactory.make();			
+			for (Key k : neededKeys) {
+				if (k instanceof QueryTriple) {
+					QueryTriple qtk = (QueryTriple) k;
+					triples: for(QueryTriple triple : node.starTriples) {
+						if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk)) {		
+							Map<Variable, Variable> variableMappings = triple.getVariableMappings(qtk);
+							if (!addGraphRestriction(variableMappings, triple, qtk)) {
+								continue triples;
+							}
+						
+							if (variableMappings != null) {
+								for (Map.Entry<Variable, Variable> entry : variableMappings.entrySet()) {
+									// check if any of the triple's variable-to-variable mappings violate any existing mappings so far
+									if (accMappingsCopy.containsKey(entry.getKey()) && !accMappingsCopy.get(entry.getKey()).equals(entry.getValue())) {
+										continue triples;
+									}								
+								}
+							
+								keys.add(k);
+								accMappingsCopy.putAll(variableMappings);
+							}
+						}
+					}
 				}
 			}
-			if (canUse) {
-				ReUseNode rn = nodesForReUse.get(node);
-				rn.keys = keys;
+			
+			if (accMappingsCopy.keySet().containsAll(node.getAvailableVariables())) {
+				nodesForReUse.put(node, new ReUseNode(node, accMappingsCopy, keys));
+				accumulatedMappings.putAll(accMappingsCopy);
+				return true;
+			} else {
+				return false;
 			}
-			return canUse;
 		}
 
 		private boolean addGraphRestriction(Map<Variable, Variable> variableMappings, QueryTriple old, QueryTriple nu) {
@@ -2256,10 +2392,7 @@ public class Planner {
 			return true;
 		}
 		
-		private boolean reuseTripleNode(QueryTriple triple, Set<Key> neededKeys,
-				Map<PlanNode, ReUseNode> nodesForReUse, PlanNode node,
-				Map<Variable, Variable> accumulatedMappings) {
-			
+		private boolean reuseCheckFilters(PlanNode node) {
 			/*
 			 * plain EXISTS filters get handled with additional CTEs, so they are not a problem 
 			 * since there will be CTEs that correspond to the unfiltered nodes.
@@ -2271,31 +2404,40 @@ public class Planner {
 					}
 				}
 			}
-
-			Map<Variable, Variable> accMappingsCopy = new HashMap<Variable, Variable>(accumulatedMappings);
+			return true;
+		}
+		
+		private boolean reuseTripleNode(QueryTriple triple, Set<Key> neededKeys,
+				Map<PlanNode, ReUseNode> nodesForReUse, PlanNode node,
+				Map<Variable, Variable> accumulatedMappings) {
 			
-			for (Key k : neededKeys) {
+			if (! reuseCheckFilters(node)) {			
+				return false;
+			}
+			
+			keys: for (Key k : neededKeys) {
 				if (k instanceof QueryTriple) {
 					QueryTriple qtk = (QueryTriple) k;
-					if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk) && qtk.gatherVariables().containsAll(node.getAvailableVariables())) {		
+					if (triple.isSimilarTo(qtk) && triple.hasSimilarGraphRestrictionTo(qtk)) {		
 						Map<Variable, Variable> variableMappings = triple.getVariableMappings(qtk);
 						if (!addGraphRestriction(variableMappings, triple, qtk)) {
-							continue;
+							continue keys;
 						}
 						boolean hasConsistentMappings = true;
+						Map<Variable, Variable> accMappingsCopy = new HashMap<Variable, Variable>(accumulatedMappings);
 						
 						if (variableMappings != null && hasConsistentMappings) {
 							for (Map.Entry<Variable, Variable> entry : variableMappings.entrySet()) {
 								// check if any of the triple's variable-to-variable mappings violate any existing mappings so far
 								if (accMappingsCopy.containsKey(entry.getKey()) && !accMappingsCopy.get(entry.getKey()).equals(entry.getValue())) {
-									hasConsistentMappings = false;
+									continue keys;
 								} else {
 									accMappingsCopy.put(entry.getKey(), entry.getValue());
 								}
 							}
-							if (hasConsistentMappings) {
-								nodesForReUse.put(node, new ReUseNode(node, variableMappings, Collections.singleton(k)));
+							if (hasConsistentMappings && accMappingsCopy.keySet().containsAll(node.getAvailableVariables())) {
 								accumulatedMappings.putAll(variableMappings);
+								nodesForReUse.put(node, new ReUseNode(node, accumulatedMappings, Collections.singleton(k)));
 								return true;
 							}			
 						}							

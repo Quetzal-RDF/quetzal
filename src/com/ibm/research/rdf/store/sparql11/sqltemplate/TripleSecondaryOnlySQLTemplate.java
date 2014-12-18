@@ -187,7 +187,7 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			
 		if(predecessor!=null){
-			String predecessorCTE = wrapper.getPlanNodeCTE(predecessor);
+			String predecessorCTE = wrapper.getPlanNodeCTE(predecessor, false);
 			Set<Variable> predecessorVars = predecessor.getAvailableVariables();
 			Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 			if(predecessorVars!=null){
@@ -219,7 +219,7 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		}
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 		if(predecessor!=null){
-			targetSQLClause.add( wrapper.getPlanNodeCTE(predecessor));
+			targetSQLClause.add( wrapper.getPlanNodeCTE(predecessor, true));
 		}
 		return targetSQLClause;		
 	}
@@ -299,10 +299,10 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 					if(availableVariables.contains(valueVariable)){
 						String valPredName = wrapper.getPlanNodeVarMapping(predecessor,valueVariable.getName());
 						valueSQLConstraint.add(valueSQLName+ 
-								" = "+ wrapper.getPlanNodeCTE(predecessor)+ "." + valPredName);
+								" = "+ wrapper.getPlanNodeCTE(predecessor, false)+ "." + valPredName);
 						if(typConstraint){
 							valueSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_TYPE + 
-									" = " + wrapper.getPlanNodeCTE(predecessor) + "." + valPredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+									" = " + wrapper.getPlanNodeCTE(predecessor, false) + "." + valPredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 						}
 						hasValueConstraintWithPredecessor = true;
 					}
@@ -335,7 +335,7 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 					if(availableVariables.contains(propTerm.getVariable())){
 						String propPredName = wrapper.getPlanNodeVarMapping(predecessor,propTerm.getVariable().getName());	
 						propSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_PREDICATE+
-								" = " +  wrapper.getPlanNodeCTE(predecessor) + "." + propPredName);
+								" = " +  wrapper.getPlanNodeCTE(predecessor, false) + "." + propPredName);
 					}
 				}
 			}

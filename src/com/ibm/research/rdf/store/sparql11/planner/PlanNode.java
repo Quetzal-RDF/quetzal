@@ -15,6 +15,7 @@ import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
 import com.ibm.research.rdf.store.sparql11.model.BindPattern;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
@@ -24,8 +25,7 @@ import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.Values;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
-import com.ibm.research.rdf.store.sparql11.planner.Planner.JoinTypes;
+import com.ibm.research.rdf.store.sparql11.planner.Planner.ReUseNode;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 
@@ -294,6 +294,10 @@ public void setMaterialzedTable(String materialzedTable) {
 		lhs = succs.next();
 		assert succs.hasNext();
 		rhs = succs.next();
+		
+		if (lhs.getType() == PlanNodeType.REUSE || rhs.getType() == PlanNodeType.REUSE) {
+			return; 
+		}
 		
 		if (rhs.getFilters() != null) {
 			allFilters.addAll(rhs.getFilters());

@@ -120,12 +120,12 @@ public abstract class AbstractSQLTemplate {
 					if (needsTypeCast) {
 						SPARQLToSQLExpression exp = new SPARQLToSQLExpression();
 						String entryPredNameMod = exp.getColumnName(entryPredName, predecessor.getTypeOfTypeCheckVariable(variable));
-						sqlConstraint.add(column + " = " +wrapper.getPlanNodeCTE(predecessor) + "." +entryPredNameMod);
+						sqlConstraint.add(column + " = " +wrapper.getPlanNodeCTE(predecessor, false) + "." +entryPredNameMod);
 					} else { 
-						sqlConstraint.add(column + " = " +wrapper.getPlanNodeCTE(predecessor) + "." +entryPredName);
+						sqlConstraint.add(column + " = " +wrapper.getPlanNodeCTE(predecessor, false) + "." +entryPredName);
 					}
 					if(needsTypeConstraint){
-						sqlConstraint.add(typeColumn + " = " +wrapper.getPlanNodeCTE(predecessor) + "." +entryPredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+						sqlConstraint.add(typeColumn + " = " +wrapper.getPlanNodeCTE(predecessor, false) + "." +entryPredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 					}
 					entryConstraintWithPredecessor = true;
 				}

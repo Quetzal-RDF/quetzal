@@ -57,7 +57,7 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 	List<String> getLeftProjectMapping(){
 		List<String> projectMapping = new LinkedList<String>();
 		Set<Variable> notExistAvailableVariables=planNode.getAvailableVariables();
-		String leftSQLCte = wrapper.getPlanNodeCTE(left); 
+		String leftSQLCte = wrapper.getPlanNodeCTE(left, false); 
 		Set<Variable> leftAvailable = left.getAvailableVariables();
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 		for(Variable v : notExistAvailableVariables){
@@ -81,7 +81,7 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 		// that specify the relationship between the constraints
 		Set<Variable> notExistVariables = planNode.getOperatorsVariables();
 		for(Variable v : notExistVariables){
-			notExistsConstraint.add(wrapper.getPlanNodeCTE(left)+"."+v.getName()+" = "+wrapper.getPlanNodeCTE(right)+"."+wrapper.getPlanNodeVarMapping(right,v.getName()));
+			notExistsConstraint.add(wrapper.getPlanNodeCTE(left, false)+"."+v.getName()+" = "+wrapper.getPlanNodeCTE(right, false)+"."+wrapper.getPlanNodeVarMapping(right,v.getName()));
 		}
 		
 		// construct a variable map to map filter names
@@ -94,7 +94,7 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 		List<String> rightTarget = getRightTargetMapping();
 
 		for (Variable v : rightVariables) {
-			String varName = wrapper.getPlanNodeCTE(right) + "." + wrapper.getPlanNodeVarMapping(right,v.getName());
+			String varName = wrapper.getPlanNodeCTE(right, false) + "." + wrapper.getPlanNodeVarMapping(right,v.getName());
 			String varType = null;
 			if(!iriBoundVariables.contains(v)){
 				varType = varName+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
@@ -103,7 +103,7 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 		}
 
 		for (Variable v : leftVariables) {
-			String varName = wrapper.getPlanNodeCTE(left) + "." + wrapper.getPlanNodeVarMapping(left,v.getName());
+			String varName = wrapper.getPlanNodeCTE(left, false) + "." + wrapper.getPlanNodeVarMapping(left,v.getName());
 			String varType = null;
 			if(!iriBoundVariables.contains(v)){
 				varType = varName+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
@@ -143,13 +143,13 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 	
 	List<String> getLeftTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>();
-		targetMapping.add(wrapper.getPlanNodeCTE(left));
+		targetMapping.add(wrapper.getPlanNodeCTE(left, true));
 		return targetMapping;
 	}
 	
 	List<String> getRightTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>(); 
-		targetMapping.add(wrapper.getPlanNodeCTE(right));
+		targetMapping.add(wrapper.getPlanNodeCTE(right, true));
 		return targetMapping;
 	}
 }

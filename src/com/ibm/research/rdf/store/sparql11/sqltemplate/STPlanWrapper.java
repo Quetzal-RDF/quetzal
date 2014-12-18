@@ -29,6 +29,7 @@ import com.ibm.wala.util.collections.HashSetFactory;
  */
 public class STPlanWrapper {
 	
+	HashMap<PlanNode,Integer> aliasMap=null;
 	HashMap<PlanNode,Integer> nodeMap=null;
 	int lastId;
 	int queryInfoId=-1;
@@ -45,6 +46,7 @@ public class STPlanWrapper {
 	public STPlanWrapper(Plan plan, Map<Variable, Variable> variableToRenamedVariable, int startCTEId ) {
 		lastId = startCTEId;
 		nodeMap=new HashMap<PlanNode,Integer>();
+		aliasMap=new HashMap<PlanNode,Integer>();
 		this.plan = plan;
 		this.variableToRenamedVariable = variableToRenamedVariable;
 		if(plan != null)
@@ -82,6 +84,10 @@ public class STPlanWrapper {
 	}
 	
 	public void mapPlanNodesAs(PlanNode p, int id){
+		int pId=lastId;
+		aliasMap.put(p, pId);
+		lastId++;
+		
 		nodeMap.put(p, id);
 		lastMappedNode = p;
 	}
@@ -95,11 +101,22 @@ public class STPlanWrapper {
 		return nodeMap.get(p);
 	}
 	
-	public String getPlanNodeCTE(PlanNode p){
+	public String getPlanNodeCTE(PlanNode p, boolean asTarget){
 		if(p.getType() == PlanNodeType.MATERIALIZED_TABLE) {
 			return p.getMaterialzedTable();
-		} else
-			return "QS"+nodeMap.get(p);
+		} else {
+			if (aliasMap.containsKey(p)) {
+				if (asTarget) {
+					assert nodeMap.containsKey(p) : p;
+					return "QS"+nodeMap.get(p) + " AS " + "QS"+aliasMap.get(p);
+				} else {
+					return "QS"+aliasMap.get(p);			
+				}
+			} else {
+				assert nodeMap.containsKey(p) : p;
+				return "QS"+nodeMap.get(p);
+			}
+		}
 	}
 	
 	public Integer getCteIdForSolutionModifier(){
@@ -134,44 +151,35 @@ public class STPlanWrapper {
 				Iterator<PlanNode> it = plan.getPlanTree().getSuccNodes(rn);
 				while (it.hasNext()) {
 					PlanNode succ = it.next();
-					if (succ.getType() == PlanNodeType.TRIPLE) {
-						reuseTripleNode(node, succ);
-					} else if (succ.getType() == PlanNodeType.STAR) {
-						reuseStarNode(node, succ);
+					if (reusableNode(succ)) {
+						reuseNode(node, succ);
 					}
 				}		
 				
-			} else if (rn.getType() == PlanNodeType.TRIPLE) {
-				reuseTripleNode(node, rn);
-			} else if (rn.getType() == PlanNodeType.STAR) {
-				reuseStarNode(node, rn);
+			} else if (reusableNode(rn)) {
+				reuseNode(node, rn);
 			}
 			return true;
 		}
 		return false;
 	}
 
-	private void reuseTripleNode(PlanNode node, PlanNode rn) {
-		mapPlanNodesAs(node, getPlanNodeId(rn));
-		Map<String, String> varMap = HashMapFactory.make();
-		for (Map.Entry<Variable, Variable> entry : node.getReuseVarMappings().entrySet()) {
-			// reverse the mapping so its re-used variable name can be found
-			varMap.put(entry.getValue().getName(), entry.getKey().getName());
-		}
-		renamedVariables.put(node, varMap);
+	private static boolean reusableNode(PlanNode node) {
+		return node.getType() == PlanNodeType.TRIPLE || 
+			node.getType() == PlanNodeType.STAR || 
+			node.getType() == PlanNodeType.PRODUCT;
 	}
-	
-	private void reuseStarNode(PlanNode node, PlanNode rn) {
-		mapPlanNodesAs(node, getPlanNodeId(rn));
-		Map<String, String> varMap = HashMapFactory.make();
-		for (Map.Entry<Variable, Variable> entry : node.getReuseVarMappings().entrySet()) {
-			// reverse the mapping so its re-used variable name can be found
-			varMap.put(entry.getValue().getName(), entry.getKey().getName());
-		}
-		renamedVariables.put(node, varMap);
-	}
-	
 
+	private void reuseNode(PlanNode node, PlanNode rn) {
+		mapPlanNodesAs(node, getPlanNodeId(rn));
+		Map<String, String> varMap = HashMapFactory.make();
+		for (Map.Entry<Variable, Variable> entry : node.getReuseVarMappings().entrySet()) {
+			// reverse the mapping so its re-used variable name can be found
+			varMap.put(entry.getValue().getName(), entry.getKey().getName());
+		}
+		renamedVariables.put(node, varMap);
+	}
+	
 	public String getPlanNodeVarMapping(PlanNode predecessor,String varName) {
 		String mappedVarName=varName;
 		Map<String,String> predRenamedVariables = renamedVariables.get(predecessor);

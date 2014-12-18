@@ -67,7 +67,7 @@ public class SubSelectTemplate extends AbstractSelectTemplate {
 	protected List<String> getTargetSQLClause() {
 		PlanNode body = wrapper.plan.getPlanTree().getSuccNodes(planNode).next();
 		body = body.getPredecessorDown(wrapper.plan);
-		String cte = wrapper.getPlanNodeCTE(body);
+		String cte = wrapper.getPlanNodeCTE(body, true);
 		return Collections.singletonList(cte);
 	}
 
@@ -90,7 +90,7 @@ public class SubSelectTemplate extends AbstractSelectTemplate {
 			vars.add(v.getVariable());
 		}
 		if(predecessor!=null){
-			String predecessorCTE = wrapper.getPlanNodeCTE(predecessor);
+			String predecessorCTE = wrapper.getPlanNodeCTE(predecessor, false);
 			Set<Variable> predecessorVars = predecessor.getAvailableVariables();
 			if(predecessorVars != null){
 				Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();

@@ -107,7 +107,7 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 			projectList.add("TEMP." + s);
 		}
 		if (pred != null) {
-			String leftSQLCte = wrapper.getPlanNodeCTE(pred);
+			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
 		
 			for (Variable v : pred.getAvailableVariables()) {
 				if (planNode.getRequiredVariables().contains(v)) {
@@ -175,7 +175,7 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 		if (pred == null) {
 			return null;
 		}
-		return Collections.<String>singletonList(wrapper.getPlanNodeCTE(pred));
+		return Collections.<String>singletonList(wrapper.getPlanNodeCTE(pred, true));
 	}
 		
 	List<String> getJoinConstraintMapping(){
@@ -183,7 +183,7 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 			return null;
 		}
 		List<String> constraintMapping = new LinkedList<String>();
-		String leftSQLCte = wrapper.getPlanNodeCTE(pred);
+		String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
 		String rightSQLCte = "TEMP"; 
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 

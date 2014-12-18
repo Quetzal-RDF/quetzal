@@ -69,7 +69,7 @@ public class MinusSQLTemplate extends AbstractSQLTemplate {
 	Map<String,String> getLeftProjectMapping(){
 		Map<String,String> projectMapping = new HashMap<String,String>();
 		Set<Variable> minusVariables=planNode.getProducedVariables();
-		String leftSQLCte = wrapper.getPlanNodeCTE(left); 
+		String leftSQLCte = wrapper.getPlanNodeCTE(left, false); 
 		Set<Variable> leftAvailable = left.getAvailableVariables();
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 		for(Variable v : minusVariables){
@@ -96,7 +96,7 @@ public class MinusSQLTemplate extends AbstractSQLTemplate {
 	Map<String,String> getRightProjectMapping(){
 		Map<String,String> projectMapping = new HashMap<String,String>();
 		Set<Variable> unionVariables=planNode.getProducedVariables();
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		String rightSQLCte = wrapper.getPlanNodeCTE(right, false); 
 		Set<Variable> rightAvailable = right.getAvailableVariables();
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 		for(Variable v : unionVariables){
@@ -120,13 +120,13 @@ public class MinusSQLTemplate extends AbstractSQLTemplate {
 	
 	List<String> getLeftTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>();
-		targetMapping.add(wrapper.getPlanNodeCTE(left));
+		targetMapping.add(wrapper.getPlanNodeCTE(left, true));
 		return targetMapping;
 	}
 	
 	List<String> getRightTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>();
-		targetMapping.add(wrapper.getPlanNodeCTE(right));
+		targetMapping.add(wrapper.getPlanNodeCTE(right, true));
 		return targetMapping;
 	}	
 	

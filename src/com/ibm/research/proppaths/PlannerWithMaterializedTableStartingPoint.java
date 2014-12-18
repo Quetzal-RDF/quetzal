@@ -142,7 +142,7 @@ public class PlannerWithMaterializedTableStartingPoint extends Planner {
 	}
 
 	public PlannerWithMaterializedTableStartingPoint(PlanNodeCreator planFactory, PlanNode materializedTable) {
-		super(planFactory);
+		super(planFactory, true);
 		materializedTableKey =  materializedTable!=null? new MaterializedTableKey(materializedTable): null;
 	}
 

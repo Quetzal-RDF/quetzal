@@ -206,9 +206,9 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 					String vPredName = wrapper.getPlanNodeVarMapping(predecessor,v.getName());
 					String vTypePredName = null;
 					map.add(vPredName+" AS "+v.getName());
-					if(!iriBoundVariables.contains(v)){
+					if(!iriBoundVariables.contains(new Variable(vPredName))){
 						vTypePredName = wrapper.getPlanNodeVarMapping(predecessor,v.getName()) + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
-						map.add(vTypePredName);
+						map.add(vTypePredName+" AS "+v.getName() + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 					}
 					varMap.put(v.getName(), Pair.make(vPredName, vTypePredName));
 				}
@@ -232,9 +232,10 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 				for(Variable v : predecessorVars){
 					if(projectedInSecondary.contains(v))continue;
 					projectedInSecondary.add(v);
+					String vPredName = wrapper.getPlanNodeVarMapping(predecessor,v.getName());
 					String vType = null;
 					map.add(v.getName()+" AS "+v.getName());
-					if(!iriBoundVariables.contains(v)){
+					if(!iriBoundVariables.contains(new Variable(vPredName))){
 						vType = v.getName() + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
 						map.add(vType);
 					}
@@ -255,7 +256,7 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 		}
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 		if(predecessor!=null){
-			targetSQLClause.add(wrapper.getPlanNodeCTE(predecessor));
+			targetSQLClause.add(wrapper.getPlanNodeCTE(predecessor, false));
 		}
 		return targetSQLClause;		
 	}
@@ -330,10 +331,10 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 						if(availableVariables.contains(valueVariable)){
 							String valuePredName = wrapper.getPlanNodeVarMapping(predecessor,valueVariable.getName());
 							valueSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_VALUE,predicate)+ 
-									" = " +wrapper.getPlanNodeCTE(predecessor)+ "." + valuePredName);
+									" = " +wrapper.getPlanNodeCTE(predecessor, false)+ "." + valuePredName);
 							if(hasSqlType && !wrapper.getIRIBoundVariables().contains(valueVariable)){
 								valueSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_TYPE,predicate)+ 
-										" = " + wrapper.getPlanNodeCTE(predecessor) + "." + valuePredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+										" = " + wrapper.getPlanNodeCTE(predecessor, false) + "." + valuePredName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 							}
 							valueHasConstraintWitPredecessor = true;
 						}

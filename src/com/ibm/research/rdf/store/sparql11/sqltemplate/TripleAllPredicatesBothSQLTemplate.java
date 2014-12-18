@@ -97,7 +97,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 			PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			if(predecessor!=null){
 				List<String> tmp = new LinkedList<String>();
-				target = wrapper.getPlanNodeCTE(predecessor).trim();
+				target = wrapper.getPlanNodeCTE(predecessor, false).trim();
 				for (String p: projectSqlParams) {
 					p = p.trim();
 					if (p.startsWith(target+".") && p.length()>target.length()+1) {
@@ -266,7 +266,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 			}
 			if(predecessor!= null ){
 				Set<Variable> availableVariables = predecessor.getAvailableVariables();
-				String predecessorCte = wrapper.getPlanNodeCTE(predecessor);
+				String predecessorCte = wrapper.getPlanNodeCTE(predecessor, false);
 				if(availableVariables != null){
 					if(availableVariables.contains(valueVariable)){
 						if(!projectedInPrimary.contains(valueVariable)){
@@ -291,7 +291,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 		if(predecessor!=null){
-			String predecessorCte = wrapper.getPlanNodeCTE(predecessor);
+			String predecessorCte = wrapper.getPlanNodeCTE(predecessor, false);
 			Set<Variable> predecessorVars = predecessor.getAvailableVariables();
 			Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 			if(predecessorVars != null){
@@ -325,7 +325,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		}
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 		if(predecessor!=null){
-			targetSQLClause.add(wrapper.getPlanNodeCTE(predecessor));
+			targetSQLClause.add(wrapper.getPlanNodeCTE(predecessor, true));
 		}
 		return targetSQLClause;		
 	}

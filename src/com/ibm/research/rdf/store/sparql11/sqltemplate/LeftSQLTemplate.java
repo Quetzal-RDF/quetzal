@@ -56,8 +56,8 @@ public class LeftSQLTemplate extends AbstractSQLTemplate {
 	List<String> getProjectMapping(){
 		List<String> projectMapping = new LinkedList<String>();
 		Set<Variable> operatorVariables=planNode.getOperatorsVariables();
-		String leftSQLCte = wrapper.getPlanNodeCTE(left);
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		String leftSQLCte = wrapper.getPlanNodeCTE(left, false);
+		String rightSQLCte = wrapper.getPlanNodeCTE(right, false); 
 		Set<Variable> leftAvailable = left.getAvailableVariables();
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 		if(leftAvailable != null){
@@ -94,8 +94,8 @@ public class LeftSQLTemplate extends AbstractSQLTemplate {
 	
 	LinkedList<String> getTargetMapping(){
 		LinkedList<String> targetMapping = new LinkedList<String>();
-		targetMapping.add(wrapper.getPlanNodeCTE(left));
-		targetMapping.add(wrapper.getPlanNodeCTE(right));
+		targetMapping.add(wrapper.getPlanNodeCTE(left, true));
+		targetMapping.add(wrapper.getPlanNodeCTE(right, true));
 		return targetMapping;
 	}
 	
@@ -104,9 +104,9 @@ public class LeftSQLTemplate extends AbstractSQLTemplate {
 		Set<Variable> operatorVariables=left.getAvailableVariables();
 		for(Variable v : operatorVariables){
 			if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
-				constraintMapping.add("(" + wrapper.getPlanNodeCTE(right)+"."+v.getName()+" <=> "+wrapper.getPlanNodeCTE(left)+"."+v.getName()+")");
+				constraintMapping.add("(" + wrapper.getPlanNodeCTE(right, false)+"."+v.getName()+" <=> "+wrapper.getPlanNodeCTE(left, false)+"."+v.getName()+")");
 			} else {
-				constraintMapping.add("(" + wrapper.getPlanNodeCTE(right)+"."+v.getName()+" = "+wrapper.getPlanNodeCTE(left)+"."+v.getName() + " OR (" + wrapper.getPlanNodeCTE(right)+"."+v.getName()+" is null and "+wrapper.getPlanNodeCTE(left)+"."+v.getName() + " is null))");
+				constraintMapping.add("(" + wrapper.getPlanNodeCTE(right, false)+"."+v.getName()+" = "+wrapper.getPlanNodeCTE(left, false)+"."+v.getName() + " OR (" + wrapper.getPlanNodeCTE(right, false)+"."+v.getName()+" is null and "+wrapper.getPlanNodeCTE(left, false)+"."+v.getName() + " is null))");
 			}
 		}
 		return constraintMapping;

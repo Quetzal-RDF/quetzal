@@ -157,7 +157,7 @@ public class TriplePrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		List<String> map = new LinkedList<String>();
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 		if(predecessor!=null){
-			String predecessorCTE = wrapper.getPlanNodeCTE(predecessor);
+			String predecessorCTE = wrapper.getPlanNodeCTE(predecessor, false);
 			Set<Variable> predecessorVars = predecessor.getAvailableVariables();
 			if(predecessorVars != null){
 				Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
@@ -165,7 +165,7 @@ public class TriplePrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 					if(projectedInPrimary.contains(v))continue;
 					projectedInPrimary.add(v);
 					String vPredName = wrapper.getPlanNodeVarMapping(predecessor,v.getName());
-					map.add(predecessorCTE+"."+v.getName()+" AS "+v.getName());
+					map.add(predecessorCTE+"."+vPredName+" AS "+v.getName());
 					String vType = null;						
 					if(!iriBoundVariables.contains(v)){
 						String vPredType = predecessorCTE+"."+v.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
@@ -189,7 +189,7 @@ public class TriplePrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		}
 		PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 		if(predecessor!=null){
-			targetSQLClause.add(wrapper.getPlanNodeCTE(predecessor));
+			targetSQLClause.add(wrapper.getPlanNodeCTE(predecessor, true));
 		}
 		return targetSQLClause;		
 	}

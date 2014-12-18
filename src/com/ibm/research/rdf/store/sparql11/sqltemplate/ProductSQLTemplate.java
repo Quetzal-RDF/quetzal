@@ -44,12 +44,12 @@ public class ProductSQLTemplate extends JoinSQLTemplate {
 		mappings.add(rMapping);
 
 		List<String> rightTarget = new LinkedList<String>();
-		rightTarget.add(wrapper.getPlanNodeCTE(right));
+		rightTarget.add(wrapper.getPlanNodeCTE(right, true));
 		SQLMapping tMapping=new SQLMapping("rightTarget", rightTarget,null);
 		mappings.add(tMapping);
 		
 		List<String> leftTarget = new LinkedList<String>();
-		leftTarget.add(wrapper.getPlanNodeCTE(left));
+		leftTarget.add(wrapper.getPlanNodeCTE(left, true));
 		SQLMapping lMapping=new SQLMapping("leftTarget", leftTarget,null);
 		mappings.add(lMapping);
 		
@@ -58,7 +58,7 @@ public class ProductSQLTemplate extends JoinSQLTemplate {
 	
 	protected void getRightProjectMapping(List<String> projectMapping) {
 		Set<Variable> operatorVariables=planNode.getOperatorsVariables();
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		String rightSQLCte = wrapper.getPlanNodeCTE(right, false); 
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 
 		Set<Variable> rightProduced = right.getProducedVariables();

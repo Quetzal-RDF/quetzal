@@ -175,7 +175,7 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 											graphVar.getName());
 							graphSQLConstraint.add(tTableColumnPrefix
 									+ Constants.NAME_COLUMN_GRAPH_ID + " = "
-									+ wrapper.getPlanNodeCTE(predecessor) + "."
+									+ wrapper.getPlanNodeCTE(predecessor, false) + "."
 									+ graphPredName);
 							graphHasConstraintWithPredecessor = true;
 						}

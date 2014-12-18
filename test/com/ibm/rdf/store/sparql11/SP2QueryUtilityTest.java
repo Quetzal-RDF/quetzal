@@ -323,6 +323,14 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
       executeQuery(file, 9);
       }
 
+   //@Test
+   public void testQueryQ7a() throws Exception
+      {
+      String file = queryDir + "q7a.sparql";
+      System.err.println("Testing:" + file);
+      executeQuery(file, -1);
+      }
+
    @Test
    public void testQueryQ8() throws Exception
       {

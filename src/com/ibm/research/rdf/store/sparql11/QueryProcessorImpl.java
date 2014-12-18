@@ -32,6 +32,7 @@ import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.planner.Plan;
 import com.ibm.research.rdf.store.sparql11.planner.Planner;
+import com.ibm.research.rdf.store.sparql11.planner.Planner.PlannerError;
 import com.ibm.research.rdf.store.sparql11.planner.statistics.SPARQLOptimizerStatistics;
 import com.ibm.research.rdf.store.sparql11.sqltemplate.SQLGenerator;
 import com.ibm.research.rdf.store.sparql11.sqltemplate.SQLMapping;
@@ -224,7 +225,12 @@ public class QueryProcessorImpl implements QueryProcessor
                PropertyPathRewrite rewrite = new PropertyPathRewrite();
                boolean hasNoPropertyPath = rewrite.rewrite(query, true, null, null);
                logger.debug("Rewritten query (after property path rewrite): {}", query);
-               Plan greedyPlan = (new Planner()).plan(query, store, stats);
+               Plan greedyPlan;
+               try {
+            	   greedyPlan = (new Planner()).plan(query, store, stats);
+               } catch (PlannerError e) {
+            	   greedyPlan = (new Planner(false)).plan(query, store, stats);            	   
+               }
                plan = greedyPlan;
                if (plan.getPlanRoot() == null)
                   {

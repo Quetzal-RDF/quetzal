@@ -64,7 +64,7 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 	}
 	
 	protected void getLeftProjectMapping(List<String> projectMapping) {
-		String leftSQLCte = wrapper.getPlanNodeCTE(left);
+		String leftSQLCte = wrapper.getPlanNodeCTE(left, false);
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 		Set<Variable> leftAvailable = left.getAvailableVariables();
 		if(leftAvailable != null){
@@ -83,7 +83,7 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 	
 	protected void getRightProjectMapping(List<String> projectMapping) {
 		Set<Variable> operatorVariables=planNode.getOperatorsVariables();
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		String rightSQLCte = wrapper.getPlanNodeCTE(right, false); 
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 
 		Set<Variable> rightAvailable = right.getAvailableVariables();
@@ -111,15 +111,15 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 	
 	List<String> getTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>();
-		targetMapping.add(wrapper.getPlanNodeCTE(left));
-		targetMapping.add(wrapper.getPlanNodeCTE(right));
+		targetMapping.add(wrapper.getPlanNodeCTE(left, true));
+		targetMapping.add(wrapper.getPlanNodeCTE(right, true));
 		return targetMapping;
 	}
 	
 	List<String> getJoinConstraintMapping(){
 		List<String> constraintMapping = new LinkedList<String>();
-		String leftSQLCte = wrapper.getPlanNodeCTE(left);
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		String leftSQLCte = wrapper.getPlanNodeCTE(left, false);
+		String rightSQLCte = wrapper.getPlanNodeCTE(right, false); 
 		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 
 		Set<Variable> joinVariables = HashSetFactory.make();

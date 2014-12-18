@@ -69,7 +69,7 @@ public class UnionSQLTemplate extends AbstractSQLTemplate {
 	HashMap<String,String> getLeftProjectMapping(){
 		HashMap<String,String> projectMapping = new HashMap<String, String>();
 		Set<Variable> unionVariables=planNode.getAvailableVariables();
-		String leftSQLCTE = wrapper.getPlanNodeCTE(left); 
+		String leftSQLCTE = wrapper.getPlanNodeCTE(left, false); 
 		Set<Variable> leftAvailable = left.getAvailableVariables();
 		Set<Variable> iriBoundVariables =  wrapper.getIRIBoundVariables();
 		for(Variable v : unionVariables){
@@ -96,7 +96,7 @@ public class UnionSQLTemplate extends AbstractSQLTemplate {
 	HashMap<String,String> getRightProjectMapping(){
 		HashMap<String,String> projectMapping = new HashMap<String, String>();
 		Set<Variable> unionVariables=planNode.getAvailableVariables();
-		String rightSQLCte = wrapper.getPlanNodeCTE(right); 
+		String rightSQLCte = wrapper.getPlanNodeCTE(right, false); 
 		Set<Variable> rightAvailable = right.getAvailableVariables();
 		Set<Variable> iriBoundVariables =  wrapper.getIRIBoundVariables();
 		for(Variable v : unionVariables){
@@ -123,13 +123,13 @@ public class UnionSQLTemplate extends AbstractSQLTemplate {
 
 	List<String> getLeftTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>();
-		targetMapping.add( wrapper.getPlanNodeCTE(left));
+		targetMapping.add( wrapper.getPlanNodeCTE(left, true));
 		return targetMapping;
 	}
 	
 	List<String> getRightTargetMapping(){
 		List<String> targetMapping = new LinkedList<String>();
-		targetMapping.add( wrapper.getPlanNodeCTE(right));
+		targetMapping.add( wrapper.getPlanNodeCTE(right, true));
 		return targetMapping;
 	}	
 	
