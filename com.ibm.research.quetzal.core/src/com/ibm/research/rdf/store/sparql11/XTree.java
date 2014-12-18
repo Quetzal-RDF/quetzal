@@ -10,8 +10,8 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11;
 
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
 
 public class XTree extends CommonTree {
 

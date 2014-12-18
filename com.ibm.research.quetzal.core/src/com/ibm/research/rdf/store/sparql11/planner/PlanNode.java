@@ -35,7 +35,6 @@ import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.Values;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.planner.Planner.ReUseNode;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 

@@ -12,25 +12,26 @@
  
 package com.ibm.research.rdf.store.sparql11;
 	
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.AbstractMap;
-import java.util.HashMap;
-
-
-
-
-import com.ibm.research.rdf.store.sparql11.SPARQLsyntaxError;
-import com.ibm.research.rdf.store.sparql11.model.*;
-
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-import java.util.Stack;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.IntStream;
+import org.antlr.runtime.MismatchedTokenException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.RewriteEarlyExitException;
+import org.antlr.runtime.tree.RewriteRuleNodeStream;
+import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
+import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeRewriter;
+import org.antlr.runtime.tree.TreeRuleReturnScope;
 
 public class IbmSparqlAstRewriter extends TreeRewriter {
     public static final String[] tokenNames = new String[] {

@@ -11,8 +11,6 @@
  package com.ibm.research.rdf.store.sparql11.model;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Set;

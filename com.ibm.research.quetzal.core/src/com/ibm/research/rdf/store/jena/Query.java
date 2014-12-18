@@ -38,6 +38,7 @@ import com.ibm.research.rdf.store.sparql11.model.ConstructQuery;
 import com.ibm.research.rdf.store.sparql11.model.DatasetClause;
 import com.ibm.research.rdf.store.sparql11.model.DescribeQuery;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.research.rdf.store.sparql11.model.GroupCondition;
 import com.ibm.research.rdf.store.sparql11.model.HavingCondition;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
@@ -45,12 +46,11 @@ import com.ibm.research.rdf.store.sparql11.model.LimitOffsetClauses;
 import com.ibm.research.rdf.store.sparql11.model.OrderCondition;
 import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
 import com.ibm.research.rdf.store.sparql11.model.SelectClause;
+import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 import com.ibm.research.rdf.store.sparql11.model.SelectQuery;
 import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
-import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 
 public class Query extends com.hp.hpl.jena.query.Query {
 

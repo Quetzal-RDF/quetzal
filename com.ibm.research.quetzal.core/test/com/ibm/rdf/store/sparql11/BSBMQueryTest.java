@@ -10,15 +10,11 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import java.util.Collections;
+import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import org.junit.Test;
 
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-import com.ibm.research.rdf.store.sparql11.model.Query;
-import com.ibm.research.rdf.store.utilities.MinusRewriter;
-
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.*;
 
 public class BSBMQueryTest extends TestRunner<DB2TestData> {
 	private final String queryFile;

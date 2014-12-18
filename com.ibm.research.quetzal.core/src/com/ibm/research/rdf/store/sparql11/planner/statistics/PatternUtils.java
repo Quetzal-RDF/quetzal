@@ -23,6 +23,9 @@ import com.ibm.research.rdf.store.sparql11.model.BuiltinFunctionExpression;
 import com.ibm.research.rdf.store.sparql11.model.Constant;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.model.FunctionCallExpression;
 import com.ibm.research.rdf.store.sparql11.model.IExpressionTraversalListener;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
@@ -32,9 +35,6 @@ import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 /**

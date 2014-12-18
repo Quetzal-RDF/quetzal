@@ -22,9 +22,7 @@ import org.antlr.stringtemplate.StringTemplate;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.Store.Db2Type;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
-import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.Pair;
 
 public class RelationalExpression extends Expression {

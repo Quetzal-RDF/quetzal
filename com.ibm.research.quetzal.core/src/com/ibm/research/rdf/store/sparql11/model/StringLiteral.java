@@ -10,9 +10,6 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.model;
 
-import java.text.SimpleDateFormat;
-
-import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 
 /**
  * Models a literal.

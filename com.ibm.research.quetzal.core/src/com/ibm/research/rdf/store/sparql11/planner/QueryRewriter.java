@@ -16,6 +16,7 @@ import java.util.Set;
 
 import com.ibm.research.rdf.store.sparql11.model.Constant;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.PatternSet;
@@ -26,7 +27,6 @@ import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
 import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.planner.QueryRewriterHelper.RenamedIRIConstant;
 import com.ibm.wala.util.collections.HashSetFactory;
 

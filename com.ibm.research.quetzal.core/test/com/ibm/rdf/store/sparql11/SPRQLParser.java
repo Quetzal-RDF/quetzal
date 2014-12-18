@@ -20,7 +20,6 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.StoreManager;
-import com.ibm.research.rdf.store.jena.RdfStoreException;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
 import com.ibm.research.rdf.store.jena.RdfStoreQueryExecutionFactory;
 import com.ibm.research.rdf.store.jena.RdfStoreQueryFactory;

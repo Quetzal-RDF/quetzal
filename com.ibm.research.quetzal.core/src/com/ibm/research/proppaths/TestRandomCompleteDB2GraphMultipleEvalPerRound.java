@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import com.hp.hpl.jena.query.ResultSet;
-
 public class TestRandomCompleteDB2GraphMultipleEvalPerRound {
 	public static enum EvaluationStrategy {
 		STRATEGY_ORIGINAL("Original", true, false, true, false, false), // (i.e., level tracking and no runstats"), 

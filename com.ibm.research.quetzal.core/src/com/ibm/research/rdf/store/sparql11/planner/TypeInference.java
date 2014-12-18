@@ -22,7 +22,6 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap.TypeCategory;
 import com.ibm.research.rdf.store.sparql11.QueryInfo;
-import com.ibm.research.rdf.store.sparql11.model.AggregateExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
 import com.ibm.research.rdf.store.sparql11.model.Query;

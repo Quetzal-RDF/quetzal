@@ -18,7 +18,6 @@ import org.antlr.stringtemplate.StringTemplate;
 
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EUnaryOp;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
 
 /**

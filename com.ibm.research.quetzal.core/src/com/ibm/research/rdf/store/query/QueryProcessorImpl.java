@@ -36,7 +36,6 @@ import com.ibm.research.proppaths.StoreProcedure;
 import com.ibm.research.proppaths.TemporaryTableMgr;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
-import com.ibm.research.rdf.store.query.QueryProcessor;
 import com.ibm.research.rdf.store.runtime.service.sql.StoreImpl;
 import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;

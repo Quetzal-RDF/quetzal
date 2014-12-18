@@ -19,15 +19,13 @@ import java.util.Set;
 import org.antlr.stringtemplate.StringTemplate;
 
 import com.ibm.research.rdf.store.Store;
-import com.ibm.research.rdf.store.config.Constants;
-import com.ibm.research.rdf.store.hashing.HashingException;
-import com.ibm.research.rdf.store.hashing.HashingHelper;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.AggregateExpression;
 import com.ibm.research.rdf.store.sparql11.model.BindPattern;
 import com.ibm.research.rdf.store.sparql11.model.BuiltinFunctionExpression;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.model.FunctionCallExpression;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.LogicalExpression;
@@ -36,7 +34,6 @@ import com.ibm.research.rdf.store.sparql11.model.NumericExpression;
 import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 

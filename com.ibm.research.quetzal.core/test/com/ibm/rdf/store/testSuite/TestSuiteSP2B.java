@@ -13,10 +13,7 @@
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import com.ibm.rdf.store.sparql11.JazzQueryUtilityTest;
-import com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest;
 import com.ibm.rdf.store.sparql11.SP2QueryUtilityTest;
-import com.ibm.rdf.store.sparql11.UOBMQueryUtilityTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(

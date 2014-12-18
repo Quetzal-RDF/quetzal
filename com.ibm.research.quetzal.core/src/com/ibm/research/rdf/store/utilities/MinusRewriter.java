@@ -16,18 +16,18 @@ import java.util.Set;
 
 import com.ibm.research.rdf.store.sparql11.model.BuiltinFunctionExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
+import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EUnaryOp;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
 import com.ibm.research.rdf.store.sparql11.model.PatternSet;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
 import com.ibm.research.rdf.store.sparql11.model.UnaryExpression;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EUnaryOp;
-import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 public class MinusRewriter {

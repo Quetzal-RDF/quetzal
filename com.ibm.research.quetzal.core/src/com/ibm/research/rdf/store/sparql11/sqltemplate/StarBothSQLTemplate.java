@@ -10,7 +10,6 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,8 +22,6 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.Store.Db2Type;
 import com.ibm.research.rdf.store.Store.PredicateTable;
 import com.ibm.research.rdf.store.config.Constants;
-import com.ibm.research.rdf.store.hashing.HashingException;
-import com.ibm.research.rdf.store.hashing.HashingHelper;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.IRI;

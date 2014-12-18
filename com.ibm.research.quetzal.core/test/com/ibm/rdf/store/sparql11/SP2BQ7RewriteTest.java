@@ -10,6 +10,8 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
+import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
+
 import java.util.Collections;
 
 import org.junit.Test;
@@ -18,8 +20,6 @@ import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.utilities.MinusRewriter;
-
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.*;
 
 public class SP2BQ7RewriteTest extends TestRunner<DB2TestData> {
 	private final String queryDir;

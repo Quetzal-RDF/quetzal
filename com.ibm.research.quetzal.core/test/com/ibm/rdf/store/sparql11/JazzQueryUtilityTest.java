@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 
 public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {

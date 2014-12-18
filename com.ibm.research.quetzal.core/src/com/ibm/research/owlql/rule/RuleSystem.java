@@ -10,8 +10,6 @@
  *****************************************************************************/
  package com.ibm.research.owlql.rule;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
-import com.ibm.wala.util.graph.Graph;
 
 /**
  * assumptions:

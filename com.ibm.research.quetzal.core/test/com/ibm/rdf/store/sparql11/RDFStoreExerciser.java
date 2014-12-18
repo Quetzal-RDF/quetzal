@@ -11,11 +11,11 @@
  package com.ibm.rdf.store.sparql11;
 
 
+import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
+
 import org.junit.Test;
 
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
-
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.*;
 
 public class RDFStoreExerciser extends TestRunner<DB2TestData> {
 	private final String queryDir;

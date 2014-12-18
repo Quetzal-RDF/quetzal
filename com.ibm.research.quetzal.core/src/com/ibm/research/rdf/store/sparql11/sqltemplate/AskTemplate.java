@@ -12,14 +12,11 @@
 
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.sparql11.model.Query;
-import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 
 public class AskTemplate extends SolutionModifierBaseTemplate {
 

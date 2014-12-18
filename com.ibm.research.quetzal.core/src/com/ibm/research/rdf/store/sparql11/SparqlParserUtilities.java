@@ -38,6 +38,7 @@ import com.ibm.research.rdf.store.sparql11.model.AltPath;
 import com.ibm.research.rdf.store.sparql11.model.Constant;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.research.rdf.store.sparql11.model.IExpressionTraversalListener;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.InvPath;
@@ -53,7 +54,6 @@ import com.ibm.research.rdf.store.sparql11.model.SimplePath;
 import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.ZeroOrMorePath;
 import com.ibm.research.rdf.store.sparql11.model.ZeroOrOnePath;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 
 
 /**

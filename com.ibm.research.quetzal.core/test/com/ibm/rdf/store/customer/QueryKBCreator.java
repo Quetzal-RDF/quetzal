@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.Random;
 
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
-import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
 import com.ibm.research.rdf.store.sparql11.model.PatternSet;
 import com.ibm.research.rdf.store.sparql11.model.PropertyTerm;
 import com.ibm.research.rdf.store.sparql11.model.Query;
@@ -24,7 +24,6 @@ import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
 import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
-import com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType;
 import com.ibm.wala.util.collections.HashMapFactory;
 
 public class QueryKBCreator {

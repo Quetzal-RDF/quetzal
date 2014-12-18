@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.text.StyledEditorKit.UnderlineAction;
-
 import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;

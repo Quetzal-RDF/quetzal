@@ -10,28 +10,15 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.cmd;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
-import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFLanguages;
 
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.util.FileManager;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.StoreManager;
-import com.ibm.research.rdf.store.jena.RdfStoreException;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
 
 public class LoadRdfStore  extends ShowPredicateColumns {

@@ -26,7 +26,6 @@ import org.semanticweb.owlapi.model.OWLPropertyExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
 import com.ibm.research.owlql.NormalizedOWLQLTbox;
 import com.ibm.research.owlql.Taxonomy;
 import com.ibm.research.owlql.rule.AtomicFormula;

@@ -12,7 +12,6 @@
 
 import static com.ibm.research.rdf.store.sparql11.model.Pattern.EPatternSetType.SUBSELECT;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
 import com.ibm.research.rdf.store.sparql11.planner.Planner;
 import com.ibm.research.utils.OCUtils;
 import com.ibm.wala.util.collections.HashSetFactory;

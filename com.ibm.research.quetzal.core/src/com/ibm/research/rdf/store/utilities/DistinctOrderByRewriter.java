@@ -21,11 +21,11 @@ import com.ibm.research.rdf.store.sparql11.model.PatternSet;
 import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.SelectClause;
+import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 import com.ibm.research.rdf.store.sparql11.model.SelectQuery;
 import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
-import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 /**

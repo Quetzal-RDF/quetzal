@@ -12,12 +12,10 @@
 
 import java.sql.Connection;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.shared.ReificationStyle;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.jena.impl.DB2Dataset;

@@ -10,7 +10,6 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.model;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

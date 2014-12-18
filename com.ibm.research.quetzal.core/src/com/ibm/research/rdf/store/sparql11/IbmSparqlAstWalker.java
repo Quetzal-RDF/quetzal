@@ -12,24 +12,87 @@
  
 package com.ibm.research.rdf.store.sparql11;
 	
-import org.antlr.runtime.BitSet;
-
-import java.util.*;
-import java.math.BigInteger;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import com.ibm.research.rdf.store.sparql11.SPARQLsyntaxError;
-import com.ibm.research.rdf.store.sparql11.model.*;
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.IntStream;
+import org.antlr.runtime.MismatchedTokenException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.TreeNodeStream;
+import org.antlr.runtime.tree.TreeParser;
+
+import com.ibm.research.rdf.store.sparql11.model.AggregateExpression;
+import com.ibm.research.rdf.store.sparql11.model.AltPath;
+import com.ibm.research.rdf.store.sparql11.model.AskQuery;
+import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
+import com.ibm.research.rdf.store.sparql11.model.BindPattern;
+import com.ibm.research.rdf.store.sparql11.model.BlankNode;
+import com.ibm.research.rdf.store.sparql11.model.BlankNodeVariable;
+import com.ibm.research.rdf.store.sparql11.model.BuiltinFunctionExpression;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
+import com.ibm.research.rdf.store.sparql11.model.ConstructQuery;
+import com.ibm.research.rdf.store.sparql11.model.DatasetClause;
+import com.ibm.research.rdf.store.sparql11.model.DescribeQuery;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
+import com.ibm.research.rdf.store.sparql11.model.FunctionCall;
+import com.ibm.research.rdf.store.sparql11.model.FunctionCallExpression;
+import com.ibm.research.rdf.store.sparql11.model.GraphNode;
+import com.ibm.research.rdf.store.sparql11.model.GraphTerm;
+import com.ibm.research.rdf.store.sparql11.model.GroupCondition;
+import com.ibm.research.rdf.store.sparql11.model.HavingCondition;
+import com.ibm.research.rdf.store.sparql11.model.IRI;
+import com.ibm.research.rdf.store.sparql11.model.InvPath;
+import com.ibm.research.rdf.store.sparql11.model.LimitOffsetClauses;
+import com.ibm.research.rdf.store.sparql11.model.LogicalExpression;
+import com.ibm.research.rdf.store.sparql11.model.NegatedProperySetPath;
+import com.ibm.research.rdf.store.sparql11.model.NumericExpression;
+import com.ibm.research.rdf.store.sparql11.model.OneOfExpression;
+import com.ibm.research.rdf.store.sparql11.model.OrderCondition;
+import com.ibm.research.rdf.store.sparql11.model.Path;
+import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.PatternSet;
+import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
+import com.ibm.research.rdf.store.sparql11.model.PropertyList;
+import com.ibm.research.rdf.store.sparql11.model.PropertyListElement;
+import com.ibm.research.rdf.store.sparql11.model.PropertyTerm;
+import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.sparql11.model.QueryPrologue;
+import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
+import com.ibm.research.rdf.store.sparql11.model.QueryTriple2;
+import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
+import com.ibm.research.rdf.store.sparql11.model.RDFCollection;
+import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
+import com.ibm.research.rdf.store.sparql11.model.SelectClause;
+import com.ibm.research.rdf.store.sparql11.model.SelectQuery;
+import com.ibm.research.rdf.store.sparql11.model.SeqPath;
+import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
+import com.ibm.research.rdf.store.sparql11.model.SimplePath;
+import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
+import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
+import com.ibm.research.rdf.store.sparql11.model.StringLiteral;
+import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
+import com.ibm.research.rdf.store.sparql11.model.TriplesNode;
+import com.ibm.research.rdf.store.sparql11.model.UNDEFExpression;
+import com.ibm.research.rdf.store.sparql11.model.UnaryExpression;
+import com.ibm.research.rdf.store.sparql11.model.Values;
+import com.ibm.research.rdf.store.sparql11.model.ValuesPattern;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
-
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 public class IbmSparqlAstWalker extends TreeParser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "PATH", "ALT", "SEQ", "ELT", "INV", "BROKEN_PLUS", "BROKEN_MINUS", "NIL", "ANNON", "ROOT", "PROLOGUE", "DEFAULT_NAMESPACE", "NAMESPACE_PREFIX_MAP", "KEY", "QUERY", "UPDATE", "TYPE", "PVARS", "EXP", "NOT_IN", "GROUP_GRAPH_PATTERN", "GROUP_GRAPH_PATTERN_SUB", "GRAPH_GRAPH_PATTERN", "SUB_SELECT", "TRIPLES_BLOCK", "NON_TRIPLES", "TRIPLE", "TRIPLE2", "TRIPLES_SAME_SUBJECT", "GRAPH_NODE", "VAR", "PREFIXED_NAME", "PREFIXED_NS", "FUNCTION", "EXPRESSION", "NOT_EXISTS", "IRI_OR_FUNCTION", "DATASET", "GROUP_BY", "ORDER_BY", "CONDITION", "BIND_VALUES", "STRING", "BOOLEAN", "NUMERIC", "SUBJECT", "PREDICATE", "VALUE", "TRIPLES_NODE_PROPERTY_LIST", "TRIPLES_NODE", "COLLECTION", "PROPERTY_LIST", "PREDICATE_VALUE", "WHERE", "IRI_REF", "LTE", "MODIFIERS", "BIG_INTEGER", "BIG_DECIMAL", "INLINE_DATA", "BASE", "PREFIX", "PNAME_NS", "SELECT", "DISTINCT", "REDUCED", "OPEN_BRACE", "AS", "CLOSE_BRACE", "CONSTRUCT", "WHERE_TOKEN", "OPEN_CURLY_BRACE", "CLOSE_CURLY_BRACE", "DESCRIBE", "ASK", "FROM", "NAMED", "GROUP", "BY", "HAVING", "ORDER", "ASC", "DESC", "LIMIT", "INTEGER", "OFFSET", "BINDINGS", "UNDEF", "SEMICOLON", "LOAD", "SILENT", "INTO", "CLEAR", "DROP", "CREATE", "ADD", "TO", "MOVE", "COPY", "INSERT", "DATA", "DELETE", "WITH", "USING", "DEFAULT", "GRAPH", "ALL", "DOT", "VALUES", "OPTIONAL", "SERVICE", "BIND", "UNION", "MINUS", "FILTER", "COMMA", "OPEN_SQ_BRACKET", "CLOSE_SQ_BRACKET", "VAR1", "VAR2", "LOGICAL_OR", "LOGICAL_AND", "LT", "IN", "NOT", "STR", "LANG", "LANGMATCHES", "DATATYPE", "BOUND", "IRI", "URI", "BNODE", "RAND", "ABS", "CEIL", "FLOOR", "ROUND", "CONCAT", "STRLEN", "UCASE", "LCASE", "ENCODE_FOR_URI", "CONTAINS", "STRSTARTS", "STRENDS", "STRBEFORE", "STRAFTER", "YEAR", "MONTH", "DAY", "HOURS", "MINUTES", "SECONDS", "TIMEZONE", "TZ", "NOW", "UUID", "STRUUID", "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "COALESCE", "IF", "STRLANG", "STRDT", "SAMETERM", "ISIRI", "ISURI", "ISBLANK", "ISLITERAL", "ISNUMERIC", "REGEX", "SUBSTR", "REPLACE", "EXISTS", "COUNT", "SUM", "MIN", "MAX", "AVG", "SAMPLE", "GROUP_CONCAT", "SEPARATOR", "LANGTAG", "DECIMAL", "DOUBLE", "INTEGER_POSITIVE", "DECIMAL_POSITIVE", "DOUBLE_POSITIVE", "INTEGER_NEGATIVE", "DECIMAL_NEGATIVE", "DOUBLE_NEGATIVE", "TRUE", "FALSE", "STRING_LITERAL1", "STRING_LITERAL2", "STRING_LITERAL_LONG1", "STRING_LITERAL_LONG2", "PNAME_LN", "BLANK_NODE_LABEL", "B", "A", "S", "E", "P", "R", "F", "I", "X", "L", "C", "T", "D", "N", "U", "O", "W", "H", "K", "M", "G", "Y", "V", "Z", "UNICODE_ESCAPE", "PN_PREFIX", "PN_LOCAL", "VARNAME", "DIGIT", "HEXDIGIT", "EXPONENT", "ECHAR", "WS", "EOL", "COMMENT", "PN_CHARS_BASE", "PN_CHARS_U", "PN_CHARS", "PLX", "PERCENT", "PN_LOCAL_ESC", "J", "Q", "'*'", "'a'", "'|'", "'/'", "'^'", "'?'", "'+'", "'!'", "'='", "'!='", "'>'", "'>='", "'-'", "'^^'"

@@ -10,6 +10,8 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
+import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
+
 import java.sql.ResultSet;
 
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
@@ -19,8 +21,6 @@ import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.Query;
-
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.*;
 
 public class JazzNewStore {
 	public DB2TestData getJazzStore() {

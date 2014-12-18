@@ -15,7 +15,6 @@ import java.sql.Connection;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.StoreManager;
-import com.ibm.research.rdf.store.jena.RdfStoreException;
 
 public class ShowPredicateColumns extends AbstractRdfCommand
    {

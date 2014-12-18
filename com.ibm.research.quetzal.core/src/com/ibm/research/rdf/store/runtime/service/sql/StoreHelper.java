@@ -33,7 +33,6 @@ import com.ibm.research.proppaths.TemporaryTableSpaceCreation;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.StoreManager;
-import com.ibm.research.rdf.store.cmd.UpdateRdfStoreStats;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.hashing.GraphColoringHashingFamily;
 import com.ibm.research.rdf.store.jena.RdfStoreException;

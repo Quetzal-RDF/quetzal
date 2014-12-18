@@ -25,7 +25,6 @@ import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
-import com.ibm.research.rdf.store.sparql11.planner.PlanNodeType;
 import com.ibm.wala.util.collections.Pair;
 
 public class SubSelectTemplate extends AbstractSelectTemplate {

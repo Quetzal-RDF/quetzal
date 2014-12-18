@@ -27,10 +27,10 @@ import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
+import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
-import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 
 public class QueryInfo {
 

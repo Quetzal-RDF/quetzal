@@ -17,8 +17,8 @@ import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.QueryInfo;
 import com.ibm.research.rdf.store.sparql11.model.OrderCondition;
-import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.OrderCondition.EOrderType;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
 
 public class InsertAndUpdateStatements {
 

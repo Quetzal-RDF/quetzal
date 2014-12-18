@@ -27,7 +27,6 @@ import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
-import com.ibm.research.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.Pair;
 
