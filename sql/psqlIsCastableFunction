@@ -1,0 +1,28 @@
+CREATE OR REPLACE FUNCTION db2inst1.isCastable(var text, xmlSchemaType text) RETURNS boolean AS $$
+DECLARE x BOOLEAN;
+DECLARE y NUMERIC;
+DECLARE z TIMESTAMP WITH TIME ZONE;
+DECLARE m DATE;
+
+BEGIN
+    IF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#boolean' THEN
+	x := var::BOOLEAN;
+    ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#integer' THEN
+	y := var::INTEGER;
+    ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#decimal' THEN
+	y := var::DECIMAL;
+    ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#float' THEN
+	y := var::REAL;
+    ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#double' THEN
+	y := var::DOUBLE PRECISION;
+    ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#dateTime' THEN
+	z := var::TIMESTAMP WITH TIME ZONE;
+    ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#date' THEN
+	m := var::DATE;
+	
+    END IF;
+    RETURN true;
+EXCEPTION WHEN others THEN
+    RETURN false;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;

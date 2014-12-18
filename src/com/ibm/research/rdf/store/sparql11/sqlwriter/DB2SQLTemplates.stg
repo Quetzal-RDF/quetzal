@@ -1,0 +1,250 @@
+
+RDF_IF(expr1, expr2, expr3, type1, type2, type3)  ::= <<  (CASE WHEN <expr1> THEN <expr2> ELSE <expr3> END) >>
+
+RDF_ISBLANK(args)  ::= << 
+ (<args> LIKE '!_:%' ESCAPE '!') 
+>>
+
+
+RDF_ABS(args)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:abs($arg cast as xs:float) return $res' PASSING <args> as "arg") AS VARCHAR(256)) >>
+
+RDF_CEIL(args)  ::= <<  CEIL(<args>) >>
+
+RDF_CONCAT(lexpr, rexpr)  ::= <<  CONCAT(<lexpr>, <rexpr>) >>
+
+RDF_OPERATOR(left, right, operator, left_type, right_type, ltype, rtype)  ::= <<  (<left> <operator> <right>
+<if(left_type)> AND <left_type> = <right_type> <endif>) >>
+
+castsForColumns(column, type) ::= << <column> >>
+
+RDF_FLOOR(args)  ::= <<  FLOOR(<args>) >>
+
+RDF_DAY(args)  ::= <<  DAY(XMLCAST(XMLTEXT(<args>) AS TIMESTAMP)) >>
+
+RDF_HOURS(args)  ::= <<  HOUR(XMLCAST(XMLTEXT(<args>) AS TIMESTAMP)) >>
+
+RDF_MONTH(args)  ::= <<  MONTH(XMLCAST(XMLTEXT(<args>) AS TIMESTAMP)) >>
+
+RDF_YEAR(args)  ::= <<  YEAR(XMLCAST(XMLTEXT(<args>) AS TIMESTAMP)) >>
+
+RDF_MINUTES(args)  ::= <<  MINUTE(XMLCAST(XMLTEXT(<args>) AS TIMESTAMP)) >>
+
+RDF_SECONDS(args)  ::= <<  SECOND(XMLCAST(XMLTEXT(<args>) AS TIMESTAMP)) >>
+
+RDF_TIMEZONE(args)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:timezone-from-dateTime($arg cast as xs:dateTime) return $res' PASSING <args> as "arg") AS VARCHAR(256)) >>
+
+RDF_RAND()  ::= <<  RAND() >>
+
+RDF_REPLACE(var, pat, rep)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:replace($var, $pat, $rep) return $res' PASSING <var> as "var", '<pat>' AS "pat", '<rep>' as "rep") AS VARCHAR(256)) >>
+
+RDF_ROUND(args)  ::= <<  ROUND(<args>) >>
+
+RDF_STRAFTER(var, value)  ::= << 
+  (CASE 
+   WHEN LOCATE('<value>', <var>) IS NOT NULL THEN SUBSTR(<var>, LOCATE('<value>', <var>) + 1) 
+   ELSE ''
+   END)
+>>
+
+
+RDF_NOW()  ::= <<  XMLCAST(XMLQUERY('let $res := fn:current-dateTime() return $res') AS VARCHAR(256)) >>
+
+RDF_TZ(args)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:timezone-from-dateTime($arg cast as xs:dateTime) return $res' PASSING <args> as "arg") AS VARCHAR(256)) >>
+
+RDF_STRBEFORE(var, value)  ::= << 
+  (CASE 
+   WHEN LOCATE('<value>', <var>) IS NOT NULL THEN LEFT(<var>, LENGTH(<var>) - LOCATE('<value>', <var>)) 
+   ELSE ''
+   END)
+>>
+
+
+
+GROUP_CONCAT(var)  ::= << 
+  LISTAGG(<var>, ',') 
+>>
+
+GT_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
+ ( 
+CASE WHEN <ltype> BETWEEN <nrstart> AND <nrend> AND <rtype> BETWEEN <nrstart> AND <nrend> AND CAST(<left> AS DECFLOAT)<operator> CAST(<right> AS DECFLOAT) THEN TRUE
+ 	WHEN <simpleLitMatch> AND <left> <operator> <right> THEN TRUE
+ 	WHEN <ltype> = <tdatetime> AND <rtype> = <tdatetime> AND XMLCAST ( XMLTEXT(<left>) AS TIMESTAMP) <operator> XMLCAST ( XMLTEXT(<right>) AS TIMESTAMP) THEN TRUE
+
+ 	else false end
+) = true
+>>
+
+EQ_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
+ ( 
+CASE WHEN <ltype> BETWEEN <nrstart> AND <nrend> AND <rtype> BETWEEN <nrstart> AND <nrend> AND CAST(<left> AS DECFLOAT) = CAST(<right> AS DECFLOAT) THEN TRUE
+ 	WHEN <simpleLitMatch> AND <left> = <right> THEN TRUE
+ 	WHEN <ltype> = <tdatetime> AND <rtype> = <tdatetime> AND XMLCAST ( XMLTEXT(<left>) AS TIMESTAMP) = XMLCAST ( XMLTEXT(<right>) AS TIMESTAMP) THEN TRUE
+ 	WHEN <ltype> >= 1500 AND <rtype> >= 1500 AND <ltype>=<rtype> AND <left>=<right> THEN TRUE
+	WHEN <ltype> = <tiri> AND <rtype> = <tiri> AND <left>=<right> THEN TRUE
+	WHEN <ltype> = <tbn> AND <rtype> = <tbn> AND <left>=<right> THEN TRUE
+	
+ 	else false end
+) = true
+>>
+
+NEQ_CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, tiri, tbn, simpleLitMatch, operator)  ::= <<  
+ ( 
+CASE WHEN <ltype> BETWEEN <nrstart> AND <nrend> AND <rtype> BETWEEN <nrstart> AND <nrend> AND CAST(<left> AS DECFLOAT) = CAST(<right> AS DECFLOAT) THEN FALSE
+ 	WHEN <simpleLitMatch> AND <left> = <right> THEN FALSE
+ 	WHEN <ltype> = <tdatetime> AND <rtype> = <tdatetime> AND XMLCAST ( XMLTEXT(<left>) AS TIMESTAMP) = XMLCAST ( XMLTEXT(<right>) AS TIMESTAMP) THEN FALSE
+ 	WHEN <ltype> >= 1500 AND <rtype> >= 1500 AND <ltype>=<rtype> AND <left>=<right> THEN FALSE
+ 	WHEN <ltype> = <tiri> AND <rtype> = <tiri> AND <left>=<right> THEN FALSE
+ 	WHEN <ltype> = <tbn> AND <rtype> = <tbn> AND <left>=<right> THEN FALSE
+ 	
+ 	else true end
+) = true
+>>
+
+numeric_expression(left,right,operator)  ::= <<  
+ <left> <operator> <right>
+>>
+
+
+TYPE_CHECK_CASE(left, right, operator, typeTest, typeToCastTo)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then <left> else null end) <operator> <right>) >>
+
+TYPE_CHECK(left, right, operator, typeTest, typeToCastTo)  ::= <<  
+(<typeTest> AND <left> <operator> <right>) >>
+
+RDF_DATATYPE_EXPRESSION(var, returnType, xmlSchemaType)  ::= << 
+(CASE
+    WHEN xmlexists('$x[. castable as <xmlSchemaType>]' passing <var> as "x") THEN '<returnType>'	
+	else
+	  'http://www.w3.org/2001/XMLSchema#string'
+	 end)
+>>
+
+XSD_BOOLEAN_CAST(arg, type, nrstart, nrend, simpleLit, string, boolean)  ::= <<  
+ ( 
+CASE
+    WHEN <arg> = 'true' THEN 'true'
+    WHEN <type> BETWEEN <nrstart> AND <nrend> AND CAST(<arg> AS DECFLOAT) \<\> 0 THEN 'true'
+ 	else null end
+)
+>>
+
+RDF_REGEX(regex_var, regex_pattern, regex_flag, stringTypes)  ::= << 
+(CASE WHEN <if(stringTypes)> (<stringTypes; separator=" OR ">) AND <endif> xmlexists('$x[fn:matches(., "<regex_pattern>", "<regex_flag>")]' passing <regex_var> as "x") then 0 else 1 end = 0)
+>>
+
+RDF_DATATYPE_NUMERIC_EXPRESSION(types)  ::= << 
+max(<types; separator=" , ">)
+>>
+
+outer_aggregate_function_type_check(var, typecheck)  ::= << 
+(CASE WHEN <typecheck; separator=" AND "> THEN <var> ELSE NULL END)
+>>
+
+cast_numeric_projected_variable(var, type) ::= << <var> >>
+
+aggregate_function_with_type_check(function,var, typecheck)  ::= << 
+<function>(CASE WHEN <typecheck> THEN <var> ELSE NULL END)
+>>
+
+RDF_ISNUMERIC(arg)  ::= <<  XMLCAST(XMLQUERY('let $res := fn:number($arg) return $res' PASSING <arg> as "arg") AS VARCHAR(256)) != 'NaN' >>
+
+TYPE_CHECK_WITH_CAST_TIMESTAMP(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then to_timestamp(REPLACE(REPLACE(<left>,'T',' '),'Z',''),'YYYY-MM-DD HH24:MI:SS') else null end) <operator>  
+ to_timestamp(REPLACE(REPLACE(<right>,'T',' '),'Z',''),'YYYY-MM-DD HH24:MI:SS')) 
+>>
+
+TYPE_CHECK_WITH_CAST_DATE(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then to_date(SUBSTR(<left>,1, 10),'YYYY-MM-DD') else null end) <operator>  
+DATE <right>) 
+>>
+
+TYPE_CHECK_WITH_CAST(left, right, cast, operator, typeTest, rhsNeedsCast)  ::= <<  
+(<typeTest>  AND (CASE WHEN <typeTest> then cast(<left> as <cast>) else null end) <operator>  
+<if(rhsNeedsCast)> cast(<right> as <cast>) <endif><right><endif> ) >>
+
+LOCATE(string_var, pattern)  ::= << 
+NOT(LOCATE('<pattern>', <string_var>) = 0)
+>>
+
+XSD_DATETIME_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> xmlexists('$x[. castable as <xmlType>]' passing <value> as "x") THEN TO_TIMESTAMP(REPLACE(REPLACE(<value>, 'T', ' '), 'Z', ''),'YYYY-MM-DD HH24:MI:SS') 
+	else null end
+)
+>>
+
+XSD_DATE_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> xmlexists('$x[. castable as <xmlType>]' passing <value> as "x") THEN TO_DATE(SUBSTR(<value>, 1, 10),'YYYY-MM-DD HH24:MI:SS') 
+	else null end
+)
+>>
+
+XSD_NUMERICS_CAST(typeMatch, value, xmlType, DBType)  ::= <<  
+(
+CASE 
+    WHEN <if(typeMatch)>( <typeMatch; separator=" OR "> )  
+    AND	<endif> xmlexists('$x[. castable as <xmlType>]' passing <value> as "x") THEN XMLCAST(XMLTEXT(<value>) AS <DBType>) 
+	else null end
+)
+>>
+
+LOCATE_LCASE(string_var, pattern)  ::= << 
+NOT(LOCATE(LCASE('<pattern>'), LCASE(<string_var>)) = 0)
+>>
+
+ 
+RDF_OPERATOR_NUM(left, right, operator)  ::= <<  (CAST(<left> AS DECFLOAT) <operator> CAST(<right> AS DECFLOAT)) >>
+
+
+
+RDF_EBV(fterm, ftype, nrstart, nrend, tstring, pstring, tboolean)  ::= <<  
+ (((<ftype> BETWEEN <nrstart> AND <nrend>) AND CAST(<fterm> AS DECFLOAT) \<\> 0) OR
+ ((<ftype> = <tstring> OR <ftype> = <pstring>) AND <fterm> \<\> '') OR 
+ (<ftype> = <tboolean> AND <fterm> = 'true')) 
+>>
+
+
+
+RDF_STRENDS(var, value)  ::= << 
+  (RIGHT(<var>, LENGTH('<value>')) = '<value>' )
+>>
+
+
+
+aggregate_function(function,var)  ::= << 
+ <function>(<var>)
+>>
+
+
+RDF_OPERATOR_DATE(left, right, operator)  ::= <<  (XMLCAST ( XMLTEXT(<left>) AS TIMESTAMP) <operator> XMLCAST ( XMLTEXT(<right>) AS TIMESTAMP)) ) >>
+
+
+CAST_ALL(left, ltype, right, rtype, nrstart, nrend, tstring, tdatetime, operator)  ::= <<  
+ (((<ltype> BETWEEN <nrstart> AND <nrend>) AND (<rtype> BETWEEN <nrstart> AND <nrend>) AND CAST(<left> AS DECFLOAT) <operator> CAST(<right> AS DECFLOAT)) OR
+ (<ltype> \> <tstring> AND <rtype> = <ltype> AND <left> <operator> <right>) OR 
+ (<ltype> = <tdatetime> AND <rtype> = <tdatetime> AND XMLCAST ( XMLTEXT(<left>) AS TIMESTAMP) <operator> XMLCAST ( XMLTEXT(<right>) AS TIMESTAMP)) ) 
+>>
+
+
+
+unary_minus(expression)  ::= << 
+ (0 - <expression>)
+>>
+
+
+
+RDF_XSD_INTEGER (var)  ::= << 
+CASE WHEN xmlexists('$x[. castable as xs:integer]' passing <var> as "x") THEN CAST( <var> AS DECFLOAT ) ELSE NULL END
+>>
+
+
+
+RDF_XSD_INTEGER_DS (type, var)  ::= << 
+CASE WHEN <type> = 'D' THEN CAST( <var> AS DECFLOAT ) ELSE NULL END
+>>
+

@@ -1,0 +1,10 @@
+CREATE OR REPLACE FUNCTION db2inst1.isNumeric(var text) RETURNS boolean AS $$
+DECLARE y NUMERIC;
+
+BEGIN
+	y := var::numeric;
+    RETURN true;
+EXCEPTION WHEN others THEN
+    RETURN false;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;

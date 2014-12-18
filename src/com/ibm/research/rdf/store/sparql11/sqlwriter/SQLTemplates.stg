@@ -1,0 +1,201 @@
+group SQLTemplates;
+
+select_caseclause_primary(triple_number, hashes, predicate_value) ::= <<
+	CASE <hashes:caseclause_when_value(hash=it, value=predicate_value)>
+		ELSE NULL
+	END AS val<triple_number>
+>>
+
+caseclause_when_value(hash, value) ::= <<
+		WHEN T.prop<hash> = '<value>' THEN T.val<hash>
+>>
+
+
+select_all_predicates(varentry, vargraph, varprop, primary_table, columns, graph) ::= <<
+	SELECT T.entry as <varentry>, T.gid as <vargraph>, LT.prop as <varprop>, LT.val as VAL0
+	FROM <primary_table> as T, 
+			TABLE( VALUES <columns:table_values(number=it); seperator=", "> )  AS LT(prop, val) 
+	WHERE (T.gid = <graph>) AND (LT.val IS NOT NULL) 
+>>
+
+tables_values(number) ::= << (prop<number>, val<number>) >>
+
+
+whereclause_primary_entry(operator, value) ::= <<
+ (T.entry <operator> <value>) 
+>>
+
+
+selectclause_secondary(varname) ::= <<
+ (T.<varname> AS <varname>)
+>>
+
+
+whereclause_secondary_value_filter(triple_number, operator, value) ::= <<
+ (T.val<triple_number> = <value> OR S<triple_number>.elem = <value>)
+>>
+
+coalesce(args) ::= << COALESCE(<args;separator=", ">) >>
+
+logical_or_expressions(expressions) ::= <<
+ (<expressions; separator="\n\t OR \n">)
+>>
+
+logical_and_expressions(expressions) ::= <<
+ (<expressions; separator="\n\t AND \n">)
+>>
+
+new_logical_or_expressions(expressions) ::= <<
+ (<expressions:effective_boolean_value(it); separator="\n\t OR \n">)
+>>
+
+new_logical_and_expressions(expressions) ::= <<
+ (<expressions:effective_boolean_value(it); separator="\n\t AND \n">)
+>>
+
+new_effective_boolean_value(expression) ::= <<
+ (RDF_EBV(<expression>) = true)
+>>
+
+relational_expression(left, right, operator) ::= <<
+ CASE WHEN LOCATE('^^', <left>) > 0 THEN SUBSTR(<left>, LOCATE('^^', <left>)) ELSE <left> END
+ 	<operator>
+ CASE WHEN LOCATE('^^', <right>) > 0 THEN SUBSTR(<right>, LOCATE('^^', <right>)) ELSE <right> END
+>>
+
+old2_relational_expression(left, right, udf) ::= <<
+ (<udf>(STRIP(<left>,B,'"'), STRIP(<right>,B,'"')) = true)
+>>
+
+old_relational_expression(left, right, udf) ::= <<
+ (<udf>(<left>, <right>) = true)
+>>
+
+unary_not(expression) ::= <<
+ (NOT (<expression>))
+>>
+
+unary_minus(expression) ::= <<
+ RDF_SUB(0^^http://www.w3.org/2001/XMLSchema#integer - (<expression>))
+>>
+
+unary_expression(operator, expression) ::= <<
+ operator (RDF_EBV(expression) = true)
+>>
+
+
+builtin_function(udf, args) ::= <<
+ <udf>(<args; separator=", ">)
+>>
+
+RDF_REGEX(args) ::= <<
+ (RDF_REGEX(<args; separator=", ">) = 1)
+>>
+
+old_RDF_EQ(left, right) ::= << 
+ ( (<left> = <right>) OR
+   (CASE WHEN LOCATE('^^', <left>) > 0 THEN SUBSTR(<left>, 1, LOCATE('^^', <left>)-1) ELSE <left> END
+ 	  =
+    CASE WHEN LOCATE('^^', <right>) > 0 THEN SUBSTR(<right>, 1, LOCATE('^^', <right>)) ELSE <right> END) )
+>>
+
+RDF_EQ(left, right) ::= << (<left> = <right>) >>
+
+old2_RDF_EQ(left, right) ::= << (RDF_EQ(<left>, <right>) = true) >>
+
+RDF_NE(left, right) ::= << (RDF_NE(<left>, <right>) = true) >>
+
+RDF_LT(left, right) ::= << (RDF_LT(<left>, <right>) = true) >>
+
+RDF_GT(left, right) ::= << (RDF_GT(<left>, <right>) = true) >>
+
+RDF_LE(left, right) ::= << (RDF_LE(<left>, <right>) = true) >>
+
+RDF_GE(left, right) ::= << (RDF_GE(<left>, <right>) = true) >>
+
+
+new_RDF_STR(args) ::= << 
+CASE WHEN LOCATE('^^', <args>) > 0 THEN '"'||SUBSTR(<args>, LOCATE('^^', <args>))||'"' 
+     WHEN LOCATE('@', <args>) > 0 THEN '"'||SUBSTR(<args>, LOCATE('@', <args>))||'"' 
+     ELSE <args> END 
+>>
+
+old_RDF_STR(args) ::= <<
+ RDF_STR(<args; separator=", ">)
+>>
+
+RDF_STR(args) ::= << <args> >>
+
+RDF_DATATYPE(args) ::= <<
+ RDF_DATATYPE(<args; separator=", ">)
+>>
+
+RDF_LANG(args) ::= <<
+ RDF_LANG(<args; separator=", ">)
+>>
+
+RDF_LANGMATCHES(args) ::= <<
+ (RDF_LANGMATCHES(<args; separator=", ">) = true)
+>>
+
+RDF_ISBLANK(args) ::= <<
+ (<args> LIKE '!_:%' ESCAPE '!') 
+>>
+
+RDF_ISURI(args) ::= <<
+ (RDF_ISURI(<args; separator=", ">) = 1)
+>>
+
+RDF_ISIRI(args) ::= <<
+ (RDF_ISIRI(<args; separator=", ">) = 1)
+>>
+
+RDF_BOUND(args) ::= <<
+ (<args> IS NOT NULL)
+>>
+
+RDF_SAMETERM(args) ::= <<
+ (<args;separator=" = ">)
+>>
+
+RDF_EBV(arg) ::= << 
+ (RDF_EBV(<arg>) = true) 
+>>
+
+RDF_STRSTARTS(var, value, long_strings_table) ::= <<
+ <var> LIKE '<value>%' OR <var> LIKE '"<value>%'  
+>>
+
+RDF_STRSTARTS_LS(var, value, long_strings_table) ::= <<
+ <var> LIKE '<value>%' OR <var> LIKE '"<value>%' 
+ OR IN (SELECT short_string FROM <long_strings_table> WHERE long_string LIKE '<value>%' OR LIKE '"<value>%') 
+>>
+
+RDF_STRENDS(var, value) ::= <<
+ <var> LIKE '%<value>' OR <var> LIKE '%<value>"' 
+>>
+
+RDF_STRENDS_LS(var, value) ::= <<
+ <var> LIKE '%<value>' OR <var> LIKE '%<value>"' 
+ OR IN (SELECT short_string FROM <long_strings_table> WHERE long_string LIKE '%<value>' OR LIKE '%<value>"')
+>>
+
+boolean_function(udf, args) ::= <<
+ <udf>(<args; separator=", ">)
+>>
+
+function(function, args) ::= <<
+ <function>(<args; separator=", ">)
+>>
+
+predicate_list(props) ::= <<
+	<props; separator="\n\t AND \n">
+>>
+
+
+predicate_columns(num, value) ::= <<
+	( <num:predicate_value(num=it, value=value); separator=" OR "> )
+>>
+
+predicate_value(num, value) ::= << PROP<num> = '<value>' >>
+

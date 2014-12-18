@@ -1,0 +1,84 @@
+CREATE OR REPLACE PROCEDURE  GENPROC1(IN STMT1 VARCHAR(10240), IN STMT2 VARCHAR(10240), IN STMT2Prime VARCHAR(10240), IN STMT3 VARCHAR(10240), IN MAXLEVEL INTEGER DEFAULT 1)  
+DYNAMIC RESULT SETS 1
+LANGUAGE SQL
+BEGIN 
+   DECLARE RCNT INTEGER;
+   DECLARE level INTEGER;
+   DECLARE var VARCHAR(10240);
+   DECLARE deltatable VARCHAR(100);
+   DECLARE olddeltatable VARCHAR(100);
+   DECLARE sndStmt  VARCHAR(10240);
+   DECLARE oldSndStmt  VARCHAR(10240);
+  
+   DECLARE INSERTSTMT VARCHAR(1000);
+   DECLARE DELETESTMT VARCHAR(1000);
+  
+   DECLARE C1 CURSOR WITH RETURN FOR S1;
+
+   -- initialization 
+   DECLARE GLOBAL TEMPORARY TABLE SESSION.TEMP(VAL BIGINT) IN USERTEMP1 ON COMMIT DELETE ROWS WITH REPLACE NOT LOGGED;
+   
+   DECLARE GLOBAL TEMPORARY TABLE SESSION.DELTAT(VAL BIGINT) IN USERTEMP1 ON COMMIT DELETE ROWS WITH REPLACE NOT LOGGED;
+    
+   DECLARE GLOBAL TEMPORARY TABLE SESSION.OLDDELTAT(VAL BIGINT) IN USERTEMP1 ON COMMIT DELETE ROWS WITH REPLACE NOT LOGGED;
+   
+   EXECUTE IMMEDIATE STMT1;
+   GET DIAGNOSTICS RCNT = ROW_COUNT;	
+     
+   INSERT INTO session.temp 
+   select * from session.deltat;
+   
+   SET level = 1;
+   SET deltatable = 'SESSION.DELTAT';
+   SET olddeltatable = 'SESSION.OLDDELTAT';
+   SET sndStmt = STMT2;
+   SET oldSndStmt = STMT2Prime;
+   
+   
+   -- end initialization 
+ 
+   -- iteration to fix point   
+   WHILE (RCNT > 0   AND (MAXLEVEL < 0 OR  level <= MAXLEVEL) ) DO 
+   		  		
+   		
+   		-- switch olddeltat and deltat
+   		SET var = olddeltatable;
+   		SET olddeltatable = deltatable;
+   		SET deltatable = var;
+   		
+   		-- switch sndStmt and oldSndStmt
+   		 SET var = oldSndStmt;
+   		 SET oldSndStmt = sndStmt;
+   		 SET sndStmt = var;
+   		 --
+   		
+   		-- delete delta
+   		SET DELETESTMT = 'DELETE FROM ' || deltatable;
+   		EXECUTE IMMEDIATE DELETESTMT;
+   		--
+        
+        -- update stats
+        CALL SYSPROC.ADMIN_CMD('RUNSTATS ON TABLE SESSION.TEMP ') ; 
+        
+        IF olddeltatable = 'SESSION.DELTAT' THEN 
+      	  CALL SYSPROC.ADMIN_CMD('RUNSTATS ON TABLE SESSION.DELTAT ') ; 
+      	ELSE 
+      	  CALL SYSPROC.ADMIN_CMD('RUNSTATS ON TABLE SESSION.OLDDELTAT ') ; 
+      	END IF;
+        --
+	    
+	    -- recompute delta
+	  	EXECUTE IMMEDIATE sndStmt;
+	 	GET DIAGNOSTICS RCNT = ROW_COUNT;
+	 	--	   		
+   		SET level = level + 1;
+   		
+   		SET INSERTSTMT = 'INSERT INTO session.temp select * from ' || deltatable;
+   		EXECUTE IMMEDIATE INSERTSTMT;
+   		
+   END WHILE; 
+   -- end iteration to fix point
+  
+   PREPARE S1 FROM STMT3;
+   OPEN C1;
+END

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jena-arq-2.11.0.jar" sourcepath="/Users/ksrinivs/Downloads/jena-2.12.1"/>
+	<classpathentry exported="true" kind="lib" path="lib/icu4j-3.4.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pdq.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/db2jcc4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit-4.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.6.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.6.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1-0-3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jena-core-2.11.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jena-iri-1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xercesImpl-2.7.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-dbutils-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/owlapi-distribution-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/parser.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/wala.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/antlr-3.3-complete.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsqlparser-0.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hive-exec-0.11.0-shark-0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hive-jdbc-0.11.0-shark-0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hive-metastore-0.11.0-shark-0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hive-service-0.11.0-shark-0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hive-shims-0.11.0-shark-0.9.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/libthrift-0.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hadoop-common-2.2.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/hash.jar" sourcepath="/Hash"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry exported="true" kind="lib" path="lib/postgresql-9.3-1102.jdbc41.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

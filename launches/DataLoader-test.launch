@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/rdfstore-base-string/src/com/ibm/rdf/store/utilities/DataLoader.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.rdf.store.utilities.DataLoader"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-files rdf_data/sortedSinglegraph -build_stats true -hash folding -db RDFWN -user db2inst4 -prefixes rdf_data/prefixes -output schema_files -sorted true -all_graphs_subj rdf_data/wn1_s_subj.nt -all_graphs_obj rdf_data/wn1_s_obj.nt"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-base-string"/>
+</launchConfiguration>

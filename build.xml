@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="sparqltosqlbase">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../../../Applications/eclipse"/>
+    <property name="DawgTests.location" value="../DawgTests"/>
+    <property name="JenaTest.location" value="../JenaTest"/>
+    <property name="project_loc:rdfstore-data" value="../rdfstore-data"/>
+    <property name="junit.output.dir" value="junit"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <path id="JUnit 3.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+    </path>
+    <path id="sparqltosqlbase.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/log4j.jar"/>
+        <pathelement location="lib/jena-arq-2.11.0.jar"/>
+        <pathelement location="lib/icu4j-3.4.4.jar"/>
+        <pathelement location="lib/pdq.jar"/>
+        <pathelement location="lib/db2jcc4.jar"/>
+        <pathelement location="lib/junit-4.10.jar"/>
+        <pathelement location="lib/slf4j-api-1.6.4.jar"/>
+        <pathelement location="lib/slf4j-log4j12-1.6.4.jar"/>
+        <pathelement location="lib/commons-logging-1-0-3.jar"/>
+        <pathelement location="lib/commons-cli-1.2.jar"/>
+        <pathelement location="lib/jena-core-2.11.0.jar"/>
+        <pathelement location="lib/jena-iri-1.0.0.jar"/>
+	    <pathelement location="lib/postgresql-9.3-1102.jdbc41.jar"/>
+        <pathelement location="lib/xercesImpl-2.7.1.jar"/>
+        <pathelement location="lib/commons-dbutils-1.5.jar"/>
+        <pathelement location="lib/owlapi-distribution-3.4.5.jar"/>
+        <pathelement location="lib/parser.jar"/>
+        <pathelement location="lib/wala.jar"/>
+        <pathelement location="lib/antlr-3.3-complete.jar"/>
+        <pathelement location="lib/jsqlparser-0.9.jar"/>
+        <pathelement location="lib/hive-exec-0.11.0-shark-0.9.1.jar"/>
+        <pathelement location="lib/hive-jdbc-0.11.0-shark-0.9.1.jar"/>
+        <pathelement location="lib/hive-metastore-0.11.0-shark-0.9.1.jar"/>
+        <pathelement location="lib/hive-service-0.11.0-shark-0.9.1.jar"/>
+        <pathelement location="lib/hive-shims-0.11.0-shark-0.9.1.jar"/>
+        <pathelement location="lib/libthrift-0.9.0.jar"/>
+        <pathelement location="lib/hadoop-common-2.2.0.jar"/>
+        <pathelement location="lib/hash.jar"/>
+        <path refid="JUnit 3.libraryclasspath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="test">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <src path="test"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${DawgTests.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${DawgTests.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${JenaTest.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${JenaTest.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="ColoringFunction">
+        <java classname="com.ibm.rdf.store.hashing.ColoringFunction" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx4G"/>
+            <arg line="/tmp/basekb.nt.sorted_obj.edge_sets"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </java>
+    </target>
+    <target name="DB2Freebase">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.FreebaseQueryUtilityTest.DB2Freebase" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="DB2LUBM100KHelix1">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DB2LUBM100KHelix1" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="DB2LUBM100MHelix1">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.DB2LUBM100MHelix1" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="PSQLLUBM100MHelix1">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.PSQLLUBM100MHelix1" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="PSQLLUBM100MSL">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest.PSQLLUBM100MSL" todir="${junit.output.dir}"/>
+            <jvmarg line="-ea -Xmx2G -Drdfstore_data=${project_loc:rdfstore-data}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="DockerPostgresqlLUBM">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes">
+        	<formatter type="xml"/>
+            <formatter type="plain" usefile="false"/>
+            <test name="com.ibm.rdf.store.sparql11.LUBMQueryUtilityTest$DockerPostgresql" todir="${junit.output.dir}"/>
+            <classpath refid="sparqltosqlbase.classpath"/>
+        </junit>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>

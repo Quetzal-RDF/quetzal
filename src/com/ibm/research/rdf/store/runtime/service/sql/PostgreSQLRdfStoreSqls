@@ -1,0 +1,230 @@
+entry_id_seq = CREATE SEQUENCE %s_entry_id_seq INCREMENT BY 1 START WITH 1 NO CYCLE
+
+storeCfgTable = CREATE TABLE %s ( \
+	entry_ID BIGINT DEFAULT nextval('%s_entry_id_seq'),  \
+	storeName VARCHAR(127) NOT NULL, \
+	version integer NOT NULL, \
+	directPrimary VARCHAR(127) NOT NULL, \
+	dPrimarySize INTEGER NOT NULL, \
+	directSecondary VARCHAR(127) NOT NULL, \
+	reversePrimary VARCHAR(127) NOT NULL, \
+	rPrimarySize INTEGER NOT NULL, \
+	reverseSecondary VARCHAR(127) NOT NULL, \
+	longStrings VARCHAR(127) NOT NULL, \
+	maxStringLen INTEGER NOT NULL, \
+	gidMaxStringLen INTEGER NOT NULL, \
+	hasLongStrings INTEGER DEFAULT 0, \
+	basicStatsTable VARCHAR(127) NOT NULL , \
+	topKStatsTable VARCHAR(127) NOT NULL , \
+	lastStatsUpdated TIMESTAMP, \
+	predicateMappings TEXT, \
+	systemPredicateTable VARCHAR(127), \
+	status INTEGER NOT NULL, \
+	dataTypeTable VARCHAR(127) NOT NULL, \
+	hasSpills INTEGER DEFAULT 0)
+	
+getDataset = SELECT * from %s WHERE upper(storeName) = ? and status = 0
+
+defaultDataset = INSERT INTO %s( storeName, version, \
+	directPrimary, dPrimarySize, directSecondary, \
+	reversePrimary, rPrimarySize, reverseSecondary, \
+	longStrings, maxStringLen, gidMaxStringLen, \
+	basicStatsTable, topKStatsTable, predicateMappings, \
+	systemPredicateTable, dataTypeTable, status) \
+	values( ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	
+sysPredEntries = INSERT INTO %s (entry_ID, colName, mapName) \
+	values (?, ?, ?)
+
+defaultPrimarys = CREATE TABLE %s( \
+	entry VARCHAR(118) NOT NULL, gid VARCHAR(118) NOT NULL, spill INTEGER DEFAULT 0, \
+	prop0 VARCHAR(118), val0  VARCHAR(118), typ0 smallint ,  prop1 VARCHAR(118), val1  VARCHAR(118), typ1 smallint , \
+	 prop2 VARCHAR(118), val2  VARCHAR(118), typ2 smallint ,  prop3 VARCHAR(118), val3  VARCHAR(118), typ3 smallint ,  prop4 VARCHAR(118), val4  VARCHAR(118), typ4 smallint , \
+	 prop5 VARCHAR(118), val5  VARCHAR(118), typ5 smallint ,  prop6 VARCHAR(118), val6  VARCHAR(118), typ6 smallint ,  prop7 VARCHAR(118), val7  VARCHAR(118), typ7 smallint , \
+	 prop8 VARCHAR(118), val8  VARCHAR(118), typ8 smallint ,  prop9 VARCHAR(118), val9  VARCHAR(118), typ9 smallint ,  prop10 VARCHAR(118), val10  VARCHAR(118), typ10 smallint , \
+	 prop11 VARCHAR(118), val11  VARCHAR(118), typ11 smallint ,  prop12 VARCHAR(118), val12  VARCHAR(118), typ12 smallint ,  prop13 VARCHAR(118), val13  VARCHAR(118), typ13 smallint , \
+	 prop14 VARCHAR(118), val14  VARCHAR(118), typ14 smallint ,  prop15 VARCHAR(118), val15  VARCHAR(118), typ15 smallint ,  prop16 VARCHAR(118), val16  VARCHAR(118), typ16 smallint , \
+	 prop17 VARCHAR(118), val17  VARCHAR(118), typ17 smallint ,  prop18 VARCHAR(118), val18  VARCHAR(118), typ18 smallint ,  prop19 VARCHAR(118), val19  VARCHAR(118), typ19 smallint , \
+	 prop20 VARCHAR(118), val20  VARCHAR(118), typ20 smallint ,  prop21 VARCHAR(118), val21  VARCHAR(118), typ21 smallint ,  prop22 VARCHAR(118), val22  VARCHAR(118), typ22 smallint , \
+	 prop23 VARCHAR(118), val23  VARCHAR(118), typ23 smallint ,  prop24 VARCHAR(118), val24  VARCHAR(118), typ24 smallint ,  prop25 VARCHAR(118), val25  VARCHAR(118), typ25 smallint , \
+	 prop26 VARCHAR(118), val26  VARCHAR(118), typ26 smallint ,  prop27 VARCHAR(118), val27  VARCHAR(118), typ27 smallint ,  prop28 VARCHAR(118), val28  VARCHAR(118), typ28 smallint , \
+	 prop29 VARCHAR(118), val29  VARCHAR(118), typ29 smallint ,  prop30 VARCHAR(118), val30  VARCHAR(118), typ30 smallint ,  prop31 VARCHAR(118), val31  VARCHAR(118), typ31 smallint , \
+	 prop32 VARCHAR(118), val32  VARCHAR(118), typ32 smallint ,  prop33 VARCHAR(118), val33  VARCHAR(118), typ33 smallint ,  prop34 VARCHAR(118), val34  VARCHAR(118), typ34 smallint , \
+	 prop35 VARCHAR(118), val35  VARCHAR(118), typ35 smallint ,  prop36 VARCHAR(118), val36  VARCHAR(118), typ36 smallint ,  prop37 VARCHAR(118), val37  VARCHAR(118), typ37 smallint , \
+	 prop38 VARCHAR(118), val38  VARCHAR(118), typ38 smallint ,  prop39 VARCHAR(118), val39  VARCHAR(118), typ39 smallint ,  prop40 VARCHAR(118), val40  VARCHAR(118), typ40 smallint , \
+	 prop41 VARCHAR(118), val41  VARCHAR(118), typ41 smallint ,  prop42 VARCHAR(118), val42  VARCHAR(118), typ42 smallint ,  prop43 VARCHAR(118), val43  VARCHAR(118), typ43 smallint , \
+	 prop44 VARCHAR(118), val44  VARCHAR(118), typ44 smallint ,  prop45 VARCHAR(118), val45  VARCHAR(118), typ45 smallint ,  prop46 VARCHAR(118), val46  VARCHAR(118), typ46 smallint , \
+	 prop47 VARCHAR(118), val47  VARCHAR(118), typ47 smallint ,  prop48 VARCHAR(118), val48  VARCHAR(118), typ48 smallint ,  prop49 VARCHAR(118), val49  VARCHAR(118), typ49 smallint , \
+	 prop50 VARCHAR(118), val50  VARCHAR(118), typ50 smallint ,  prop51 VARCHAR(118), val51  VARCHAR(118), typ51 smallint ,  prop52 VARCHAR(118), val52  VARCHAR(118), typ52 smallint , \
+	 prop53 VARCHAR(118), val53  VARCHAR(118), typ53 smallint ,  prop54 VARCHAR(118), val54  VARCHAR(118), typ54 smallint ,  prop55 VARCHAR(118), val55  VARCHAR(118), typ55 smallint , \
+	 prop56 VARCHAR(118), val56  VARCHAR(118), typ56 smallint ,  prop57 VARCHAR(118), val57  VARCHAR(118), typ57 smallint ,  prop58 VARCHAR(118), val58  VARCHAR(118), typ58 smallint , \
+	 prop59 VARCHAR(118), val59  VARCHAR(118), typ59 smallint ,  prop60 VARCHAR(118), val60  VARCHAR(118), typ60 smallint ,  prop61 VARCHAR(118), val61  VARCHAR(118), typ61 smallint , \
+	 prop62 VARCHAR(118), val62  VARCHAR(118), typ62 smallint ,  prop63 VARCHAR(118), val63  VARCHAR(118), typ63 smallint ,  prop64 VARCHAR(118), val64  VARCHAR(118), typ64 smallint , \
+	 prop65 VARCHAR(118), val65  VARCHAR(118), typ65 smallint ,  prop66 VARCHAR(118), val66  VARCHAR(118), typ66 smallint ,  prop67 VARCHAR(118), val67  VARCHAR(118), typ67 smallint , \
+	 prop68 VARCHAR(118), val68  VARCHAR(118), typ68 smallint ,  prop69 VARCHAR(118), val69  VARCHAR(118), typ69 smallint ,  prop70 VARCHAR(118), val70  VARCHAR(118), typ70 smallint , \
+	 prop71 VARCHAR(118), val71  VARCHAR(118), typ71 smallint ,  prop72 VARCHAR(118), val72  VARCHAR(118), typ72 smallint ,  prop73 VARCHAR(118), val73  VARCHAR(118), typ73 smallint , \
+	 prop74 VARCHAR(118), val74  VARCHAR(118), typ74 smallint ,  prop75 VARCHAR(118), val75  VARCHAR(118), typ75 smallint ,  prop76 VARCHAR(118), val76  VARCHAR(118), typ76 smallint , \
+	 prop77 VARCHAR(118), val77  VARCHAR(118), typ77 smallint ,  prop78 VARCHAR(118), val78  VARCHAR(118), typ78 smallint ,  prop79 VARCHAR(118), val79  VARCHAR(118), typ79 smallint , \
+	 prop80 VARCHAR(118), val80  VARCHAR(118), typ80 smallint ,  prop81 VARCHAR(118), val81  VARCHAR(118), typ81 smallint ,  prop82 VARCHAR(118), val82  VARCHAR(118), typ82 smallint , \
+	 prop83 VARCHAR(118), val83  VARCHAR(118), typ83 smallint ,  prop84 VARCHAR(118), val84  VARCHAR(118), typ84 smallint ,  prop85 VARCHAR(118), val85  VARCHAR(118), typ85 smallint , \
+	 prop86 VARCHAR(118), val86  VARCHAR(118), typ86 smallint ,  prop87 VARCHAR(118), val87  VARCHAR(118), typ87 smallint ,  prop88 VARCHAR(118), val88  VARCHAR(118), typ88 smallint , \
+	 prop89 VARCHAR(118), val89  VARCHAR(118), typ89 smallint ,  prop90 VARCHAR(118), val90  VARCHAR(118), typ90 smallint ,  prop91 VARCHAR(118), val91  VARCHAR(118), typ91 smallint , \
+	 prop92 VARCHAR(118), val92  VARCHAR(118), typ92 smallint ,  prop93 VARCHAR(118), val93  VARCHAR(118), typ93 smallint ,  prop94 VARCHAR(118), val94  VARCHAR(118), typ94 smallint , \
+	 prop95 VARCHAR(118), val95  VARCHAR(118), typ95 smallint ,  prop96 VARCHAR(118), val96  VARCHAR(118), typ96 smallint ,  prop97 VARCHAR(118), val97  VARCHAR(118), typ97 smallint , \
+	 prop98 VARCHAR(118), val98  VARCHAR(118), typ98 smallint ,  prop99 VARCHAR(118), val99  VARCHAR(118), typ99 smallint ,  prop100 VARCHAR(118), val100  VARCHAR(118), typ100 smallint , \
+	 prop101 VARCHAR(118), val101  VARCHAR(118), typ101 smallint ,  prop102 VARCHAR(118), val102  VARCHAR(118), typ102 smallint ,  prop103 VARCHAR(118), val103  VARCHAR(118), typ103 smallint , \
+	 prop104 VARCHAR(118), val104  VARCHAR(118), typ104 smallint ,  prop105 VARCHAR(118), val105  VARCHAR(118), typ105 smallint ,  prop106 VARCHAR(118), val106  VARCHAR(118), typ106 smallint , \
+	 prop107 VARCHAR(118), val107  VARCHAR(118), typ107 smallint ,  prop108 VARCHAR(118), val108  VARCHAR(118), typ108 smallint ,  prop109 VARCHAR(118), val109  VARCHAR(118), typ109 smallint , \
+	 prop110 VARCHAR(118), val110  VARCHAR(118), typ110 smallint ,  prop111 VARCHAR(118), val111  VARCHAR(118), typ111 smallint ,  prop112 VARCHAR(118), val112  VARCHAR(118), typ112 smallint , \
+	 prop113 VARCHAR(118), val113  VARCHAR(118), typ113 smallint ,  prop114 VARCHAR(118), val114  VARCHAR(118), typ114 smallint ,  prop115 VARCHAR(118), val115  VARCHAR(118), typ115 smallint , \
+	 prop116 VARCHAR(118), val116  VARCHAR(118), typ116 smallint ,  prop117 VARCHAR(118), val117  VARCHAR(118), typ117 smallint ,  prop118 VARCHAR(118), val118  VARCHAR(118), typ118 smallint , \
+	 prop119 VARCHAR(118), val119  VARCHAR(118), typ119 smallint ,  prop120 VARCHAR(118), val120  VARCHAR(118), typ120 smallint ,  prop121 VARCHAR(118), val121  VARCHAR(118), typ121 smallint , \
+	 prop122 VARCHAR(118), val122  VARCHAR(118), typ122 smallint ,  prop123 VARCHAR(118), val123  VARCHAR(118), typ123 smallint ,  prop124 VARCHAR(118), val124  VARCHAR(118), typ124 smallint , \
+	 prop125 VARCHAR(118), val125  VARCHAR(118), typ125 smallint ,  prop126 VARCHAR(118), val126  VARCHAR(118), typ126 smallint ,  prop127 VARCHAR(118), val127  VARCHAR(118), typ127 smallint) 
+	
+indexPG = CREATE INDEX idx_gid_%s   ON %s(gid)  
+
+indexPE = CREATE INDEX idx_entry_%s ON %s(entry)
+
+indexRphNumerics = CREATE INDEX idx_numentry_%s ON %s(numentry)
+
+indexRphDatetime = CREATE INDEX idx_dtentry_%s ON %s(dtentry)
+
+indexRphTyp = CREATE INDEX idx_typ_%s ON %s(typ)
+
+defaultDirectSecondary = CREATE TABLE %s( \
+	gID VARCHAR(118) NOT NULL, list_id VARCHAR(36) NOT NULL, elem VARCHAR(118), \
+	typ smallint NOT NULL, 	ENTITY VARCHAR(118), PROP VARCHAR(118), \
+	sqltyp char(1))
+	
+defaultReverseSecondary = CREATE TABLE %s( \
+	gID VARCHAR(118) NOT NULL, list_id VARCHAR(36) NOT NULL, elem VARCHAR(118), \
+	ENTITY VARCHAR(118), TYP SMALLINT, PROP VARCHAR(118))
+	
+indexRS = CREATE UNIQUE INDEX lid_gid_%s ON %s(list_id,gid,  elem)
+indexLidElemDS = CREATE UNIQUE INDEX lid_elem_typ_%s ON %s(list_id, elem, typ)
+indexLidElemRS = CREATE UNIQUE INDEX lid_elem_%s ON %s(list_id, elem)
+indexDS = CREATE UNIQUE INDEX lid_gid_%s ON %s(list_id, gid, elem, typ)
+
+defaultLongStrings = CREATE TABLE %s ( \
+	short_string VARCHAR (34) NOT NULL, \
+        long_string TEXT, typ SMALLINT NOT NULL, \
+	PRIMARY KEY(short_string,typ))
+
+indexLS = CREATE UNIQUE INDEX lstr_%s ON %s(short_string, typ)
+
+basicStats = CREATE TABLE %s(TYPE VARCHAR(50), AVG DOUBLE PRECISION, STDDEV DOUBLE PRECISION, \
+	MIN INTEGER, MAX INTEGER )
+	
+topKStats = CREATE TABLE %s(TYPE VARCHAR(50), GRAPH VARCHAR(120), \
+	SUBJECT VARCHAR(120), PREDICATE VARCHAR(120), OBJECT VARCHAR(120), \
+	CNT INTEGER )
+	
+insertBasicStats = INSERT INTO %s(TYPE, AVG) VALUES(?,?)
+
+distinctCountQuery = SELECT COUNT(DISTINCT %type) AS COUNT FROM %table
+	
+insertTopK = INSERT INTO %s(%c , CNT)
+ 
+getBasicStats = SELECT TYPE, AVG, STDDEV, MIN, MAX FROM %s order by type
+getTopKStats = SELECT TYPE, GRAPH, SUBJECT, PREDICATE, OBJECT, CNT FROM %s order by type
+updateStatsTS = UPDATE %s set lastStatsUpdated = current timestamp
+
+optimizedDataset = INSERT INTO %s( storeName, version, \
+	directPrimary, dPrimarySize, directSecondary, \
+	reversePrimary,rPrimarySize,reverseSecondary, \
+	longStrings, maxStringLen, gidMaxStringLen,basicStatsTable,topKStatsTable, predicateMappings, systemPredicateTable, status, dataTypeTable) \
+	values( ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
+	
+defaultReversePrimary = CREATE TABLE %s( \
+	entry VARCHAR(118) NOT NULL, numentry DOUBLE PRECISION , dtentry TIMESTAMP , typ SMALLINT NOT NULL, gid VARCHAR(118) NOT NULL, spill INTEGER DEFAULT 0, \
+	prop0 VARCHAR(118), val0  VARCHAR(118), prop1 VARCHAR(118), val1  VARCHAR(118), prop2 VARCHAR(118), val2  VARCHAR(118),  \
+	prop3 VARCHAR(118), val3  VARCHAR(118), prop4 VARCHAR(118), val4  VARCHAR(118), prop5 VARCHAR(118), val5  VARCHAR(118),  \
+	prop6 VARCHAR(118), val6  VARCHAR(118), prop7 VARCHAR(118), val7  VARCHAR(118), prop8 VARCHAR(118), val8  VARCHAR(118),  \
+	prop9 VARCHAR(118), val9  VARCHAR(118), prop10 VARCHAR(118), val10  VARCHAR(118), prop11 VARCHAR(118), val11  VARCHAR(118),  \
+	prop12 VARCHAR(118), val12  VARCHAR(118), prop13 VARCHAR(118), val13  VARCHAR(118), prop14 VARCHAR(118), val14  VARCHAR(118),  \
+	prop15 VARCHAR(118), val15  VARCHAR(118), prop16 VARCHAR(118), val16  VARCHAR(118), prop17 VARCHAR(118), val17  VARCHAR(118), \
+	prop18 VARCHAR(118), val18  VARCHAR(118), prop19 VARCHAR(118), val19  VARCHAR(118), prop20 VARCHAR(118), val20  VARCHAR(118), \
+	prop21 VARCHAR(118), val21  VARCHAR(118), prop22 VARCHAR(118), val22  VARCHAR(118), prop23 VARCHAR(118), val23  VARCHAR(118), \
+	prop24 VARCHAR(118), val24  VARCHAR(118), prop25 VARCHAR(118), val25  VARCHAR(118), prop26 VARCHAR(118), val26  VARCHAR(118), \
+	prop27 VARCHAR(118), val27  VARCHAR(118), prop28 VARCHAR(118), val28  VARCHAR(118), prop29 VARCHAR(118), val29  VARCHAR(118), \
+	prop30 VARCHAR(118), val30  VARCHAR(118), prop31 VARCHAR(118), val31  VARCHAR(118), prop32 VARCHAR(118), val32  VARCHAR(118))
+	
+storeSwitchForward = UPDATE %s SET status=status-1
+storeSwitchRollback = UPDATE %s SET status=status+1
+getDatasetForStatus = SELECT * from %s WHERE upper(storeName) = ? and status = ?
+
+defaultPredInfoTable = CREATE TABLE %s_preds ( \
+    pred VARCHAR(116) NOT NULL UNIQUE, \
+    PRIMARY KEY(pred), \
+    onetoone smallint not null, \
+    spills smallint not null, \
+    num_hashes smallint not null, \
+    hash0 smallint not null, \
+    hash1 smallint, \
+    hash2 smallint, \
+    hash3 smallint, \
+    db2type varchar(25) not null)
+    
+defaultDataTypeTable = CREATE TABLE %s ( \
+	datatype_id SMALLINT NOT NULL UNIQUE, datatype_name VARCHAR(128) NOT NULL UNIQUE, \
+	PRIMARY KEY(datatype_id, datatype_name))
+	
+defaultDataTypeEntry = INSERT INTO %s (\
+	datatype_id, datatype_name) \
+	VALUES(?, ?)
+	
+defaultDataTypeSequence = CREATE SEQUENCE %s_type_seq START WITH 1500 \
+	INCREMENT BY 1 \
+	MAXVALUE 9999 \
+	CYCLE \
+	CACHE 10
+	
+defaultDataLangSequence = CREATE SEQUENCE %s_lang_seq START WITH 10600 \
+	INCREMENT BY 1 \
+	MAXVALUE 12000 \
+	CYCLE \
+	CACHE 10
+
+detailStats = ALTER TABLE %s.%t ALTER %s SET STATISTICS 5000
+
+dphRphRunStats = VACUUM VERBOSE ANALYZE %s.%t
+
+dsRsLsRunStats = VACUUM VERBOSE ANALYZE %s.%t 
+
+setAutoStats = UPDATE DB CONFIG USING AUTO_MAINT ON AUTO_TBL_MAINT ON AUTO_RUNSTATS ON
+
+sysPredIndices = CREATE INDEX idx_syspred_%s ON %t(%c)
+
+tablespaceQuery = select TBSPACE from SYSCAT.TABLES where TABNAME = '%s'
+
+typeofFuntion = CREATE OR REPLACE FUNCTION typeof(lit varchar(200)) RETURNS CHAR(1) AS $$ \
+ DECLARE v FLOAT; \
+         d TIMESTAMP; \
+BEGIN \
+        BEGIN \
+                BEGIN \
+                v := lit::float; \
+                EXCEPTION WHEN OTHERS THEN \
+                        BEGIN \
+                        d := lit::timestamp; \
+                        EXCEPTION WHEN OTHERS THEN \
+                                BEGIN \
+                                RETURN 'V'; \
+                                END; \
+                        END; \
+                        RETURN 'T'; \
+                END; \
+                RETURN 'D'; \
+        END; \
+END; \
+$$ LANGUAGE plpgsql;
+
+triggerFunction = CREATE OR REPLACE FUNCTION typeof_insert() RETURNS trigger AS $$ \
+BEGIN \
+	NEW.sqltyp := typeof(NEW.elem); \
+	RETURN NEW; \
+END; \
+$$ LANGUAGE plpgsql;
+
+typeofTrigger = CREATE TRIGGER typeof_trigger BEFORE INSERT OR UPDATE ON %s FOR EACH ROW EXECUTE PROCEDURE typeof_insert();

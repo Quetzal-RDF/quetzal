@@ -1,0 +1,34 @@
+<project name="com.ibm.rdf.store" default="tree_grammar" basedir="src/com/ibm/rdf/store/sparql11">
+	<property name="libdir" location="../../../../../../lib"/>
+	<target name="tree_grammar" depends="ast_grammar"> 
+		<echo message="Current dir is: ${basedir}"/>
+		<echo message="IbmSparqlAstWalker.g"/>
+		<java classname="org.antlr.Tool" fork="true" maxmemory="1024m" dir="${basedir}">
+			<classpath>
+				<pathelement location="${libdir}/antlr-3.3-complete.jar"/>
+			</classpath>
+			<arg value="IbmSparqlAstWalker.g"/>
+		</java>
+	</target>
+	<target name="ast_grammar" depends="grammar"> 
+			<echo message="Current dir is: ${basedir}"/>
+			<echo message="IbmSparqlAstRewriter.g"/>
+			<java classname="org.antlr.Tool" fork="true" maxmemory="1024m" dir="${basedir}">
+				<classpath>
+					<pathelement location="${libdir}/antlr-3.3-complete.jar"/>
+				</classpath>
+				<arg value="IbmSparqlAstRewriter.g"/>
+			</java>
+	</target>
+	<target name="grammar">
+		<echo message="Current dir is: ${basedir}"/>
+		<echo message="IbmSparql.g"/>
+		<java classname="org.antlr.Tool" fork="true" maxmemory="1024m" dir="${basedir}">
+			<classpath>
+				<pathelement location="${libdir}/antlr-3.3-complete.jar"/>
+			</classpath>
+			<arg value="-encoding=UTF-8"/>
+			<arg value="IbmSparql.g"/>
+		</java>
+	</target>
+</project>

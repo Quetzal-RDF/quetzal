@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/rdfstore-base/test/com/ibm/rdf/store/sparql11/DB2RDFQuery.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.rdf.store.sparql11.DB2RDFQuery"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-jdbcurl jdbc:db2://helix1.pok.ibm.com:50001/lubm100K -kb LUBM100K -password db2inst1  -queryFile /Users/ksrinivs/Documents/workspace/rdfstore-data/lubm_queries_QL_reversed/q1.sparql -schema db2inst1 -username db2inst1"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-base"/>
+</launchConfiguration>

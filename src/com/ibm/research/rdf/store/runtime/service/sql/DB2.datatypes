@@ -1,0 +1,17 @@
+FLOAT=FLOAT
+STRING=VARCHAR
+DOUBLE=DOUBLE
+DECIMAL=DECIMAL
+DATETIME=TIMESTAMP
+INTEGER=INTEGER
+DATE=DATE
+NUMERIC=DECFLOAT
+xs_dateTime=xs:dateTime
+xs_integer=xs:integer
+xs_date=xs:date
+xs_decimal=xs:decimal
+xs_float=xs:float
+xs_double=xs:double
+xs_boolean=xs:boolean
+xs_string=xs:string
+

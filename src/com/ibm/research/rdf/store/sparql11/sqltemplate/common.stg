@@ -1,0 +1,83 @@
+group sql;
+
+
+
+not_exists(left_project,left_target,filter_constraints,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> WHERE <filter_constraints; separator=" AND ">)
+>>
+
+offset(project,target,sql_id, limit, offset)  ::= << 
+QR<sql_id> AS (SELECT <project; separator=","> FROM <target> WHERE row_num \> <offset> AND row_num \<= <limit>)
+>>
+
+union(left_project,left_target,right_project,right_target,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> UNION ALL
+SELECT <right_project; separator=","> FROM <right_target>)
+>>
+
+join(project,target,op_constraint,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <project; separator=",">
+FROM <target; separator=",">
+<if(op_constraint)>
+WHERE  <op_constraint; separator=" AND "> <endif> )
+>>
+
+join(project,target,op_constraint,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <project; separator=",">
+FROM <target; separator=",">
+<if(op_constraint)>
+WHERE  <op_constraint; separator=" AND "> <endif> )
+>>
+
+product(leftProject, rightProject, leftTarget, rightTarget, sql_id)  ::= <<  
+QS<sql_id> AS ( SELECT <leftProject; separator=",">, <rightProject; separator=",">
+FROM <leftTarget>, <rightTarget> )
+>>
+
+star_both(project,s_project,target,s_target, entry_constraint, graph_constraint, predicate_constraint, sep, val_constraint,s_val_constraint, filter_constraint, s_filter_constraint, sql_id, multivalued_ids)  ::= << 
+ Q<sql_id> AS (SELECT <project; separator=",">
+ FROM <target; separator=",">
+ WHERE <if(entry_constraint)> <entry_constraint; separator=" AND "> <endif>
+ 	   <if(predicate_constraint)> <if(entry_constraint)> AND <endif>  (<predicate_constraint; separator=sep>)<endif>
+	   <if(val_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <endif> <val_constraint; separator=" AND "> <endif>
+	   <if(filter_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <endif> <filter_constraint; separator=" AND \n"> <endif>
+	   <if(graph_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <elseif(filter_constraint)> AND <endif> <graph_constraint; separator=" AND "> <endif> ),
+ QS<sql_id> AS (SELECT <s_project; separator=",">
+ FROM Q<sql_id>
+ <multivalued_ids:{c | LEFT OUTER JOIN <s_target> AS S<c> ON  Q<sql_id>.VAL<c> = S<c>.list_id} ; separator=" " >
+ <if(s_val_constraint)> WHERE <s_val_constraint; separator=" AND "> <endif> <if(s_filter_constraint)> <if(s_val_constraint)> AND <else> WHERE <endif>  (<s_filter_constraint; separator= " AND ">)<endif>)
+>>
+
+solnModifier(project,target,sql_id, groupBy, having, orderBy, limit, offset)  ::= << 
+<if(groupBy)> GROUP BY <groupBy; separator=","> <endif> 
+<if(having)> HAVING <having; separator=","> <endif> 
+<if(orderBy)> ORDER BY <orderBy; separator=","> <endif> 
+<if(limit)> LIMIT <limit> <endif> 
+<if(offset)> OFFSET <offset> <endif> 
+>>
+
+simple_ph_exp1(project,target, entry_constraint, graph_constraint, predicate_constraint, sep, val_constraint, filter_constraint, sql_id)  ::= << 
+ QS<sql_id> AS (SELECT <project; separator=",">
+ FROM <target; separator=",">
+ 	   <if(entry_constraint)> WHERE <entry_constraint; separator=" AND "> <endif>
+ 	   <if(predicate_constraint)> <if(entry_constraint)> AND <else> WHERE <endif>   (<predicate_constraint; separator=sep>)<endif>
+	   <if(val_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <else> WHERE <endif> <val_constraint; separator=" AND "> <endif>
+	   <if(filter_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <else> WHERE <endif> <filter_constraint; separator=" AND \n"> <endif>
+	   <if(graph_constraint)> <if(entry_constraint)> AND <elseif(predicate_constraint)>  AND <elseif(val_constraint)> AND <elseif(filter_constraint)> AND <else> WHERE <endif> <graph_constraint; separator=" AND "> <endif> )
+>>
+
+limit(project,target,sql_id, limit)  ::= << 
+QR<sql_id> AS (SELECT <project; separator=","> FROM <target> LIMIT <limit>)
+>>
+
+limit_for_offset(project,target,sql_id, limit)  ::= << 
+QR<sql_id> AS (SELECT <project; separator=","> , ( ROW_NUMBER() OVER() ) AS ROW_NUM FROM <target> FETCH FIRST <limit> ROWS ONLY)
+>>
+
+left(project,target,op_constraint,filter_constraint,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <project; separator=",">
+FROM <target; separator=" LEFT OUTER JOIN "> 
+<if(op_constraint)>ON <op_constraint; separator=" AND "> <endif>
+<if(filter_constraint)>WHERE <filter_constraint; separator=" AND "> <endif> )
+>>
+

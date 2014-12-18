@@ -1,0 +1,8 @@
+db2batch -d rdfjazzh -f obj_pred_cnt.sql -r obj_pred_cnt.out
+db2batch -d rdfjazzh -f obj_pred_avg.sql -r obj_pred_avg.out
+db2batch -d rdfjazzh -f obj_cnt.sql -r obj_cnt.out
+db2batch -d rdfjazzh -f obj_avg.sql -r obj_avg.out
+db2batch -d rdfjazzh -f graph_obj_pred_cnt.sql -r graph_obj_pred_cnt.out
+db2batch -d rdfjazzh -f graph_obj_pred_avg.sql -r graph_obj_pred_avg.out
+db2batch -d rdfjazzh -f graph_obj_cnt.sql -r graph_obj_cnt.out
+db2batch -d rdfjazzh -f graph_obj_avg.sql -r graphobj_avg.out

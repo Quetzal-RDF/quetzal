@@ -1,0 +1,437 @@
+
+###
+#  Create a db with a pagesize of 32K.  Needed to handle URIs
+#  especially in DBs with 1000s of properties/columns
+#
+
+db2inst1@helix1:~/workspace/rdfstore-base/scripts> db2 create db LUBM100K pagesize 32 k
+DB20000I  The CREATE DATABASE command completed successfully.
+
+
+##
+#  Following user defined function is needed to handle dynamic type casts in
+#  SPARQL.  Needed because XML casts perform terribly, and DB2's CAST
+#  operations are great by comparison with the one critical flaw that they do
+#  not ignore errors in type casts.
+#
+
+db2inst1@helix1:~/workspace/rdfstore-base/scripts> db2batch -d LUBM100K -l '@' -f ~/workspace/rdfstore-base/sql/typeof.sql
+* Timestamp: Mon Oct 07 2013 13:39:56 EDT
+---------------------------------------------
+
+* SQL Statement Number 1:
+
+create or replace function typeof(lit varchar(200))
+returns CHAR(1)
+language sql contains sql no external action deterministic
+begin
+ declare v DECFLOAT;
+ declare continue handler for sqlstate '22018'
+ begin
+  declare d TIMESTAMP;
+  declare continue handler for sqlstate '22007'
+  begin
+   return 'V';
+  end;
+  set d = CAST(lit as TIMESTAMP);
+  return 'T';
+ end;
+ declare continue handler for sqlstate '42820'
+ begin
+  return 'V';
+ end;
+ declare continue handler for sqlstate '22003'
+ begin
+  return 'V';
+ end;
+ set v = CAST(lit as DECFLOAT);
+ return 'D';
+END
+@
+
+* Elapsed Time is:       0.119448 seconds
+
+* Summary Table:
+
+Type      Number      Repetitions Total Time (s) Min Time (s)   Max Time (s)   Arithmetic Mean Geometric Mean Row(s) Fetched Row(s) Output
+--------- ----------- ----------- -------------- -------------- -------------- --------------- -------------- -------------- -------------
+Statement           1           1       0.119448       0.119448       0.119448        0.119448       0.119448              0             0
+
+* Total Entries:              1
+* Total Time:                 0.119448 seconds
+* Minimum Time:               0.119448 seconds
+* Maximum Time:               0.119448 seconds
+* Arithmetic Mean Time:       0.119448 seconds
+* Geometric Mean Time:        0.119448 seconds
+---------------------------------------------
+* Timestamp: Mon Oct 07 2013 13:40:01 EDT
+
+#
+# This next step just builds the load files for DB2.  Note, we have a script
+# to combine the building of the load files with the loading of the load files
+# into DB2, but its sometimes easier to re-run parts of the load.
+# Note: (1) in the research code, we reverse all urls, so queries are reversed
+# as well to handle the silliness in DB2 statistics.  
+# (2) db2 config information is encapsulated in sample-db-cfg.sh (Its not a
+# shell script :).  
+# (3) Bulk load tries to exploit parallelism in sorting and parsing the nt --
+# hence the --parallel option.  For the larger stores, there are more options
+# that can be tweaked.  
+# (4) Knowledgebase refers to the fact that multiple rdf kbs end up in the
+# same database
+
+db2inst1@helix1:~/workspace/rdfstore-base/scripts> bash build-load-files.sh
+--db2-config sample-db-cfg.sh --knowledge-base lubm100k --parallel 4
+--schema-experiments nt /tmp/LUBM100K/100K_r.nt
+
+#
+# This step just loads the files.  It takes the same set of parameters as the 
+# build, although it doesn't have to.  --drop here forces the system to drop
+# any KB already built with the same name.  The errors here just reflect that
+# no such KB exists.
+
+db2inst1@helix1:~/workspace/rdfstore-base/scripts> bash load-load-files.sh --db2-config ~/workspace/rdfstore-base/scripts/sample-db-cfg.sh --knowledge-base lubm100k --parallel 4 --drop nt /tmp/LUBM100K/100K_r.nt
+ERROR 2013-10-07 13:40:46,571  (DropRdfStore.java:30)   com.ibm.research.rdf.store.jena.RdfStoreException: DB255012E: The RDF command failed because the specified RDF store does not exist in the specified schema. Specified RDF store name: lubm100k. Specified schema: db2inst1.
+DB255012E: The RDF command failed because the specified RDF store does not exist in the specified schema. Specified RDF store name: lubm100k. Specified schema: db2inst1.
+createrdfstore completed.
+createrdfstore completed.
+(c) Copyright IBM Corporation 1993,2007
+Command Line Processor for DB2 Client 10.1.0
+
+You can issue database manager commands and SQL statements from the command 
+prompt. For example:
+    db2 => connect to sample
+    db2 => bind sample.bnd
+
+For general help, type: ?.
+For command help, type: ? command, where command can be
+the first few keywords of a database manager command. For example:
+ ? CATALOG DATABASE for help on the CATALOG DATABASE command
+ ? CATALOG          for help on all of the CATALOG commands.
+
+To exit db2 interactive mode, type QUIT at the command prompt. Outside 
+interactive mode, all commands must be prefixed with 'db2'.
+To list the current command option settings, type LIST COMMAND OPTIONS.
+
+For more detailed help, refer to the Online Reference Manual.
+
+db2 => 
+   Database Connection Information
+
+ Database server        = DB2/LINUXX8664 10.1.0
+ SQL authorization ID   = DB2INST1
+ Local database alias   = LUBM100K
+
+db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => SQL0541W  The referential, primary key, or unique constraint "PRED..." is 
+ignored because it is a duplicate constraint.  SQLSTATE=01543
+db2 => db2 => SQL0541W  The referential, primary key, or unique constraint "PRED..." is 
+ignored because it is a duplicate constraint.  SQLSTATE=01543
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/kb.load".
+
+SQL3110N  The utility has completed processing.  "1" rows were read from the 
+input file.
+
+SQL3221W  ...Begin COMMIT WORK. Input Record Count = "1".
+
+SQL3222W  ...COMMIT of any database changes was successful.
+
+SQL3149N  "1" rows were processed from the input file.  "1" rows were 
+successfully inserted into the table.  "0" rows were rejected.
+
+
+Number of rows read         = 1
+Number of rows skipped      = 0
+Number of rows inserted     = 1
+Number of rows updated      = 0
+Number of rows rejected     = 0
+Number of rows committed    = 1
+
+db2 => db2 => SQL3501W  The table space(s) in which the table resides will not be placed in 
+backup pending state since forward recovery is disabled for the database.
+
+SQL3418W  The NOCHARDEL file type modifier should not be specified if the data 
+was exported using DB2. It is provided to support vendor data files that do 
+not have character delimiters.
+
+SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/100K_r.nt.sorted_subj.primary.load.0".
+
+SQL3500W  The utility is beginning the "LOAD" phase at time "10/07/2013 
+13:41:02.749378".
+
+SQL3519W  Begin Load Consistency Point. Input record count = "0".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3110N  The utility has completed processing.  "17189" rows were read from 
+the input file.
+
+SQL3519W  Begin Load Consistency Point. Input record count = "17189".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3515W  The utility has finished the "LOAD" phase at time "10/07/2013 
+13:41:03.230187".
+
+
+Number of rows read         = 17189
+Number of rows skipped      = 0
+Number of rows loaded       = 17189
+Number of rows rejected     = 0
+Number of rows deleted      = 0
+Number of rows committed    = 17189
+
+db2 => SQL2979I  The ingest utility is starting at "10/07/2013 13:41:03.310902".
+SQL2914I  The ingest utility has started the following ingest job: 
+"DB21001:20131007.134103.310902:00002:00007".
+
+Number of rows read         = 32283
+Number of rows inserted     = 32283
+Number of rows rejected     = 0
+
+SQL2980I  The ingest utility completed successfully at timestamp "10/07/2013 
+13:41:06.613410"
+db2 => SQL3501W  The table space(s) in which the table resides will not be placed in 
+backup pending state since forward recovery is disabled for the database.
+
+SQL3418W  The NOCHARDEL file type modifier should not be specified if the data 
+was exported using DB2. It is provided to support vendor data files that do 
+not have character delimiters.
+
+SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/100K_r.nt.sorted_obj.primary.load.0".
+
+SQL3500W  The utility is beginning the "LOAD" phase at time "10/07/2013 
+13:41:06.708494".
+
+SQL3519W  Begin Load Consistency Point. Input record count = "0".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3110N  The utility has completed processing.  "13948" rows were read from 
+the input file.
+
+SQL3519W  Begin Load Consistency Point. Input record count = "13948".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3515W  The utility has finished the "LOAD" phase at time "10/07/2013 
+13:41:06.978121".
+
+
+Number of rows read         = 13948
+Number of rows skipped      = 0
+Number of rows loaded       = 13948
+Number of rows rejected     = 0
+Number of rows deleted      = 0
+Number of rows committed    = 13948
+
+db2 => SQL3501W  The table space(s) in which the table resides will not be placed in 
+backup pending state since forward recovery is disabled for the database.
+
+SQL3418W  The NOCHARDEL file type modifier should not be specified if the data 
+was exported using DB2. It is provided to support vendor data files that do 
+not have character delimiters.
+
+SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/100K_r.nt.sorted_obj.secondary.load.0".
+
+SQL3500W  The utility is beginning the "LOAD" phase at time "10/07/2013 
+13:41:07.138994".
+
+SQL3519W  Begin Load Consistency Point. Input record count = "0".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3110N  The utility has completed processing.  "88861" rows were read from 
+the input file.
+
+SQL3519W  Begin Load Consistency Point. Input record count = "88861".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3515W  The utility has finished the "LOAD" phase at time "10/07/2013 
+13:41:07.734191".
+
+
+Number of rows read         = 88861
+Number of rows skipped      = 0
+Number of rows loaded       = 88861
+Number of rows rejected     = 0
+Number of rows deleted      = 0
+Number of rows committed    = 88861
+
+db2 => SQL3501W  The table space(s) in which the table resides will not be placed in 
+backup pending state since forward recovery is disabled for the database.
+
+SQL3418W  The NOCHARDEL file type modifier should not be specified if the data 
+was exported using DB2. It is provided to support vendor data files that do 
+not have character delimiters.
+
+SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/datatypes.load".
+
+SQL3500W  The utility is beginning the "LOAD" phase at time "10/07/2013 
+13:41:07.888994".
+
+SQL3519W  Begin Load Consistency Point. Input record count = "0".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3116W  The field value in row "F0-20" and column "1" is missing, but the 
+target column is not nullable.
+
+SQL3185W  The previous error occurred while processing data from row "F0-20" 
+of the input file.
+
+SQL3227W  Record token "F0-20" refers to user record number "20".
+
+SQL3110N  The utility has completed processing.  "97" rows were read from the 
+input file.
+
+SQL3519W  Begin Load Consistency Point. Input record count = "97".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3515W  The utility has finished the "LOAD" phase at time "10/07/2013 
+13:41:07.966023".
+
+SQL3500W  The utility is beginning the "BUILD" phase at time "10/07/2013 
+13:41:07.968069".
+
+SQL3213I  The indexing mode is "REBUILD".
+
+SQL3515W  The utility has finished the "BUILD" phase at time "10/07/2013 
+13:41:08.158735".
+
+SQL3500W  The utility is beginning the "DELETE" phase at time "10/07/2013 
+13:41:08.203176".
+
+SQL3509W  The utility has deleted "19" rows from the table.
+
+SQL3515W  The utility has finished the "DELETE" phase at time "10/07/2013 
+13:41:08.228648".
+
+SQL3107W  At least one warning message was encountered during LOAD processing.
+
+
+Number of rows read         = 97
+Number of rows skipped      = 0
+Number of rows loaded       = 96
+Number of rows rejected     = 1
+Number of rows deleted      = 19
+Number of rows committed    = 97
+
+db2 => SQL3501W  The table space(s) in which the table resides will not be placed in 
+backup pending state since forward recovery is disabled for the database.
+
+SQL3418W  The NOCHARDEL file type modifier should not be specified if the data 
+was exported using DB2. It is provided to support vendor data files that do 
+not have character delimiters.
+
+SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/direct-predicate-info.load".
+
+SQL3500W  The utility is beginning the "LOAD" phase at time "10/07/2013 
+13:41:08.417651".
+
+SQL3519W  Begin Load Consistency Point. Input record count = "0".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3110N  The utility has completed processing.  "18" rows were read from the 
+input file.
+
+SQL3519W  Begin Load Consistency Point. Input record count = "18".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3515W  The utility has finished the "LOAD" phase at time "10/07/2013 
+13:41:08.489749".
+
+SQL3500W  The utility is beginning the "BUILD" phase at time "10/07/2013 
+13:41:08.491932".
+
+SQL3213I  The indexing mode is "REBUILD".
+
+SQL3515W  The utility has finished the "BUILD" phase at time "10/07/2013 
+13:41:08.674415".
+
+
+Number of rows read         = 18
+Number of rows skipped      = 0
+Number of rows loaded       = 18
+Number of rows rejected     = 0
+Number of rows deleted      = 0
+Number of rows committed    = 18
+
+db2 => SQL3501W  The table space(s) in which the table resides will not be placed in 
+backup pending state since forward recovery is disabled for the database.
+
+SQL3418W  The NOCHARDEL file type modifier should not be specified if the data 
+was exported using DB2. It is provided to support vendor data files that do 
+not have character delimiters.
+
+SQL3109N  The utility is beginning to load data from file 
+"/tmp/LUBM100K/reverse-predicate-info.load".
+
+SQL3500W  The utility is beginning the "LOAD" phase at time "10/07/2013 
+13:41:08.862627".
+
+SQL3519W  Begin Load Consistency Point. Input record count = "0".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3110N  The utility has completed processing.  "18" rows were read from the 
+input file.
+
+SQL3519W  Begin Load Consistency Point. Input record count = "18".
+
+SQL3520W  Load Consistency Point was successful.
+
+SQL3515W  The utility has finished the "LOAD" phase at time "10/07/2013 
+13:41:08.934058".
+
+SQL3500W  The utility is beginning the "BUILD" phase at time "10/07/2013 
+13:41:08.936174".
+
+SQL3213I  The indexing mode is "REBUILD".
+
+SQL3515W  The utility has finished the "BUILD" phase at time "10/07/2013 
+13:41:09.106465".
+
+
+Number of rows read         = 18
+Number of rows skipped      = 0
+Number of rows loaded       = 18
+Number of rows rejected     = 0
+Number of rows deleted      = 0
+Number of rows committed    = 18
+
+db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => db2 => SQL0605W  The index was not created because an index 
+"SYSIBM.SQL131007134100510" with a matching definition already exists.  
+SQLSTATE=01550
+db2 => db2 => DB20000I  The SQL command completed successfully.
+db2 => updaterdfstorestats completed.
+db2inst1@helix1:~/workspace/rdfstore-base/scripts> 

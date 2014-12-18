@@ -1,0 +1,36 @@
+This readme describes how to generate the required stored procedures and install them into DB2.
+
+NOTE: You will need ant installed on your system to be able to do this. To check for ant, open a 
+
+Step 1. Generate an rdfstore install directory. To do this, right click build.xml in the root of your project, right click and select Run As > Ant build. 
+		(you need to do this every time you regenerate the procedures).
+		This will generate an install directory in your project containing two scripts and a lib subdirectory.
+		
+Step 2. Set the RDFSTORE_HOME system property to point to the install directory generated in the previous step. Let's call that directory INSTALL.
+	    
+	    If in Windows, Right click My Computer > Properties > Advanced > Environment variables. In the Systems variables half of the window (lower half),
+	    click New and then set the name of the property to RDFSTORE_HOME and the value to the install directory INSTALL. You will need to restart eclipse after you do this.
+	    
+	    If in Linux, edit ~/.bashrc with your favorite editor and add a new line at the end saying
+	    	export RDFSTORE_HOME=<INSTALL>, (without the angle brackets) where INSTALL is the directory generated in step 1. Then execute source .bashrc in the terminal
+	    	from which you started eclipse, close eclipse and start it again.
+	    	
+	    NOTE: YOU WILL ONLY HAVE TO DO THIS ONCE.
+	    
+Step 3. Normally, the DataLoader scripts will also generate a second SQL script for you to execute to install the stored procedures. However, if you already
+		have the data loaded and want to regenerated the procedures, you can use the ScriptsOnlyUtility class in the utilities package (an eclipse launch configuration
+		is also available in launches).
+		
+		This class takes three parameters:
+			- the .rconfig database configuration file (remember that in this case the database has already been created and loaded)
+			- the name of the folder where to generate the SQL file
+			- the name of the SQL file.
+			
+		Example: ScriptsOnlyUtility -config schema_files/RDFSTORE.rconfig -folder schema_files -file RDFSTORE_PROC.sql
+		
+		After the script is done, execute the SQL file created using the command that the ScriptsOnlyUtility will print.
+		
+Important NOTE: if you want more sameSubject, sameObject, subjectChain and objectChain methods, simple change the value of Constants.MAX_COMPLEX_UDF and follow
+this process from Step 1.
+
+Important NOTE2: For examples of running/testing the stored procedures, please look at the tests package, for StoredProcedureTest.sql
