@@ -1703,6 +1703,7 @@ public class Planner {
 						if ((idx.isVariable() || idx.isIRI()) && 
 								triple.getPredicate().isIRI() &&
 								neededKeys.contains(triple) &&
+								!(forward? forwardPreds: reversePreds).hasSpills(triple.getPredicate().getIRI().getValue()) &&
 								(p.getGraphRestriction() != null || !defaultUnionGraph) &&
 								(availableVars == null || 
 								 !idx.isVariable() ||
