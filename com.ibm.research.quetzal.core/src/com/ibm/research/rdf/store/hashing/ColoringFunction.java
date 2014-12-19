@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -260,8 +261,8 @@ public class ColoringFunction {
 									.defaultComparator(currentGraph);
 	
 							public int compare(ColorNode o1, ColorNode o2) {
-								boolean p1 = priorityPredicates.contains(o1);
-								if (p1 == priorityPredicates.contains(o2)) {
+								boolean p1 = priorityPredicates.contains(o1.predicate);
+								if (p1 == priorityPredicates.contains(o2.predicate)) {
 									return usual.compare(o1, o2);
 								} else {
 									return p1 ? Integer.MIN_VALUE
@@ -291,8 +292,8 @@ public class ColoringFunction {
 							private final Comparator<ColorNode> usual = popularityComparator;
 	
 							public int compare(ColorNode o1, ColorNode o2) {
-								boolean p1 = priorityPredicates.contains(o1);
-								if (p1 == priorityPredicates.contains(o2)) {
+								boolean p1 = priorityPredicates.contains(o1.predicate);
+								if (p1 == priorityPredicates.contains(o2.predicate)) {
 									return usual.compare(o1, o2);
 								} else {
 									return p1 ? Integer.MIN_VALUE
@@ -362,16 +363,26 @@ public class ColoringFunction {
 		return Pair.make(getColors(colors, allPreds), getColors(remColors, allPreds));
 	}
 	
+
 	private void testColoring(ColoredVertices<ColorNode> colors, String numColoringFunc) {
 		System.out.println("Checking " +  numColoringFunc + " coloring");
 		WelshPowellTest.assertColoring(currentGraph, colors.getColors(), colors.isFullColoring());
 		if (!colors.isFullColoring()) {
 			Map<ColorNode, Integer> coloring = colors.getColors();
 			if (priorityPredicates != null) {
+				Map<Integer, String> priorityPredsAssignment = new HashMap<Integer, String>();
 				for (Map.Entry<ColorNode, Integer> e: coloring.entrySet()) {
-					if (priorityPredicates.contains(e.getKey())) {
+					if (priorityPredicates.contains(e.getKey().predicate)) {
 						assert e.getValue().intValue() != -1 : " priority predicates were not assigned a value";
+						if (priorityPredsAssignment.containsKey(e.getValue())) {
+							assert e.getKey().predicate.equals(priorityPredsAssignment.get(e.getValue())) : " priority predicates assigned same integer value ";
+						} else {
+							priorityPredsAssignment.put(e.getValue(), e.getKey().predicate);
+						}
 					}
+				}
+				for (Integer i : priorityPredsAssignment.keySet()) {
+					System.out.println("Assignment for priority predicates:" + i + " " + priorityPredsAssignment.get(i));
 				}
 			} else {
 				int maxColoredPopularity = 0;
@@ -390,7 +401,6 @@ public class ColoringFunction {
 		}
 		System.out.println(numColoringFunc + " Coloring checked");
 	}
-	
 	private static Map<String, Integer> getColors(ColoredVertices<ColorNode> color, Set<String> allPredicates) {
 
 		Map<String, Integer> ret = HashMapFactory.make();
