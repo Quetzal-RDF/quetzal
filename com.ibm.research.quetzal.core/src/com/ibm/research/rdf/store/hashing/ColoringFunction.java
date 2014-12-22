@@ -265,8 +265,8 @@ public class ColoringFunction {
 								if (p1 == priorityPredicates.contains(o2.predicate)) {
 									return usual.compare(o1, o2);
 								} else {
-									return p1 ? Integer.MIN_VALUE
-											: Integer.MAX_VALUE;
+									return p1 ? -1
+											: 1;
 								}
 							}
 						}, maxColors);
@@ -296,8 +296,8 @@ public class ColoringFunction {
 								if (p1 == priorityPredicates.contains(o2.predicate)) {
 									return usual.compare(o1, o2);
 								} else {
-									return p1 ? Integer.MIN_VALUE
-											: Integer.MAX_VALUE;
+									return p1 ? -1
+											: 1;
 								}
 							}
 						}, maxColors);
@@ -375,7 +375,16 @@ public class ColoringFunction {
 					if (priorityPredicates.contains(e.getKey().predicate)) {
 						assert e.getValue().intValue() != -1 : " priority predicates were not assigned a value";
 						if (priorityPredsAssignment.containsKey(e.getValue())) {
-							assert e.getKey().predicate.equals(priorityPredsAssignment.get(e.getValue())) : " priority predicates assigned same integer value ";
+							
+							Iterator<ColorNode> neighbors = this.currentGraph.getPredNodes(e.getKey());
+							
+							while (neighbors.hasNext()) {
+								assert !(neighbors.next().predicate.equals(priorityPredsAssignment.get(e.getValue()))) : " adjacent priority predicates assigned same integer value ";
+							}
+							neighbors = this.currentGraph.getSuccNodes(e.getKey());
+							while (neighbors.hasNext()) {
+								assert !(neighbors.next().predicate.equals(priorityPredsAssignment.get(e.getValue()))) : " adjacent priority predicates assigned same integer value ";
+							}
 						} else {
 							priorityPredsAssignment.put(e.getValue(), e.getKey().predicate);
 						}
