@@ -26,7 +26,7 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
 	public static class Reversed10M extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://pasta-dev.watson.ibm.com:50002/testrev", "dbp10m_r", "db2inst4", "sheruser", "db2inst4", false);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://pasta-dev.watson.ibm.com:50002/testrev", "dbp10m_r", "db2inst4", "sheruser", "db2inst4", false);
 		public Reversed10M() {
 			super(new DB2Engine(), data, TestConstants.dbpedia10mAnswers, "../rdfstore-data/dbpedia_queries_rev/");
 		}
@@ -35,7 +35,7 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
 	public static class RDFStoreDBpedia37 extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://localhost:8997/dbp", "dbp37_r", "db2inst1", "db2admin", "db2inst1", false);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:8997/dbp", "dbp37_r_qd", "db2inst1", "db2admin", "db2inst1", false);
 		public RDFStoreDBpedia37() {
 			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, "/Users/ksrinivs/Documents/workspace/rdfstore-data/dbpedia3.7_queries_rev/");
 		}
@@ -45,7 +45,7 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	@RandomizedRepeat(8)
 	public static class RDFStoreDBpediaRC237 extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.202.45:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://9.47.202.45:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
 		public RDFStoreDBpediaRC237() {
 			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
 		}
@@ -53,7 +53,7 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	
 
 	public static class RDFStoreDBpedia37_RC2 extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.202.45:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://9.47.202.45:50001/dbpedia", "dbpedia", "db2inst2", "db2admin", "db2inst2", false);
 		public RDFStoreDBpedia37_RC2() {
 			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, "../rdfstore-data/dbpedia3.7_queries_rev/");
 		}

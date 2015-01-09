@@ -10,7 +10,6 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import org.junit.Test;
 
@@ -20,7 +19,7 @@ public class BSBMQueryTest extends TestRunner<DB2TestData> {
 	private final String queryFile;
 	
 	public static class BSBMTest extends BSBMQueryTest {
-		private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/bsbm",
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://helix1.pok.ibm.com:50001/bsbm",
 				"bsbm_1m", "db2inst1","db2admin","db2inst1",false);
 		
 		public BSBMTest() {

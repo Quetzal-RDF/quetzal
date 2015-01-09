@@ -34,7 +34,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
    // @RandomizedRepeat(1)
    public static class DB2JazzHelix1 extends JazzQueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://helix1.pok.ibm.com:50001/jazz", "jazz",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://helix1.pok.ibm.com:50001/jazz", "jazz",
                                                   "db2inst1", "db2inst1", "db2inst1", true);
 
       public DB2JazzHelix1()
@@ -47,7 +47,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
    // @RandomizedRepeat(1)
    public static class SharkJazzVM_9_12_196_243 extends JazzQueryUtilityTest<SharkTestData>
       {
-      private static final SharkTestData data = SharkTestData.getStore("jdbc:hive2://9.12.196.243:10000/default", "jazz", "root", "nkoutche",
+      private static final SharkTestData data = new SharkTestData("jdbc:hive2://9.12.196.243:10000/default", "jazz", "root", "nkoutche",
    		   "default", false);
       public SharkJazzVM_9_12_196_243()
          {
@@ -59,7 +59,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
    // @RandomizedRepeat(1)
    public static class PSQLJazzHelix1 extends JazzQueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/jazz", "jazz",
+      private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://helix1.pok.ibm.com:24973/jazz", "jazz",
                                                   "akement", "passw0rd", "db2inst1", true);
 
       public PSQLJazzHelix1()
@@ -71,7 +71,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(1)
 	public static class JazzOptimizedStore extends JazzQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.202.45:50001/jazz", "jazz", "db2inst2", "db2admin", "db2inst2", true);
+		private static final DB2TestData data =  new DB2TestData("jdbc:db2://9.47.202.45:50001/jazz", "jazz", "db2inst2", "db2admin", "db2inst2", true);
 		public JazzOptimizedStore() {
 			super(new DB2Engine(), data, true);
 		}
@@ -80,7 +80,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	@RandomizedRepeat(8)
 	public static class JazzOptimizedStoreSL extends JazzQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://9.47.204.38:60000/Rational", "old", "db2inst1", "db2admin", "db2inst1", true);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://9.47.204.38:60000/Rational", "old", "db2inst1", "db2admin", "db2inst1", true);
 		public JazzOptimizedStoreSL() {
 			super(new DB2Engine(), data, true);
 		}
@@ -90,7 +90,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
 	public static class JazzOptimizedStoreOld extends JazzQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://min-1.watson.ibm.com:50001/jaztypes", "jazzopt", "db2inst1", "db2inst1", "db2inst1", true);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://min-1.watson.ibm.com:50001/jaztypes", "jazzopt", "db2inst1", "db2inst1", "db2inst1", true);
 		public JazzOptimizedStoreOld() {
 			super(new DB2Engine(), data, true);
 		}
@@ -99,7 +99,7 @@ public abstract class JazzQueryUtilityTest<D> extends TestRunner<D> {
 	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	@RandomizedRepeat(8)
 	public static class JazzDefaultStore extends JazzQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://min-1.watson.ibm.com:50001/jaztypes", "defjazzstore", "db2inst1", "db2inst1", "db2inst1", true);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://min-1.watson.ibm.com:50001/jaztypes", "defjazzstore", "db2inst1", "db2inst1", "db2inst1", true);
 		public JazzDefaultStore() {
 			super(new DB2Engine(), data, true);
 		}

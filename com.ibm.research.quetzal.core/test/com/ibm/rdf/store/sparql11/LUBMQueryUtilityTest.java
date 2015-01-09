@@ -43,7 +43,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	}
 
 	public static class DockerDB2 extends LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				System.getenv("JDBC_URL"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
@@ -70,7 +70,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	}
 	
 	public static class DockerPostgresql extends LUBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				"jdbc:postgresql://" + System.getenv("POSTGRES_PORT_5432_TCP_ADDR") + ":"+ System.getenv("POSTGRES_PORT_5432_TCP_PORT") + "/quetzal", System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
@@ -97,7 +97,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	}
 	
 	public static class DockerShark extends LUBMQueryUtilityTest<SharkTestData> {
-		private static final SharkTestData data = SharkTestData.getStore(
+		private static final SharkTestData data = new SharkTestData(
 				System.getenv("JDBC_URL"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
@@ -125,7 +125,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 	public static class DB2LUBM10MHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://helix1.pok.ibm.com:50001/lubm10m", "lubm10m",
 				"db2inst1", "db2inst1", "db2inst2", false);
 
@@ -142,7 +142,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// "default", false);
 	public static class SharkLUBM100KOnVM_9_51_154_25 extends
 			LUBMQueryUtilityTest<SharkTestData> {
-		private static final SharkTestData data = SharkTestData.getStore(
+		private static final SharkTestData data = new SharkTestData(
 				"jdbc:hive2://9.51.154.25:10000/default", "lubm100k", "root",
 				"KX2ETEp6", "default", false);
 		
@@ -155,7 +155,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 		
 	public static class DB2LUBM100KHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://helix1.pok.ibm.com:50001/lubm100k", "lubm100k",
 				"db2inst1", "db2inst1", "db2inst1", false);
 
@@ -168,7 +168,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 	public static class PSQLLUBM10MHelix1 extends
 			LUBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				"jdbc:postgresql://helix1.pok.ibm.com:24973/lubm10m",
 				"lubm10m", "akement", "passw0rd", "db2inst2", false);
 
@@ -183,7 +183,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	@RandomizedRepeat(8)
 	public static class PSQLLUBM100MHelix1 extends
 			LUBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				"jdbc:postgresql://helix1.pok.ibm.com:5432/lubm100m",
 				"lubm100m", "akement", "passw0rd", "db2inst2", false);
 
@@ -200,7 +200,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	//
 	public static class PSQLLUBM100MSL extends
 			LUBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				"jdbc:postgresql://localhost:9999/lubm", "l100m", "kavitha",
 				"sherlives", "db2inst1", false);
 
@@ -214,7 +214,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RandomizedRepeat(1)
 	public static class PSQLLUBMPropPathHelix1 extends
 			LUBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				"jdbc:postgresql://helix1.pok.ibm.com:24973/lubm100m",
 				"lubm100m", "akement", "passw0rd", "db2inst2", false);
 
@@ -232,7 +232,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 
 	public static class PSQLLUBMCastTestHelix1 extends
 			LUBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				"jdbc:postgresql://helix1.pok.ibm.com:24973/lubm100m",
 				"lubm100m", "akement", "passw0rd", "db2inst2", false);
 		private static String queryDir = "../rdfstore-data/uobm_queries_proppaths/";
@@ -309,7 +309,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBMHelix1 extends LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://helix1.pok.ibm.com:50001/lubm100m", "lubm100m",
 				"db2inst1", "db2inst1", "db2inst2", false);
 
@@ -324,7 +324,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RandomizedRepeat(1)
 	public static class DB2LUBMPropPathHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://helix1.pok.ibm.com:50001/lubm100m", "lubm100m",
 				"db2inst1", "db2inst1", "db2inst2", false);
 
@@ -339,7 +339,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RandomizedRepeat(1)
 	public static class DB2LUBM10MHelix2 extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://helix2.pok.ibm.com:50001/lubm", "lubm10m",
 				"db2inst1", "db2inst1", "db2inst2", false);
 
@@ -354,7 +354,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	@RandomizedRepeat(1)
 	public static class DB2LUBM100MHelix1 extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://helix1.pok.ibm.com:50001/lubm", "lubm_100m_r",
 				"db2inst1", "db2admin", "db2inst1", false);
 
@@ -369,7 +369,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	@RandomizedRepeat(8)
 	public static class Reversed100MSL extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://10.80.29.218:50000/lubm", "lubm100m", "db2inst1",
 				"db2admin", "db2inst1", false);
 
@@ -384,7 +384,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RandomizedRepeat(1)
 	public static class DB2LUBM100M_SL extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://localhost:50002/lubm", "lubm_100m_r", "db2inst1",
 				"db2admin", "db2inst1", false);
 
@@ -398,7 +398,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	// @RandomizedRepeat(1)
 	public static class DB2LUBM10MRC2 extends LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://9.47.202.45:50001/lubm", "lubm10m", "db2inst2",
 				"db2admin", "db2inst2", false);
 
@@ -413,7 +413,7 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RandomizedRepeat(1)
 	public static class Reversed100M_WithOWLQLCompilation extends
 			LUBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://9.47.202.45:50001/lubm", "lubm100m", "db2inst2",
 				"db2admin", "db2inst2", false);
 		private static final File tbox = new File(

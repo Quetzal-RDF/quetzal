@@ -10,7 +10,6 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import org.junit.Test;
 
@@ -30,7 +29,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 	}*/
 
 	public static class UOBM30 extends UOBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/uobm",
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://helix1.pok.ibm.com:50001/uobm",
 				"uobm30", "db2inst1","db2admin","db2inst1",false);
 		public UOBM30() {
 			super(new DB2Engine(),"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/uobm_queries_original/", data, uobm_30_answers_original);
@@ -55,7 +54,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 		}
 	}
 	public static class DB2UOBM30PropPaths extends UOBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://localhost:50002/uobm",
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/uobm",
 				"uobm_30", "db2inst1","db2admin","db2inst1",false);
 		public DB2UOBM30PropPaths() {
 			super(new DB2Engine(),"/Users/dolby/RdfStoreGitWorkspace/rdfstore-data/uobm_queries_proppaths/", data, uobm_30_answers_proppaths);
@@ -147,7 +146,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 	}
 	
 	public static class PSQLUOBM30PropPathsHelix extends UOBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data =PSQLTestData.getStore("jdbc:postgresql://localhost:8996/uobm", "uobm_30", "akement", "passw0rd",
+		private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://localhost:8996/uobm", "uobm_30", "akement", "passw0rd",
                 "db2inst1", false);
 		public PSQLUOBM30PropPathsHelix() {
 			super(new PSQLEngine(),"../rdfstore-data/uobm_queries_proppaths/", data, uobm_30_answers_proppaths);
@@ -229,7 +228,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 		}
 	}
 	public static class SharkUOBM1MPropPathsExpVM_9_12_196_243 extends UOBMQueryUtilityTest<SharkTestData> {
-		private static final SharkTestData data = SharkTestData.getStore("jdbc:hive2://9.12.196.243:10000/default", "uobm1a", "root", "nkoutche",
+		private static final SharkTestData data = new SharkTestData("jdbc:hive2://9.12.196.243:10000/default", "uobm1a", "root", "nkoutche",
                 "default", false);
 			//getStore("jdbc:db2://9.47.202.45:50001/uobm",
 			//	"uobm30", "db2inst2","db2admin","db2inst2",false);
@@ -296,7 +295,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 	}
 	
 	public static class PSQLUOBM30MPropPathsExpHelix1 extends UOBMQueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://localhost:8996/uobm", "uobm_30", "akement", "passw0rd",
+		private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://localhost:8996/uobm", "uobm_30", "akement", "passw0rd",
                 "db2inst1", false);
 			//getStore("jdbc:db2://9.47.202.45:50001/uobm",
 			//	"uobm30", "db2inst2","db2admin","db2inst2",false);
@@ -380,7 +379,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 		}
 	}
 	public static class DB2UOBM1MPropPathsExp extends AbstractDB2UOBM30MPropPathsExp {
-		private static final DB2TestData data = getStore("jdbc:db2://localhost:50002/uobm",
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/uobm",
 				"uobm1u", "db2inst1","db2admin","db2inst1",false);
 		public DB2UOBM1MPropPathsExp() {
 			super(new DB2Engine(),"../rdfstore-data/uobm_queries_proppaths_expansion/", data, 
@@ -395,7 +394,7 @@ public class UOBMQueryUtilityTest<D> extends TestRunner<D> implements TestConsta
 	}
 	
 	public static abstract class AbstractDB2UOBM30MPropPathsExp extends UOBMQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://localhost:50002/uobm",
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/uobm",
 				"uobm_30", "db2inst1","db2admin","db2inst1",false);
 
 		
