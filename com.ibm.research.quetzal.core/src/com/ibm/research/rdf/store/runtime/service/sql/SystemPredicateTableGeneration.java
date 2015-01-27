@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
- package com.ibm.research.rdf.store.runtime.service.sql;
+package com.ibm.research.rdf.store.runtime.service.sql;
 
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
@@ -63,8 +63,8 @@ public class SystemPredicateTableGeneration
          sql.append(")");
          }
       if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
-    	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t'");
-    	  sql.append(" TBLPROPERTIES (\"shark.cache\" = \"true\")");
+    	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t'; \n");
+    	  sql.append("CACHE TABLE %s");
       }
       return sql.toString();
       }
@@ -116,8 +116,8 @@ public class SystemPredicateTableGeneration
          sql.append(")");
          }
       if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
-    	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t'");
-    	  sql.append(" TBLPROPERTIES (\"shark.cache\" = \"true\")");
+    	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';\n");
+    	  sql.append("CACHE TABLE %s");
       }
       return sql.toString();
       }
