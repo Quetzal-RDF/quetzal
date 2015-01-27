@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
- package com.ibm.research.rdf.store.runtime.service.sql;
+package com.ibm.research.rdf.store.runtime.service.sql;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,7 +32,9 @@ import com.ibm.research.proppaths.StoreProcedure;
 import com.ibm.research.proppaths.TemporaryTableSpaceCreation;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.cmd.UpdateRdfStoreStats;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.hashing.GraphColoringHashingFamily;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
@@ -158,6 +160,9 @@ public class StoreHelper
       long length = new File(predicateMappings).length();
       String t = Sqls.getSqls(backend).getSql("storeCfgTable");
       t = t.replaceFirst("%s", storeName);
+      if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+     	 t = t.replaceFirst("%s",storeName); // needed for shark in "CACHE TABLE %s"
+      }
 
       //
       // In both DB2 and PostgreSQL, there is a second %s, but for different reasons in each one.
@@ -246,6 +251,9 @@ public class StoreHelper
             }
          currentObj = names.getProperty(Constants.NAME_TABLE_DIRECT_PRIMARY_HASH);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -266,6 +274,9 @@ public class StoreHelper
             t = Sqls.getSqls(backend).getSql("defaultReversePrimary");
             }
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -278,6 +289,9 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultDirectSecondary");
          currentObj = names.getProperty(Constants.NAME_TABLE_DIRECT_SECONDARY_HASH);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -300,6 +314,9 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultReverseSecondary");
          currentObj = names.getProperty(Constants.NAME_TABLE_REVERSE_SECONDARY_HASH);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -312,6 +329,9 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultLongStrings");
          currentObj = names.getProperty(Constants.NAME_TABLE_LONG_STRINGS);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          t = t.replaceFirst("%s", System.getProperty("com.ibm.rdf.longStringsLength", "2600"));
          if (tablespaceName != null)
             {
@@ -324,6 +344,9 @@ public class StoreHelper
          //
          t = Sqls.getSqls(backend).getSql("defaultPredInfoTable");
          t = t.replaceFirst("%s", datasetName + "_direct");
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s",datasetName + "_direct"); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -335,6 +358,9 @@ public class StoreHelper
          //
          t = Sqls.getSqls(backend).getSql("defaultPredInfoTable");
          t = t.replaceFirst("%s", datasetName + "_reverse");
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s",datasetName + "_reverse"); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -347,6 +373,9 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("basicStats");
          currentObj = names.getProperty(Constants.NAME_TABLE_BASIC_STATS);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -359,6 +388,9 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("topKStats");
          currentObj = names.getProperty(Constants.NAME_TABLE_TOPK_STATS);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
@@ -371,6 +403,9 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultDataTypeTable");
          currentObj = names.getProperty(Constants.NAME_TABLE_DATATYPE);
          t = t.replaceFirst("%s", currentObj);
+         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+        	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
+         }
          if (tablespaceName != null)
             {
             t = t + " IN " + tablespaceName;
