@@ -15,7 +15,7 @@ CORRELATIONS=0
 COLOR="true"
 CHUNKS=1
 CREATE_ONLY=0
-JAVA_OPTS=$_JAVA_OPTIONS
+JAVA_OPTS="$_JAVA_OPTIONS -Dfile.encoding=UTF-8"
 TABLES="both"
 REUSE=0
 ENTITY_IN_SECONDARY=1
@@ -124,7 +124,7 @@ while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
 done
 
 if [[ $INVOKED_FROM_WRAPPER != 1 ]]; then
-    export CLASSPATH=$DIR/../bin:$DIR/../../com.ibm.wala.util/bin:$DIR/../lib/wala.jar:$DIR/../lib/hash.jar:$DIR/../lib/antlr-3.3-complete.jar:$DIR/../lib/jena-core-2.11.0.jar:$DIR/../lib/jena-arq-2.11.0.jar:$DIR/../lib/jena-iri-1.0.0.jar:$DIR/../lib/slf4j-api-1.6.4.jar:$DIR/../lib/slf4j-log4j-1.6.4.jar:$DIR/../lib/xercesImpl-2.7.1.jar:$DIR/../lib/arq-2.8.5-patched.jar:$DIR/../lib/iri-0.8.jar:$DIR/../lib/icu4j-3.4.4.jar:$DIR/../lib/commons-logging-1-0-3.jar:$DIR/../lib/db2jcc4.jar:$DIR/../lib/pdq.jar:$DIR/../lib/junit-4.10.jar:$DIR/../lib/postgresql-9.2-1003.jdbc4.jar:$DIR/../lib/hive-exec-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-jdbc-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-metastore-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-service-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-shims-0.11.0-shark-0.9.1.jar:$DIR/../lib/libfb303-0.9.0.jar:$DIR/../lib/libthrift-0.9.0.jar:$DIR/../lib/hadoop-common-2.2.0.jar:$DIR/../lib/jsqlparser-0.9.jar:$DIR/../lib/owlapi-distribution-3.4.5.jar
+    export CLASSPATH=$DIR/../bin:$DIR/../../com.ibm.wala.util/bin:$DIR/../lib/wala.jar:$DIR/../lib/hash.jar:$DIR/../lib/antlr-3.3-complete.jar:$DIR/../lib/jena-core-2.11.0.jar:$DIR/../lib/jena-arq-2.11.0.jar:$DIR/../lib/jena-iri-1.0.0.jar:$DIR/../lib/slf4j-api-1.6.4.jar:$DIR/../lib/slf4j-log4j-1.6.4.jar:$DIR/../lib/xercesImpl-2.7.1.jar:$DIR/../lib/arq-2.8.5-patched.jar:$DIR/../lib/iri-0.8.jar:$DIR/../lib/icu4j-3.4.4.jar:$DIR/../lib/commons-logging-1-0-3.jar:$DIR/../lib/db2jcc4.jar:$DIR/../lib/pdq.jar:$DIR/../lib/junit-4.10.jar:$DIR/../lib/postgresql-9.3-1102.jdbc41.jar:$DIR/../lib/hive-exec-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-jdbc-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-metastore-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-service-0.11.0-shark-0.9.1.jar:$DIR/../lib/hive-shims-0.11.0-shark-0.9.1.jar:$DIR/../lib/libfb303-0.9.0.jar:$DIR/../lib/libthrift-0.9.0.jar:$DIR/../lib/hadoop-common-2.2.0.jar:$DIR/../lib/jsqlparser-0.9.jar:$DIR/../lib/owlapi-distribution-3.4.5.jar
 fi
 
 #  it really sucks to have random distinct characters be 

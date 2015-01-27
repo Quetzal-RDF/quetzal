@@ -407,7 +407,7 @@ public class TestRunner<D> {
          com.hp.hpl.jena.query.ResultSet rs = qe.execSelect();
          while (rs.hasNext())
             {
-        	rs.next();
+        	System.out.println(rs.next());
             count++;
             }
          }
