@@ -4,19 +4,10 @@ MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
 
 RUN apt-get update && apt-get install -y default-jdk
 
-RUN apt-get update && apt-get install -y ant
+RUN apt-get update && apt-get install -y maven
 
 RUN apt-get update && apt-get install -y git
 
-RUN mkdir -p /root/.ssh
+RUN git clone https://github.com/Quetzal-RDF/quetzal
 
-ADD id_rsa /root/.ssh/id_rsa
-
-RUN chmod 700 /root/.ssh/id_rsa
-
-RUN echo "Host github.rtp.raleigh.ibm.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
-
-RUN git clone git@github.rtp.raleigh.ibm.com:sparqltosqlgp/sparqltosqlbase.git
-
-RUN cd ./sparqltosqlbase && ant
-
+RUN cd ./quetzal/com.ibm.research.quetzal.core/ &&  mvn verify -DskipTests
