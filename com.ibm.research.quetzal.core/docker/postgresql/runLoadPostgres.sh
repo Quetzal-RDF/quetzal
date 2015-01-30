@@ -1,5 +1,6 @@
-mkdir /data/tmp
+cd /data
 
+mkdir /data/tmp
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
