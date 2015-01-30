@@ -8,6 +8,10 @@ RUN apt-get update && apt-get install -y maven
 
 RUN apt-get update && apt-get install -y git
 
+RUN apt-get install -y gawk
+
+RUN apt-get install -y realpath
+
 RUN git clone https://github.com/Quetzal-RDF/quetzal
 
 RUN cd ./quetzal/com.ibm.research.quetzal.core/ &&  mvn verify -DskipTests
