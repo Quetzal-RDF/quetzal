@@ -1,6 +1,5 @@
 mkdir /data/tmp
 
-su - postgres
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
