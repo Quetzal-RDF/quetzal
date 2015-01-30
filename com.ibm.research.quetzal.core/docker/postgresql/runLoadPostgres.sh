@@ -1,5 +1,6 @@
 mkdir /data/tmp
 
+
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
 if [[ x$CREATE_DB == "xtrue" ]]; then
@@ -8,10 +9,10 @@ if [[ x$CREATE_DB == "xtrue" ]]; then
 fi
 
 if ls *.nt; then
-    export DATAFILE=`ls *.nt`
+    export DATAFILE=`ls /data/*.nt`
     export FILETYPE=nt
 else
-    export DATAFILE=`ls *.nq`
+    export DATAFILE=`ls /data/*.nq`
     export FILETYPE=nq
 fi
 
@@ -26,8 +27,8 @@ export KNOWLEDGE_BASE=kb
 echo $FILETYPE
 echo $DATAFILE
 
-bash /sparqltosqlbase/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /quetzal/com.ibm.research.quetzal.core/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
-bash /sparqltosqlbase/scripts/load-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /quetzal/com.ibm.research.quetzal.core/scripts/load-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
 rm -rf /data/tmp
