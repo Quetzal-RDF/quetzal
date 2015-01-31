@@ -10,10 +10,8 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 
 VOLUME /data
 
-RUN    /etc/init.d/postgresql start &&
-    psql --command "CREATE USER docker WITH SUPERUSER PASSWORD 'docker';" &&\
-    createdb -O docker docker
-
+RUN    /etc/init.d/postgresql start
+ 
 # Adjust PostgreSQL configuration so that local connections to the
 # database don't need a password
 RUN echo "local all  all    0.0.0.0/0  trust" >> /etc/postgresql/9.3/main/pg_hba.conf
