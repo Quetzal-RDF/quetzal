@@ -1,3 +1,7 @@
+/etc/init.d/postgresql start
+
+export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
+
 cd /data
 
 mkdir /data/tmp
