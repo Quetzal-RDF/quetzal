@@ -28,8 +28,8 @@ export KNOWLEDGE_BASE=kb
 echo $FILETYPE
 echo $DATAFILE
 
-bash /quetzal/com.ibm.research.quetzal.core/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /data/quetzal/com.ibm.research.quetzal.core/scripts/build-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
-bash /quetzal/com.ibm.research.quetzal.core/scripts/load-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash /data/quetzal/com.ibm.research.quetzal.core/scripts/load-load-files.sh --db-engine postgresql --parallel $PROCESSOR --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
 rm -rf /data/tmp
