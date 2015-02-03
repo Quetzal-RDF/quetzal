@@ -10,7 +10,6 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import java.sql.ResultSet;
 
@@ -24,7 +23,7 @@ import com.ibm.research.rdf.store.sparql11.model.Query;
 
 public class JazzNewStore {
 	public DB2TestData getJazzStore() {
-		return getStore("jdbc:db2://9.47.202.45:50001/DAWG", "dawg",
+		return new DB2TestData("jdbc:db2://9.47.202.45:50001/DAWG", "dawg",
 				"db2inst2", "db2admin", "db2inst2", false);
 	}
 

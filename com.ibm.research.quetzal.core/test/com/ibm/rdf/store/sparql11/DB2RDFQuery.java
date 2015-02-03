@@ -40,7 +40,7 @@ public class DB2RDFQuery extends TestRunner<DB2TestData> {
 			CommandLineParser parser = new GnuParser();
 			CommandLine cmd = parser.parse( options, args);
 			boolean defUnion = cmd.hasOption("defaultUnionGraph") ? Boolean.parseBoolean(cmd.getOptionValue("defaultUnionGraph")) : false;
-			DB2TestData data = DB2TestData.getStore(cmd.getOptionValue("jdbcurl"), 
+			DB2TestData data = new DB2TestData(cmd.getOptionValue("jdbcurl"), 
 					cmd.getOptionValue("kb"), 
 					cmd.getOptionValue("username"), 
 					cmd.getOptionValue("password"), 

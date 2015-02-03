@@ -208,7 +208,7 @@ public class StoreHelper
       {
       boolean storeCreation = checkProperty("com.ibm.rdf.createStore");
       boolean indexCreation = checkProperty("com.ibm.rdf.createIndex");
-      boolean generateSqlOnly = checkProperty("com.ibm.rdf.generateStoreSQL");
+      boolean generateSqlOnly = System.getProperty("com.ibm.rdf.generateStoreSQL") != null;
 
       int gidLenght = Constants.DEFAULT_GID_LENGTH;
       int colLenght = Constants.DEFAULT_COL_LENGTH;
@@ -529,19 +529,21 @@ public class StoreHelper
 
    private static void doSql(Connection conn, String backend, String t)
       {
-      boolean generateSqlOnly = checkProperty("com.ibm.rdf.generateStoreSQL");
-      if (generateSqlOnly)
-         {
-         if (backend.equalsIgnoreCase(Store.Backend.postgresql.name())
-        	|| backend.equalsIgnoreCase(Store.Backend.shark.name())
-        	)
-            {
-            System.out.println(t + ";\n");
-            }
-         else
-            {
-            System.out.println(t + "\n");
-            }
+      String generateSqlOnly = System.getProperty("com.ibm.rdf.generateStoreSQL");
+      if (generateSqlOnly != null) {
+    	  try {
+			FileWriter fw = new FileWriter(generateSqlOnly, true);
+			fw.append(t);
+			fw.append(
+				backend.equalsIgnoreCase(Store.Backend.postgresql.name())
+				|| backend.equalsIgnoreCase(Store.Backend.shark.name())?
+					";\n":
+					"\n");
+			fw.close();
+    	  } catch (IOException e) {
+    		  e.printStackTrace();
+    		  assert false;
+    	  }
          }
       else
          {

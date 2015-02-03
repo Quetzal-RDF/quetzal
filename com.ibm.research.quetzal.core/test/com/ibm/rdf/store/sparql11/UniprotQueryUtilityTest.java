@@ -10,7 +10,6 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +29,7 @@ public abstract class UniprotQueryUtilityTest<D extends DB2TestData> extends Tes
 	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	@RandomizedRepeat(5)
 	public static class XIVC6 extends UniprotQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://localhost:50000/xivdb_c6", "uniprot", "db2inst1", "ihaterc2", "db2inst1", false);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50000/xivdb_c6", "uniprot", "db2inst1", "ihaterc2", "db2inst1", false);
 
 		public XIVC6() {
 			super(new DB2Engine(), "../rdfstore-data/uniprot_queries_rev/", data);
@@ -40,7 +39,7 @@ public abstract class UniprotQueryUtilityTest<D extends DB2TestData> extends Tes
 	@RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 	@RandomizedRepeat(5)
 	public static class TMSC6 extends UniprotQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = getStore("jdbc:db2://localhost:50000/tmsdb_c6", "uniprot", "db2inst1", "ihaterc2", "db2inst1", false);
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50000/tmsdb_c6", "uniprot", "db2inst1", "ihaterc2", "db2inst1", false);
 
 		public TMSC6() {
 			super(new DB2Engine(), "../rdfstore-data/uniprot_queries_rev/", data);

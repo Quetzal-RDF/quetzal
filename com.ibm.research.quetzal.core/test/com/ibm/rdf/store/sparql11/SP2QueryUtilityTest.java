@@ -10,9 +10,8 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import static com.ibm.rdf.store.sparql11.TestRunner.DB2TestData.getStore;
-
 import org.junit.Test;
+
 
 //@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 //@RandomizedRepeat(1)
@@ -27,7 +26,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
       }
 
    public static class DockerDB2 extends SP2QueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				System.getenv("JDBC_URL"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
@@ -51,7 +50,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 	}
 	
 	public static class DockerPostgresql extends SP2QueryUtilityTest<PSQLTestData> {
-		private static final PSQLTestData data = PSQLTestData.getStore(
+		private static final PSQLTestData data = new PSQLTestData(
 				System.getenv("JDBC_URL"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
@@ -75,7 +74,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 	}
 	
 	public static class DockerShark extends SP2QueryUtilityTest<SharkTestData> {
-		private static final SharkTestData data = SharkTestData.getStore(
+		private static final SharkTestData data = new SharkTestData(
 				System.getenv("JDBC_URL"), System.getenv("KB"),
 				System.getenv("DB_USER"), System.getenv("DB_PASSWORD"),
 				System.getenv("DB_SCHEMA"), false);
@@ -98,7 +97,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 	}
    public static class DB2SP2B100MHelix1 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = DB2TestData.getStore("jdbc:db2://helix1.pok.ibm.com:50001/sp2b", "sp2b_100m_r", "db2inst1",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://helix1.pok.ibm.com:50001/sp2b", "sp2b_100m_r", "db2inst1",
                                                   "db2admin", "db2inst1", false);
 
       public DB2SP2B100MHelix1()
@@ -109,7 +108,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B10MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b10m", "sp2b10m", "akement",
+      private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b10m", "sp2b10m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B10MHelix1()
@@ -120,18 +119,18 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B100MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:24973/sp2b100m", "sp2b100m", "akement",
+      private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://localhost:8996/sp2b", "sp2b_100m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B100MHelix1()
          {
-         super(new PSQLEngine(), data, TestConstants.sp2b100MAnswers, "../rdfstore-data/sp2b_queries_rev/");
+         super(new PSQLEngine(), data, TestConstants.sp2b100MAnswers, "/Users/ksrinivs/Documents/workspace/rdfstore-data/sp2b_queries/");
          }
       }
 
    public static class DB2SP2B1MHelix1 extends SP2QueryUtilityTest<DB2TestData>
    {
-   private static final DB2TestData data = getStore("jdbc:db2://helix1.pok.ibm.com:50001/sp2b", "sp2b1m", "db2inst1",
+   private static final DB2TestData data = new DB2TestData("jdbc:db2://helix1.pok.ibm.com:50001/sp2b", "sp2b1m", "db2inst1",
                                                "db2inst1", "db2inst1", false);
 
    public DB2SP2B1MHelix1()
@@ -142,7 +141,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class DB2SP2B1M_SLSSD extends SP2QueryUtilityTest<DB2TestData>
    {
-   private static final DB2TestData data = getStore("jdbc:db2://localhost:50002/sp2b", "sp2b_1m_r", "db2inst1",
+   private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/sp2b", "sp2b_1m_r", "db2inst1",
                                                "db2admin", "db2inst1", false);
 
    public DB2SP2B1M_SLSSD()
@@ -153,7 +152,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class DB2SP2B100M_SLSSD extends SP2QueryUtilityTest<DB2TestData>
    {
-   private static final DB2TestData data = getStore("jdbc:db2://localhost:50002/sp2b", "sp2b_100m_r", "db2inst1",
+   private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/sp2b", "sp2b_100m_r", "db2inst1",
                                                "db2admin", "db2inst1", false);
 
    public DB2SP2B100M_SLSSD()
@@ -164,7 +163,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SharkSP2B1MVM9_12_196_243 extends SP2QueryUtilityTest<SharkTestData>
       {
-	   private static final SharkTestData data =  SharkTestData.getStore("jdbc:hive2://9.12.196.243:10000/default", "sp2b1m", "root", "nkoutche",
+	   private static final SharkTestData data =  new SharkTestData("jdbc:hive2://9.12.196.243:10000/default", "sp2b1m", "root", "nkoutche",
     		   "default", false);
  
 
@@ -176,7 +175,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class PSQLSP2B1MHelix1 extends SP2QueryUtilityTest<PSQLTestData>
       {
-      private static final PSQLTestData data = PSQLTestData.getStore("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b1m", "sp2b1m", "akement",
+      private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://helix1.pok.ibm.com:5432/sp2b1m", "sp2b1m", "akement",
                                                   "passw0rd", "db2inst1", false);
 
       public PSQLSP2B1MHelix1()
@@ -187,7 +186,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SP2B10M_R_MIN1 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://min-1.watson.ibm.com:50001/testrev", "sp2b10m_r", "db2inst1",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://min-1.watson.ibm.com:50001/testrev", "sp2b10m_r", "db2inst1",
                                                   "sheruser", "db2inst1", false);
 
       public SP2B10M_R_MIN1()
@@ -198,7 +197,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SP2B10K_R_MIN1 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://min-1.watson.ibm.com:50001/testrev", "sp2b10k_r", "db2inst1",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://min-1.watson.ibm.com:50001/testrev", "sp2b10k_r", "db2inst1",
                                                   "sheruser", "db2inst1", false);
 
       public SP2B10K_R_MIN1()
@@ -209,7 +208,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SP2B100M_SL extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://localhost:9997/lubm", "sp2b100m", "db2inst2", "db2admin",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:9997/lubm", "sp2b100m", "db2inst2", "db2admin",
                                                   "db2inst2", false);
 
       public SP2B100M_SL()
@@ -220,7 +219,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SP2B100M_R_RC2 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/sp2b", "sp2b100m", "db2inst2", "db2admin",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://9.47.202.45:50001/sp2b", "sp2b100m", "db2inst2", "db2admin",
                                                   "db2inst2", false);
 
       public SP2B100M_R_RC2()
@@ -231,7 +230,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SP2B10M_R_RC2 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/sp2b", "sp2b10m", "db2inst2", "db2admin",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://9.47.202.45:50001/sp2b", "sp2b10m", "db2inst2", "db2admin",
                                                   "db2inst2", false);
 
       public SP2B10M_R_RC2()
@@ -242,7 +241,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
 
    public static class SP2B100K_R_RC2 extends SP2QueryUtilityTest<DB2TestData>
       {
-      private static final DB2TestData data = getStore("jdbc:db2://9.47.202.45:50001/sp2b", "sp2b100k", "db2inst2", "db2admin",
+      private static final DB2TestData data = new DB2TestData("jdbc:db2://9.47.202.45:50001/sp2b", "sp2b100k", "db2inst2", "db2admin",
                                                   "db2inst2", false);
 
       public SP2B100K_R_RC2()
@@ -251,7 +250,7 @@ public class SP2QueryUtilityTest<D> extends TestRunner<D>
          }
       }
 
-   @Test
+	@Test
    public void testQueryQ1() throws Exception
       {
       String file = queryDir + "q1.sparql";

@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
- package com.ibm.rdf.store.sparql11;
+package com.ibm.rdf.store.sparql11;
 
 import java.io.File;
 import java.sql.Connection;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Properties;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -40,19 +40,63 @@ import com.ibm.research.rdf.store.sparql11.model.Query;
 public class TestRunner<D> {
 
 	public static abstract class TestData {
-		final public Connection conn;
-		final public Store      store;
-		final public Context    ctx;
-		final public Dataset    ds;
+		protected Connection conn;
+		protected Store store;
+		protected Context ctx;
+		protected Dataset ds;
+		protected String jdbcurl;
+		protected String dataset;
+		protected String username;
+		protected String password;
+		protected String schemaName;
+		protected boolean defUnionGraph;
 
-		protected TestData(Connection conn, Store store, Context ctx, Dataset ds) {
+		protected TestData(String jdbcurl, String dataset, String username,
+				String password, String schemaName, boolean defUnionGraph) {
 			super();
-			this.conn = conn;
-			this.store = store;
-			this.ctx = ctx;
-			this.ds = ds;
+			this.jdbcurl = jdbcurl;
+			this.dataset = dataset;
+			this.username = username;
+			this.password = password;
+			this.schemaName = schemaName;
+			this.defUnionGraph = defUnionGraph;
+			setConnectionDetails();
 		}
-
+		
+		protected TestData(TestData toCopy, String dataset) {
+			super();
+			this.jdbcurl = toCopy.jdbcurl;
+			this.dataset = dataset;
+			this.username = toCopy.username;
+			this.password = toCopy.password;
+			this.schemaName = toCopy.schemaName;
+			this.defUnionGraph = toCopy.defUnionGraph;
+			this.conn = toCopy.conn;
+			this.ctx = toCopy.ctx;
+		}
+		
+		protected abstract void setConnectionDetails();
+		
+		protected abstract Store.Backend getBackend();
+		
+		public abstract TestData cloneAndResetStore(String dataset);
+		
+		protected void setStore() {
+			store = StoreManager.connectStore(conn, getBackend().name(), schemaName,
+					dataset, ctx);
+			if (defUnionGraph)
+				ctx.set(Context.unionDefaultGraph, Boolean.TRUE);
+			ds = RdfStoreFactory.connectDataset(store, conn, getBackend().name());
+		}
+				
+		/**
+		 * Reset connection altogether
+		 * @return
+		 */
+		public void resetConnection() {
+			setConnectionDetails();
+		}
+		
 		public Connection getConnection() {
 			return conn;
 		}
@@ -70,514 +114,441 @@ public class TestRunner<D> {
 		}
 
 	}
-	
-   //
-   // DB2 Test Data
-   //
-   public static class DB2TestData extends TestData
-      {
-      public DB2TestData(Connection conn, Store store, Context ctx, Dataset ds)
-         {
-         super(conn, store, ctx, ds);
-         }
 
-      public static DB2TestData getStore(String jdbcurl, String dataset, String username, String password, String schemaName,
-            boolean defUnionGraph)
-         {
-         try
-            {
-            Connection conn = getConnection(jdbcurl, username, password);
-            return getStore(conn, dataset, schemaName, defUnionGraph);
-            }
-         catch (ClassNotFoundException e)
-            {
-            e.printStackTrace();
-            return null;
-            }
-         catch (SQLException e)
-            {
-            e.printStackTrace();
-            return null;
-            }
-         }
+	//
+	// DB2 Test Data
+	//
+	public static class DB2TestData extends TestData {
+		public DB2TestData(String jdbcurl, String dataset, String username,
+				String password, String schemaName, boolean defUnionGraph) {
+			super(jdbcurl, dataset, username, password, schemaName,
+					defUnionGraph);
+		}
+		
+		private DB2TestData(DB2TestData toCopy, String dataset) {
+			super(toCopy, dataset);
+			setStore();
+		}
+		
+		public DB2TestData cloneAndResetStore(String dataset) {
+			return new DB2TestData(this, dataset);
+		}
+		
+		protected Store.Backend getBackend() {
+			return Store.Backend.db2;
+		}
 
-      public static Connection
-            getConnection(String jdbcurl, String username, String password) throws ClassNotFoundException, SQLException
-         {
-         Class.forName("com.ibm.db2.jcc.DB2Driver");
-         Properties info = new Properties();
-         info.setProperty("user", username);
-         info.setProperty("password", password);
-         info.setProperty("prompt", "false");
-         info.setProperty("access", "read only");
-         info.setProperty("big decimal", "false");
-         info.setProperty("lazy close", "true");
-         info.setProperty("block criteria", "2");
-         info.setProperty("block size", "1024");
-         info.setProperty("data compression", "true");
-         Connection conn = DriverManager.getConnection(jdbcurl, info);
-         return conn;
-         }
+		protected void setConnectionDetails() {
+			try {
+				Class.forName("com.ibm.db2.jcc.DB2Driver");
+				Properties info = new Properties();
+				info.setProperty("user", username);
+				info.setProperty("password", password);
+				info.setProperty("prompt", "false");
+				info.setProperty("access", "read only");
+				info.setProperty("big decimal", "false");
+				info.setProperty("lazy close", "true");
+				info.setProperty("block criteria", "2");
+				info.setProperty("block size", "1024");
+				info.setProperty("data compression", "true");
+				conn = DriverManager.getConnection(jdbcurl, info);
+				ctx = new Context();
+				setStore();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 
-      public static DB2TestData getStore(Connection conn, String dataset, String schemaName, boolean defUnionGraph)
-         {
-         Context ctx = new Context();
-         Store store = StoreManager.connectStore(conn, "db2", schemaName, dataset, ctx);
-         if (defUnionGraph)
-            ctx.set(Context.unionDefaultGraph, Boolean.TRUE);
-         Dataset ds = RdfStoreFactory.connectDataset(store, conn, "db2");
-         return new DB2TestData(conn, store, ctx, ds);
-         }
-
-      }
-
-   //
-   // PostgreSQL Test Data
-   //
-   public static class PSQLTestData extends TestData {
-  
-      public PSQLTestData(Connection conn, Store store, Context ctx, Dataset ds)
-         {
-         super(conn, store, ctx, ds);
-         }
-
-      public static PSQLTestData getStore(String jdbcurl, String dataset, String username, String password, String schemaName,
-            boolean defUnionGraph)
-         {
-         try
-            {
-            Connection conn = getConnection(jdbcurl, username, password);
-            return getStore(conn, dataset, schemaName, defUnionGraph);
-            }
-         catch (ClassNotFoundException e)
-            {
-            e.printStackTrace();
-            return null;
-            }
-         catch (SQLException e)
-            {
-            e.printStackTrace();
-            return null;
-            }
-         }
-
-      public static Connection
-            getConnection(String jdbcurl, String username, String password) throws ClassNotFoundException, SQLException
-         {
-         Class.forName("org.postgresql.Driver");
-         Properties info = new Properties();
-         info.setProperty("user", username);
-         info.setProperty("password", password);
-         info.setProperty("socketTimeout", "1200");
-         Connection conn = DriverManager.getConnection(jdbcurl, info);
-         return conn;
-         }
-
-      public static PSQLTestData getStore(Connection conn, String dataset, String schemaName, boolean defUnionGraph)
-         {
-         Context ctx = new Context();
-         Store store = StoreManager.connectStore(conn, "postgresql", schemaName, dataset, ctx);
-         if (defUnionGraph)
-            ctx.set(Context.unionDefaultGraph, Boolean.TRUE);
-         Dataset ds = RdfStoreFactory.connectDataset(store, conn, "postgresql");
-         return new PSQLTestData(conn, store, ctx, ds);
-         }
-
-      }
-   
-   //
-   // Shark Test Data
-   //
-   public static class SharkTestData extends TestData {
-  
-      public SharkTestData(Connection conn, Store store, Context ctx, Dataset ds)
-         {
-         super(conn, store, ctx, ds);
-         }
-
-      public static SharkTestData getStore(String jdbcurl, String dataset, String username, String password, String schemaName,
-            boolean defUnionGraph)
-         {
-         try
-            {
-            Connection conn = getConnection(jdbcurl, username, password);
-            return getStore(conn, dataset, schemaName, defUnionGraph);
-            }
-         catch (ClassNotFoundException e)
-            {
-            e.printStackTrace();
-            return null;
-            }
-         catch (SQLException e)
-            {
-            e.printStackTrace();
-            return null;
-            }
-         }
-
-      public static Connection
-            getConnection(String jdbcurl, String username, String password) throws ClassNotFoundException, SQLException
-         {
-         Class.forName("org.apache.hive.jdbc.HiveDriver");
-         Properties info = new Properties();
-         info.setProperty("user", username);
-         info.setProperty("password", password);
-         Connection conn = DriverManager.getConnection(jdbcurl, info);
-         return conn;
-         }
-
-      public static SharkTestData getStore(Connection conn, String dataset, String schemaName, boolean defUnionGraph)
-         {
-         Context ctx = new Context();
-         Store store = StoreManager.connectStore(conn, Store.Backend.shark.name(), schemaName, dataset, ctx);
-         if (defUnionGraph)
-            ctx.set(Context.unionDefaultGraph, Boolean.TRUE);
-         Dataset ds = RdfStoreFactory.connectDataset(store, conn, Store.Backend.shark.name());
-         return new SharkTestData(conn, store, ctx, ds);
-         }
-
-      }
+		}
 
 
-   public interface DatabaseEngine<D>
-      {
 
-      int executeQuery(D data, String file);
+	}
 
-      int executeStringQuery(D data, String query);
+	//
+	// PostgreSQL Test Data
+	//
+	public static class PSQLTestData extends TestData {
 
-      int execute(D data, String file, boolean isDescribeWithoutRows);
+		public PSQLTestData(String jdbcurl, String dataset, String username,
+				String password, String schemaName, boolean defUnionGraph) {
+			super(jdbcurl, dataset, username, password, schemaName,
+					defUnionGraph);
+		}
+		
+		private PSQLTestData(PSQLTestData toCopy, String dataset) {
+			super(toCopy, dataset);
+			setStore();
+		}
+		
+		public PSQLTestData cloneAndResetStore(String dataset) {
+			return new PSQLTestData(this, dataset);
+		}
+		
+		protected Store.Backend getBackend() {
+			return Store.Backend.postgresql;
+		}
 
-      int executeSQLTest(D data, String file, String sqlCode);
+		public void setConnectionDetails() {
+			try {
+				Class.forName("org.postgresql.Driver");
+				Properties info = new Properties();
+				info.setProperty("user", username);
+				info.setProperty("password", password);
+				info.setProperty("socketTimeout", "1200");
+				conn = DriverManager.getConnection(jdbcurl, info);
+				ctx = new Context();
+				setStore();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-      }
+	}
 
-   protected final D                 data;
-   protected final DatabaseEngine<D> engine;
-   protected final int[]             answers;
+	//
+	// Shark Test Data
+	//
+	public static class SharkTestData extends TestData {
 
-   // initialize the store
-   public TestRunner(D data, DatabaseEngine<D> engine, int[] answers)
-      {
-      this.data = data;
-      this.engine = engine;
-      this.answers = answers;
-      }
+		public SharkTestData(String jdbcurl, String dataset, String username,
+				String password, String schemaName, boolean defUnionGraph) {
+			super(jdbcurl, dataset, username, password, schemaName,
+					defUnionGraph);
+		}
 
-   protected int executeQuery(String file)
-      {
-      long time = System.currentTimeMillis();
-      int v = engine.executeQuery(data, file);
-      System.err.println("Query: " + file + " time:" + (System.currentTimeMillis() - time));
-      return v;
-      }
+		private SharkTestData(SharkTestData toCopy, String dataset) {
+			super(toCopy, dataset);
+			setStore();
+		}
+		
+		public SharkTestData cloneAndResetStore(String dataset) {
+			return new SharkTestData(this, dataset);
+		}
+		protected Store.Backend getBackend() {
+			return Store.Backend.shark;
+		}
+		
+		protected void setConnectionDetails() {
+			try {
+				Class.forName("org.apache.hive.jdbc.HiveDriver");
+				Properties info = new Properties();
+				info.setProperty("user", username);
+				info.setProperty("password", password);
+				conn = DriverManager.getConnection(jdbcurl, info);
+				setStore();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
-   protected int execute(String file, boolean isDescribeWithoutRows)
-      {
-      long time = System.currentTimeMillis();
-      int v = engine.execute(data, file, isDescribeWithoutRows);
-      System.err.println("Query: " + file + " time:" + (System.currentTimeMillis() - time));
-      return v;
-      }
+	}
 
-   protected int executeSQLTest(String file, String sqlCode)
-      {
-      long time = System.currentTimeMillis();
-      int v = engine.executeSQLTest(data, file, sqlCode);
-      System.err.println("Query: " + file + " time:" + (System.currentTimeMillis() - time));
-      return v;
-      }
+	public interface DatabaseEngine<D> {
 
-   protected int executeQuery(String file, int queryNum)
-      {
-      long time = System.currentTimeMillis();
-      int nOR = engine.execute(data, file, false);
-      if (answers != null && answers.length > queryNum && answers[queryNum] >= -1)
-         {
-         Assert.assertEquals(answers[queryNum], nOR);
-         }
-      System.err.println("Query: " + file + " time:" + (System.currentTimeMillis() - time) + " ");
-      System.err.println(file + " has : " + nOR + " rows");
-      return nOR;
-      }
+		int executeQuery(D data, String file);
 
-   protected int executeSparql(String sparql, int answers) {
-	   long time = System.currentTimeMillis();
-	   int nOR = engine.executeStringQuery(data, sparql);
-	   if (answers != -1)
-	   {
-		   Assert.assertEquals(answers, nOR);
-	   }
-	   System.err.println("Query time:" + (System.currentTimeMillis() - time) + " ");
-	   System.err.println("query has : " + nOR + " rows");
-	   return nOR;
-   }
+		int executeStringQuery(D data, String query);
 
-   public static class DB2Engine extends AbstractEngine<DB2TestData>
-      {
-      private OWLQLSPARQLCompiler compiler;
+		int execute(D data, String file, boolean isDescribeWithoutRows);
 
-      public DB2Engine()
-         {
-         this.compiler = null;
-         }
+		int executeSQLTest(D data, String file, String sqlCode);
 
-      public DB2Engine(OWLQLSPARQLCompiler compiler)
-         {
-         this.compiler = compiler;
-         }
-      
-	 protected  QueryProcessor createQueryProcessor(DB2TestData data, Query q) {
-		   return QueryProcessorFactory.create(q, data.conn, data.store, data.ctx, compiler);
-	 }
-	   
- 
+	}
 
-      }
+	protected final D data;
+	protected final DatabaseEngine<D> engine;
+	protected final int[] answers;
 
-   public static abstract class AbstractEngine<D extends TestData> implements DatabaseEngine<D>
-      {
-      protected OWLQLSPARQLCompiler compiler;
-      //protected boolean isWrapperEnabled = true;
-      protected boolean isWrapperEnabled = true;
+	// initialize the store
+	public TestRunner(D data, DatabaseEngine<D> engine, int[] answers) {
+		this.data = data;
+		this.engine = engine;
+		this.answers = answers;
+	}
 
-      public AbstractEngine()
-         {
-         this.compiler = null;
-         }
+	protected int executeQuery(String file) {
+		long time = System.currentTimeMillis();
+		int v = engine.executeQuery(data, file);
+		System.err.println("Query: " + file + " time:"
+				+ (System.currentTimeMillis() - time));
+		return v;
+	}
 
-      public AbstractEngine(OWLQLSPARQLCompiler compiler)
-         {
-         this.compiler = compiler;
-         }
+	protected int execute(String file, boolean isDescribeWithoutRows) {
+		long time = System.currentTimeMillis();
+		int v = engine.execute(data, file, isDescribeWithoutRows);
+		System.err.println("Query: " + file + " time:"
+				+ (System.currentTimeMillis() - time));
+		return v;
+	}
 
-      public int executeQuery(D data, String file)
-         {
-         return execute(data, file, false);
-         }
+	protected int executeSQLTest(String file, String sqlCode) {
+		long time = System.currentTimeMillis();
+		int v = engine.executeSQLTest(data, file, sqlCode);
+		System.err.println("Query: " + file + " time:"
+				+ (System.currentTimeMillis() - time));
+		return v;
+	}
 
-      @Override
-      public int executeStringQuery(D data, String query)
-         {
-         if (isWrapperEnabled)
-            {
-             com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory.create(query);
-            //com.hp.hpl.jena.query.Query q = QueryFactory.create(query);
-            return executeWithInternal(data, q);
-            }
-         else
-            {
-            Query q = SparqlParserUtilities.parseSparqlString(query);
-            return executeQuery(data, false, q);
-            }
-         }
+	protected int executeQuery(String file, int queryNum) {
+		long time = System.currentTimeMillis();
+		int nOR = engine.execute(data, file, false);
+		if (answers != null && answers.length > queryNum
+				&& answers[queryNum] >= -1) {
+			Assert.assertEquals(answers[queryNum], nOR);
+		}
+		System.err.println("Query: " + file + " time:"
+				+ (System.currentTimeMillis() - time) + " ");
+		System.err.println(file + " has : " + nOR + " rows");
+		return nOR;
+	}
 
-      public int execute(D data, String file, boolean isDescribeWithoutRows)
-      {
-      if (isWrapperEnabled)
-         {
-         return executeWith(data, file, isDescribeWithoutRows);
-         }
-      else
-         {
-          File f = new File(file);
-          Query q = SparqlParserUtilities.parseSparql(f, Collections.<String, String> emptyMap());
-          return executeQuery(data, isDescribeWithoutRows, q);
-         }
-      }
-      
-      protected int executeWith(D data, String file, boolean isDescribeWithoutRows)
-      {
-      com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory.read(file, null, null);
+	protected int executeSparql(String sparql, int answers) {
+		long time = System.currentTimeMillis();
+		int nOR = engine.executeStringQuery(data, sparql);
+		if (answers != -1) {
+			Assert.assertEquals(answers, nOR);
+		}
+		System.err.println("Query time:" + (System.currentTimeMillis() - time)
+				+ " ");
+		System.err.println("query has : " + nOR + " rows");
+		return nOR;
+	}
 
-      return executeWithInternal(data, q);
-      }
+	public static class DB2Engine extends AbstractEngine<DB2TestData> {
+		private OWLQLSPARQLCompiler compiler;
 
-   private int executeWithInternal(D data, com.hp.hpl.jena.query.Query q)
-      {
-      int count = 0;
-      long time = System.currentTimeMillis();
+		public DB2Engine() {
+			this.compiler = null;
+		}
 
-      QueryExecution qe = RdfStoreQueryExecutionFactory.create(q, data.ds, compiler);
-      if (data.ctx.get(Context.unionDefaultGraph) != null)
-         qe.getContext().set(Context.unionDefaultGraph, new Boolean(true));
+		public DB2Engine(OWLQLSPARQLCompiler compiler) {
+			this.compiler = compiler;
+		}
 
-      if (q.isSelectType())
-         {
-         com.hp.hpl.jena.query.ResultSet rs = qe.execSelect();
-         while (rs.hasNext())
-            {
-        	System.out.println(rs.next());
-            count++;
-            }
-         }
-      else if (q.isDescribeType())
-         {
-         Model m = qe.execDescribe();
-         count = (int) m.size();
-         }
-      else if (q.isConstructType())
-         {
-         Model m = qe.execConstruct();
-         count = (int) m.size();
-         }
-      else if (q.isAskType())
-         {
-         boolean ask = qe.execAsk();
-         if (ask)
-            {
-            count = 1;
-            }
-         }
-      System.err.println("Query: time:" + (System.currentTimeMillis() - time));
+		protected QueryProcessor createQueryProcessor(DB2TestData data, Query q) {
+			return QueryProcessorFactory.create(q, data.conn, data.store,
+					data.ctx, compiler);
+		}
 
-      qe.close();
-      return count;
-      }
+	}
 
-      public int executeSQLTest(D data, String file, String sqlCode)
-         {
-         // TODO Auto-generated method stub
-         return 0;
-         }
-      
-      protected abstract QueryProcessor createQueryProcessor(D data, Query q); // QueryProcessorFactory.create(q, data.conn, data.store, data.ctx, compiler);
+	public static abstract class AbstractEngine<D extends TestData> implements
+			DatabaseEngine<D> {
+		protected OWLQLSPARQLCompiler compiler;
+		// protected boolean isWrapperEnabled = true;
+		protected boolean isWrapperEnabled = true;
 
-      private int executeQuery(D data, boolean isDescribeWithoutRows, Query q)
-         {
-         int nOR = -1;
+		public AbstractEngine() {
+			this.compiler = null;
+		}
 
-         QueryProcessor qp = createQueryProcessor(data, q);
-         LiteralInfoResultSet rs = null;
-         if (q.isSelectQuery())
-            {
-            rs = qp.execSelect();
-            nOR = printResult(rs.getResultSet());
-            }
-         else if (q.isDescribeQuery())
-            {
-            rs = qp.execDescribe();
-            if (isDescribeWithoutRows)
-               {
-               nOR = 0;
-               }
-            else
-               {
-               if (rs != null && rs.getResultSet() != null)
-                  {
-                  nOR = printResult(rs.getResultSet());
-                  }
-               }
-            }
-         else if (q.isAskQuery())
-            {
-            nOR = qp.execAsk() ? 1 : 0;
+		public AbstractEngine(OWLQLSPARQLCompiler compiler) {
+			this.compiler = compiler;
+		}
 
-            }
-         else if (q.isConstructQuery())
-            {
-            rs = qp.execConstruct();
-            if (rs != null && rs.getResultSet() != null)
-               {
-               nOR = printResult(rs.getResultSet());
-               }
-            }
+		public int executeQuery(D data, String file) {
+			return execute(data, file, false);
+		}
 
-         try
-            {
-            rs.getResultSet().getStatement().close();
-            }
-         catch (Throwable e)
-            {
+		@Override
+		public int executeStringQuery(D data, String query) {
+			if (isWrapperEnabled) {
+				com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory
+						.create(query);
+				// com.hp.hpl.jena.query.Query q = QueryFactory.create(query);
+				return executeWithInternal(data, q);
+			} else {
+				Query q = SparqlParserUtilities.parseSparqlString(query);
+				return executeQuery(data, false, q);
+			}
+		}
 
-            }
+		public int execute(D data, String file, boolean isDescribeWithoutRows) {
+			if (isWrapperEnabled) {
+				return executeWith(data, file, isDescribeWithoutRows);
+			} else {
+				File f = new File(file);
+				Query q = SparqlParserUtilities.parseSparql(f,
+						Collections.<String, String> emptyMap());
+				return executeQuery(data, isDescribeWithoutRows, q);
+			}
+		}
 
-         return nOR;
-         }
+		protected int executeWith(D data, String file,
+				boolean isDescribeWithoutRows) {
+			com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory.read(file,
+					null, null);
 
-      protected static int printResult(/* String sparqlQuery, */ResultSet rst)
-         {
-         // System.err.println("QUERY: "+sparqlQuery);
-         // returns the number of rows returned
+			return executeWithInternal(data, q);
+		}
 
-         System.err.println("RESULT: ");
+		private int executeWithInternal(D data, com.hp.hpl.jena.query.Query q) {
+			int count = 0;
+			long time = System.currentTimeMillis();
+			try {
+				if (data.getConnection().isClosed()) {
+					data.resetConnection();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 
-         int i, sz = 0;
-         int numberOfRows = 0;
-         try
-            {
-            ResultSetMetaData rsmd = rst.getMetaData();
-            int numberOfColumns = rsmd.getColumnCount();
-            StringBuffer resultHeader = new StringBuffer();
-            for (int nCols = 1; nCols <= numberOfColumns; nCols++)
-               {
-               resultHeader.append(rsmd.getColumnLabel(nCols));
-               resultHeader.append("|||");
-               }
-            System.err.println("============================================================");
-            System.err.println(resultHeader.toString());
-            System.err.println("============================================================");
-            String[] row = null;
-            while (rst.next())
-               {
-               numberOfRows++;
-               if (row == null)
-                  {
-                  sz = rst.getMetaData().getColumnCount();
-                  row = new String[sz];
-                  }
+			QueryExecution qe = RdfStoreQueryExecutionFactory.create(q,
+					data.ds, compiler);
+			if (data.ctx.get(Context.unionDefaultGraph) != null)
+				qe.getContext().set(Context.unionDefaultGraph,
+						new Boolean(true));
 
-               for (i = 1; i <= sz; i++)
-                  row[i - 1] = rst.getString(i);
-               	 // System.err.println(Arrays.toString(row));
-               }
-            }
-         catch (SQLException e)
-            {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            }
-         System.err.println("============================================================");
-         return numberOfRows;
-         }
+			if (q.isSelectType()) {
+				com.hp.hpl.jena.query.ResultSet rs = qe.execSelect();
+				while (rs.hasNext()) {
+					rs.next();
+					count++;
+				}
+			} else if (q.isDescribeType()) {
+				Model m = qe.execDescribe();
+				count = (int) m.size();
+			} else if (q.isConstructType()) {
+				Model m = qe.execConstruct();
+				count = (int) m.size();
+			} else if (q.isAskType()) {
+				boolean ask = qe.execAsk();
+				if (ask) {
+					count = 1;
+				}
+			}
+			System.err.println("Query: time:"
+					+ (System.currentTimeMillis() - time));
 
-      }
+			qe.close();
+			return count;
+		}
 
-   public static class PSQLEngine extends AbstractEngine<PSQLTestData>
-   {
-	 
-	   public PSQLEngine()
-	      {
-		   super();
-	      }
-	
-	   public PSQLEngine(OWLQLSPARQLCompiler compiler)
-	      {
-	      super(compiler);
-	      }
-	   protected  QueryProcessor createQueryProcessor(PSQLTestData data, Query q) {
-		   return QueryProcessorFactory.create(q, data.conn, data.store, data.ctx, compiler);
-	   }
+		public int executeSQLTest(D data, String file, String sqlCode) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
 
-	    
-   }
-   public static class SharkEngine extends AbstractEngine<SharkTestData>
-   {
-	   private OWLQLSPARQLCompiler compiler;
+		protected abstract QueryProcessor createQueryProcessor(D data, Query q); // QueryProcessorFactory.create(q,
+																					// data.conn,
+																					// data.store,
+																					// data.ctx,
+																					// compiler);
 
-	   public SharkEngine()
-	      {
-	      super();
-	      }
-	
-	   public SharkEngine(OWLQLSPARQLCompiler compiler)
-	      {
-	      super(compiler);
-	      }
-	   protected  QueryProcessor createQueryProcessor(SharkTestData data, Query q) {
-		   return QueryProcessorFactory.create(q, data.conn, data.store, data.ctx, compiler);
-	   }
-  
+		private int executeQuery(D data, boolean isDescribeWithoutRows, Query q) {
+			int nOR = -1;
 
-   }
+			QueryProcessor qp = createQueryProcessor(data, q);
+			LiteralInfoResultSet rs = null;
+			if (q.isSelectQuery()) {
+				rs = qp.execSelect();
+				nOR = printResult(rs.getResultSet());
+			} else if (q.isDescribeQuery()) {
+				rs = qp.execDescribe();
+				if (isDescribeWithoutRows) {
+					nOR = 0;
+				} else {
+					if (rs != null && rs.getResultSet() != null) {
+						nOR = printResult(rs.getResultSet());
+					}
+				}
+			} else if (q.isAskQuery()) {
+				nOR = qp.execAsk() ? 1 : 0;
+
+			} else if (q.isConstructQuery()) {
+				rs = qp.execConstruct();
+				if (rs != null && rs.getResultSet() != null) {
+					nOR = printResult(rs.getResultSet());
+				}
+			}
+
+			try {
+				rs.getResultSet().getStatement().close();
+			} catch (Throwable e) {
+
+			}
+
+			return nOR;
+		}
+
+		protected static int printResult(/* String sparqlQuery, */ResultSet rst) {
+			// System.err.println("QUERY: "+sparqlQuery);
+			// returns the number of rows returned
+
+			System.err.println("RESULT: ");
+
+			int i, sz = 0;
+			int numberOfRows = 0;
+			try {
+				ResultSetMetaData rsmd = rst.getMetaData();
+				int numberOfColumns = rsmd.getColumnCount();
+				StringBuffer resultHeader = new StringBuffer();
+				for (int nCols = 1; nCols <= numberOfColumns; nCols++) {
+					resultHeader.append(rsmd.getColumnLabel(nCols));
+					resultHeader.append("|||");
+				}
+				System.err
+						.println("============================================================");
+				System.err.println(resultHeader.toString());
+				System.err
+						.println("============================================================");
+				String[] row = null;
+				while (rst.next()) {
+					numberOfRows++;
+					if (row == null) {
+						sz = rst.getMetaData().getColumnCount();
+						row = new String[sz];
+					}
+
+					for (i = 1; i <= sz; i++)
+						row[i - 1] = rst.getString(i);
+					// System.err.println(Arrays.toString(row));
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.err
+					.println("============================================================");
+			return numberOfRows;
+		}
+
+	}
+
+	public static class PSQLEngine extends AbstractEngine<PSQLTestData> {
+
+		public PSQLEngine() {
+			super();
+		}
+
+		public PSQLEngine(OWLQLSPARQLCompiler compiler) {
+			super(compiler);
+		}
+
+		protected QueryProcessor createQueryProcessor(PSQLTestData data, Query q) {
+			return QueryProcessorFactory.create(q, data.conn, data.store,
+					data.ctx, compiler);
+		}
+
+	}
+
+	public static class SharkEngine extends AbstractEngine<SharkTestData> {
+		private OWLQLSPARQLCompiler compiler;
+
+		public SharkEngine() {
+			super();
+		}
+
+		public SharkEngine(OWLQLSPARQLCompiler compiler) {
+			super(compiler);
+		}
+
+		protected QueryProcessor createQueryProcessor(SharkTestData data,
+				Query q) {
+			return QueryProcessorFactory.create(q, data.conn, data.store,
+					data.ctx, compiler);
+		}
+
+	}
 }

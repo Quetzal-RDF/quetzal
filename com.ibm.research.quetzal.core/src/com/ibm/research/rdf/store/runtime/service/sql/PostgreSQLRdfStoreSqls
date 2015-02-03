@@ -155,7 +155,7 @@ storeSwitchRollback = UPDATE %s SET status=status+1
 getDatasetForStatus = SELECT * from %s WHERE upper(storeName) = ? and status = ?
 
 defaultPredInfoTable = CREATE TABLE %s_preds ( \
-    pred VARCHAR(116) NOT NULL UNIQUE, \
+    pred VARCHAR(118) NOT NULL UNIQUE, \
     PRIMARY KEY(pred), \
     onetoone smallint not null, \
     spills smallint not null, \

@@ -28,7 +28,7 @@ public abstract class FreebaseQueryUtilityTest<D> extends TestRunner<D> {
 
 	public static class DB2Freebase extends
 			FreebaseQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = DB2TestData.getStore(
+		private static final DB2TestData data = new DB2TestData(
 				"jdbc:db2://localhost:9997/lubm", "qdata",
 				"db2inst2", "db2admin", "db2inst2", false);
 

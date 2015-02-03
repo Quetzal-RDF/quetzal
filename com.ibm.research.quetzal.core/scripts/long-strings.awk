@@ -1,6 +1,9 @@
 BEGIN {
     stringOut = (pawk == "yes")? longStringFile "." part: longStringFile;
-	cmd = "java com.ibm.research.rdf.store.loader.LongStringHasher " cutoff;
+
+    cmd = "java -Dfile.encoding=UTF-8 com.ibm.research.rdf.store.loader.LongStringHasher " cutoff;
+#    PROCINFO[cmd, "pty"] = 1;
+
     table = "sort | uniq > " stringOut
 }
 
