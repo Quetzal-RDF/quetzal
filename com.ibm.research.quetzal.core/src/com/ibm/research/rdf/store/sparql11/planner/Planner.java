@@ -2166,6 +2166,8 @@ public class Planner {
 			}
 			
 			process: while (!neededKeys.isEmpty()) {
+				applyFilters(topLevelPattern, availableVars);
+
 				prune: for (Iterator<Edge> es = orderedEdges.iterator(); es
 						.hasNext();) {
 					Node s = es.next().snd;
@@ -2177,6 +2179,7 @@ public class Planner {
 
 				Edge savedProductEdge = null;
 				Edge savedMinusEdge = null;
+				
 				edges: for (Iterator<Edge> es = orderedEdges.iterator(); es.hasNext();) {
 					Edge e = es.next();
 					if (neededKeys.containsAll(e.snd.getKeys())) {						
@@ -2695,9 +2698,9 @@ public class Planner {
 		forwardPreds = store.getDirectPredicates();
 		
 		Plan p = plan(q, new StandardApplicableNodes(defaultUnionGraph, stats));
+		System.out.println("Planner has query:" + q);
 
 		if (TEST_PLANNER) {
-			System.out.println("Planner has query:" + q);
 
 			Iterator<PlanNode> it = p.getPlanTree().iterator();
 			boolean hasScan = false;

@@ -21,9 +21,9 @@ storeCfgTable = CREATE TABLE %s( \
 	status INT , \
 	dataTypeTable STRING , \
 	hasSpills INT ) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
-	
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';  \
+	\nCACHE TABLE %s
+		
 getDataset = SELECT * from %s WHERE storeName = ? and status = 0
 
 loadFromFile = LOAD DATA LOCAL INPATH '%c' INTO TABLE %s
@@ -84,8 +84,8 @@ defaultPrimarys = CREATE TABLE %s( \
 	 prop119 STRING, val119  STRING, typ119 smallint ,  prop120 STRING, val120  STRING, typ120 smallint ,  prop121 STRING, val121  STRING, typ121 smallint , \
 	 prop122 STRING, val122  STRING, typ122 smallint ,  prop123 STRING, val123  STRING, typ123 smallint ,  prop124 STRING, val124  STRING, typ124 smallint , \
 	 prop125 STRING, val125  STRING, typ125 smallint ,  prop126 STRING, val126  STRING, typ126 smallint ,  prop127 STRING, val127  STRING, typ127 smallint) \
-	 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	 TBLPROPERTIES ("shark.cache" = "true")
+	 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+	 \nCACHE TABLE %s
 	
 indexPG = CREATE INDEX idx_gid_%s   ON TABLE %s(gid)  AS 'COMPACT' WITH DEFERRED REBUILD
 
@@ -98,14 +98,14 @@ indexRphDatetime = CREATE INDEX idx_dtentry_%s ON TABLE %s(dtentry) AS 'COMPACT'
 indexRphTyp = CREATE INDEX idx_typ_%s ON TABLE %s(typ) AS 'COMPACT' WITH DEFERRED REBUILD
 
 defaultDirectSecondary = CREATE TABLE %s(gID STRING,list_id STRING,elem STRING,typ smallint,ENTITY STRING,PROP STRING,sqltyp STRING) \
-						ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-						TBLPROPERTIES ("shark.cache" = "true")
+						ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+						\nCACHE TABLE %s
 	
 defaultReverseSecondary = CREATE TABLE %s( \
 	gID STRING , list_id STRING , elem STRING, \
 	ENTITY STRING, TYP SMALLINT, PROP STRING) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+	\nCACHE TABLE %s
 	
 indexRS = CREATE  INDEX lid_gid_%s ON TABLE %s(list_id,gid,  elem) AS 'COMPACT' WITH DEFERRED REBUILD
 indexLidElemDS = CREATE  INDEX lid_elem_typ_%s ON TABLE %s(list_id, elem, typ) AS 'COMPACT' WITH DEFERRED REBUILD
@@ -114,22 +114,22 @@ indexDS = CREATE  INDEX lid_gid_%s ON TABLE %s(list_id, gid, elem, typ) AS 'COMP
 
 defaultLongStrings = CREATE TABLE %s( \
 	short_string STRING , long_string STRING , typ SMALLINT) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';  \
+	\nCACHE TABLE %s
 
 
 indexLS = CREATE  INDEX lstr_%s ON TABLE %s(short_string, typ)  AS 'COMPACT' WITH DEFERRED REBUILD
 
 basicStats = CREATE TABLE %s(TYPE STRING, AVG DOUBLE , STDDEV DOUBLE , \
 	MIN INT, MAX INT ) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+	\nCACHE TABLE %s
 	
 topKStats = CREATE TABLE %s(TYPE STRING, GRAPH STRING, \
 	SUBJECT STRING, PREDICATE STRING, OBJECT STRING, \
 	CNT INT ) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+	\nCACHE TABLE %s
 	
 insertBasicStats = LOAD DATA LOCAL INPATH '%c' INTO TABLE %s
 
@@ -162,8 +162,8 @@ defaultReversePrimary = CREATE TABLE %s( \
 	prop24 STRING, val24  STRING, prop25 STRING, val25  STRING, prop26 STRING, val26  STRING, \
 	prop27 STRING, val27  STRING, prop28 STRING, val28  STRING, prop29 STRING, val29  STRING, \
 	prop30 STRING, val30  STRING, prop31 STRING, val31  STRING, prop32 STRING, val32  STRING) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';  \
+	\nCACHE TABLE %s
 	
 storeSwitchForward = UPDATE %s SET status=status-1
 storeSwitchRollback = UPDATE %s SET status=status+1
@@ -179,15 +179,15 @@ defaultPredInfoTable = CREATE TABLE %s_preds( \
     hash2 smallint, \
     hash3 smallint, \
     db2type STRING ) \
-    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-    TBLPROPERTIES ("shark.cache" = "true")
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+	\nCACHE TABLE %s
 
 indexPREDINFO = CREATE  INDEX pred_%s_preds ON TABLE %s_preds(pred)  AS 'COMPACT' WITH DEFERRED REBUILD
 
 defaultDataTypeTable = CREATE TABLE %s( \
 	datatype_id SMALLINT , datatype_name STRING) \
-	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' \
-	TBLPROPERTIES ("shark.cache" = "true")
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  \
+	\nCACHE TABLE %s
 	
 indexDATATYPE = CREATE  INDEX datatype_%s ON TABLE %s(datatype_id, datatype_name) AS 'COMPACT' WITH DEFERRED REBUILD
 	

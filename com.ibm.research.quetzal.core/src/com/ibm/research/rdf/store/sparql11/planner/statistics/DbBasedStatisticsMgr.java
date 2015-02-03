@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
- package com.ibm.research.rdf.store.sparql11.planner.statistics;
+package com.ibm.research.rdf.store.sparql11.planner.statistics;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -103,9 +103,14 @@ public class DbBasedStatisticsMgr
    private void populateTopKStats()
       {
 	  boolean sharkEngine = isSharkEngine();
+	  
       // Delete topk stats
-      SQLExecutor.executeUpdate(con, "delete from " + store.getTopKStatsTable());
-
+      if (!sharkEngine) {
+    	  SQLExecutor.executeUpdate(con, "delete from " + store.getTopKStatsTable());
+      } else {
+    	  //delete is only supported starting at hive 0.14
+    	  
+      }
       String topKInsert = Sqls.getSqls(this.backend).getSql("insertTopK").replaceFirst("%s", store.getTopKStatsTable());
 
       // Top Subject
@@ -283,9 +288,13 @@ public class DbBasedStatisticsMgr
          {
          SQLExecutor.executeUpdate(con, "delete from " + store.getSchemaName() + "." + store.getBasicStatsTable());
          }
-      else
+      else if (!isSharkEngine())
          {
-         SQLExecutor.executeUpdate(con, "delete from " + store.getBasicStatsTable());
+    	  
+    	  SQLExecutor.executeUpdate(con, "delete from " + store.getBasicStatsTable());
+         } else {
+       	  //delete is only supported starting at hive 0.14
+       	  
          }
 
       // Total number of values in DPH
