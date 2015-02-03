@@ -43,12 +43,11 @@ cat > $NT_FILE.db2_cmds_tmp <<EOF
 EOF
 fi
 
-java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createTables="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS > $NT_FILE.db2_create_cmds
+rm -f $NT_FILE.db2_create_cmds
+java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="$NT_FILE.db2_create_cmds" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS
 
-echo java $JAVA_OPTS -Dcom.ibm.rdf.longStringsLength=$LONG_STRINGS_LEN -Dcom.ibm.rdf.createStore="true" -Dcom.ibm.rdf.createTables="true" -Dcom.ibm.rdf.createIndex="false" -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS
-
-
-java $JAVA_OPTS -Dcom.ibm.rdf.createStore="false" -Dcom.ibm.rdf.createIndex="true" -Dcom.ibm.research.rdf.store.no_lids=$NO_LIDS -Dcom.ibm.rdf.generateStoreSQL="true" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS > $NT_FILE.db2_index_cmds
+rm -f $NT_FILE.db2_index_cmds
+java $JAVA_OPTS -Dcom.ibm.rdf.createStore="false" -Dcom.ibm.rdf.createIndex="true" -Dcom.ibm.research.rdf.store.no_lids=$NO_LIDS -Dcom.ibm.rdf.generateStoreSQL="$NT_FILE.db2_index_cmds" -cp $CLASSPATH com.ibm.research.rdf.store.cmd.CreateRdfStore $KNOWLEDGE_BASE $CREATE_OPTS
 
 if [[ $SCHEMA_EXPERIMENTS == 1 ]]; then
     rm -f $NT_FILE.exp_sql

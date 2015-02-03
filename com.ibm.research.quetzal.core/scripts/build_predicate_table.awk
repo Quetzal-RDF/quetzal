@@ -46,7 +46,7 @@ function get_pred(predicate) {
 END {
     for(pred in hash_count) {
 	# pred
-	printf("%s\t",  pred);
+	printf("%s\t", hash_string(fixBrackets(pred),pred));
 	
 	# one-to-one
 	if (pred_multi[pred]==1) {

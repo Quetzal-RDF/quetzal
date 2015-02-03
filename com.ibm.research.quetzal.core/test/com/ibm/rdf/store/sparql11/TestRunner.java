@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Properties;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
