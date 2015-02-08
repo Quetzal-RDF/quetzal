@@ -123,8 +123,10 @@ while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
     fi
 done
 
+for f in $DIR/../target/lib/*.jar; do s+=$f; done;
+
 if [[ $INVOKED_FROM_WRAPPER != 1 ]]; then
-    export CLASSPATH=$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$DIR/../target/lib/*.jar
+    export CLASSPATH=$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$s
 fi
 
 #  it really sucks to have random distinct characters be 
