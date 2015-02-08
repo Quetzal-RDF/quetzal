@@ -189,7 +189,7 @@ function process_load_files() {
     bash $DIR/triple-pawk.sh $PER_SORT_PARALLEL $CHUNKS $1 $nt_file_1 -b -O $GAWK_OPTS -v priorityPredicatesFile=$nt_file_1.predicates_to_index -v predicateInfoFile=$nt_file_1.pred_info -v longStringFile=$nt_file_1.long_strings  -v primaryFile=$nt_file_1.primary.load -v secondaryFile=$nt_file_1.secondary.load -v dbEngine=$DB_ENGINE -f $DIR/types.awk -f $DIR/long-strings.awk -f $DIR/createLoadFile.awk
 
     # create predicate info load file
-    awk -b -f $DIR/build_predicate_table.awk `ls $nt_file_1.pred_info.[0-9]* $nt_file_1.multi.[0-9]* $nt_file_1.edge_sets1_${HASHES}.hashes $nt_file_1.pred_types.[0-9]* 2>/dev/null` > $LOAD_DIR/${table_name}-predicate-info.load
+    awk -f $DIR/strings.awk -f $DIR/types.awk -v cutoff=$LONG_LENGTH -f $DIR/long-strings.awk -v longStringFile=$nt_file_1.predicate-info.long_strings -v typeCodeFile=$NT_FILE.types -b -f $DIR/build_predicate_table.awk `ls $nt_file_1.pred_info.[0-9]* $nt_file_1.multi.[0-9]* $nt_file_1.edge_sets1_${HASHES}.hashes $nt_file_1.pred_types.[0-9]* 2>/dev/null` > $LOAD_DIR/${table_name}-predicate-info.load
 }
 
 ###########################################################################

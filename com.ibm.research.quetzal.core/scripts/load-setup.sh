@@ -15,7 +15,7 @@ CORRELATIONS=0
 COLOR="true"
 CHUNKS=1
 CREATE_ONLY=0
-JAVA_OPTS=$_JAVA_OPTIONS
+JAVA_OPTS="$_JAVA_OPTIONS -Dfile.encoding=UTF-8"
 TABLES="both"
 REUSE=0
 ENTITY_IN_SECONDARY=1
@@ -123,10 +123,13 @@ while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
     fi
 done
 
-for f in $DIR/../target/lib/*.jar; do s+=$f; done;
+sep=":"
+for f in $DIR/../target/lib/*.jar; do lib+=$f$sep; done
+
+echo "LIB=" $lib
 
 if [[ $INVOKED_FROM_WRAPPER != 1 ]]; then
-    export CLASSPATH=$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$s
+    export CLASSPATH=$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$lib
 fi
 
 #  it really sucks to have random distinct characters be 
