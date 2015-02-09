@@ -123,8 +123,13 @@ while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
     fi
 done
 
+sep=":"
+for f in $DIR/../target/lib/*.jar; do lib+=$f$sep; done
+
+echo "LIB=" $lib
+
 if [[ $INVOKED_FROM_WRAPPER != 1 ]]; then
-    export CLASSPATH=$DIR/../target/classes:$DIR/../bin:$DIR/../../com.ibm.wala.util/bin:$DIR/../target/lib/com.ibm.wala.util-1.3.7-SNAPSHOT.jar:$DIR/../target/lib/hash.jar:$DIR/../target/lib/antlr-3.3-runtime.jar:$DIR/../target/lib/antlr-2.7.7.jar:$DIR/../target/lib/jena-core-2.11.0.jar:$DIR/../target/lib/jena-arq-2.11.0.jar:$DIR/../target/lib/jena-iri-1.0.0.jar:$DIR/../target/lib/slf4j-api-1.6.4.jar:$DIR/../target/lib/slf4j-log4j-1.6.4.jar:$DIR/../target/lib/xercesImpl-2.11.0.jar:$DIR/../target/lib/arq-2.8.5-patched.jar:$DIR/../target/lib/iri-0.8.jar:$DIR/../target/lib/icu4j-3.4.4.jar:$DIR/../target/lib/commons-logging-1.1.1.jar:$DIR/../target/lib/db2jcc4.jar:$DIR/../target/lib/pdq.jar:$DIR/../target/lib/junit-4.10.jar:$DIR/../target/lib/postgresql-9.3-1102-jdbc41.jar:$DIR/../target/lib/hive-exec-0.11.0-shark-0.9.1.jar:$DIR/../target/lib/hive-jdbc-0.11.0-shark-0.9.1.jar:$DIR/../target/lib/hive-metastore-0.11.0-shark-0.9.1.jar:$DIR/../target/lib/hive-service-0.11.0-shark-0.9.1.jar:$DIR/../target/lib/hive-shims-0.11.0-shark-0.9.1.jar:$DIR/../target/lib/libfb303-0.9.0.jar:$DIR/../target/lib/libthrift-0.9.0.jar:$DIR/../target/lib/hadoop-common-2.2.0.jar:$DIR/../target/lib/jsqlparser-0.9.jar:$DIR/../target/lib/owlapi-distribution-3.4.5.jar:$DIR/../target/lib/iodt.sor-1.0.jar:$DIR/../target/lib/hashmvn-1.0.jar:$DIR/../target/lib/xml-apis-1.4.01.jar:$DIR/../target/lib/stringtemplate-3.2.1.jar
+    export CLASSPATH=$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$lib
 fi
 
 #  it really sucks to have random distinct characters be 
