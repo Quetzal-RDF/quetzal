@@ -1,13 +1,18 @@
-useradd quetzal -p quetzalcoatl
+if [ -z "$PASSWD" ]; then
+    echo "Need to set PASSWD for docker container.  Use docker -e PASSWD=<password> to set"
+    exit 1
+fi 
 
 mkdir /data/tmp
-
-chown -R quetzal /data
 
 /etc/bootstrap.sh
 
 /usr/local/spark/sbin/start-all.sh 
-/usr/local/spark/sbin/start-thriftserver.sh &
+/usr/local/spark/sbin/start-thriftserver.sh > /tmp/thrift.log 2>&1 &
+
+until [ grep 'listening on 0.0.0.0/0.0.0.0:10000' /tmp/thrift.log ]; do sleep 10; done
+
+echo root:$PASSWD | chpasswd
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 DIR=`dirname $0`
@@ -30,7 +35,7 @@ export DB2_HOST=localhost
 export DB2_PORT=10000
 export DB2_DB=default
 export DB2_USER=quetzal
-export DB2_PASSWORD=quetzalcoatl
+export DB2_PASSWORD=$PASSWD
 export DB2_SCHEMA=default
 export KNOWLEDGE_BASE=kb
 
