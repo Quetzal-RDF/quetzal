@@ -34,7 +34,7 @@ fi
 export DB2_HOST=localhost
 export DB2_PORT=10000
 export DB2_DB=default
-export DB2_USER=quetzal
+export DB2_USER=root
 export DB2_PASSWORD=$PASSWD
 export DB2_SCHEMA=default
 export KNOWLEDGE_BASE=kb
