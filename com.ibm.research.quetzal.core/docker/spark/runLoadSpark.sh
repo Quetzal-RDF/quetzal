@@ -10,7 +10,7 @@ mkdir /data/tmp
 /usr/local/spark/sbin/start-all.sh 
 /usr/local/spark/sbin/start-thriftserver.sh > /tmp/thrift.log 2>&1 &
 
-until [ grep 'listening on 0.0.0.0/0.0.0.0:10000' /tmp/thrift.log ]; do sleep 10; done
+until grep 'listening on 0.0.0.0/0.0.0.0:10000' /tmp/thrift.log; do sleep 10; done
 
 echo root:$PASSWD | chpasswd
 
