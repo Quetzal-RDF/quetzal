@@ -58,6 +58,11 @@
     </plugins>
   </build>
   <dependencies>
+	<dependency>
+	<groupId>org.apache.hive</groupId>
+	<artifactId>hive-jdbc</artifactId>
+	<version>0.12.0</version>
+	</dependency>
   	<dependency>
   		<groupId>org.apache.jena</groupId>
   		<artifactId>jena-core</artifactId>
