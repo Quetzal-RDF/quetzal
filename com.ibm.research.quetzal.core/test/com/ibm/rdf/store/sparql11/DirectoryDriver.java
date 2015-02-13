@@ -34,6 +34,7 @@ public class DirectoryDriver extends TestCase {
 
 	public static OrderedTestSuite suite() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		final TestData data = getData("com.ibm.rdf.store.sparql11.TestRunner$" + System.getenv("DB_ENGINE"), System.getenv("KNOWLEDGE_BASE"));
+		@SuppressWarnings("rawtypes")
 		final DatabaseEngine engine = getEngine(data);
 		final OrderedTestSuite x = new OrderedTestSuite();
 		recurseFiles(new VoidFunction<File>() {
@@ -41,6 +42,7 @@ public class DirectoryDriver extends TestCase {
 			public void apply(final File arg0) {
 				x.addTest(new TestCase(arg0.getName()) {
 					@Override
+					@SuppressWarnings("unchecked")
 					public void runTest() {
 						engine.executeQuery(data, arg0.getAbsolutePath());
 					} 

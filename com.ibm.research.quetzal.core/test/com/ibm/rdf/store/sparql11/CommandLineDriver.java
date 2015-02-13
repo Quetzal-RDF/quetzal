@@ -27,7 +27,7 @@ import com.ibm.rdf.store.sparql11.TestRunner.SharkEngine;
 import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
 import com.ibm.rdf.store.sparql11.TestRunner.TestData;
 
-public class CommandLineDriver  {
+public class CommandLineDriver {
 
 	private static String getProtocol(String dataClass) {
 		if (dataClass.contains("DB2")) {
@@ -42,10 +42,11 @@ public class CommandLineDriver  {
 		}
 	}
 	
-	protected static TestData getData(String dataClass, String dataset) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	protected static TestData getData(String dataClass, String dataset) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+		@SuppressWarnings("unchecked")
 		Class<? extends TestData> cls = (Class<? extends TestData>) Class.forName(dataClass);
-		Method factory = cls.getMethod("getStore", String.class, String.class, String.class, String.class, String.class, boolean.class);
-		return (TestData) factory.invoke(null,
+		Constructor<? extends TestData> factory = cls.getConstructor(String.class, String.class, String.class, String.class, String.class, boolean.class);
+		return (TestData) factory.newInstance(
 			"jdbc:" + getProtocol(dataClass) + "://" + System.getenv("DB2_HOST") + ":" + System.getenv("DB2_PORT") + "/" + System.getenv("DB2_DB"), 
 			dataset, 
 			System.getenv("DB2_USER"),
@@ -82,7 +83,7 @@ public class CommandLineDriver  {
 		}
 	}
 
-	private static DatabaseEngine<?> getEngine(TestData data) {
+	protected static DatabaseEngine<? extends TestData> getEngine(TestData data) {
 		if (data instanceof DB2TestData) {
 			return new DB2Engine();
 		} else if (data instanceof PSQLTestData) {
@@ -96,6 +97,7 @@ public class CommandLineDriver  {
 	}
 
 	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException {
+		@SuppressWarnings("unchecked")
 		Class<TestRunner<? extends TestData>> cls = (Class<TestRunner<? extends TestData>>) Class.forName(args[0]);
 		Constructor<TestRunner<? extends TestData>> ctor = cls.getDeclaredConstructor(DatabaseEngine.class, Object.class, int[].class, String.class);
 		TestData data = getData(args[1], args[2]);
