@@ -129,7 +129,7 @@ for f in $DIR/../target/lib/*.jar; do lib+=$f$sep; done
 echo "LIB=" $lib
 
 if [[ $INVOKED_FROM_WRAPPER != 1 ]]; then
-    export CLASSPATH=$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$lib
+    export CLASSPATH=$DIR/../target/test-classes:$DIR/../target/classes:$DIR/../../com.ibm.wala.util/bin:$DIR/../lib/db2jcc4.jar:$lib
 fi
 
 #  it really sucks to have random distinct characters be 

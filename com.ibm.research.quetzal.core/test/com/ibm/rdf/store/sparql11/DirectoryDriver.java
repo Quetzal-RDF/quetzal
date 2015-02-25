@@ -33,7 +33,7 @@ public class DirectoryDriver extends TestCase {
 		  }
 
 	public static OrderedTestSuite suite() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-		final TestData data = getData("com.ibm.rdf.store.sparql11.TestRunner$" + System.getenv("DB_ENGINE"), System.getenv("KNOWLEDGE_BASE"));
+		final TestData data = getData();
 		@SuppressWarnings("rawtypes")
 		final DatabaseEngine engine = getEngine(data);
 		final OrderedTestSuite x = new OrderedTestSuite();
@@ -50,7 +50,7 @@ public class DirectoryDriver extends TestCase {
 			} }, new Predicate<File>() {
 				@Override
 				public boolean test(File arg0) {
-					return arg0.getName().endsWith(".sparql");
+					return arg0.getName().endsWith(".sparql") || arg0.getName().endsWith(".rq");
 				} }, new File(System.getenv("TEST_DIR")));
 		return x;
 	}

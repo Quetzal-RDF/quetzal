@@ -16,8 +16,6 @@ import org.junit.runner.RunWith;
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 
 public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
-	private static final String dataDir = System.getProperty("workspaceRoot") + "/rdfstore-data/";
-	
 	private final String queryDir;
 	
 	public DBpediaQueryUtilityTest(DatabaseEngine<D> engine, D data, int[] answers, String queryDir) {
@@ -39,14 +37,14 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 	public static class RDFStoreDBpedia37_DB2 extends DBpediaQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/dbp", "dbp37_r_qd", "db2inst1", "db2admin", "db2inst1", false);
 		public RDFStoreDBpedia37_DB2() {
-			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, dataDir + "dbpedia3.7_queries_rev/");
+			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, TestConstants.dataDir + "dbpedia3.7_queries_rev/");
 		}
 	}
 
 	public static class RDFStoreDBpedia37_PG extends DBpediaQueryUtilityTest<PSQLTestData> {
 		private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://localhost:9996/dbp", "dbp37_qd", "akement", "passw0rd", "db2inst1", false);
 		public RDFStoreDBpedia37_PG() {
-			super(new PSQLEngine(), data, TestConstants.dbpedia100mAnswers, dataDir + "dbpedia3.7_queries/");
+			super(new PSQLEngine(), data, TestConstants.dbpedia100mAnswers, TestConstants.dataDir + "dbpedia3.7_queries/");
 		}
 	}
 
