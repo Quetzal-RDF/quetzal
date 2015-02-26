@@ -1,5 +1,3 @@
-su - db2inst1
-
 db2start
 
 cd /data
