@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.junit.launchconfig">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/rdfstore-base/test/com/ibm/rdf/store/sparql11/DirectoryDriver.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="DB2_DB" value="lubm"/>
+<mapEntry key="DB2_HOST" value="localhost"/>
+<mapEntry key="DB2_PASSWORD" value="db2admin"/>
+<mapEntry key="DB2_PORT" value="50002"/>
+<mapEntry key="DB2_SCHEMA" value="db2inst1"/>
+<mapEntry key="DB2_USER" value="db2inst1"/>
+<mapEntry key="DB_ENGINE" value="DB2TestData"/>
+<mapEntry key="KNOWLEDGE_BASE" value="lubm_100m_r"/>
+<mapEntry key="TEST_DIR" value="${project_loc:/rdfstore-data}/lubm_queries_QL_reversed"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
+<booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
+<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
+<stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit4"/>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.rdf.store.sparql11.DirectoryDriver"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-base"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
+</launchConfiguration>

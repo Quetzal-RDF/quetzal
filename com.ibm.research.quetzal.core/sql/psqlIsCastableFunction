@@ -8,7 +8,7 @@ BEGIN
     IF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#boolean' THEN
 	x := var::BOOLEAN;
     ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#integer' THEN
-	y := var::INTEGER;
+	y := var::NUMERIC(1000,0);
     ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#decimal' THEN
 	y := var::DECIMAL;
     ELSIF xmlSchemaType = 'http://www.w3.org/2001/XMLSchema#float' THEN

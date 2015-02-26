@@ -34,10 +34,17 @@ public class DBpediaQueryUtilityTest<D> extends TestRunner<D> {
 
 	//@RunWith(com.ibm.research.rdf.store.testing.RandomizedRepeatRunner.class)
 	//@RandomizedRepeat(8)
-	public static class RDFStoreDBpedia37 extends DBpediaQueryUtilityTest<DB2TestData> {
-		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:8997/dbp", "dbp37_r_qd", "db2inst1", "db2admin", "db2inst1", false);
-		public RDFStoreDBpedia37() {
-			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, "/Users/ksrinivs/Documents/workspace/rdfstore-data/dbpedia3.7_queries_rev/");
+	public static class RDFStoreDBpedia37_DB2 extends DBpediaQueryUtilityTest<DB2TestData> {
+		private static final DB2TestData data = new DB2TestData("jdbc:db2://localhost:50002/dbp", "dbp37_r_qd", "db2inst1", "db2admin", "db2inst1", false);
+		public RDFStoreDBpedia37_DB2() {
+			super(new DB2Engine(), data, TestConstants.dbpedia100mAnswers, TestConstants.dataDir + "dbpedia3.7_queries_rev/");
+		}
+	}
+
+	public static class RDFStoreDBpedia37_PG extends DBpediaQueryUtilityTest<PSQLTestData> {
+		private static final PSQLTestData data = new PSQLTestData("jdbc:postgresql://localhost:9996/dbp", "dbp37_qd", "akement", "passw0rd", "db2inst1", false);
+		public RDFStoreDBpedia37_PG() {
+			super(new PSQLEngine(), data, TestConstants.dbpedia100mAnswers, TestConstants.dataDir + "dbpedia3.7_queries/");
 		}
 	}
 

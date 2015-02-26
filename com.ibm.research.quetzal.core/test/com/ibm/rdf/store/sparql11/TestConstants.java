@@ -36,8 +36,8 @@ public interface TestConstants {
 
 	public static final int[] dbpedia10mAnswers = { 9, 1, 119, 3, 90, 310, 2,
 			129, 3, 1, 1, 98, 2, 6, 39, 2, 2, 1, 20, 99780, 2 };
-	public static final int[] dbpedia100mAnswers = { 0, 1, 32, 0, 5, 55716, 2,
-			4354, 5, 1, 1, 1, 7, 2, 2, 1, 338676, 856, 0, 4 };
+	public static final int[] dbpedia100mAnswers = { 0, 1, 32, 0, 5, 55710, 2,
+			4349, 5, 1, 1, 1, 7, 2, 2, 1, 338676, 458, 0, 4 };
 
 	public static final int[] uobm_30_answers_original = { 0, 0, 25, 533, 0,
 			5112, 1, 29, 34, -2, 47, 0, 0, 376 };
@@ -50,4 +50,6 @@ public interface TestConstants {
 	public static final int[] uobm_1_answers_proppaths_expansion = { 2352,
 			37808, 22, 533, 322, 184, 4, 36, 26, -2, 90, 0, 0, -2, 350, 0, 350,
 			-2, 1017, -2, 351, 1152768, 23, 322, 0, 0, 6, -2 };
+
+	static final String dataDir = System.getProperty("workspaceRoot") + "/rdfstore-data/";
 }

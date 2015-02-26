@@ -27,26 +27,42 @@ import com.ibm.rdf.store.sparql11.TestRunner.SharkEngine;
 import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
 import com.ibm.rdf.store.sparql11.TestRunner.TestData;
 
-public class CommandLineDriver  {
+public class CommandLineDriver {
 
-	private static String getProtocol(String dataClass) {
-		if (dataClass.contains("DB2")) {
+	private static String getProtocol() {
+		String dataClass = System.getenv("DB_ENGINE");
+		if (dataClass.contains("db2")) {
 			return "db2";
-		} else if (dataClass.contains("PSQL")) {
+		} else if (dataClass.contains("postgresql")) {
 			return "postgresql";
-		} else if (dataClass.contains("Shark")) {
+		} else if (dataClass.contains("shark")) {
 			return "hive2";
 		} else {
 			assert false;
 			return null;
 		}
 	}
-	
-	protected static TestData getData(String dataClass, String dataset) throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-		Class<? extends TestData> cls = (Class<? extends TestData>) Class.forName(dataClass);
-		Method factory = cls.getMethod("getStore", String.class, String.class, String.class, String.class, String.class, boolean.class);
-		return (TestData) factory.invoke(null,
-			"jdbc:" + getProtocol(dataClass) + "://" + System.getenv("DB2_HOST") + ":" + System.getenv("DB2_PORT") + "/" + System.getenv("DB2_DB"), 
+
+	private static Class<? extends TestData> getDataClass() {
+		String dataClass = System.getenv("DB_ENGINE");
+		if (dataClass.contains("db2")) {
+			return DB2TestData.class;
+		} else if (dataClass.contains("postgresql")) {
+			return PSQLTestData.class;
+		} else if (dataClass.contains("shark")) {
+			return SharkTestData.class;
+		} else {
+			assert false;
+			return null;
+		}
+	}
+
+	protected static TestData getData() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+		String dataset = System.getenv("KNOWLEDGE_BASE");
+		Class<? extends TestData> cls = getDataClass();
+		Constructor<? extends TestData> factory = cls.getConstructor(String.class, String.class, String.class, String.class, String.class, boolean.class);
+		return (TestData) factory.newInstance(
+			"jdbc:" + getProtocol() + "://" + System.getenv("DB2_HOST") + ":" + System.getenv("DB2_PORT") + "/" + System.getenv("DB2_DB"), 
 			dataset, 
 			System.getenv("DB2_USER"),
 			System.getenv("DB2_PASSWORD"),
@@ -82,7 +98,7 @@ public class CommandLineDriver  {
 		}
 	}
 
-	private static DatabaseEngine<?> getEngine(TestData data) {
+	protected static DatabaseEngine<? extends TestData> getEngine(TestData data) {
 		if (data instanceof DB2TestData) {
 			return new DB2Engine();
 		} else if (data instanceof PSQLTestData) {
@@ -96,10 +112,11 @@ public class CommandLineDriver  {
 	}
 
 	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InstantiationException, InvocationTargetException {
+		@SuppressWarnings("unchecked")
 		Class<TestRunner<? extends TestData>> cls = (Class<TestRunner<? extends TestData>>) Class.forName(args[0]);
 		Constructor<TestRunner<? extends TestData>> ctor = cls.getDeclaredConstructor(DatabaseEngine.class, Object.class, int[].class, String.class);
-		TestData data = getData(args[1], args[2]);
-		run(ctor.newInstance(getEngine(data), data, getAnswers(args[3]), args[4]), Integer.parseInt(args[5]), Boolean.parseBoolean(args[6]));
+		TestData data = getData();
+		run(ctor.newInstance(getEngine(data), data, getAnswers(args[1]), System.getenv("TEST_DIR")), Integer.parseInt(args[2]), Boolean.parseBoolean(args[3]));
 	}
 
 }
