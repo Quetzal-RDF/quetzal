@@ -1,10 +1,10 @@
-db2start
+su - db2inst1 -c 'db2start'
+su - db2inst1 -c 'db2 "CREATE DATABASE QUETZAL"'
 
 cd /data
 
 mkdir /data/tmp
 
-db2 "CREATE DATABASE QUETZAL"
 # uncomment the following if your database has over 100 properties
 # and long strings for URIS
 # db2 "CREATE DATABASE QUETZAL PAGESIZE 32K"
