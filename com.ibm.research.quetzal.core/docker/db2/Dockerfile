@@ -7,9 +7,10 @@ RUN apt-get update && apt-get install -y default-jdk \
 && apt-get install -y git \
 && apt-get install -y gawk \
 && apt-get install -y realpath \
-&& mkdir /data && chown db2inst1 /data 
+&& mkdir /data && cd /data \
+&& git clone https://github.com/Quetzal-RDF/quetzal \
+&& cd /data/quetzal/com.ibm.research.quetzal.core/ &&  mvn verify -DskipTests && mkdir /data/tmp \
+&& chown -R db2inst1:db2grp1 /data
 
-WORKDIR /data
-
-RUN git clone https://github.com/Quetzal-RDF/quetzal \
-&& cd /data/quetzal/com.ibm.research.quetzal.core/ &&  mvn verify -DskipTests
+# cant switch user here to db2inst1.  Mounting the volume for /home seems to depend 
+# on logging in as root, and then db2 does not start 

@@ -1,14 +1,11 @@
-su - db2inst1 -c 'db2start'
-su - db2inst1 -c 'db2 "CREATE DATABASE QUETZAL"'
+db2start
+db2 "CREATE DATABASE QUETZAL"
 
 # uncomment the following if your database has over 100 properties
 # and long strings for URIS
-# su - db2inst1 -c 'db2 "CREATE DATABASE QUETZAL PAGESIZE 32K"'
+# db2 "CREATE DATABASE QUETZAL PAGESIZE 32K"'
 
 cd /data
-
-mkdir /data/tmp
-
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 DIR=`dirname $0`
