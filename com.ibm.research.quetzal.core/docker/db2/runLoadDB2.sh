@@ -1,3 +1,4 @@
+db2set DB2COMM=TCPIP
 db2start
 db2 "CREATE DATABASE QUETZAL"
 
