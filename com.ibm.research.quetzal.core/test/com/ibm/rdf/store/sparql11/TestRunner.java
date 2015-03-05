@@ -235,6 +235,7 @@ public class TestRunner<D> {
 				info.setProperty("user", username);
 				info.setProperty("password", password);
 				conn = DriverManager.getConnection(jdbcurl, info);
+				ctx = new Context();
 				setStore();
 			} catch (Exception e) {
 				e.printStackTrace();
