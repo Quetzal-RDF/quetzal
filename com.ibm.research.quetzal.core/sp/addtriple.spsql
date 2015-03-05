@@ -1,0 +1,236 @@
+CREATE OR REPLACE PROCEDURE DB2INST1.ADDTRIPLE (IN DBSCHEMA VARCHAR(118),		--schema for the rdf store
+												 	IN STORENAME VARCHAR(118),	--rdf store name
+												 	IN SUB VARCHAR(118),		--subject of the triple to insert
+												 	IN OBJ VARCHAR(118),		--object of the triple to insert
+												 	IN PRED VARCHAR(118),		--predicate of the triple to insert
+												 	IN OBJDT SMALLINT,			--object datatype of the triple to insert (as in the _DT table)
+												 	IN DFTDCOL SMALLINT,		--default dph column id for unregisered predicates
+												 	IN DFTRCOL SMALLINT,		--default rph column id for unregisered predicates
+												 	IN GID VARCHAR(118),		--GID of the triple to insert
+												 	IN LOCKCODE SMALLINT,		--control lock
+													OUT RET VARCHAR(1180))		--return string to indicate "FINISHED", "UNFINISHED", or other error msg
+--
+--assumption0: for the dph and rph tables, entry + spill indicate a unique row (e.g., spill = 0 when there're no spill rows for the entry, spill = 1, 2, ..., for spilled rows for the same entry)
+--assumption1: there's a dummy table $DBSCHEMA.dummy1 for lock control
+--assumption2: there's a sequence $DBSCHEMA.$STORENAME_LID_SEQ for new LID values in DS/RS
+--assumption3: the predicate $PRED either has been registered at the _DIRECT_PREDS / _REVERSE_PREDS tables, or has the default hash column ids $DFTDCOL, $DFTRCOL
+--assumption4: for the triple to insert, we didn't check duplication (assume no duplicated triple will be insert)
+--assumption5: in the select and update, we didn't really use GID to handle multiple graph case (assume a single graph 'DEF')
+--
+LANGUAGE SQL
+COMMIT ON RETURN YES
+P1: BEGIN
+	DECLARE SQLSTATE CHAR(5);
+	DECLARE PREFIX VARCHAR(118);
+	DECLARE SQL VARCHAR(512);
+	DECLARE SQL1 VARCHAR(512);
+	DECLARE SPILLS SMALLINT;
+	DECLARE NUM_HASHES SMALLINT;
+	DECLARE COL_HASH SMALLINT;
+	DECLARE CNT INTEGER;
+	DECLARE SPILL INTEGER;
+	DECLARE COL SMALLINT;
+	DECLARE PROP VARCHAR(118);
+	DECLARE VAL VARCHAR(118);
+	DECLARE TYP SMALLINT;
+	DECLARE SID VARCHAR(118);
+	DECLARE FOUND BOOLEAN;
+	DECLARE C CURSOR FOR S;
+	DECLARE C1 CURSOR FOR S1;
+	
+	SET RET = 'UNFINISHED';
+	
+	SET PREFIX = DBSCHEMA || '.' || STORENAME;
+	
+	--lock dummy table to avoid conflicting update
+	IF (LOCKCODE = 1) THEN
+		SET SQL = 'LOCK TABLE ' || DBSCHEMA || '.DUMMY1 IN EXCLUSIVE MODE';
+		PREPARE S FROM SQL;
+		EXECUTE S;
+	END IF;
+	
+	--construct dph query
+	SET SQL = 'SELECT P.SPILL, T.* FROM ' || PREFIX || '_DPH P, TABLE(VALUES ';
+	SET CNT = 0;
+	SET SQL1 = 'SELECT SPILLS, NUM_HASHES, T.* FROM ' || PREFIX || '_DIRECT_PREDS P, TABLE(VALUES P.HASH0, P.HASH1, P.HASH2, P.HASH3) AS T(HASH) WHERE PRED = ? AND T.HASH <> -1';
+	PREPARE S FROM SQL1;
+    OPEN C USING PRED;
+    	FETCH C INTO SPILLS, NUM_HASHES, COL_HASH;
+ 		IF (SQLSTATE = '00000') THEN
+ 			WHILE (CNT < NUM_HASHES) DO
+	   			SET CNT = CNT + 1;
+				IF (CNT > 1) THEN
+					SET SQL = SQL || ', ';
+				END IF;
+				SET SQL = SQL || '(' || COL_HASH || ', P.TYP' || COL_HASH || ', ' || 'P.PROP' || COL_HASH || ', ' || 'P.VAL' || COL_HASH || ')'; 
+				FETCH C INTO SPILLS, NUM_HASHES, COL_HASH;
+			END WHILE;
+		END IF;
+	CLOSE C;
+	IF (CNT = 0) THEN
+		SET COL_HASH = DFTDCOL;
+		SET SQL = SQL || '(' || DFTDCOL || ', P.TYP' || DFTDCOL || ', ' || 'P.PROP' || DFTDCOL || ', ' || 'P.VAL' || DFTDCOL || ')'; 
+	END IF;
+	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE P.ENTRY = ? ORDER BY T.PROP';
+	
+	--insert dph
+	PREPARE S FROM SQL;
+    OPEN C USING SUB;
+ 		FETCH C INTO SPILL, COL, TYP, PROP, VAL;
+ 		IF (SQLSTATE = '00000') THEN
+			SET FOUND = FALSE;
+			SET CNT = 0;
+			FETCH_LOOP1:
+			WHILE (SQLSTATE = '00000') DO
+	   			IF (CNT < SPILL) THEN
+	   				SET CNT = SPILL;
+	   			END IF;
+	   					
+				IF (PROP = PRED) OR (PROP IS NULL) THEN
+					IF (PROP = PRED) THEN
+	   					IF (TYP = -1) THEN
+				   			SET SQL = 'INSERT INTO ' || PREFIX || '_DS(GID, LIST_ID, ELEM, TYP, ENTITY, PROP) VALUES(?, ?, ?, ?, ?, ?)';
+				   			PREPARE S1 FROM SQL;
+				   			EXECUTE S1 USING GID, VAL, OBJ, OBJDT, SUB, PROP;
+	   					ELSE
+				   			SET SQL = 'SELECT LIST_ID FROM FINAL TABLE (INSERT INTO ' || PREFIX || '_DS(GID, LIST_ID, ELEM, TYP, ENTITY, PROP) VALUES(?, ''lid:-'' || NEXTVAL FOR ' || PREFIX || '_LID_SEQ, ?, ?, ?, ?))';
+							PREPARE S1 FROM SQL;
+						    OPEN C1 USING GID, OBJ, OBJDT, SUB, PROP;
+						   		FETCH C1 INTO SID;
+						   	CLOSE C1;
+
+				   			SET SQL = 'INSERT INTO ' || PREFIX || '_DS(GID, LIST_ID, ELEM, TYP, ENTITY, PROP) VALUES(?, ?, ?, ?, ?, ?)';
+				   			PREPARE S1 FROM SQL;
+				   			EXECUTE S1 USING GID, SID, VAL, TYP, SUB, PROP;
+
+				   			SET SQL = 'UPDATE ' || PREFIX || '_DPH SET VAL' || COL || ' = ?, TYP' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+				   			PREPARE S1 FROM SQL;
+				   			EXECUTE S1 USING SID, -1, SUB, SPILL;
+	   					END IF;
+	   				ELSE
+			   			SET SQL = 'UPDATE ' || PREFIX || '_DPH SET TYP' || COL || ' = ?, PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+			   			PREPARE S1 FROM SQL;
+			   			EXECUTE S1 USING OBJDT, PRED, OBJ, SUB, SPILL;
+	   				END IF;
+	   				SET FOUND = TRUE;
+	   				LEAVE FETCH_LOOP1;
+	   			END IF;
+	   			FETCH C INTO SPILL, COL, TYP, PROP, VAL;
+	   		END WHILE FETCH_LOOP1;
+	   			
+	   		IF (FOUND = FALSE) THEN
+		   		IF (CNT = 0) THEN
+			 		SET SQL = 'UPDATE ' || PREFIX || '_DPH SET SPILL = ? WHERE ENTRY = ?';
+			   		PREPARE S1 FROM SQL;
+			   		EXECUTE S1 USING 1, SUB;
+			   		SET CNT = CNT + 1;
+			   		
+			   		--?also need to update direct_pred?
+		   		END IF;
+
+		   		SET SQL = 'INSERT INTO ' || PREFIX || '_DPH(ENTRY, GID, SPILL, TYP' || COL_HASH || ', PROP' || COL_HASH || ', VAL' || COL_HASH || ') VALUES(?, ?, ?, ?, ?, ?)';
+		   		PREPARE S1 FROM SQL;
+		   		EXECUTE S1 USING SUB, GID, CNT+1, OBJDT, PRED, OBJ;
+	   		END IF;
+	   	ELSE
+	   		SET SQL = 'INSERT INTO ' || PREFIX || '_DPH(ENTRY, GID, SPILL, TYP' || COL_HASH || ', PROP' || COL_HASH || ', VAL' || COL_HASH || ') VALUES(?, ?, ?, ?, ?, ?)';
+	   		PREPARE S1 FROM SQL;
+	   		EXECUTE S1 USING SUB, GID, 0, OBJDT, PRED, OBJ;
+	   	END IF;
+	CLOSE C;
+
+
+	--construct rph query
+	SET SQL = 'SELECT R.SPILL, T.* FROM ' || PREFIX || '_RPH R, TABLE(VALUES ';
+	SET CNT = 0;
+	SET SQL1 = 'SELECT SPILLS, NUM_HASHES, T.* FROM ' || PREFIX || '_REVERSE_PREDS R, TABLE(VALUES R.HASH0, R.HASH1, R.HASH2, R.HASH3) AS T(HASH) WHERE PRED = ? AND T.HASH <> -1';
+	PREPARE S FROM SQL1;
+    OPEN C USING PRED;
+    	FETCH C INTO SPILLS, NUM_HASHES, COL_HASH;
+ 		IF (SQLSTATE = '00000') THEN
+ 			WHILE (CNT < NUM_HASHES) DO
+	   			SET CNT = CNT + 1;
+				IF (CNT > 1) THEN
+					SET SQL = SQL || ', ';
+				END IF;
+				SET SQL = SQL || '(' || COL_HASH || ', R.TYP, ' || 'R.PROP' || COL_HASH || ', ' || 'R.VAL' || COL_HASH || ')'; 
+				FETCH C INTO SPILLS, NUM_HASHES, COL_HASH;
+			END WHILE;
+		END IF;
+	CLOSE C;
+	IF (CNT = 0) THEN
+		SET COL_HASH = DFTRCOL;
+		SET SQL = SQL || '(' || DFTRCOL || ', R.TYP, ' || 'R.PROP' || DFTRCOL || ', ' || 'R.VAL' || DFTRCOL || ')'; 
+	END IF;
+	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE R.ENTRY = ? ORDER BY T.PROP';
+	
+	--insert rph
+	PREPARE S FROM SQL;
+    OPEN C USING OBJ;
+ 		FETCH C INTO SPILL, COL, TYP, PROP, VAL;
+ 		IF (SQLSTATE = '00000') THEN
+			SET FOUND = FALSE;
+			SET CNT = 0;
+			FETCH_LOOP2:
+			WHILE (SQLSTATE = '00000') DO
+	   			IF (CNT < SPILL) THEN
+	   				SET CNT = SPILL;
+	   			END IF;
+	   					
+				IF (PROP = PRED) OR (PROP IS NULL) THEN
+					IF (PROP = PRED) THEN
+	   					--IF (TYP = -1) THEN
+	   					IF (VAL like 'lid:%' or VAL like 'fake_lid:%') THEN
+				   			SET SQL = 'INSERT INTO ' || PREFIX || '_RS(GID, LIST_ID, ELEM, TYP, ENTITY, PROP) VALUES(?, ?, ?, ?, ?, ?)';
+				   			PREPARE S1 FROM SQL;
+				   			EXECUTE S1 USING GID, VAL, SUB, OBJDT, OBJ, PROP;
+	   					ELSE
+				   			SET SQL = 'SELECT LIST_ID FROM FINAL TABLE (INSERT INTO ' || PREFIX || '_RS(GID, LIST_ID, ELEM, TYP, ENTITY, PROP) VALUES(?, ''lid:-'' || NEXTVAL FOR ' || PREFIX || '_LID_SEQ, ?, ?, ?, ?))';
+							PREPARE S1 FROM SQL;
+						    OPEN C1 USING GID, SUB, OBJDT, OBJ, PROP;
+						   		FETCH C1 INTO SID;
+						   	CLOSE C1;
+
+				   			SET SQL = 'INSERT INTO ' || PREFIX || '_RS(GID, LIST_ID, ELEM, TYP, ENTITY, PROP) VALUES(?, ?, ?, ?, ?, ?)';
+				   			PREPARE S1 FROM SQL;
+				   			EXECUTE S1 USING GID, SID, VAL, TYP, OBJ, PROP;
+
+				   			SET SQL = 'UPDATE ' || PREFIX || '_RPH SET VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+				   			PREPARE S1 FROM SQL;
+				   			EXECUTE S1 USING SID, OBJ, SPILL;
+	   					END IF;
+	   				ELSE
+			   			SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+			   			PREPARE S1 FROM SQL;
+			   			EXECUTE S1 USING PRED, SUB, OBJ, SPILL;
+	   				END IF;
+	   				SET FOUND = TRUE;
+	   				LEAVE FETCH_LOOP2;
+	   			END IF;
+	   			FETCH C INTO SPILL, COL, TYP, PROP, VAL;
+	   		END WHILE FETCH_LOOP2;
+	   			
+	   		IF (FOUND = FALSE) THEN
+		   		IF (CNT = 0) THEN
+			 		SET SQL = 'UPDATE ' || PREFIX || '_RPH SET SPILL = ? WHERE ENTRY = ?';
+			   		PREPARE S1 FROM SQL;
+			   		EXECUTE S1 USING 1, OBJ;
+			   		SET CNT = CNT + 1;
+			   		
+			   		--also need to update reverse_pred?
+		   		END IF;
+
+		   		SET SQL = 'INSERT INTO ' || PREFIX || '_RPH(ENTRY, GID, SPILL, TYP, PROP' || COL_HASH || ', VAL' || COL_HASH || ') VALUES(?, ?, ?, ?, ?, ?)';
+		   		PREPARE S1 FROM SQL;
+		   		EXECUTE S1 USING OBJ, GID, CNT+1, OBJDT, PRED, SUB;
+	   		END IF;
+	   	ELSE
+	   		SET SQL = 'INSERT INTO ' || PREFIX || '_RPH(ENTRY, GID, SPILL, TYP, PROP' || COL_HASH || ', VAL' || COL_HASH || ') VALUES(?, ?, ?, ?, ?, ?)';
+	   		PREPARE S1 FROM SQL;
+	   		EXECUTE S1 USING OBJ, GID, 0, OBJDT, PRED, SUB;
+	   	END IF;
+	CLOSE C;
+	
+	SET RET = 'FINISHED';
+	
+END P1 
