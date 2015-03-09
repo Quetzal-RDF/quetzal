@@ -671,7 +671,7 @@ public class StoreHelper
       Store s = connectStore(conn, backend, schemaName, datasetName, context);
       if (s == null)
          {
-         System.err.println("Failed to create store object");
+         System.err.println("Failed to get connection");
          return;
          }
 
