@@ -435,7 +435,9 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 			projectedInSecondary.add(entryTermVar);
 			if (sVarMap.containsKey(entryTermVar.getName())) {
 				Pair<String, String> pair = sVarMap.get(entryTermVar.getName());
-				entrySqlToSparql.add(pair.snd+" AS "+pair.snd);
+				if (pair.snd != null) {			// KAVITHA: snd is a type is sometimes null if the variable is uri bound
+					entrySqlToSparql.add(pair.snd+" AS "+pair.snd);
+				}
 			}
 			entrySqlToSparql.add(entryTermVar.getName()+" AS "+entryTermVar.getName());
 		}
