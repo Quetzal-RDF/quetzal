@@ -8,14 +8,14 @@ CREATE OR REPLACE PROCEDURE DB2INST1.ADDTRIPLE (IN DBSCHEMA VARCHAR(118),		--sch
 												 	IN DFTRCOL SMALLINT,		--default rph column id for unregisered predicates
 												 	IN GID VARCHAR(118),		--GID of the triple to insert
 												 	IN LOCKCODE SMALLINT,		--control lock
-													OUT RET VARCHAR(1180))		--return string to indicate "FINISHED", "UNFINISHED", or other error msg
+													OUT RET VARCHAR(118))		--return string to indicate "FINISHED", "UNFINISHED", or other error msg
 --
 --assumption0: for the dph and rph tables, entry + spill indicate a unique row (e.g., spill = 0 when there're no spill rows for the entry, spill = 1, 2, ..., for spilled rows for the same entry)
---assumption1: there's a dummy table $DBSCHEMA.dummy1 for lock control
+--assumption1: there's a dummy table $DBSCHEMA.$STORENAME_DUMMY for lock control
 --assumption2: there's a sequence $DBSCHEMA.$STORENAME_LID_SEQ for new LID values in DS/RS
 --assumption3: the predicate $PRED either has been registered at the _DIRECT_PREDS / _REVERSE_PREDS tables, or has the default hash column ids $DFTDCOL, $DFTRCOL
 --assumption4: for the triple to insert, we didn't check duplication (assume no duplicated triple will be insert)
---assumption5: in the select and update, we didn't really use GID to handle multiple graph case (assume a single graph 'DEF')
+--todo1: update _direct_preds and _reverse_preds tables (ONETOONE, SPILLS) when counters are used
 --
 LANGUAGE SQL
 COMMIT ON RETURN YES
@@ -44,7 +44,7 @@ P1: BEGIN
 	
 	--lock dummy table to avoid conflicting update
 	IF (LOCKCODE = 1) THEN
-		SET SQL = 'LOCK TABLE ' || DBSCHEMA || '.DUMMY1 IN EXCLUSIVE MODE';
+		SET SQL = 'LOCK TABLE ' || PREFIX || '_DUMMY IN EXCLUSIVE MODE';
 		PREPARE S FROM SQL;
 		EXECUTE S;
 	END IF;
@@ -71,11 +71,11 @@ P1: BEGIN
 		SET COL_HASH = DFTDCOL;
 		SET SQL = SQL || '(' || DFTDCOL || ', P.TYP' || DFTDCOL || ', ' || 'P.PROP' || DFTDCOL || ', ' || 'P.VAL' || DFTDCOL || ')'; 
 	END IF;
-	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE P.ENTRY = ? ORDER BY T.PROP';
+	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE P.GID = ? AND P.ENTRY = ? ORDER BY T.PROP';
 	
 	--insert dph
 	PREPARE S FROM SQL;
-    OPEN C USING SUB;
+    OPEN C USING GID, SUB;
  		FETCH C INTO SPILL, COL, TYP, PROP, VAL;
  		IF (SQLSTATE = '00000') THEN
 			SET FOUND = FALSE;
@@ -103,14 +103,14 @@ P1: BEGIN
 				   			PREPARE S1 FROM SQL;
 				   			EXECUTE S1 USING GID, SID, VAL, TYP, SUB, PROP;
 
-				   			SET SQL = 'UPDATE ' || PREFIX || '_DPH SET VAL' || COL || ' = ?, TYP' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+				   			SET SQL = 'UPDATE ' || PREFIX || '_DPH SET VAL' || COL || ' = ?, TYP' || COL || ' = ? WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 				   			PREPARE S1 FROM SQL;
-				   			EXECUTE S1 USING SID, -1, SUB, SPILL;
+				   			EXECUTE S1 USING SID, -1, GID, SUB, SPILL;
 	   					END IF;
 	   				ELSE
-			   			SET SQL = 'UPDATE ' || PREFIX || '_DPH SET TYP' || COL || ' = ?, PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+			   			SET SQL = 'UPDATE ' || PREFIX || '_DPH SET TYP' || COL || ' = ?, PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 			   			PREPARE S1 FROM SQL;
-			   			EXECUTE S1 USING OBJDT, PRED, OBJ, SUB, SPILL;
+			   			EXECUTE S1 USING OBJDT, PRED, OBJ, GID, SUB, SPILL;
 	   				END IF;
 	   				SET FOUND = TRUE;
 	   				LEAVE FETCH_LOOP1;
@@ -120,9 +120,9 @@ P1: BEGIN
 	   			
 	   		IF (FOUND = FALSE) THEN
 		   		IF (CNT = 0) THEN
-			 		SET SQL = 'UPDATE ' || PREFIX || '_DPH SET SPILL = ? WHERE ENTRY = ?';
+			 		SET SQL = 'UPDATE ' || PREFIX || '_DPH SET SPILL = ? WHERE GID = ? AND ENTRY = ?';
 			   		PREPARE S1 FROM SQL;
-			   		EXECUTE S1 USING 1, SUB;
+			   		EXECUTE S1 USING 1, GID, SUB;
 			   		SET CNT = CNT + 1;
 			   		
 			   		--?also need to update direct_pred?
@@ -162,11 +162,11 @@ P1: BEGIN
 		SET COL_HASH = DFTRCOL;
 		SET SQL = SQL || '(' || DFTRCOL || ', R.TYP, ' || 'R.PROP' || DFTRCOL || ', ' || 'R.VAL' || DFTRCOL || ')'; 
 	END IF;
-	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE R.ENTRY = ? ORDER BY T.PROP';
+	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE R.GID = ? AND R.ENTRY = ? ORDER BY T.PROP';
 	
 	--insert rph
 	PREPARE S FROM SQL;
-    OPEN C USING OBJ;
+    OPEN C USING GID, OBJ;
  		FETCH C INTO SPILL, COL, TYP, PROP, VAL;
  		IF (SQLSTATE = '00000') THEN
 			SET FOUND = FALSE;
@@ -195,14 +195,14 @@ P1: BEGIN
 				   			PREPARE S1 FROM SQL;
 				   			EXECUTE S1 USING GID, SID, VAL, TYP, OBJ, PROP;
 
-				   			SET SQL = 'UPDATE ' || PREFIX || '_RPH SET VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+				   			SET SQL = 'UPDATE ' || PREFIX || '_RPH SET VAL' || COL || ' = ? WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 				   			PREPARE S1 FROM SQL;
-				   			EXECUTE S1 USING SID, OBJ, SPILL;
+				   			EXECUTE S1 USING SID, GID, OBJ, SPILL;
 	   					END IF;
 	   				ELSE
-			   			SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+			   			SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 			   			PREPARE S1 FROM SQL;
-			   			EXECUTE S1 USING PRED, SUB, OBJ, SPILL;
+			   			EXECUTE S1 USING PRED, SUB, GID, OBJ, SPILL;
 	   				END IF;
 	   				SET FOUND = TRUE;
 	   				LEAVE FETCH_LOOP2;
@@ -212,9 +212,9 @@ P1: BEGIN
 	   			
 	   		IF (FOUND = FALSE) THEN
 		   		IF (CNT = 0) THEN
-			 		SET SQL = 'UPDATE ' || PREFIX || '_RPH SET SPILL = ? WHERE ENTRY = ?';
+			 		SET SQL = 'UPDATE ' || PREFIX || '_RPH SET SPILL = ? WHERE GID = ? AND ENTRY = ?';
 			   		PREPARE S1 FROM SQL;
-			   		EXECUTE S1 USING 1, OBJ;
+			   		EXECUTE S1 USING 1, GID, OBJ;
 			   		SET CNT = CNT + 1;
 			   		
 			   		--also need to update reverse_pred?
