@@ -12,12 +12,15 @@
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,6 +57,7 @@ public class DB2ResultSetImpl implements ResultSet
    private DB2Binding           binding       = null;
    private boolean              hasNextCalled = false;
    private boolean              nextCalled    = true;
+   private Set<String>			columnNames = new HashSet<String>();
 
    private static final Log     log           = LogFactory.getLog(DB2ResultSetImpl.class);
 
@@ -61,6 +65,19 @@ public class DB2ResultSetImpl implements ResultSet
       {
       liRs = rs;
       set = rs.getResultSet();
+      try {
+	      ResultSetMetaData rsMetaData = set.getMetaData();
+	      int numberOfColumns = rsMetaData.getColumnCount();
+	
+	      // get the column names; column indexes start from 1
+	      for (int i = 1; i <= numberOfColumns; i++) {
+	          columnNames.add(rsMetaData.getColumnName(i));
+	         
+	      }
+      } catch (SQLException e) {
+    	  e.printStackTrace();
+    	  throw new RuntimeException("Error getting result metadata");
+      }
       this.store = store;
       connection = c;
       exprList = varExprList;
@@ -165,8 +182,12 @@ public class DB2ResultSetImpl implements ResultSet
                      {
                      if (liRs.isLiteralVariable(colName))
                         {
-                        short type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
-                        sidMap.put(new TypedValue(result, type), colName);
+                       		short type = TypeMap.SIMPLE_LITERAL_ID;
+                           	if (columnNames.contains((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase())) { 
+                           		type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
+                           	}
+                            sidMap.put(new TypedValue(result, type), colName);
+ 
                         }
                      else
                         {
@@ -180,7 +201,11 @@ public class DB2ResultSetImpl implements ResultSet
                      RDFNode n = null;
                      if (liRs.isLiteralVariable(colName))
                         {
-                        short type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
+                   
+                    	short type = TypeMap.SIMPLE_LITERAL_ID;
+                    	if (columnNames.contains((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase())) {
+                    		type = set.getShort((colName + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).toLowerCase());
+                    	}
 
                         n = new String2Node(Constants.NAME_COLUMN_OBJECT, result, type).getNode();
                         }
@@ -237,6 +262,7 @@ public class DB2ResultSetImpl implements ResultSet
             }
          catch (SQLException e)
             {
+        	 e.printStackTrace();
             }
          }
       return binding;
