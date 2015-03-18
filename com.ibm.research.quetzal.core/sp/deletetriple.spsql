@@ -9,14 +9,14 @@ CREATE OR REPLACE PROCEDURE DB2INST1.DELETETRIPLE (IN DBSCHEMA VARCHAR(118),	--s
 												 	IN DFTRCOL SMALLINT,		--default rph column id for unregisered predicates
 												 	IN GID VARCHAR(118),		--GID of the triple to delete
 												 	IN LOCKCODE SMALLINT,		--control lock
-													OUT RET VARCHAR(1180))		--return string to indicate "FINISHED", "UNFINISHED", or other error msg
+													OUT RET VARCHAR(118))		--return string to indicate "FINISHED", "UNFINISHED", or other error msg
 --
 --assumption0: for the dph and rph tables, entry + spill indicate a unique row (e.g., spill = 0 when there're no spill rows for the entry, spill = 1, 2, ..., for spilled rows for the same entry)
 --assumption1: there's a dummy table $DBSCHEMA.dummy1 for lock control
 --assumption2: there's a sequence $DBSCHEMA.$STORENAME_LID_SEQ for new LID values in DS/RS
 --assumption3: the predicate $PRED either has been registered at the _DIRECT_PREDS / _REVERSE_PREDS tables, or has the default hash column ids $DFTDCOL, $DFTRCOL
 --assumption4: for the triple to delete, we didn't check duplication (assume no duplicated triples exist)
---assumption5: in the select and update, we didn't really use GID to handle multiple graph case (assume a single graph 'DEF')
+--todo1: update _direct_preds and _reverse_preds tables (ONETOONE, SPILLS) when counters are used
 --
 LANGUAGE SQL
 COMMIT ON RETURN YES
@@ -45,7 +45,7 @@ P1: BEGIN
 	
 	--lock dummy table to avoid conflicting update
 	IF (LOCKCODE = 1) THEN
-		SET SQL = 'LOCK TABLE ' || DBSCHEMA || '.DUMMY1 IN EXCLUSIVE MODE';
+		SET SQL = 'LOCK TABLE ' || PREFIX || '_DUMMY IN EXCLUSIVE MODE';
 		PREPARE S FROM SQL;
 		EXECUTE S;
 	END IF;
@@ -72,39 +72,39 @@ P1: BEGIN
 		SET COL_HASH = DFTDCOL;
 		SET SQL = SQL || '(' || DFTDCOL || ', P.TYP' || DFTDCOL || ', ' || 'P.PROP' || DFTDCOL || ', ' || 'P.VAL' || DFTDCOL || ')'; 
 	END IF;
-	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE P.ENTRY = ? AND T.PROP = ? AND (T.TYP = -1 OR T.VAL = ?)';
+	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE P.GID = ? AND P.ENTRY = ? AND T.PROP = ? AND (T.TYP = -1 OR T.VAL = ?)';
 	
 	--delete dph
 	PREPARE S FROM SQL;
-    OPEN C USING SUB, PRED, OBJ;
+    OPEN C USING GID, SUB, PRED, OBJ;
  		FETCH C INTO SPILL, COL, TYP, VAL;
  		IF (SQLSTATE = '00000') THEN
 			IF (TYP = -1) THEN
-	   			SET SQL = 'DELETE FROM (SELECT * FROM ' || PREFIX || '_DS WHERE LIST_ID = ? AND ELEM = ? FETCH FIRST 1 ROWS ONLY)';
+	   			SET SQL = 'DELETE FROM (SELECT * FROM ' || PREFIX || '_DS WHERE GID = ? AND LIST_ID = ? AND ELEM = ? FETCH FIRST 1 ROWS ONLY)';
 	   			PREPARE S1 FROM SQL;
-				EXECUTE S1 USING VAL, OBJ;
+				EXECUTE S1 USING GID, VAL, OBJ;
 				
-				SET SQL = 'SELECT COUNT(*), MIN(ELEM), MIN(TYP), MIN(PROP) FROM ' || PREFIX || '_DS WHERE LIST_ID = ? GROUP BY LIST_ID';
+				SET SQL = 'SELECT COUNT(*), MIN(ELEM), MIN(TYP), MIN(PROP) FROM ' || PREFIX || '_DS WHERE GID = ? AND LIST_ID = ? GROUP BY LIST_ID';
 			   	PREPARE S1 FROM SQL;
-			   	OPEN C1 USING VAL;
+			   	OPEN C1 USING GID, VAL;
 			   		FETCH C1 INTO CNT, SID, TYP, PROP;
 			   		IF (CNT = 1) THEN
-					 	SET SQL = 'DELETE FROM ' || PREFIX || '_DS WHERE LIST_ID = ?';
+					 	SET SQL = 'DELETE FROM ' || PREFIX || '_DS WHERE GID = ? AND LIST_ID = ?';
 					   	PREPARE S2 FROM SQL;
-					   	EXECUTE S2 USING VAL;
+					   	EXECUTE S2 USING GID, VAL;
 			   			
-					   	SET SQL = 'UPDATE ' || PREFIX || '_DPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ?, TYP' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+					   	SET SQL = 'UPDATE ' || PREFIX || '_DPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ?, TYP' || COL || ' = ? WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 					   	PREPARE S2 FROM SQL;
-					   	EXECUTE S2 USING PROP, SID, TYP, SUB, SPILL;
+					   	EXECUTE S2 USING PROP, SID, TYP, GID, SUB, SPILL;
 			   		END IF;
 			   	CLOSE C1;
 			   	
    				ELSE
-			   		SET SQL = 'UPDATE ' || PREFIX || '_DPH SET TYP' || COL || ' = NULL, PROP' || COL || ' = NULL, VAL' || COL || ' = NULL WHERE ENTRY = ? AND SPILL = ?';
+			   		SET SQL = 'UPDATE ' || PREFIX || '_DPH SET TYP' || COL || ' = NULL, PROP' || COL || ' = NULL, VAL' || COL || ' = NULL WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 			   		PREPARE S1 FROM SQL;
-			   		EXECUTE S1 USING SUB, SPILL;
+			   		EXECUTE S1 USING GID, SUB, SPILL;
 
-				   	SET SQL = 'DELETE FROM ' || PREFIX || '_DPH WHERE ENTRY = ? AND SPILL = ? AND NOT EXISTS (SELECT P.ENTRY FROM ' || PREFIX || '_DPH P, TABLE(VALUES ';
+				   	SET SQL = 'DELETE FROM ' || PREFIX || '_DPH WHERE GID = ? AND ENTRY = ? AND SPILL = ? AND NOT EXISTS (SELECT P.ENTRY FROM ' || PREFIX || '_DPH P, TABLE(VALUES ';
 					SET CNT = 0;
 					WHILE (CNT < DBSIZE) DO
 						IF (CNT > 0) THEN
@@ -113,13 +113,13 @@ P1: BEGIN
 						SET SQL = SQL || '(P.TYP' || CNT || ')'; 
 						SET CNT = CNT + 1;
 					END WHILE;
-				   	SET SQL = SQL || ') AS T(TYP) WHERE P.ENTRY = ? AND P.SPILL = ? AND T.TYP IS NOT NULL)';
+				   	SET SQL = SQL || ') AS T(TYP) WHERE P.GID = ? AND P.ENTRY = ? AND P.SPILL = ? AND T.TYP IS NOT NULL)';
 				   	PREPARE S1 FROM SQL;
-				   	EXECUTE S1 USING SUB, SPILL, SUB, SPILL;
+				   	EXECUTE S1 USING GID, SUB, SPILL, GID, SUB, SPILL;
 				   	
-				   	SET SQL = 'UPDATE ' || PREFIX || '_DPH SET SPILL = ? WHERE ENTRY = ? AND 1 = (SELECT COUNT(ENTRY) FROM ' || PREFIX || '_DPH WHERE ENTRY = ?)';
+				   	SET SQL = 'UPDATE ' || PREFIX || '_DPH SET SPILL = ? WHERE GID = ? AND ENTRY = ? AND 1 = (SELECT COUNT(ENTRY) FROM ' || PREFIX || '_DPH WHERE GID = ? AND ENTRY = ?)';
 				   	PREPARE S1 FROM SQL;
-				   	EXECUTE S1 USING 0, SUB, SUB;
+				   	EXECUTE S1 USING 0, GID, SUB, GID, SUB;
    				END IF;
 	   	END IF;
 	CLOSE C;
@@ -147,39 +147,39 @@ P1: BEGIN
 		SET COL_HASH = DFTRCOL;
 		SET SQL = SQL || '(' || DFTRCOL || ', R.TYP, ' || 'R.PROP' || DFTRCOL || ', ' || 'R.VAL' || DFTRCOL || ')'; 
 	END IF;
-	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE R.ENTRY = ? AND T.PROP = ? AND (T.VAL = ? OR T.VAL like ''lid:%'' OR VAL like ''fake_lid:%'')';
+	SET SQL = SQL || ') AS T(COL, TYP, PROP, VAL) WHERE R.GID = ? AND R.ENTRY = ? AND T.PROP = ? AND (T.VAL = ? OR T.VAL like ''lid:%'' OR VAL like ''fake_lid:%'')';
 	
 	--delete rph
 	PREPARE S FROM SQL;
-    OPEN C USING OBJ, PRED, SUB;
+    OPEN C USING GID, OBJ, PRED, SUB;
  		FETCH C INTO SPILL, COL, TYP, VAL;
  		IF (SQLSTATE = '00000') THEN
 			IF (VAL like 'lid:%' or VAL like 'fake_lid:%') THEN
-	   			SET SQL = 'DELETE FROM (SELECT * FROM ' || PREFIX || '_RS WHERE LIST_ID = ? AND ELEM = ? FETCH FIRST 1 ROWS ONLY)';
+	   			SET SQL = 'DELETE FROM (SELECT * FROM ' || PREFIX || '_RS WHERE GID = ? AND LIST_ID = ? AND ELEM = ? FETCH FIRST 1 ROWS ONLY)';
 	   			PREPARE S1 FROM SQL;
-				EXECUTE S1 USING VAL, SUB;
+				EXECUTE S1 USING GID, VAL, SUB;
 				
-				SET SQL = 'SELECT COUNT(*), MIN(ELEM), MIN(PROP) FROM ' || PREFIX || '_RS WHERE LIST_ID = ? GROUP BY LIST_ID';
+				SET SQL = 'SELECT COUNT(*), MIN(ELEM), MIN(PROP) FROM ' || PREFIX || '_RS WHERE GID = ? AND LIST_ID = ? GROUP BY LIST_ID';
 			   	PREPARE S1 FROM SQL;
-			   	OPEN C1 USING VAL;
+			   	OPEN C1 USING GID, VAL;
 			   		FETCH C1 INTO CNT, SID, PROP;
 			   		IF (CNT = 1) THEN
-					 	SET SQL = 'DELETE FROM ' || PREFIX || '_RS WHERE LIST_ID = ?';
+					 	SET SQL = 'DELETE FROM ' || PREFIX || '_RS WHERE GID = ? AND LIST_ID = ?';
 					   	PREPARE S2 FROM SQL;
-					   	EXECUTE S2 USING VAL;
+					   	EXECUTE S2 USING GID, VAL;
 			   			
-					   	SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE ENTRY = ? AND SPILL = ?';
+					   	SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = ?, VAL' || COL || ' = ? WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 					   	PREPARE S2 FROM SQL;
-					   	EXECUTE S2 USING PROP, SID, OBJ, SPILL;
+					   	EXECUTE S2 USING PROP, SID, GID, OBJ, SPILL;
 			   		END IF;
 			   	CLOSE C1;
 			   	
    				ELSE
-			   		SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = NULL, VAL' || COL || ' = NULL WHERE ENTRY = ? AND SPILL = ?';
+			   		SET SQL = 'UPDATE ' || PREFIX || '_RPH SET PROP' || COL || ' = NULL, VAL' || COL || ' = NULL WHERE GID = ? AND ENTRY = ? AND SPILL = ?';
 			   		PREPARE S1 FROM SQL;
-			   		EXECUTE S1 USING OBJ, SPILL;
+			   		EXECUTE S1 USING GID, OBJ, SPILL;
 
-				   	SET SQL = 'DELETE FROM ' || PREFIX || '_RPH WHERE ENTRY = ? AND SPILL = ? AND NOT EXISTS (SELECT P.ENTRY FROM ' || PREFIX || '_RPH P, TABLE(VALUES ';
+				   	SET SQL = 'DELETE FROM ' || PREFIX || '_RPH WHERE GID = ? AND ENTRY = ? AND SPILL = ? AND NOT EXISTS (SELECT P.ENTRY FROM ' || PREFIX || '_RPH P, TABLE(VALUES ';
 					SET CNT = 0;
 					WHILE (CNT < RBSIZE) DO
 						IF (CNT > 0) THEN
@@ -188,13 +188,13 @@ P1: BEGIN
 						SET SQL = SQL || '(P.VAL' || CNT || ')'; 
 						SET CNT = CNT + 1;
 					END WHILE;
-				   	SET SQL = SQL || ') AS T(VAL) WHERE P.ENTRY = ? AND P.SPILL = ? AND T.VAL IS NOT NULL)';
+				   	SET SQL = SQL || ') AS T(VAL) WHERE P.GID = ? AND P.ENTRY = ? AND P.SPILL = ? AND T.VAL IS NOT NULL)';
 				   	PREPARE S1 FROM SQL;
-				   	EXECUTE S1 USING OBJ, SPILL, OBJ, SPILL;
+				   	EXECUTE S1 USING GID, OBJ, SPILL, GID, OBJ, SPILL;
 				   	
-				   	SET SQL = 'UPDATE ' || PREFIX || '_RPH SET SPILL = ? WHERE ENTRY = ? AND 1 = (SELECT COUNT(ENTRY) FROM ' || PREFIX || '_RPH WHERE ENTRY = ?)';
+				   	SET SQL = 'UPDATE ' || PREFIX || '_RPH SET SPILL = ? WHERE GID = ? AND ENTRY = ? AND 1 = (SELECT COUNT(ENTRY) FROM ' || PREFIX || '_RPH WHERE GID = ? AND ENTRY = ?)';
 				   	PREPARE S1 FROM SQL;
-				   	EXECUTE S1 USING 0, OBJ, OBJ;
+				   	EXECUTE S1 USING 0, GID, OBJ, GID, OBJ;
    				END IF;
 	   	END IF;
 	CLOSE C;
