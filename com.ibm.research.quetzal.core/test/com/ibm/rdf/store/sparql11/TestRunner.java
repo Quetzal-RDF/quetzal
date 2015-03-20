@@ -16,6 +16,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -23,6 +24,7 @@ import org.junit.Assert;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.Context;
@@ -340,6 +342,8 @@ public class TestRunner<D> {
 		// protected boolean isWrapperEnabled = true;
 		protected boolean isWrapperEnabled = true;
 
+		protected boolean print = false;
+		
 		public AbstractEngine() {
 			this.compiler = null;
 		}
@@ -404,7 +408,10 @@ public class TestRunner<D> {
 			if (q.isSelectType()) {
 				com.hp.hpl.jena.query.ResultSet rs = qe.execSelect();
 				while (rs.hasNext()) {
-					rs.next();
+					QuerySolution qs = rs.next();
+					if (print) {
+						System.err.println(qs);
+					}
 					count++;
 				}
 			} else if (q.isDescribeType()) {
@@ -473,7 +480,7 @@ public class TestRunner<D> {
 			return nOR;
 		}
 
-		protected static int printResult(/* String sparqlQuery, */ResultSet rst) {
+		protected int printResult(/* String sparqlQuery, */ResultSet rst) {
 			// System.err.println("QUERY: "+sparqlQuery);
 			// returns the number of rows returned
 
@@ -504,7 +511,9 @@ public class TestRunner<D> {
 
 					for (i = 1; i <= sz; i++)
 						row[i - 1] = rst.getString(i);
-					// System.err.println(Arrays.toString(row));
+					if (print) {
+						System.err.println(Arrays.toString(row));
+					}
 				}
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
