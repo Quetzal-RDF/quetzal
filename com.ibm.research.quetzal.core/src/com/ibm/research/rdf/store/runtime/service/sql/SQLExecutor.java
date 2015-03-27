@@ -119,6 +119,7 @@ public class SQLExecutor {
 
 			return p.processRow(conn, rs);
 		} catch (SQLException e) {
+			e.printStackTrace();
 			throw new SQLExceptionWrapper(e);
 		} finally {
 			SQLExecutor.closeSQLObjects(stmt, rs);
