@@ -24,8 +24,9 @@ import org.junit.Assert;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
@@ -407,11 +408,13 @@ public class TestRunner<D> {
 
 			if (q.isSelectType()) {
 				com.hp.hpl.jena.query.ResultSet rs = qe.execSelect();
+				if (print) {
+					rs = new ResultSetMem(rs);
+					ResultSetFormatter.outputAsCSV(rs);
+					((ResultSetMem)rs).rewind();
+				} 
 				while (rs.hasNext()) {
-					QuerySolution qs = rs.next();
-					if (print) {
-						System.err.println(qs);
-					}
+					rs.next();
 					count++;
 				}
 			} else if (q.isDescribeType()) {
