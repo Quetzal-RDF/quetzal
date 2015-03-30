@@ -584,6 +584,11 @@ public class CodeGenerator {
 		assert node.getTriple().getObject().isVariable() : "The following triple has not been properly normalized\n\t"+node.getTriple(); 
 		//
 		assert !AccessMethodType.isGraphAccess(node.getMethod().getType()) : "Graph access not supported for property paths";
+		// KAVITHA: If a triple has a variable in the object position, and it defines a recursive path, then the intermediate variables
+		// that get bound to ?x do not need to be URIs.  
+		if (node.getTriple().getObject().isVariable()) {
+			explicitIRIBoundVariables.remove(node.getTriple().getObject().getVariable());
+		}
 		
 		
 		List<SQLCommand> ret = new LinkedList<SQLCommand>();
@@ -1624,6 +1629,7 @@ public class CodeGenerator {
 			explicitNotIRIBoundVariables.add(gr.getFirst());
 		}
 		explicitNotIRIBoundVariables.removeAll(explicitIRIBoundVariables);
+
 		
 		SimplePattern sp = new SimplePatternWithExplicitIRIBoundVariables(explicitIRIBoundVariables, explicitNotIRIBoundVariables);
 		sp.addQueryTriple(st);
