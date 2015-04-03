@@ -22,21 +22,27 @@ public class ProjectedVariable {
 	
 	public ProjectedVariable(String s) 
 	{
-		this.name = new Variable(s);
-		this.exp = null;
+		this(s, null);
 	}
 	
 	public ProjectedVariable(String s, Expression e)
 	{
-		this.name = new Variable(s);
-		this.exp = e;
+		this( new Variable(s), e);
 	}
 	
 	public ProjectedVariable(Expression e)
 	{
-		this.exp = e;
+		this("v_"+(++id), e);
+		/*this.exp = e;
 		id++;
-		this.name = new Variable("v_"+id);
+		this.name = new Variable("v_"+id);*/
+	}
+	public ProjectedVariable(Variable v, Expression e) {
+		this.exp = e;
+		this.name = v;
+	}
+	public ProjectedVariable(Variable v) {
+		this(v, null);
 	}
 	
 	public Variable getVariable() {return this.name;}

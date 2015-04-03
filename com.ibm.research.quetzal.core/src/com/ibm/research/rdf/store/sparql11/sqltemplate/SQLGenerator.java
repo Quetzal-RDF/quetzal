@@ -47,7 +47,7 @@ public class SQLGenerator {
 	 * returns a pair of strings consisting of the CTE definitions and the main select statement, and an integer corresponding to an upper bound on the number of created CTEs (note the number
 	 * of actually created CTEs may be less than it).
 	 */
-	public Pair<Pair<String, String>, Integer> toSQLDetailed(Map<Variable, Variable> var2NewName) throws Exception{
+	public Pair<Pair<String, String>, Integer> toSQLDetailed(Map<Variable, Variable> var2NewName, Set<Variable> explicitIRIBoundVariables ) throws Exception{
 		
 		this.wrapper = new STPlanWrapper(plan,  var2NewName, cteStartID);
 		
@@ -60,7 +60,7 @@ public class SQLGenerator {
 		if (solutionModifierCTEDefinitions!=null) {
 			cteDefinitions.append(solutionModifierCTEDefinitions);
 		}
-		String solutionModifierCTEMainSelect = gen.toTopQuerySQL();
+		String solutionModifierCTEMainSelect = gen.toTopQuerySQL(explicitIRIBoundVariables);
 		int cteCount = wrapper.getLastCTEIdForPlanNodes() - cteStartID;
 		cteStartID = wrapper.getLastCTEIdForPlanNodes();
 		return Pair.make(Pair.make(cteDefinitions.toString(), solutionModifierCTEMainSelect), cteCount);

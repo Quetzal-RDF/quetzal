@@ -1115,12 +1115,12 @@ public class PropertyPathRewrite {
 		if (query.isSelectQuery() && 
 			(query.getSelectQuery().getSelectClause().getProjectedVariables()==null || query.getSelectQuery().getSelectClause().getProjectedVariables().isEmpty()) ) {
 			for (Variable v: Planner.gatherInScopeVariables(query.getMainPattern())) {
-				query.getSelectQuery().getSelectClause().addProjectedVariable(new ProjectedVariable(v.getName()));
+				query.getSelectQuery().getSelectClause().addProjectedVariable(new ProjectedVariable(v));
 			}
 			if (query.getMainPattern().getOptionalPatterns()!=null) {
 				for (Pattern op : query.getMainPattern().getOptionalPatterns()) {
 					for (Variable v: Planner.gatherInScopeVariables(op)) {
-						query.getSelectQuery().getSelectClause().addProjectedVariable(new ProjectedVariable(v.getName()));
+						query.getSelectQuery().getSelectClause().addProjectedVariable(new ProjectedVariable(v));
 					}
 				}
 			}
@@ -1304,7 +1304,7 @@ public class PropertyPathRewrite {
 	protected boolean rewrite(SubSelectPattern p, boolean bestEffort, NewVariableGenerator vargen, Set<Variable> explicitIRIBoundVariables, Set<Variable> explicitNotIRIBoundVariables) {
 		if (p.getSelectClause().getProjectedVariables()==null || p.getSelectClause().getProjectedVariables().isEmpty()) {
 			for (Variable pv: p.gatherProjectedVariables()) {
-				p.getSelectClause().addProjectedVariable(new ProjectedVariable(pv.getName()));
+				p.getSelectClause().addProjectedVariable(new ProjectedVariable(pv));
 			}
 		}
 		return rewrite(p.getGraphPattern(), bestEffort, vargen, explicitIRIBoundVariables, explicitNotIRIBoundVariables);

@@ -168,9 +168,22 @@ public class SimplePattern extends Pattern {
 	public Set<Variable> gatherIRIBoundVariables(){
 		Set<Variable> ret = new HashSet<Variable>();
 		for(QueryTriple qt: queryTriples) {
-			if(qt.getSubject().isVariable())ret.add(qt.getSubject().getVariable());
-			if(qt.getPredicate().isVariable())ret.add(qt.getPredicate().getVariable());
-			if(graphRestriction!=null && graphRestriction.isFirstType())ret.add(graphRestriction.getFirst());
+			if (qt.getPredicate().isIRI() || qt.getPredicate().isVariable()) {
+				if(qt.getSubject().isVariable())ret.add(qt.getSubject().getVariable());
+				if(qt.getPredicate().isVariable())ret.add(qt.getPredicate().getVariable());
+				if(graphRestriction!=null && graphRestriction.isFirstType())ret.add(graphRestriction.getFirst());
+			} else  {
+				assert qt.getPredicate().isPath() : qt.getPredicate();
+				Path path = qt.getPredicate().getPath();
+				if (path.isDirectlyRecursive() || path.isDirectlyZeroOrOnePath()) {
+					//do nothing
+					//TODO: This is a very conservative analysis.
+					// We can do better by analysis the content of the sub-path
+				} else {
+					throw new RuntimeException(qt+" has not been properly rewritten to get rid of the property path");
+				}
+				
+			}
 		}
 		return ret;
 	}  

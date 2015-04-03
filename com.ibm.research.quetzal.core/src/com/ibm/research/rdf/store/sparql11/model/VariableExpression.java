@@ -24,31 +24,42 @@ import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
  */
 public class VariableExpression extends Expression {
 	private Expression expression;
-	private String variable;
+	private Variable variable;
 
 	public VariableExpression(String v) {
-		super(EExpressionType.VAR);
-		variable = v;
+		this(new Variable(v));
 	}
+	public VariableExpression(Variable v) {
+		this(null, v);
+	}
+	
 
 	public VariableExpression(Expression e) {
-		super(EExpressionType.VAR);
-		expression = e;
+		this(e,(Variable) null);
 	}
 
-	public VariableExpression(Expression e, String v) {
+	public VariableExpression(Expression e, Variable v) {
 		super(EExpressionType.VAR);
 		expression = e;
 		variable = v;
 	}
+	public VariableExpression(Expression e, String v) {
+		this(e, new Variable(v));
+	}
+	
+	
 
 	public String getVariable() {
-		return variable;
+		return variable==null? null: variable.getName();
 	}
 
-	public void setVariable(String v) {
+	public void setVariable(Variable v) {
 		variable = v;
 	}
+	public void setVariable(String v) {
+		setVariable(new Variable(v));
+	}
+	
 
 	public Expression getExpression() {
 		return expression;
@@ -122,7 +133,7 @@ public class VariableExpression extends Expression {
 			return expression.toString();
 		}
 		if (expression == null) {
-			return "?" + variable;
+			return variable.toString();
 		}
 		return "(" + expression.toString() + " AS " + variable + ")";
 	}
@@ -136,9 +147,9 @@ public class VariableExpression extends Expression {
 			return expression.getStringWithVarName();
 		}
 		if (expression == null) {
-			return variable;
+			return variable.getName();
 		}
-		return "(" + expression.getStringWithVarName() + " AS " + variable
+		return "(" + expression.getStringWithVarName() + " AS " + variable.getName()
 				+ ")";
 	}
 
@@ -187,7 +198,7 @@ public class VariableExpression extends Expression {
 	public Set<Variable> gatherVariables() {
 		Set<Variable> ret = new HashSet<Variable>();
 		if (variable != null) {
-			ret.add(new Variable(variable));
+			ret.add(variable);
 		}
 		if (expression != null) {
 			ret.addAll(expression.gatherVariables());
@@ -198,7 +209,7 @@ public class VariableExpression extends Expression {
 	@Override
 	public Set<Variable> getVariables() {
 		if (variable != null) {
-			return Collections.singleton(new Variable(variable));
+			return Collections.singleton(variable);
 		} else {
 			return Collections.emptySet();
 		}

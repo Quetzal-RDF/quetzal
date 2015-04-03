@@ -29,13 +29,12 @@ import com.ibm.research.rdf.store.sparql11.model.Variable;
 public class TopSelectTemplate extends AbstractSelectTemplate {
 
 	Query q;
-	
 	public TopSelectTemplate(String templateName, Query q, Store store, Context ctx,
-			STPlanWrapper wrapper) {
-		super(templateName, store, ctx, wrapper);
+			STPlanWrapper wrapper, Set<Variable> explicitIRIBoundVariables) {
+		super(templateName, store, ctx, wrapper, explicitIRIBoundVariables);
 		wrapper.incrementCteIdForSolutionModifier();
 		this.q = q;
-	}
+		}
 	
 	@Override
 	protected Set<Variable> getAllPatternVariables() {

@@ -27,6 +27,7 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
+import com.ibm.research.rdf.store.sparql11.model.BindPattern;
 import com.ibm.research.rdf.store.sparql11.model.Constant;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
@@ -155,7 +156,7 @@ public class CodeGenerator {
 			List<SQLCommand> cmds = new LinkedList<SQLCommand>();
 			cmds.addAll(computeAllSQLCommand(dependentProcedures));
 			SQLGenerator gen = new SQLGenerator(plan, query, store, context, cteCount);
-			Pair<Pair<String, String>, Integer> pair = gen.toSQLDetailed(variable2RenamedVariable);
+			Pair<Pair<String, String>, Integer> pair = gen.toSQLDetailed(variable2RenamedVariable, explicitIRIBoundVariables);
 			cteCount += pair.snd+1;
 			//return gen.toSQL(variable2RenamedVariable);
 			String sql =  gen.toSQL(pair.fst);
@@ -241,7 +242,7 @@ public class CodeGenerator {
 				ret.add((CTEDefinition) cmd);
 			}
 			SQLGenerator gen = new SQLGenerator(plan, query, store, context, cteCount);
-			Pair<Pair<String, String>, Integer> pair = gen.toSQLDetailed(variable2RenamedVariable);
+			Pair<Pair<String, String>, Integer> pair = gen.toSQLDetailed(variable2RenamedVariable, explicitIRIBoundVariables);
 			String ctedefs = pair.fst.fst;
 			String mainSelect = pair.fst.snd;
 			cteCount += pair.snd+1;
@@ -265,7 +266,7 @@ public class CodeGenerator {
 				return null;
 			} else {
 				SQLGenerator gen = new SQLGenerator(plan, query, store, context, cteCount);
-				Pair<Pair<String, String>, Integer> pair = gen.toSQLDetailed(variable2RenamedVariable);
+				Pair<Pair<String, String>, Integer> pair = gen.toSQLDetailed(variable2RenamedVariable, explicitIRIBoundVariables);
 				cteCount += pair.snd+1;
 				//return gen.toSQL(variable2RenamedVariable);
 				return gen.toSQL(pair.fst);
@@ -586,9 +587,9 @@ public class CodeGenerator {
 		assert !AccessMethodType.isGraphAccess(node.getMethod().getType()) : "Graph access not supported for property paths";
 		// KAVITHA: If a triple has a variable in the object position, and it defines a recursive path, then the intermediate variables
 		// that get bound to ?x do not need to be URIs.  
-		if (node.getTriple().getObject().isVariable()) {
-			explicitIRIBoundVariables.remove(node.getTriple().getObject().getVariable());
-		}
+		//if (node.getTriple().getObject().isVariable()) {
+		//	explicitIRIBoundVariables.remove(node.getTriple().getObject().getVariable());
+		//}
 		
 		
 		List<SQLCommand> ret = new LinkedList<SQLCommand>();
@@ -605,7 +606,7 @@ public class CodeGenerator {
 		
 		
 		if (!trackSubjectObjectPairs && !(subPath.isRecursive() || subPath.hasZeroOrOnePath()) ) {
-			Pair<Pair<String, Variable>,  List<SQLCommand>> pair = computeReachableNodes(node, predecessor, t.getPredicate().getPath().isDirectlyZeroOrOnePath()?1:-1);
+			Pair<Pair<String, Variable>,  List<SQLCommand>> pair = computeReachableNodes(node, predecessor, t.getPredicate().getPath().isDirectlyZeroOrOnePath()?1:-1, trackSubjectObjectPairs);
 			String resultTable = pair.fst.fst;
 			ret.addAll(pair.snd);
 			// additional constraints
@@ -626,8 +627,8 @@ public class CodeGenerator {
 				AccessMethodType.isDirectAccess(node.getMethod().getType())?
 						t.getSubject().getVariable(): t.getObject().getVariable();
 			var2Const =  HashMapFactory.make();
-			if (node.getAvailableVariables().contains(startingPoint)) {
-				assert node.getPattern().getFilterBindings().get(startingPoint)!=null && node.getPattern().getFilterBindings().get(startingPoint).size() ==1:
+			if (node.getAvailableVariables().contains(startingPoint) &&  !trackSubjectObjectPairs) {
+				assert   node.getPattern().getFilterBindings().get(startingPoint)!=null && node.getPattern().getFilterBindings().get(startingPoint).size() ==1:
 					node.getPattern().getFilterBindings().get(startingPoint)+"\n" +startingPoint+"\n"+node;
 				var2Const.put(startingPoint, node.getPattern().getFilterBindings().get(startingPoint).iterator().next());
 			}		
@@ -694,7 +695,7 @@ public class CodeGenerator {
 						explicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 						explicitIRIBoundVariables.remove(resultVariable);
 					}
-					Pair<Pair<String, Variable>, List<SQLCommand>> p = computeReachableNodes(newNode, predecessor, t.getPredicate().getPath().isDirectlyZeroOrOnePath()?1:-1);
+					Pair<Pair<String, Variable>, List<SQLCommand>> p = computeReachableNodes(newNode, predecessor, t.getPredicate().getPath().isDirectlyZeroOrOnePath()?1:-1, false);
 					explicitIRIBoundVariables = oldExplicitIRIBoundVariables;
 					String reachableTable = p.fst.fst;
 					Variable reachableVariable = p.fst.snd;
@@ -832,7 +833,7 @@ public class CodeGenerator {
 				Variable resultVariable ;
 				
 				if (!( subPath.isRecursive() || subPath.hasZeroOrOnePath())) {
-					Pair<Pair<String, Variable>, List<SQLCommand>> p = computeReachableNodes(newNode, predecessor,0);
+					Pair<Pair<String, Variable>, List<SQLCommand>> p = computeReachableNodes(newNode, predecessor,0,false);
 					startingPointTable = p.fst.fst;
 					resultVariable = p.fst.snd;
 					ret.addAll(p.snd);
@@ -850,7 +851,7 @@ public class CodeGenerator {
 						newNode2.setAvailableVariables(node.getAvailableVariables());
 					}
 					//
-					Pair<Pair<String, Variable>, List<SQLCommand>> p = computeReachableNodes(newNode2, predecessor,0);
+					Pair<Pair<String, Variable>, List<SQLCommand>> p = computeReachableNodes(newNode2, predecessor,0, false);
 					startingPointTable = p.fst.fst;
 					resultVariable = p.fst.snd;
 					ret.addAll(p.snd);
@@ -1248,7 +1249,7 @@ public class CodeGenerator {
 	}
 	
 	// return result table, result variable,  and list of commands
-	private Pair<Pair<String, Variable>, List<SQLCommand>> computeReachableNodes(PlanNode node, PlanNode predecessor, int level) {
+	private Pair<Pair<String, Variable>, List<SQLCommand>> computeReachableNodes(PlanNode node, PlanNode predecessor, int level, boolean trackStartingPoint) {
 		assert level == 0 || level <0 || level ==1 : level; //
 		QueryTriple t = node.getTriple();
 
@@ -1303,7 +1304,10 @@ public class CodeGenerator {
 													t.getGraphRestriction().getFirst() : null;
 		//assert !QueryTripleNode.isNotBoundVariable(t.getSubject(), node.getPattern().getFilterBindings()) : t;
 		// result table contains object values
-		Variable[] tableVariables = graphRestrictionVariable == null? new Variable[] {resultVariable} : new Variable[] { graphRestrictionVariable, resultVariable};
+		Variable[] tableVariables = graphRestrictionVariable == null? 
+										(trackStartingPoint? new Variable[]{startingPoint, resultVariable} : new Variable[] {resultVariable} )
+										: 
+										(trackStartingPoint? new Variable[]{startingPoint,graphRestrictionVariable, resultVariable}:	new Variable[] { graphRestrictionVariable, resultVariable});
 		Pair<String, List<SQLCommand>> pair = tmptableMgr.getTemporaryTable(getTableSignature(tableVariables));
 		resultTable = pair.fst;
 		ret.addAll(pair.snd);
@@ -1333,12 +1337,13 @@ public class CodeGenerator {
 		// starting point 
 		if (t.getPredicate().getPath() instanceof ZeroOrMorePath || (t.getPredicate().getPath() instanceof ZeroOrOnePath)) {
 			boolean includeType = !explicitIRIBoundVariables.contains(resultVariable);
+			boolean includeTypeStartingVariable = trackStartingPoint && !explicitIRIBoundVariables.contains(startingPoint);
 			if (predecessor==null || !AccessMethodType.isPollAccess(node.getMethod().getType()) /*|| STEAccessMethodType.isGraphAccess(node.getMethod().getType())*/) {
 				assert AccessMethodType.isIndexAccess(node.getMethod().getType()) || AccessMethodType.isScanAccess(node.getMethod().getType())
 				/*||  STEAccessMethodType.isGraphAccess(node.getMethod().getType())*/ : node;
 				// starting point is the subject only
 				Set<Constant> constants = node.getPattern().getFilterBindings().get(startingPoint);
-				if (constants != null && constants.size()>0 && graphRestrictionVariable == null  &&  !AccessMethodType.isScanAccess(node.getMethod().getType())) {
+				if (constants != null && constants.size()>0 && graphRestrictionVariable == null  && !trackStartingPoint &&  !AccessMethodType.isScanAccess(node.getMethod().getType())) {
 					//assert STEAccessMethodType.isIndexAccess(node.getMethod().getType()) : node;
 					StringBuffer buf = new StringBuffer();
 					InsertValuesIntoTable ins = new InsertValuesIntoTable(deltaTable, constants, includeType, store);
@@ -1358,7 +1363,11 @@ public class CodeGenerator {
 					}
 					Set<Constant> graphRestrictionConstants = t.getGraphRestriction()!=null 
 							&& t.getGraphRestriction().isFirstType()? node.getPattern().getFilterBindings().get(t.getGraphRestriction().getFirst()) : null;
-					Query q = getSelectAllResources(t.getGraphRestriction(), graphRestrictionConstants, startingPoint,  includeType, constants);
+					Query q = trackStartingPoint?
+							getSelectAllResources(t.getGraphRestriction(), graphRestrictionConstants, startingPoint,  includeTypeStartingVariable, constants,
+									trackStartingPoint, resultVariable , includeType)
+							:getSelectAllResources(t.getGraphRestriction(), graphRestrictionConstants, startingPoint,  includeType, constants,
+							trackStartingPoint, null , false);
 					logger.info("Select all resources query: {}", q);
 					Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 					//newExplicitIRIBoundVariables.addAll(q.getMainPattern().gatherIRIBoundVariables());
@@ -1380,6 +1389,14 @@ public class CodeGenerator {
 				if (graphRestrictionVariable == null || predecessor.getAvailableVariables().contains(graphRestrictionVariable)) {
 					StringBuffer sql = new StringBuffer();
 					sql.append("SELECT DISTINCT ");
+					if (trackStartingPoint) {
+						sql.append(startingPoint.getName()).append(" AS ")
+							.append(startingPoint.getName()).append(", ");
+						if (includeTypeStartingVariable) {
+							sql.append(startingPoint.getName()).append(Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).append(" AS ")
+							.append(startingPoint.getName()).append(Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS).append(", ");
+						}
+					}
 					if (graphRestrictionVariable!=null) {
 						sql.append(graphRestrictionVariable.getName()).append(" AS ")
 						.append(graphRestrictionVariable.getName()).append(", ");
@@ -1414,7 +1431,11 @@ public class CodeGenerator {
 				} else {
 					Set<Constant> graphRestrictionConstants = t.getGraphRestriction()!=null 
 					&& t.getGraphRestriction().isFirstType()? node.getPattern().getFilterBindings().get(t.getGraphRestriction().getFirst()) : null;
-					Query q = getSelectAllResources(t.getGraphRestriction(), graphRestrictionConstants, startingPoint,  includeType, null);
+					Query q = trackStartingPoint?
+							getSelectAllResources(t.getGraphRestriction(), graphRestrictionConstants, startingPoint,  includeTypeStartingVariable, null,
+									trackStartingPoint, resultVariable, includeType)
+							:getSelectAllResources(t.getGraphRestriction(), graphRestrictionConstants, startingPoint,  includeType, null,
+							trackStartingPoint, null, false);
 					logger.info("Select all resources query: {}", q);
 					Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 					//newExplicitIRIBoundVariables.addAll(q.getMainPattern().gatherIRIBoundVariables());
@@ -1435,6 +1456,7 @@ public class CodeGenerator {
 			// starting point = result of the query select ?resultVariable where { ?startingPoint subPath ?resultVariable . FILTER (?startingPoint = XYZ) } 
 			assert (t.getPredicate().getPath() instanceof OneOrMorePath) : t.getPredicate().getPath();
 			Query subQuery = getSubQuery(node,  true, tableVariables);
+			logger.info("Subquery = {}", subQuery);	
 			Set<Variable> newExplicitIRIBoundVariables = HashSetFactory.make(explicitIRIBoundVariables);
 			//newExplicitIRIBoundVariables.addAll(subQuery.getMainPattern().gatherIRIBoundVariables());
 			CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, 
@@ -1452,7 +1474,15 @@ public class CodeGenerator {
 			cteCount = newcodegen.cteCount;
 		}
 		// iteration step = select ?resultVariable where  { oldDeltaTable subPath ?resultVariable . FILTER (?startingPoint = XYZ) }
-		PlanNode oldDeltaTableNode = new PlanNode(oldDeltaTable, Collections.singleton(resultVariable));
+		Set<Variable> prodVars;
+		if (trackStartingPoint) {
+			prodVars = HashSetFactory.make();
+			prodVars.add(resultVariable);
+			prodVars.add(startingPoint);
+		} else {
+			prodVars =  Collections.singleton(resultVariable);
+		}
+		PlanNode oldDeltaTableNode = new PlanNode(oldDeltaTable,prodVars);
 		
 									
 		QueryTriple triple;
@@ -1469,16 +1499,23 @@ public class CodeGenerator {
 		if (explicitIRIBoundVariables.contains(resultVariable)) {
 			newExplicitIRIBoundVariables.add(newResultVar);
 		}
-		Query subQuery = graphRestrictionVariable == null?
-						getSubQuery(triple, node.getTriple().getGraphRestriction(), node, false, newExplicitIRIBoundVariables,  newResultVar)// resultVariable);
-						: getSubQuery(triple, node.getTriple().getGraphRestriction(), node, false,newExplicitIRIBoundVariables, graphRestrictionVariable, newResultVar);
-		
+		Variable newStartingPoint= trackStartingPoint? startingPoint:null;
+		Variable[] newTableVariables = graphRestrictionVariable == null? 
+				(trackStartingPoint? new Variable[]{newStartingPoint, newResultVar} : new Variable[] {newResultVar} )
+				: 
+				(trackStartingPoint? new Variable[]{newStartingPoint,graphRestrictionVariable, newResultVar}:	new Variable[] { graphRestrictionVariable, newResultVar});
+
+		Query subQuery = getSubQuery(triple, node.getTriple().getGraphRestriction(), node, false, newExplicitIRIBoundVariables, newTableVariables);//  // newResultVar)// resultVariable);
 		//newExplicitIRIBoundVariables.addAll(subQuery.getMainPattern().gatherIRIBoundVariables());
 		Map<Variable, Variable> newVariable2RenamedVariable = variable2RenamedVariable==null? HashMapFactory.<Variable, Variable>make() : HashMapFactory.<Variable, Variable>make(variable2RenamedVariable);
 		newVariable2RenamedVariable.put(newResultVar,  resultVariable);
+		if (trackStartingPoint) {
+			newVariable2RenamedVariable.put(newStartingPoint, startingPoint);
+		}
 		CodeGenerator newcodegen = new CodeGenerator( store, stats, context, subQuery, oldDeltaTableNode, tmptableMgr, procMgr, newvargen, newExplicitIRIBoundVariables,newVariable2RenamedVariable, cteCount);
 		assert !newcodegen.isRecursiveQueryOrHasZeroOrOne();
 		String loopFromOldDeltaToDeltaSQL = newcodegen.toSQLWithoutStoreProcedureSQL();
+		logger.info("Subquery = {}", subQuery);			
 		logger.info("Recursive step SQL:\n{}", loopFromOldDeltaToDeltaSQL);
 		logger.info("InitializationSTMT:\n{}", initializationSTMT);
 		logger.info("InitializationCTE:\n{}", initializationCTE);
@@ -1535,10 +1572,13 @@ public class CodeGenerator {
 	}
 	/**
 	 * return a query that returns all the resources in a store (i.e., "select distinct ?variable where { {?variable ?p1  ?x1} union { ?x2 ?p2 ?variable} }"
-	 * or "select ?graphRestriction ?variable where { GRAPH graphRestriction { {?variable ?p1  ?x1} union { ?x2 ?p2 ?variable} } }"). 
+	 * or "select ?graphRestriction ?variable where { GRAPH graphRestriction { {?variable ?p1  ?x1} union { ?x2 ?p2 ?variable} } }"
+	 * or "select distinct ?startingVar ?variable where { {?variable ?p1  ?x1} union { ?x2 ?p2 ?variable}  bind (?variable AS ?startingVar)}"
+	 * or "select ?startingVar ?graphRestriction ?variable where { GRAPH graphRestriction { {?variable ?p1  ?x1} union { ?x2 ?p2 ?variable} } bind (?variable AS ?startingVar) } ). 
 	 * @return
 	 */
-	private Query getSelectAllResources( BinaryUnion<Variable, IRI> graphRestriction, Set<Constant> graphRestrictionConstBindings,  final Variable variable, final boolean projectVariableType,Set<Constant> variableConstBindings) {
+	private Query getSelectAllResources( BinaryUnion<Variable, IRI> graphRestriction, Set<Constant> graphRestrictionConstBindings,  final Variable variable, final boolean projectVariableType,Set<Constant> variableConstBindings,
+					final boolean trackStartingPoint, final Variable startingVariable,final  boolean projectStartingVariableType ) {
 		PatternSet union = new PatternSet(EPatternSetType.UNION) {
 			@Override
 			public Set<Variable> gatherIRIBoundVariables() {
@@ -1547,6 +1587,13 @@ public class CodeGenerator {
 					ret.remove(variable);
 				} else {
 					ret.add(variable);
+				}
+				if (trackStartingPoint) {
+					if (projectStartingVariableType) {
+						ret.remove(startingVariable); 
+					}else {
+						ret.add(startingVariable);
+					}
 				}
 				return ret;
 			}
@@ -1595,14 +1642,27 @@ public class CodeGenerator {
 				}
 			}
 		}
-		union.pushFilters();
-		SelectQuery sq = new SelectQuery();
-		sq.setGraphPattern(union);
-		SelectClause sc = new SelectClause();
-		if (graphRestriction!=null && graphRestriction.isFirstType()) {
-			sc.addProjectedVariable(new ProjectedVariable(graphRestriction.getFirst().getName()));
+		PatternSet top;
+		if (trackStartingPoint) {
+			top=new PatternSet(EPatternSetType.AND);
+			top.addPattern(union);
+			top.addPattern(new BindPattern(startingVariable, new VariableExpression(variable))); 
+			
+		} else {
+			top = union;
 		}
-		sc.addProjectedVariable(new ProjectedVariable(variable.getName()));
+		top.pushFilters();
+		SelectQuery sq = new SelectQuery();
+		sq.setGraphPattern(top);
+	
+		SelectClause sc = new SelectClause();
+		if (trackStartingPoint) {
+			sc.addProjectedVariable(new ProjectedVariable(startingVariable));//, new VariableExpression(variable.getName())));
+		}
+ 		if (graphRestriction!=null && graphRestriction.isFirstType()) {
+			sc.addProjectedVariable(new ProjectedVariable(graphRestriction.getFirst()));
+		}
+		sc.addProjectedVariable(new ProjectedVariable(variable));
 		sq.setSelectClause(sc);
 		Query ret = new Query(new QueryPrologue(), sq);
 		ret.getSelectQuery().getSelectClause().setSelectModifier(ESelectModifier.DISTINCT);
@@ -1662,7 +1722,7 @@ public class CodeGenerator {
 		sq.setGraphPattern(sp);
 		SelectClause sc = new SelectClause();
 		for (Variable v : projectedVariables) {
-			sc.addProjectedVariable(new ProjectedVariable(v.getName()));
+			sc.addProjectedVariable(new ProjectedVariable(v));
 		}
 		sq.setSelectClause(sc);
 		Query subQuery = new Query(new QueryPrologue(), sq);

@@ -62,9 +62,10 @@ public class TopSelectAllTemplate extends SolutionModifierBaseTemplate {
 
 		Set<Variable> queryPatternVariables = new HashSet<Variable>();
 		// eliminate blank nodes
+		// Achille : We should not eliminate blanknode
 		Set<Variable> patternVariables = q.getMainPattern().gatherVariablesWithOptional();;
 		for (Variable v : patternVariables)
-			if (!(v instanceof BlankNodeVariable))
+			//if (!(v instanceof BlankNodeVariable))
 				queryPatternVariables.add(v);
 
 		Set<Variable> iriBoundVariables = explicitIRIBoundVariables!=null? 

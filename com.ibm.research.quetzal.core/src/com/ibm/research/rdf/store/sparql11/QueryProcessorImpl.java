@@ -215,7 +215,12 @@ public class QueryProcessorImpl implements QueryProcessor
          stats.perGraphSingleStatistic = store.getPerGraphStatistics();
          new SPARQLToSQLExpression().setStore(this.store);
          SQLTemplateManager.setStoreTemplate(store);
-         
+         //Achille: Perform prop path query rewrite early
+         PropertyPathRewrite rewrite = new PropertyPathRewrite();
+         boolean hasNoPropertyPath = rewrite.rewrite(query, true, null, null);
+         logger.info("Rewritten query (after property path rewrite): {}", query);
+         //
+      
          qi = new QueryInfo(query);
          if (condition)
             {
@@ -232,10 +237,7 @@ public class QueryProcessorImpl implements QueryProcessor
             if (USE_NEW_PLANNER)
             {
                long time = System.currentTimeMillis();
-               PropertyPathRewrite rewrite = new PropertyPathRewrite();
-               boolean hasNoPropertyPath = rewrite.rewrite(query, true, null, null);
-               logger.debug("Rewritten query (after property path rewrite): {}", query);
-               Plan greedyPlan;
+                Plan greedyPlan;
                try {
             	   greedyPlan = (new Planner()).plan(query, store, stats);
                } catch (PlannerError e) {
@@ -273,27 +275,27 @@ public class QueryProcessorImpl implements QueryProcessor
                            {
                            for (SQLCommand cmd : pair.snd)
                               {
-                              if (logger.isDebugEnabled())
+                             // if (logger.isDebugEnabled())
                                  {
-                                 logger.debug(cmd.toSQL());
+                                 logger.info(cmd.toSQL());
                                  }
                               // st.addBatch(cmd.toSQL());
                               boolean exres = st.execute(cmd.toSQL());
-                              if (logger.isDebugEnabled())
+                              //if (logger.isDebugEnabled())
                               {
-                            	  logger.debug("Command execution successful? {} ", exres);
+                            	  logger.info("Command execution successful? {} ", exres);
                               }
                               }
-                           if (logger.isDebugEnabled())
+                          // if (logger.isDebugEnabled())
                               {
-                              logger.debug(pair.fst.getSqlDeclarationCode(true));
+                              logger.info(pair.fst.getSqlDeclarationCode(true));
                               }
                            // st.addBatch(pair.fst.getSqlDeclarationCode(true));
                            st.execute(pair.fst.getSqlDeclarationCode(true));
                            }
-                        if (logger.isDebugEnabled())
+                        //if (logger.isDebugEnabled())
                            {
-                           logger.debug(proc.getSqlDeclarationCode(true));
+                           logger.info(proc.getSqlDeclarationCode(true));
                            }
                         // st.addBatch(proc.getSqlDeclarationCode(true));
                         st.execute(proc.getSqlDeclarationCode(true));                        

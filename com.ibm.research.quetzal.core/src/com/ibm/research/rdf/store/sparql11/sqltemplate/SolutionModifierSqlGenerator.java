@@ -54,7 +54,7 @@ public class SolutionModifierSqlGenerator {
 	public String toSQL() throws Exception{
 		StringBuffer sql = new StringBuffer();
 		String solutionModifier = toSolutionModifierSQL();
-		String topSql = toTopQuerySQL();
+		String topSql = toTopQuerySQL(null);
 		if(solutionModifier != null)sql.append(solutionModifier);
 		if(sql.length()>0)sql.append("\n");
 		if(topSql != null)sql.append(topSql);
@@ -71,18 +71,18 @@ public class SolutionModifierSqlGenerator {
 		return null;
 	}
 	
-	public String toTopQuerySQL() throws Exception{
+	public String toTopQuerySQL(Set<Variable> explicitIRIBoundVariables) throws Exception{
 		if(q.isSelectQuery()){
-			return processTopQueryForSelectDescribeConstruct();
+			return processTopQueryForSelectDescribeConstruct(explicitIRIBoundVariables);
 		}
 		else if(q.isAskQuery()){
 			return processAskQuery();
 		}
 		else if(q.isDescribeQuery()){
-			return processTopQueryForSelectDescribeConstruct();
+			return processTopQueryForSelectDescribeConstruct(explicitIRIBoundVariables);
 		}
 		else if(q.isConstructQuery()){
-			return processTopQueryForSelectDescribeConstruct();
+			return processTopQueryForSelectDescribeConstruct(explicitIRIBoundVariables);
 		}
 		return null;
 	}
@@ -115,8 +115,8 @@ public class SolutionModifierSqlGenerator {
 		return sql.toString();
 	}
 	
-	private String processTopQueryForSelectDescribeConstruct() throws Exception{
-		AbstractSQLTemplate topSQLTemplate = new TopSelectTemplate("top_select",q ,store, ctx, wrapper);
+	private String processTopQueryForSelectDescribeConstruct(Set<Variable> explicitIRIBoundVariables) throws Exception{
+		AbstractSQLTemplate topSQLTemplate = new TopSelectTemplate("top_select",q ,store, ctx, wrapper, explicitIRIBoundVariables);
 		return topSQLTemplate.createSQLString();
 	}
 	

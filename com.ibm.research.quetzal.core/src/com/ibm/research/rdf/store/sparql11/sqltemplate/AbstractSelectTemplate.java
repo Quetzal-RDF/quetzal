@@ -46,9 +46,14 @@ import com.ibm.wala.util.collections.Pair;
 
 
 public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplate {
-
-	public AbstractSelectTemplate(String templateName, Store store, Context ctx, STPlanWrapper wrapper) {
+	protected Set<Variable> explicitIRIBoundVariables;
+	public AbstractSelectTemplate(String templateName, Store store, Context ctx, STPlanWrapper wrapper, Set<Variable> explicitIRIBoundVariables) {
 		super(templateName, store, ctx, wrapper);
+		this.explicitIRIBoundVariables = explicitIRIBoundVariables;
+	}
+	public AbstractSelectTemplate(String templateName, Store store, Context ctx, STPlanWrapper wrapper) {
+		this(templateName, store, ctx, wrapper, null);
+		
 	}
 
 	protected abstract Set<Variable> getAllPatternVariables();
@@ -247,16 +252,20 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 		Set<Variable> queryPatternVariables = HashSetFactory.make();
 		Set<AggregateExpression> aggregateExpressions = HashSetFactory.make();
 		// eliminate blank nodes
+		//Achille: We should not eliminate blank nodes
 		Set<Variable> patternVariables = getAllPatternVariables();
 		if (patternVariables != null) {
 			for (Variable v : patternVariables) {
-				if (!(v instanceof BlankNodeVariable))
+				//if (!(v instanceof BlankNodeVariable))
+				//Achille: We should not eliminate blank nodes
 				queryPatternVariables.add(v);
 			}
 		}
 
 		List<String> projectMapping = new LinkedList<String>();
-		Set<Variable> iriBoundVariables = getPattern().gatherIRIBoundVariables();
+		Set<Variable> iriBoundVariables = 
+				explicitIRIBoundVariables!=null?explicitIRIBoundVariables: getPattern().gatherIRIBoundVariables();
+		
 		
 		Map<String, Expression> expressionsInSolutions = getExpressionsInSolutionModifiers();
 		
@@ -282,6 +291,10 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 				} else {
 					projectMapping.add(renamedpv.getName());
 					projectAliasNames.add(renamedpv.getName());
+					if( explicitIRIBoundVariables!=null && !iriBoundVariables.contains(pv.getVariable())){
+						projectMapping.add( renamedpv.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+						projectAliasNames.add(renamedpv.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+					}
 				}
 			}
 		}
