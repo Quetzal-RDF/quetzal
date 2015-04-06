@@ -135,4 +135,9 @@ public class ValuesPattern extends Pattern {
 		return sb.toString();
 	}
 
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		return Collections.EMPTY_SET;
+	}
+
 }

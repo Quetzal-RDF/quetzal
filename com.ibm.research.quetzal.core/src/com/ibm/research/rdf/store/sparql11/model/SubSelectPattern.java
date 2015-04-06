@@ -278,6 +278,8 @@ public class SubSelectPattern extends Pattern
 	
 	public Set<Variable> gatherIRIBoundVariables() { return (graphPattern == null) ? null : graphPattern.gatherIRIBoundVariables(); }
 	
+	public Set<Variable> gatherVariablesInTransitiveClosure() { return (graphPattern == null) ? null : graphPattern.gatherVariablesInTransitiveClosure(); }
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

@@ -177,6 +177,8 @@ public class PatternSet extends Pattern {
 		Set<Variable> commonVariables = new HashSet<Variable>();
 		Set<Variable> commonIRIVariables = new HashSet<Variable>();
 		Set<Variable> allIRIVariables = new HashSet<Variable>();
+		Set<Variable> allVariablesInTransitiveClosure = new HashSet<Variable>();
+		
 		for(Pattern p: patterns)
 		{ 	
 			Set<Variable> localVariables = p.gatherVariables();
@@ -242,6 +244,10 @@ public class PatternSet extends Pattern {
 				ret.removeAll(toRemove);*/
 			}			
 		}	
+		
+		// if variables are involved in a property path with transitivity, they should always have their types projected
+		// so ignore optimization even if its known that they are variable bound
+		ret.removeAll(gatherVariablesInTransitiveClosure());
 		return ret;
 	}
 
@@ -479,5 +485,13 @@ public class PatternSet extends Pattern {
 	public void reverse() {
 		// do nothing
 		
+	}
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		Set<Variable> vars = HashSetFactory.make();
+		for (Pattern p : patterns) {
+			vars.addAll(p.gatherVariablesInTransitiveClosure());
+		}
+		return vars;
 	}
 }

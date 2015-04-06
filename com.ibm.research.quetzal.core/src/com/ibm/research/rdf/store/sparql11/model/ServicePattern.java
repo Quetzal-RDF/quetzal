@@ -13,6 +13,7 @@
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 public class ServicePattern extends Pattern {
@@ -112,6 +113,11 @@ public class ServicePattern extends Pattern {
 	public boolean isEmpty() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		return Collections.EMPTY_SET;
 	}
 
 }

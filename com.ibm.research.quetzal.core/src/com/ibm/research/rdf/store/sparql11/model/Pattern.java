@@ -275,6 +275,8 @@ public abstract class Pattern implements Planner.Key {
 	public abstract Set<Variable> gatherVariablesWithOptional();
 	
 	public abstract Set<Variable> gatherIRIBoundVariables();
+	
+	public abstract Set<Variable> gatherVariablesInTransitiveClosure();
 
 	public abstract void replaceFilterBindings();
 	

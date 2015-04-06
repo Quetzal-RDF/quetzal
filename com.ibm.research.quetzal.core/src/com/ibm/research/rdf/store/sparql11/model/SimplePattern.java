@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
+import com.ibm.wala.util.collections.HashSetFactory;
 
 /**
  * @author oudrea
@@ -316,6 +317,22 @@ public class SimplePattern extends Pattern {
 
 	public Set<Variable> gatherOptionalVariablesWithMultipleBindings(){
 		return new HashSet<Variable>();
+	}
+
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		Set<Variable> vars = HashSetFactory.make();
+		for (QueryTriple q: queryTriples) {
+			if (q.getPredicate().isComplexPath() && q.getPredicate().getPath().isRecursive()) {
+				if (q.getSubject().isVariable()) {
+					vars.add(q.getSubject().getVariable());
+				}
+				if (q.getObject().isVariable()) {
+					vars.add(q.getObject().getVariable());
+				}
+			}
+		}
+		return vars;
 	}
 	
 }
