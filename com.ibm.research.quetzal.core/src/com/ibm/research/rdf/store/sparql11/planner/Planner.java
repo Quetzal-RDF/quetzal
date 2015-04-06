@@ -608,15 +608,15 @@ public class Planner {
 	
 	public class ValuesNode implements Node {
 
-		private ValuesPattern vp;
-		private Set<Variable> producedVariables;
-		private Set<Variable> requiredVariables;
+		private final ValuesPattern vp;
+		private final Set<Variable> producedVariables;
+		private final Set<Variable> requiredVariables;
 		private final int id = ++graphCounterId;
 
 		public ValuesNode(ValuesPattern vp, Set<Variable> requiredVariables, Set<Variable> producedVariables) {
 			this.vp = vp;
-			this.requiredVariables = requiredVariables;
-			this.producedVariables = producedVariables;
+			this.requiredVariables = HashSetFactory.make(requiredVariables);
+			this.producedVariables = HashSetFactory.make(producedVariables);
 		}
 		
 		@Override
@@ -668,7 +668,7 @@ public class Planner {
 
 		@Override
 		public Set<Variable> getProducedVariables() {
-			return producedVariables;
+			return HashSetFactory.make(producedVariables);
 		}
 
 		
