@@ -122,6 +122,12 @@ public class GraphRestrictionPattern extends Pattern implements Key {
 		// no filter allowed
 		return Collections.emptySet();
 	}
+	
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		// no filter allowed
+		return Collections.emptySet();
+	}
 
 	@Override
 	public void replaceFilterBindings() {
