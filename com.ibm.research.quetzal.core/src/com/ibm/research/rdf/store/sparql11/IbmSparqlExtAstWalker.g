@@ -527,10 +527,32 @@ serviceGraphPattern  returns [Pattern p]
          }
 	;
 
-bind  returns [Pattern p]
+//added & modified by wensun
+bind	returns [Pattern p]
+	:	bp=bind1 {$p=bp;}
+	|	bf=bind2 {$p=bf;}
+	;
+
+bind1  returns [Pattern p]
 	:    ^(BIND v=var  e= expression) { $p = new BindPattern(v, e); }
 	    ;
 
+bind2  returns [Pattern p]
+	@init { $p = new BindFunctionPattern(); }
+	:    ^(BIND 
+			(f=funcCall { $p.setFuncCall(f); } )
+			(v= var { $p.addVar(v); } )+
+		)
+	    ;
+
+funcCall  returns [BindFunctionCall f]
+	@init { $f = new BindFunctionCall(); }
+	:    ^( FUNCCALL 
+			(fn=VARNAME {$f.setName(fn); } )
+			(v=var {$f.addVar(v);} )+
+		)
+	;
+	
 groupMinusOrUnionGraphPattern  returns [Pattern r]
 	@init {
 	  PatternSet p = null;

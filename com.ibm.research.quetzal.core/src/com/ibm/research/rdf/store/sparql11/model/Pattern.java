@@ -38,7 +38,7 @@ import com.ibm.wala.util.functions.Function;
 public abstract class Pattern implements Planner.Key {
 
 	public static enum EPatternSetType {
-		UNION, AND, OPTIONAL, SIMPLE, SUBSELECT, PRODUCT, EXISTS, NOT_EXISTS, MINUS, BIND, GRAPH, VALUES, SERVICE
+		UNION, AND, OPTIONAL, SIMPLE, SUBSELECT, PRODUCT, EXISTS, NOT_EXISTS, MINUS, BIND, BINDFUNC, GRAPH, VALUES, SERVICE
 	};
 
 	protected BinaryUnion<Variable, IRI> graphRestriction = null;
@@ -275,8 +275,6 @@ public abstract class Pattern implements Planner.Key {
 	public abstract Set<Variable> gatherVariablesWithOptional();
 	
 	public abstract Set<Variable> gatherIRIBoundVariables();
-	
-	public abstract Set<Variable> gatherVariablesInTransitiveClosure();
 
 	public abstract void replaceFilterBindings();
 	
