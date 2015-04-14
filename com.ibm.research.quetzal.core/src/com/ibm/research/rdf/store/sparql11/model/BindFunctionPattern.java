@@ -166,4 +166,11 @@ public class BindFunctionPattern extends Pattern {
 		Set<Variable> scope = getGroup() != null ? getGroup().inScopeVars() : Collections.<Variable>emptySet();
 		return !scope.containsAll(funcCall.gatherVariables());
 	}
+
+
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		return Collections.EMPTY_SET;
+	}
+	
 }
