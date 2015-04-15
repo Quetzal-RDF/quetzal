@@ -6,7 +6,7 @@
   <name>Quetzal</name>
   <description>RDF store for multiple backends</description>
   <build>
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>.</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
       <resource>
@@ -31,10 +31,13 @@
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
+	  <includes>
+            <include>src/**/*.java</include>
+            <include>generated/**/*.java</include>
+          </includes>
         </configuration>
       </plugin>
-      
-            <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.9</version>
@@ -53,12 +56,64 @@
             </configuration>
           </execution>
         </executions>
+      </plugin> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>grammars</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <property name="compile_classpath" refid="maven.compile.classpath"/>
+		<ant antfile="${basedir}/build-grammar.xml" inheritRefs="true"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
-      
     </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>
+    									org.apache.maven.plugins
+    								</groupId>
+    								<artifactId>
+    									maven-antrun-plugin
+    								</artifactId>
+    								<versionRange>[1.8,)</versionRange>
+    								<goals>
+    									<goal>run</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
   </build>
   <dependencies>
-	<dependency>
+ 	<dependency>
 	<groupId>org.apache.hive</groupId>
 	<artifactId>hive-jdbc</artifactId>
 	<version>0.12.0</version>
@@ -120,10 +175,15 @@
   	</dependency>
   	<dependency>
   		<groupId>org.antlr</groupId>
-  		<artifactId>antlr-runtime</artifactId>
+  		<artifactId>antlr</artifactId>
   		<version>3.3</version>
   	</dependency>
   	<dependency>
+  		<groupId>org.antlr</groupId>
+  		<artifactId>antlr-runtime</artifactId>
+  		<version>3.3</version>
+  	</dependency>
+   	<dependency>
   		<groupId>commons-dbutils</groupId>
   		<artifactId>commons-dbutils</artifactId>
   		<version>1.5</version>
@@ -137,6 +197,11 @@
 		<groupId>org.apache.hadoop</groupId>
 		<artifactId>hadoop-common</artifactId>
 		<version>2.4.0</version>
+	</dependency>
+	<dependency>
+	  <groupId>ant-contrib</groupId>
+	  <artifactId>ant-contrib</artifactId>
+	  <version>1.0b3</version>
 	</dependency>
   </dependencies>
   

@@ -7,14 +7,13 @@ options {
 }						
 				
 @header { 
-package com.ibm.rdf.store.sparql11;
+package com.ibm.research.rdf.store.sparql11;
 	
 import org.antlr.runtime.BitSet;
 import java.util.*;
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import com.ibm.rdf.store.sparql11.SPARQLsyntaxError;
-import com.ibm.rdf.store.sparql11.model.*;
+import com.ibm.research.rdf.store.sparql11.model.*;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 }	

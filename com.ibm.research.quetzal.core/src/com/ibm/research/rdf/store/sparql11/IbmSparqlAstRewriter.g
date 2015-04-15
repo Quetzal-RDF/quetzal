@@ -15,15 +15,14 @@ tokens {
 }
 		
 @header { 
-package com.ibm.rdf.store.sparql11;
+package com.ibm.research.rdf.store.sparql11;
 	
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.AbstractMap;
 import java.util.HashMap;
-import com.ibm.rdf.store.sparql11.SPARQLsyntaxError;
-import com.ibm.rdf.store.sparql11.model.*;
+import com.ibm.research.rdf.store.sparql11.model.*;
 
 }	
 

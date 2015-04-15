@@ -70,9 +70,7 @@ tokens {
 }
 
 @header { 
-package com.ibm.rdf.store.sparql11;
-
-import com.ibm.rdf.store.sparql11.SPARQLsyntaxError;
+package com.ibm.research.rdf.store.sparql11;
 }
 
 @members {
@@ -102,7 +100,7 @@ import com.ibm.rdf.store.sparql11.SPARQLsyntaxError;
 }
 
 @lexer::header { 
-package com.ibm.rdf.store.sparql11; 
+package com.ibm.research.rdf.store.sparql11; 
 }
 
 
