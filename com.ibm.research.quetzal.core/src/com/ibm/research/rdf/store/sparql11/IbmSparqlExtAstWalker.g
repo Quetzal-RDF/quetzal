@@ -539,8 +539,8 @@ bind1  returns [Pattern p]
 bind2  returns [Pattern p]
 	@init { $p = new BindFunctionPattern(); }
 	:    ^(BIND 
-			(f=funcCall { /*$p.setFuncCall(f);*/ } )
-			(v= var { /*$p.addVar(v);*/ } )+
+			(f=funcCall { ((BindFunctionPattern)$p).setFuncCall(f); } )
+			(v= var { ((BindFunctionPattern)$p).addVar(v); } )+
 		)
 	    ;
 
