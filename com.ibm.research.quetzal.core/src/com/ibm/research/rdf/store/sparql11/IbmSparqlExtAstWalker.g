@@ -1,8 +1,8 @@
-tree grammar IbmSparqlAstWalker;
+tree grammar IbmSparqlExtAstWalker;
 
 options {
 	language = Java;
-	tokenVocab = IbmSparql;
+	tokenVocab = IbmSparqlExt;
 	ASTLabelType = XTree;
 }						
 				
@@ -57,18 +57,19 @@ import com.ibm.wala.util.collections.Pair;
 	}
 }
 
-		
-queryUnit returns [Query q]
+	//modified by wensun
+queryUnit returns [QueryExt q]
 	:     ^(ROOT x=query)  	{ $q = x; /*System.out.println($q.toString());*/ }
 	;
 	
-query returns [Query q]
+	//modified by wensun
+query returns [QueryExt q]
 	@init {
 		
 	}
 	: ^(QUERY 
 			( p=prologue )      
-			(	( s=selectQuery  	{ $q = new Query(p,s); } 
+			(	( s=selectQuery  	{ $q = new QueryExt(p,s); } 
 			    ( b=bindingsClause  
                   { 
                     PatternSet top = new PatternSet();
@@ -81,9 +82,9 @@ query returns [Query q]
                   }
                 )?
 			)
-			|	( c=constructQuery 	{ $q = new Query(p,c); } )
-			|	( d=describeQuery 	{ $q = new Query(p,d); } )
-			|	( a=askQuery 		{ $q = new Query(p,a); } )
+			|	( c=constructQuery 	{ $q = new QueryExt(p,c); } )
+			|	( d=describeQuery 	{ $q = new QueryExt(p,d); } )
+			|	( a=askQuery 		{ $q = new QueryExt(p,a); } )
 			)
 				// ???TBD: add this clause to Query
 			
@@ -114,17 +115,60 @@ prefixDecl [QueryPrologue qp]
 		^(PREFIX n=prefixedName  v=iRIref)	  { $qp.getPrefixes().put(n.substring(0,n.length()-1), v);	}
 		//^(KEY n=PNAME_NS) ^(VALUE v=IRI_REF)	{ $qp.getPrefixes().put($n.getText(), new IRI($v.getText()));	}
 	;
-			
-selectQuery	returns [SelectQuery sq]
-	@init { $sq = new SelectQuery(); }
+	
+	//modified by wensun		
+selectQuery	returns [SelectQueryExt sq]
+	@init { $sq = new SelectQueryExt(); }
 	:  	
 		^(SELECT  
+			(f=functionSet			{ $sq.setFunctions(f);    }  )*  
 			(s=selectClause  		{ $sq.setSelectClause(s);      }  )
 			(d=dataset				{ $sq.setDatasetClauses(d);    }  )*  
 			(w=whereClause			{ $sq.setGraphPattern(w);      }  )?
 			(m=solutionModifier     { $sq.setSolutionModifier(m);  }  )
 		)
 	;
+	
+	//added by wensun
+functionSet returns [List<FunctionExt> funcs]
+	@init { funcs = new ArrayList<FunctionExt>(); }
+	:	
+		^(FUNCTION 
+			(f=functionDecl {funcs.add(f);} )+
+		)
+	;
+
+	//added by wensun
+functionDecl returns [FunctionExt func]
+	@init { $func = new FunctionExt(); }
+	:	
+		^(FUNCTION
+			(fn=VARNAME { $func.setName(fn); } )
+			OPEN_BRACE
+			(inv=var { $func.addInVar(inv); } )+
+			ARROW
+			(outv=var { $func.addOutVar(outv); } )+ 
+			CLOSE_BRACE
+			(^(FUNCLANG 
+				(fl=VARNAME { $func.setLang(fl); } )
+				(fb=functionBody { $func.setBody(fb); } )
+				)
+			)
+		)
+	;
+
+	//added by wensun
+functionBody returns [FunctionBody fb]
+	@init { $fb = new FunctionBody(); }
+	:
+	 	^(FUNCBODY
+	 		(
+	 		(f=STRING_LITERAL2 {$fb.setFlag(0); $fb.setBody(f); } )
+	 		| 
+	 		(p=groupGraphPattern[true] {$fb.setFlag(1); $fb.setBody(p); } )
+	 		)
+	 	)
+	 ;
 	
 dataset returns [List<DatasetClause> dcl]
 	@init { dcl = new ArrayList<DatasetClause>(); }
@@ -482,10 +526,32 @@ serviceGraphPattern  returns [Pattern p]
          }
 	;
 
-bind  returns [Pattern p]
+//added & modified by wensun
+bind	returns [Pattern p]
+	:	bp=bind1 {$p=bp;}
+	|	bf=bind2 {$p=bf;}
+	;
+
+bind1  returns [Pattern p]
 	:    ^(BIND v=var  e= expression) { $p = new BindPattern(v, e); }
 	    ;
 
+bind2  returns [Pattern p]
+	@init { $p = new BindFunctionPattern(); }
+	:    ^(BIND 
+			(f=funcCall { ((BindFunctionPattern)$p).setFuncCall(f); } )
+			(v= var { ((BindFunctionPattern)$p).addVar(v); } )+
+		)
+	    ;
+
+funcCall  returns [BindFunctionCall f]
+	@init { $f = new BindFunctionCall(); }
+	:    ^( FUNCCALL 
+			(fn=VARNAME {$f.setName(fn); } )
+			(v=var {$f.addVar(v);} )+
+		)
+	;
+	
 groupMinusOrUnionGraphPattern  returns [Pattern r]
 	@init {
 	  PatternSet p = null;

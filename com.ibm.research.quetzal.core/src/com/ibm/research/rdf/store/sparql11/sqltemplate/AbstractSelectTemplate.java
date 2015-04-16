@@ -25,6 +25,7 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.AggregateExpression;
+import com.ibm.research.rdf.store.sparql11.model.AggregateExpression.EType;
 import com.ibm.research.rdf.store.sparql11.model.BlankNodeVariable;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
@@ -334,11 +335,18 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 		
 		String vtyp = null;
 		if (e instanceof AggregateExpression) {
-			Set<Variable> vars = e.gatherVariables();
-			if (vars.size() == 1) {
+			// if the aggregation is a max or min, and has a variable as an argument, then the 
+			// type of whatever gets returned is the max of variable
+			if (((AggregateExpression) e).getAggregationType() == EType.MAX || ((AggregateExpression) e).getAggregationType() == EType.MIN
+					|| ((AggregateExpression) e).getAggregationType() == EType.SUM || ((AggregateExpression) e).getAggregationType() == EType.SAMPLE) {
+				Set<Variable> vars = e.gatherVariables();
+				assert vars.size() == 1;
 				Variable v = vars.iterator().next();
 				vtyp = varMap.get(v.getName()).snd;
 				projectMapping.add("MAX(" + vtyp + ") AS " + renamedpv.getName() + "_TYP");
+				projectAliasNames.add( renamedpv.getName() + "_TYP"); 
+			} else {
+				projectMapping.add(e.getReturnType() + " AS " + renamedpv.getName() + "_TYP");
 				projectAliasNames.add( renamedpv.getName() + "_TYP");
 			}
 		} else if (!(e instanceof VariableExpression) && !(e instanceof ConstantExpression)){

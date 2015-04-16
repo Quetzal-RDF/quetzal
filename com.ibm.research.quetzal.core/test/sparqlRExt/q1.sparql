@@ -1,0 +1,19 @@
+select ?d ?c ?p ?t where {
+
+{ ?d ?p ?t } union { ?c ?p ?t }
+
+{select ?d ?c ?p1 ?p2 ?pn ?outcome (count(*) as ?freq) where {
+?d a :Drug .
+?c a :Disease .
+
+{select (1 as ?outcome) where { ?d :treats ?c }} union
+{select (-1 as ?outcome) where { ?d :isbadfor ?c }} .
+
+{ ?d ?p1 ?c } union
+{ ?d ?p1 _:x . _:x ?p2 ?c } 
+
+}
+
+} filter (?predictedOutcome != ?outcome) }
+order by abs(?predictedOutcome - ?outcome)
+limit 100

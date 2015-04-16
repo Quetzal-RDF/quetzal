@@ -1,4 +1,4 @@
-grammar IbmSparql;
+grammar IbmSparqlExt;
 
 options {
 	language = Java;
@@ -67,6 +67,11 @@ tokens {
     BIG_INTEGER;
     BIG_DECIMAL;
     INLINE_DATA;
+    
+    //added by wensun
+    OUTV;
+    INV;
+    FUNCBODY;
 }
 
 @header { 
@@ -153,9 +158,24 @@ prefixDecl
 		->  ^( PREFIX ^(PREFIXED_NS $p) $i )
 	;
 
+//modified by wensun
 selectQuery	  
-	:  	s=selectClause d+=datasetClause* w=whereClause m=solutionModifier
-		->  ^( SELECT $s ^(DATASET $d*)? $w? $m? )
+	:  	f+=functionDecl* s=selectClause d+=datasetClause* w=whereClause m=solutionModifier
+		->  ^( SELECT $s ^(FUNCTION $f*)? ^(DATASET $d*)? $w? $m? )
+	;
+	
+//added by wensun
+functionDecl
+	:	FUNCTION fn=VARNAME OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=VARNAME fb=functionBody
+	  -> ^( FUNCTION $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLANG $fl) $fb )
+	;
+
+//added by wensun
+functionBody
+	: OPEN_CURLY_BRACE f=STRING_LITERAL2 CLOSE_CURLY_BRACE
+	  ->  ^( FUNCBODY $f )
+	| OPEN_CURLY_BRACE p=groupGraphPattern CLOSE_CURLY_BRACE
+	  ->  ^( FUNCBODY $p )
 	;
 	
 subSelect	  
@@ -455,10 +475,29 @@ serviceGraphPattern
 		->  ^( SERVICE  $s?  $v  $g )
 	;
 
-bind
+//added by wensun
+bind	
+	:	bind1
+	|	bind2
+	;
+	
+//modified by wensun
+bind1
 	:    BIND OPEN_BRACE e=expression AS v=var CLOSE_BRACE
 	
 		->  ^( BIND  $v  $e )
+	;
+
+//added by wensun
+bind2
+	:    BIND OPEN_BRACE f=funcCall AS OPEN_BRACE v+=var+ CLOSE_BRACE CLOSE_BRACE
+	
+		->  ^( BIND  $f  $v* )
+	;
+	
+funcCall
+	:    fn=VARNAME OPEN_BRACE v+=var+ CLOSE_BRACE
+		->  ^( FUNCCALL  $fn  $v* )
 	;
 
 groupOrUnionGraphPattern
@@ -956,6 +995,14 @@ nil	:  	OPEN_BRACE  CLOSE_BRACE	-> NIL
 // $>
 
 // $<Lexer
+
+//added by wensun
+ARROW 	:  '-'  '>'  ;
+FUNCLANG	:  L  A  N  G  U  A  G  E  ;
+FUNCCALL	:  F  U  N  C  C  A  L  L  ;
+FUNCTION	:  F  U  N  C  T  I  O  N  ;
+//IRI_REF		:  I  R  I  R  E  F  ;
+//LTE		:  L  T  E  ;
 
 BASE	:  B  A  S  E   ; 
 

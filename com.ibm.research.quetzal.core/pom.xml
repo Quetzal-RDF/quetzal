@@ -6,7 +6,7 @@
   <name>Quetzal</name>
   <description>RDF store for multiple backends</description>
   <build>
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>.</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
       <resource>
@@ -31,10 +31,13 @@
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
+	  <includes>
+            <include>src/**/*.java</include>
+            <include>generated/**/*.java</include>
+          </includes>
         </configuration>
       </plugin>
-      
-            <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.9</version>
@@ -53,8 +56,27 @@
             </configuration>
           </execution>
         </executions>
+      </plugin> 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>grammars</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <property name="compile_classpath" refid="maven.compile.classpath"/>
+		<ant antfile="${basedir}/build-grammar.xml" inheritRefs="true"/>
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
-      
     </plugins>
     <pluginManagement>
     	<plugins>
@@ -72,11 +94,11 @@
     									org.apache.maven.plugins
     								</groupId>
     								<artifactId>
-    									maven-dependency-plugin
+    									maven-antrun-plugin
     								</artifactId>
-    								<versionRange>[2.9,)</versionRange>
+    								<versionRange>[1.8,)</versionRange>
     								<goals>
-    									<goal>copy-dependencies</goal>
+    									<goal>run</goal>
     								</goals>
     							</pluginExecutionFilter>
     							<action>
@@ -91,7 +113,22 @@
     </pluginManagement>
   </build>
   <dependencies>
-	<dependency>
+	<groupId>org.openrdf.sesame</groupId>
+  		<artifactId>sesame-runtime</artifactId>
+  		<version>2.8.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.openrdf.sesame</groupId>
+  		<artifactId>sesame-queryrender</artifactId>
+  		<version>2.8.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.openrdf.sesame</groupId>
+  		<artifactId>sesame-queryalgebra-model</artifactId>
+  		<version>2.8.1</version>
+  	</dependency>
+	
+ 	<dependency>
 	<groupId>org.apache.hive</groupId>
 	<artifactId>hive-jdbc</artifactId>
 	<version>0.12.0</version>
@@ -153,10 +190,15 @@
   	</dependency>
   	<dependency>
   		<groupId>org.antlr</groupId>
-  		<artifactId>antlr-runtime</artifactId>
+  		<artifactId>antlr</artifactId>
   		<version>3.3</version>
   	</dependency>
   	<dependency>
+  		<groupId>org.antlr</groupId>
+  		<artifactId>antlr-runtime</artifactId>
+  		<version>3.3</version>
+  	</dependency>
+   	<dependency>
   		<groupId>commons-dbutils</groupId>
   		<artifactId>commons-dbutils</artifactId>
   		<version>1.5</version>
@@ -172,22 +214,10 @@
 		<version>2.4.0</version>
 	</dependency>
 	<dependency>
-	<!-- this includes ALL seasame -->
-		<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-runtime</artifactId>
-		<version>2.8.1</version>
+	  <groupId>ant-contrib</groupId>
+	  <artifactId>ant-contrib</artifactId>
+	  <version>1.0b3</version>
 	</dependency>
-	<dependency>
-		<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-queryrender</artifactId>
-		<version>2.8.1</version>
-	</dependency>
-	<dependency>
-		<groupId>org.openrdf.sesame</groupId>
-		<artifactId>sesame-queryalgebra-model</artifactId>
-		<version>2.8.1</version>
-	</dependency>
-	
   </dependencies>
   
   

@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>rdfstore-server</groupId>
+  <artifactId>rdfstore-server</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>QuetzalServer</name>
+  <description>Quetzal RDF store Fuseki server integration</description>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+ 	<dependency>
+    	<groupId>org.apache.jena</groupId>
+    	<artifactId>jena-fuseki1</artifactId>
+    	<version>1.1.2</version>
+  	</dependency>
+  </dependencies>
+  <repositories>
+         <repository>
+            <id>jena-maven-releases-repository</id>
+            <url>https://repository.apache.org/content/repositories/releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+           <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+  		</repository>
+
+        <repository>
+            <id>jena-maven-snapshots-repository</id>
+            <url>https://repository.apache.org/content/repositories/snaphots/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+           <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+  		</repository>
+  </repositories>
+</project>
