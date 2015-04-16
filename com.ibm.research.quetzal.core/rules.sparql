@@ -1,0 +1,48 @@
+
+PREFIX : <http://example.org/> 
+CONSTRUCT { ?x :S ?y }
+WHERE {
+  ?x :R ?y .
+}
+
+###
+
+PREFIX : <http://example.org/> 
+CONSTRUCT { ?x a :OilDeclineBenefittingCompany }
+WHERE {
+  ?x a :Company ; :name ?name ; :name "name" ; :name3 _:mybnode .
+}
+
+###
+
+PREFIX : <http://example.org/> 
+CONSTRUCT { ?x a :OilDeclineBenefittingIndustry }
+WHERE {
+   ?x a :Industry ; :hasNAICSCode ?c.
+   { { ?c a :TravelTransportation } UNION 
+     { ?c a :AirlineTransportation } UNION 
+     { ?c a :RoadTransportation }
+   }
+}   
+
+###
+
+PREFIX : <http://example.org/> 
+CONSTRUCT { ?x a :OilDeclineBenefittingCompany }
+WHERE {
+  ?x a :Company ; :connectedTo ?y. ?y a :OilDeclineBenefittingIndustry .
+  ?o :oilDecline ?od . FILTER ( ?od > 99999)
+}
+
+###
+PREFIX : <http://example.org/> 
+
+CONSTRUCT { ?x a :OilDeclineBenefittingInstrument }
+WHERE {
+  ?x a :FinantialInstrument; :connectedTo* ?y. ?y a :OilDeclineBenefittingIndustry .
+  ?o :oilDecline ?od . FILTER ( ?od > 99999)
+}
+
+
+
+
