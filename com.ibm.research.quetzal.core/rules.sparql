@@ -28,6 +28,17 @@ WHERE {
 ###
 
 PREFIX : <http://example.org/> 
+
+CONSTRUCT {?n a :OilDeclineVulnerableIndustry}
+WHERE {
+	?n (<http://www.w3.org/2004/02/skos/core#broader>)* ?c . 
+} values ?c { <http://naicscodes/211> <http://naicscodes/213111>  <http://naicscodes/213112> <http://naicscodes/21114> <http://naicscodes/21115> <http://naicscodes/21116>
+}
+
+
+###
+
+PREFIX : <http://example.org/> 
 CONSTRUCT { ?x a :OilDeclineBenefittingCompany }
 WHERE {
   ?x a :Company ; :connectedTo ?y. ?y a :OilDeclineBenefittingIndustry .
