@@ -83,9 +83,24 @@ public class SPARQLRewriter {
 
 			SPARQLRewriter rewriter = new SPARQLRewriter(rulesFile);
 
+//			System.out
+//					.println(rewriter
+//							.rewrite("PREFIX : <http://example.org/> SELECT ?x WHERE { ?x a :OilDeclineBenefittingIndustry . }"));
+//			
+			
 			System.out
-					.println(rewriter
-							.rewrite("PREFIX : <http://example.org/> SELECT ?x WHERE { ?x a :OilDeclineBenefittingIndustry . ?x :S ?y }"));
+			.println(rewriter
+					.rewrite("PREFIX : <http://example.org/> SELECT * WHERE {  ?x :S ?y . BIND(:testc as ?yoyo) }"));
+			
+			
+			
+			SPARQLParserFactory fac = new SPARQLParserFactory();
+			QueryParser parser = fac.getParser();
+			ParsedTupleQuery query = (ParsedTupleQuery) parser.parseQuery("PREFIX : <http://example.org/> SELECT (COUNT(*) as ?c) WHERE {  ?x :S ?y . BIND(:testc as ?yoyo) . FILTER(?x = 2) OPTIONAL {?x :P ?t} . { SELECT ?momo { ?momo :waka ?toto}  } } GROUP BY ?x", null);
+			SPARQLQueryRenderer renderer = new SPARQLQueryRenderer();
+			String renderedQuery = renderer.render(query);
+			System.out.println(renderedQuery);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

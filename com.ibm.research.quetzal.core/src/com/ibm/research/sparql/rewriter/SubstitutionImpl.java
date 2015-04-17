@@ -77,5 +77,9 @@ public class SubstitutionImpl implements Substitution {
 	public boolean isEmpty() {
 		return map.isEmpty();
 	}
+	
+	public String toString() {
+		return map.toString();
+	}
 
 }
