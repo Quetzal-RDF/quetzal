@@ -7,7 +7,6 @@
   <description>RDF store for multiple backends</description>
   <build>
     <sourceDirectory>.</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
     <resources>
       <resource>
         <directory>src</directory>
@@ -33,6 +32,7 @@
           <target>1.7</target>
 	  <includes>
             <include>src/**/*.java</include>
+            <include>test/**/*.java</include>
             <include>generated/**/*.java</include>
           </includes>
         </configuration>
