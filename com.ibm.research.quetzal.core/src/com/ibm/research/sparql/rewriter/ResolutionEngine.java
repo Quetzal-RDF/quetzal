@@ -5,12 +5,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.openrdf.query.algebra.Extension;
+import org.openrdf.query.algebra.ExtensionElem;
 import org.openrdf.query.algebra.QueryModelNode;
 import org.openrdf.query.algebra.StatementPattern;
 import org.openrdf.query.algebra.TupleExpr;
 import org.openrdf.query.algebra.Union;
+import org.openrdf.query.algebra.Var;
 import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
+import org.openrdf.query.algebra.helpers.VarNameCollector;
 import org.openrdf.query.parser.ParsedTupleQuery;
+
+import com.hp.hpl.jena.graph.Node_Variable.VariableName;
 
 
 public class ResolutionEngine {
@@ -30,6 +36,14 @@ public class ResolutionEngine {
 		ResolutionVisitor visitor = new ResolutionVisitor(rules);
 		TupleExpr body = query.getTupleExpr();
 		
+		
+		
+		VarNameCollector collector = new VarNameCollector();
+		body.visit(collector);
+		Set<String> bindingNames = collector.getVarNames();
+		
+		visitor.setBindingNames(bindingNames);
+		
 		body.visit(visitor);
 		while (visitor.producedChange) {
 			visitor.producedChange = false;
@@ -38,9 +52,6 @@ public class ResolutionEngine {
 		
 	}
 
-	public void unfoldSinglePass(QueryModelNode query) {
-
-	}
 
 	/***
 	 * traverses the algebra tree looking for PatternStatements that can be
@@ -57,6 +68,8 @@ public class ResolutionEngine {
 		private Set<QueryModelNode> visited;
 		
 		private boolean producedChange = false;
+		
+		private Set<String> queryBindingNames = null;
 
 		// Each rules is a head (key) and body (value)
 		private List<Rule> rules = new LinkedList<Rule>();
@@ -64,6 +77,10 @@ public class ResolutionEngine {
 		public ResolutionVisitor(List<Rule> rules) {
 			this.rules = rules;
 			this.visited = new HashSet<QueryModelNode>();
+		}
+		
+		public void setBindingNames(Set<String> names) {
+			this.queryBindingNames = names;
 		}
 
 		public void clearVisited() {
@@ -105,10 +122,37 @@ public class ResolutionEngine {
 				// The rule matches the node, replacing (executing a resolution
 				// step)
 
+				// Preparing the body of the rule
 				TupleExpr body = rule.antecedent;
 				SubstitutionApplier app = new SubstitutionApplier(s);
 				body.visit(app);
-				nodeAlternatives.add(body);
+				
+				/* If the substitution affects any variables in the domain of the original query
+				then we need to add a BIND(...) element, using extensions, for example. If x is in 
+				the original query, and we have the substition x/<example.org> we need the 
+				extension BIND(<example.org> as ?x)
+				*/
+				Extension ex = new Extension();
+				for (Var var: s.getMap().keySet()) {
+					String name = var.getName();
+					if (!queryBindingNames.contains(name)) {
+						continue;
+					}
+					
+					Var expr = s.get(var);
+					ex.addElement(new ExtensionElem(expr, name));
+				}
+				
+				TupleExpr newExpression;
+				
+				if (!ex.getElements().isEmpty()) {
+					ex.setArg(body);
+					newExpression = ex;
+				} else {
+					newExpression = body;
+				}
+				
+				nodeAlternatives.add(newExpression);
 			}
 
 			if (nodeAlternatives.size() == 1) {
