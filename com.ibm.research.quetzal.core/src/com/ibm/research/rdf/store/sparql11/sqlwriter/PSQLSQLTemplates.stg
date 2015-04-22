@@ -191,7 +191,7 @@ aggregate_function_with_type_check(function,var, typecheck)  ::= <<
 >>
 
 outer_aggregate_function_type_check(var, typecheck)  ::= << 
-(CASE WHEN <typecheck; separator=" AND "> THEN <var>::numeric ELSE NULL END)
+(CASE WHEN <typecheck; separator=" AND "> THEN <var>::numeric ELSE NULL END) AS <var>
 >>
 
 cast_numeric_projected_variable(var, type) ::= << <var><if(type)>::<type> <endif> >>

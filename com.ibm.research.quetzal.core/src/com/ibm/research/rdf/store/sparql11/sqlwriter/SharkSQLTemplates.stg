@@ -5,7 +5,7 @@ RDF_ISBLANK(args)  ::= <<
  (<args> LIKE '\_:%') 
 >>
 outer_aggregate_function_type_check(var, typecheck)  ::= << 
-(CASE WHEN <typecheck; separator=" AND "> THEN <var> ELSE NULL END)
+(CASE WHEN <typecheck; separator=" AND "> THEN <var> ELSE NULL END) AS <var>
 >>
 
 
