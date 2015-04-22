@@ -35,7 +35,7 @@ public class DirectoryDriver extends TestCase {
 	public static OrderedTestSuite suite() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		final TestData data = getData();
 		@SuppressWarnings("rawtypes")
-		final DatabaseEngine engine = getEngine(data);
+		final DatabaseEngine engine = getEngine(data, false);
 		final OrderedTestSuite x = new OrderedTestSuite();
 		recurseFiles(new VoidFunction<File>() {
 			@Override

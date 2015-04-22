@@ -98,13 +98,13 @@ public class CommandLineDriver {
 		}
 	}
 
-	protected static DatabaseEngine<? extends TestData> getEngine(TestData data) {
+	protected static DatabaseEngine<? extends TestData> getEngine(TestData data, final boolean repeat) {
 		if (data instanceof DB2TestData) {
-			return new DB2Engine();
+			return new DB2Engine() { { print=!repeat; } };
 		} else if (data instanceof PSQLTestData) {
-			return new PSQLEngine();
+			return new PSQLEngine() { { print=!repeat; } };
 		} else if (data instanceof SharkTestData) {
-			return new SharkEngine();
+			return new SharkEngine() { { print=!repeat; } };
 		} else {
 			assert false;
 			return null;
@@ -116,7 +116,8 @@ public class CommandLineDriver {
 		Class<TestRunner<? extends TestData>> cls = (Class<TestRunner<? extends TestData>>) Class.forName(args[0]);
 		Constructor<TestRunner<? extends TestData>> ctor = cls.getDeclaredConstructor(DatabaseEngine.class, Object.class, int[].class, String.class);
 		TestData data = getData();
-		run(ctor.newInstance(getEngine(data), data, getAnswers(args[1]), System.getenv("TEST_DIR")), Integer.parseInt(args[2]), Boolean.parseBoolean(args[3]));
+		int repeatCount = Integer.parseInt(args[2]);
+		run(ctor.newInstance(getEngine(data, repeatCount == 1), data, getAnswers(args[1]), System.getenv("TEST_DIR")), repeatCount, Boolean.parseBoolean(args[3]));
 	}
 
 }

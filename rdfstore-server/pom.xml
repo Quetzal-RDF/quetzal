@@ -16,9 +16,54 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.9</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.4.0</version>
+        <executions>
+          <execution>
+	    <id>server</id>
+            <phase>server</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>org.apache.jena.fuseki.FusekiCmd</mainClass>
+          <arguments>
+            <argument>--config=${basedir}/default.ttl</argument>
+          </arguments>
+	  <additionalClasspathElements>
+	    <additionalClasspathElement>
+	      ${basedir}/lib/db2jcc4.jar
+	    </additionalClasspathElement>
+	  </additionalClasspathElements>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-  <dependencies>
+    <dependencies>
  	<dependency>
     	  <groupId>org.apache.jena</groupId>
     	  <artifactId>jena-fuseki1</artifactId>
@@ -28,7 +73,17 @@
  	  <groupId>quetzal-RDF</groupId>
  	  <artifactId>quetzal-RDF</artifactId>
  	  <version>0.0.1-SNAPSHOT</version>
- 	</dependency>
+	  <exclusions>
+            <exclusion>
+	      <groupId>org.apache.jena</groupId>
+  	      <artifactId>jena-arq</artifactId>
+            </exclusion>
+            <exclusion>
+  	      <groupId>org.apache.jena</groupId>
+  	      <artifactId>jena-core</artifactId>
+            </exclusion>
+          </exclusions>
+	</dependency>
   </dependencies>
   <repositories>
          <repository>
