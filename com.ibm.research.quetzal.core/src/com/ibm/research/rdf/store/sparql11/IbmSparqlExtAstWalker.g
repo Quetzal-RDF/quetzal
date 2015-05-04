@@ -120,8 +120,9 @@ prefixDecl [QueryPrologue qp]
 selectQuery	returns [SelectQueryExt sq]
 	@init { $sq = new SelectQueryExt(); }
 	:  	
+		(^(f=functionSet			{ $sq.setFunctions(f);    }  )
+		)?
 		^(SELECT  
-			(f=functionSet			{ $sq.setFunctions(f);    }  )*  
 			(s=selectClause  		{ $sq.setSelectClause(s);      }  )
 			(d=dataset				{ $sq.setDatasetClauses(d);    }  )*  
 			(w=whereClause			{ $sq.setGraphPattern(w);      }  )?
@@ -133,7 +134,7 @@ selectQuery	returns [SelectQueryExt sq]
 functionSet returns [List<FunctionExt> funcs]
 	@init { funcs = new ArrayList<FunctionExt>(); }
 	:	
-		^(FUNCTION 
+		^(FUNCTION
 			(f=functionDecl {funcs.add(f);} )+
 		)
 	;
@@ -142,18 +143,12 @@ functionSet returns [List<FunctionExt> funcs]
 functionDecl returns [FunctionExt func]
 	@init { $func = new FunctionExt(); }
 	:	
-		^(FUNCTION
-			(fn=VARNAME { $func.setName(fn); } )
-			OPEN_BRACE
-			(inv=var { $func.addInVar(inv); } )+
-			ARROW
-			(outv=var { $func.addOutVar(outv); } )+ 
-			CLOSE_BRACE
-			(^(FUNCLANG 
-				(fl=VARNAME { $func.setLang(fl); } )
-				(fb=functionBody { $func.setBody(fb); } )
-				)
-			)
+		^(FUNCNAME
+			^(fn=var { $func.setName(fn); } )
+			^(INV ( inv=var { $func.addInVar(inv); } )+)
+			^(OUTV ( outv=var { $func.addOutVar(outv); } )+) 
+			^(FUNCLG (fl=var { $func.setLang(fl); } ))
+			(fb=functionBody { $func.setBody(fb); } )
 		)
 	;
 
@@ -547,7 +542,7 @@ bind2  returns [Pattern p]
 funcCall  returns [BindFunctionCall f]
 	@init { $f = new BindFunctionCall(); }
 	:    ^( FUNCCALL 
-			(fn=VARNAME {$f.setName(fn); } )
+			(fn=var {$f.setName(fn); } )
 			(v=var {$f.addVar(v);} )+
 		)
 	;

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.antlr.runtime.tree.CommonTree;
+
 import com.ibm.research.rdf.store.sparql11.XTree;
 import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.wala.util.collections.HashMapFactory;
@@ -53,7 +55,8 @@ public class FunctionBody {
 		strBody = s;
 	}
 	
-	public void setBody(XTree s) {
+	//modified by wensun
+	public void setBody(CommonTree s) {
 		strBody = s.getText();
 	}
 	
