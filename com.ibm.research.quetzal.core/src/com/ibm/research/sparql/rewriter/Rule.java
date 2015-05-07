@@ -1,10 +1,3 @@
-/*
- * Copyright (C) 2009-2013, Free University of Bozen Bolzano This source code is
- * available under the terms of the Affero General Public License v3.
- * 
- * Please see LICENSE.txt for full license terms, including the availability of
- * proprietary exceptions.
- */
 package com.ibm.research.sparql.rewriter;
 
 import java.util.HashMap;
@@ -25,10 +18,6 @@ import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.ast.VisitorException;
 
-/**
- * @author Mariano Rodriguez Muro <mariano.muro@gmail.com>
- * 
- */
 public class Rule {
 
 	StatementPattern consequent;
