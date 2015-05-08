@@ -23,6 +23,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.sparql11.model.QueryExt;
 
 
 public class TestExt {
@@ -67,9 +68,10 @@ public class TestExt {
 			
 			BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(ast);
 			nodes.setTokenStream(tokens);
-			IbmSparqlAstWalker walker = new IbmSparqlAstWalker(nodes);
-			Query query = walker.queryUnit();
+			IbmSparqlExtAstWalker walker = new IbmSparqlExtAstWalker(nodes);
+			QueryExt query = walker.queryUnit();
 			
+			//query.
 			//
 			System.out.println(query.toString());
 		} catch (Exception e) {

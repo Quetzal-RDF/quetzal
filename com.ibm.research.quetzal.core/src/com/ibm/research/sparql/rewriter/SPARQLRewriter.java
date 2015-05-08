@@ -1,10 +1,3 @@
-/*
- * Copyright (C) 2009-2013, Free University of Bozen Bolzano This source code is
- * available under the terms of the Affero General Public License v3.
- * 
- * Please see LICENSE.txt for full license terms, including the availability of
- * proprietary exceptions.
- */
 package com.ibm.research.sparql.rewriter;
 
 import java.io.BufferedReader;
@@ -22,10 +15,6 @@ import org.openrdf.queryrender.sparql.SPARQLQueryRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Mariano Rodriguez Muro <mariano.muro@gmail.com>
- * 
- */
 public class SPARQLRewriter {
 
 	// private OWLOntology ontology;

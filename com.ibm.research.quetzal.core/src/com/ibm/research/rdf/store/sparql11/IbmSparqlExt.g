@@ -72,6 +72,8 @@ tokens {
     OUTV;
     INV;
     FUNCBODY;
+    FUNCNAME;
+    FUNCLG;
 }
 
 @header { 
@@ -161,13 +163,13 @@ prefixDecl
 //modified by wensun
 selectQuery	  
 	:  	f+=functionDecl* s=selectClause d+=datasetClause* w=whereClause m=solutionModifier
-		->  ^( SELECT $s ^(FUNCTION $f*)? ^(DATASET $d*)? $w? $m? )
+		->  ^(FUNCTION $f*)? ^(SELECT $s ^(DATASET $d*)? $w? $m? )
 	;
 	
 //added by wensun
 functionDecl
-	:	FUNCTION fn=VARNAME OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=VARNAME fb=functionBody
-	  -> ^( FUNCTION $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLANG $fl) $fb )
+	:	FUNCTION fn=var OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=var fb=functionBody
+	  -> ^( FUNCNAME $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb )
 	;
 
 //added by wensun
@@ -496,7 +498,7 @@ bind2
 	;
 	
 funcCall
-	:    fn=VARNAME OPEN_BRACE v+=var+ CLOSE_BRACE
+	:    fn=var OPEN_BRACE v+=var+ CLOSE_BRACE
 		->  ^( FUNCCALL  $fn  $v* )
 	;
 
