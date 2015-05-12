@@ -8,6 +8,8 @@ db2 "CREATE DATABASE QUETZAL"
 
 cd /data
 
+mkdir -p tmp
+
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 DIR=`dirname $0`
 
