@@ -114,13 +114,17 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 	List<String> getProjectList(){
 		List<String> projectList = new LinkedList<String>();
 		for (String s: getValuesProjectList()) {
-			projectList.add("TEMP." + s);
+			projectList.add("TEMP." + s + " AS " + s);
 		}
 		if (pred != null) {
 			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
-		
+			Set<Variable> valueVars = new HashSet(planNode.getValues().getVariables());;
+	
 			for (Variable v : pred.getAvailableVariables()) {
 				if (planNode.getRequiredVariables().contains(v)) {
+					continue;
+				}
+				if (valueVars.contains(v)) {
 					continue;
 				}
 				String vPredName = wrapper.getPlanNodeVarMapping(pred,v.getName());
@@ -135,7 +139,7 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 
 	private List<String> getValuesProjectList() {
 		List<String> projectList = new LinkedList<String>();
-		
+
 		for (Variable v : planNode.getValues().getVariables()){
 			projectList.add(v.getName());
 			if (!wrapper.getIRIBoundVariables().contains(v)) {
@@ -239,8 +243,15 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 			joinVariables.addAll(leftAvailable);
 		}
 		Set<Variable> rightAvailable = planNode.getRequiredVariables();
-		if(rightAvailable != null){
+		if(rightAvailable != null && !rightAvailable.isEmpty()) {
 			joinVariables.retainAll(rightAvailable);
+		}
+		// KAVITHA: In a values node, nothing might be required but if the variable that is 
+		// being produced has been produced before by the predecessor, it needs to be 
+		// joined
+		Set<Variable> rightProduced = planNode.getProducedVariables();
+		if(rightProduced != null && !rightProduced.isEmpty()) {
+			joinVariables.retainAll(rightProduced);
 		}
 		return joinVariables;
 	}
