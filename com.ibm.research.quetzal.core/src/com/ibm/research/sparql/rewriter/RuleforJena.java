@@ -32,6 +32,7 @@ import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
 public class RuleforJena {
 	OpTriple consequent;
 	Op antecedent;
+	static int count = 0;
 	
 	public RuleforJena(Query constructQuery) {
 		antecedent = Algebra.compile(constructQuery);
@@ -79,7 +80,8 @@ public class RuleforJena {
 			Var var2 = aliases.get(var);
 			if (var2 != null)
 				return var2;
-			var2 = Var.alloc(var.getName() + "_" + UUID.randomUUID());
+			var2 = Var.alloc(var.getName() + "_" + count);
+			count++;
 			aliases.put(var, var2);
 			return var2;
 		}

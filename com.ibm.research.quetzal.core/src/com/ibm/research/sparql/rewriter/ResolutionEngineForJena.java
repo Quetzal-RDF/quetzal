@@ -73,8 +73,9 @@ public class ResolutionEngineForJena {
 		Op newQuery = body;
 		newQuery = Transformer.transform(visitor, body);
 		
-		System.out.println(OpAsQuery.asQuery(newQuery));
-		return OpAsQuery.asQuery(newQuery);
+		Query q = OpAsQuery.asQuery(newQuery);
+		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
+		return q;
 
 	}
 
