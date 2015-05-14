@@ -234,7 +234,7 @@ public class ResolutionEngineForJena {
 			if (tripleToOp.values().size() == 1) {
 				union = tripleToOp.values().iterator().next();
 			} else {
-				union = createUnionOfOps(new LinkedList<Op>(tripleToOp.values()));	// this is now the union of all transformed triples
+				union = createJoinOfOps(new LinkedList<Op>(tripleToOp.values()));	// this is now the join of all transformed triples
 			}
 			
 			// iterate on this new expanded query until we ensure we have no more unfolding
@@ -253,6 +253,25 @@ public class ResolutionEngineForJena {
 			return op;
 		}
 
+		private Op createJoinOfOps(List<Op> alternatives) {
+			Op union = null;
+			if (alternatives.size() == 1) {
+				return alternatives.get(0);
+			}
+			while (!alternatives.isEmpty()) {
+				Op newunion = null;
+				if (union == null) {
+					newunion = OpJoin.create(alternatives.remove(0),
+							alternatives.remove(0));
+				} else {
+					newunion = OpJoin.create(alternatives.remove(0),
+							union);
+				}
+				union = newunion;
+			}
+			return union;		
+		}
+		
 		private Op createUnionOfOps(List<Op> alternatives) {
 			Op union = null;
 			if (alternatives.size() == 1) {
