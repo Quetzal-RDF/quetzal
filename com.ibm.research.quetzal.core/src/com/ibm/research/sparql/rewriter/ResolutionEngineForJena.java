@@ -41,7 +41,13 @@ import com.ibm.research.sparql.rewriter.ResolutionEngine.ResolutionVisitor;
 public class ResolutionEngineForJena {
 
 	private List<RuleforJena> rules;
+	private boolean consequentsExistInDB = false;
 
+	public ResolutionEngineForJena(List<RuleforJena> rules, boolean consequentsExistInDB) {
+		this.rules = rules;
+		this.consequentsExistInDB = consequentsExistInDB;
+	}
+	
 	public ResolutionEngineForJena(List<RuleforJena> rules) {
 		this.rules = rules;
 	}
@@ -126,7 +132,9 @@ public class ResolutionEngineForJena {
 			for (Triple triple : opBGP.getPattern().getList()) {
 				OpTriple opTriple = new OpTriple(triple);
 				List<Op> alternatives = new LinkedList<Op>();
-				alternatives.add(opTriple);
+				if (consequentsExistInDB) {
+					alternatives.add(opTriple);
+				}
 				
 				for (RuleforJena rule : rules) {
 
@@ -207,10 +215,14 @@ public class ResolutionEngineForJena {
 				// done with triple
 				// constructing UNION operator, a binary tree, removing 2 at a
 				// time 
-				if (alternatives.size() == 1) {
+				if (alternatives.isEmpty()) {
 					continue;
 				}
-				OpUnion union = createUnionOfOps(alternatives);	
+				if (consequentsExistInDB && alternatives.size() == 1) {
+					continue;
+				}
+				
+				Op union = createUnionOfOps(alternatives);	
 				tripleToOp.put(triple, union);
 			}
 			if (tripleToOp.isEmpty()) {
@@ -241,8 +253,11 @@ public class ResolutionEngineForJena {
 			return op;
 		}
 
-		private OpUnion createUnionOfOps(List<Op> alternatives) {
-			OpUnion union = null;
+		private Op createUnionOfOps(List<Op> alternatives) {
+			Op union = null;
+			if (alternatives.size() == 1) {
+				return alternatives.get(0);
+			}
 			while (!alternatives.isEmpty()) {
 				OpUnion newunion = null;
 				if (union == null) {
