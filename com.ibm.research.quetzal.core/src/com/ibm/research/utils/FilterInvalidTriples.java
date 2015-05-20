@@ -23,7 +23,7 @@ import org.apache.jena.riot.RiotWriter;
 import org.apache.jena.riot.system.Checker;
 
 import com.hp.hpl.jena.graph.Triple;
-import com.ibm.wala.util.collections.Filter;
+import com.ibm.wala.util.Predicate;
 import com.ibm.wala.util.collections.FilterIterator;
 
 public class FilterInvalidTriples {
@@ -32,12 +32,12 @@ public class FilterInvalidTriples {
 			Lang lang) throws MalformedURLException, IOException {
 		Iterator<Triple> ts = RiotReader.createIteratorTriples(
 				url.openStream(), lang, baseURI);
-		return new FilterIterator<Triple>(ts, new Filter<Triple>() {
+		return new FilterIterator<Triple>(ts, new Predicate<Triple>() {
 			private int i = 0;
 			private final Checker checker = new Checker();
 
 			@Override
-			public boolean accepts(Triple t) {
+			public boolean test(Triple t) {
 				return !t.getObject().isLiteral() || checker.checkLiteral(t.getObject(), i++, 0);
 			}
 
