@@ -1,9 +1,20 @@
-function ?testR (?a ?b -> ?c ?d ?e) language ?R { 
-	"test1; test2; test3;"
+function testR (?a ?b -> ?c ?d ?e) language R { 
+	\SOP
+	
+	test1; 
+	\n
+	\t
+	"\thi\t\n"
+	test2; test3;
+	
+	\EOP
 }
 
-function ?testR1 (?aa ?bb -> ?cc ?dd) language ?RR { 
-	"test11; test12; test13;"
+function testR1 (?aa ?bb -> ?cc ?dd) language RR { 
+	{
+	?d a :Drug .
+	?c a :Disease .
+	}
 }
 
 select ?d ?c ?p ?t where {
@@ -20,9 +31,9 @@ select ?d ?c ?p ?t where {
 { ?d ?p1 ?c } union
 { ?d ?p1 _:x . _:x ?p2 ?c } 
 
-BIND ( ?testR ( ?allgeos ?unemploymentRate ) AS ( ?allgeos ?forecastedUnemploymentRate ?avgForecastedRate )) 
+BIND ( testR ( ?allgeos ?unemploymentRate ) AS ( ?allgeos ?forecastedUnemploymentRate ?avgForecastedRate )) 
 
-BIND ( ?testR1 ( ?allgeos ?unemploymentRate ) AS ( ?forecastedUnemploymentRate ?avgForecastedRate )) 
+BIND ( testR1 ( ?allgeos ?unemploymentRate ) AS ( ?forecastedUnemploymentRate ?avgForecastedRate )) 
 
 }
 
