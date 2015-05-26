@@ -168,14 +168,14 @@ selectQuery
 	
 //added by wensun
 functionDecl
-	:	FUNCTION fn=var OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=var fb=functionBody
+	:	FUNCTION fn=VAR0 OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=VAR0 fb=functionBody
 	  -> ^( FUNCNAME $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb )
 	;
 
 //added by wensun
 functionBody
-	: OPEN_CURLY_BRACE f=STRING_LITERAL2 CLOSE_CURLY_BRACE
-	  ->  ^( FUNCBODY $f )
+	: OPEN_CURLY_BRACE f=STRING_LINE_NONEOP CLOSE_CURLY_BRACE
+	  ->  ^( FUNCBODY $f* )
 	| OPEN_CURLY_BRACE p=groupGraphPattern CLOSE_CURLY_BRACE
 	  ->  ^( FUNCBODY $p )
 	;
@@ -498,7 +498,7 @@ bind2
 	;
 	
 funcCall
-	:    fn=var OPEN_BRACE v+=var+ CLOSE_BRACE
+	:    fn=VAR0 OPEN_BRACE v+=var+ CLOSE_BRACE
 		->  ^( FUNCCALL  $fn  $v* )
 	;
 
@@ -1232,6 +1232,10 @@ UUID : U U I D ;
 
 STRUUID : S T R U U I D ;
 
+SOP  : '\\' S O P ;
+
+EOP  : '\\' E O P ;
+
 OPEN_CURLY_BRACE
 	:	'{'
 	;
@@ -1306,6 +1310,11 @@ VAR2
 	:  	'$' VARNAME
 	;
 	
+	
+VAR0	  
+	:  	('a'..'z'|'A'..'Z')+  ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+	;
+		
 LANGTAG	  
 	:  	'@' ('a'..'z'|'A'..'Z')+ ( '-' ('a'..'z'|'A'..'Z'|'0'..'9')+  )*		{ setText($text.substring(1, $text.length())); }
 	;
@@ -1368,6 +1377,11 @@ EXPONENT
 	:  	('e'|'E') ( ('+'|'-')? ('0'..'9') )+
 	;
 	
+STRING_LINE_NONEOP	  
+:  SOP	( options {greedy=false;} : ~('\u007C'|'\u005C') | ECHAR )*  EOP
+	{ setText($text.substring(4, $text.length()-4)); 		}
+;
+
 STRING_LITERAL1	  
 	:  	'\'' ( options {greedy=false;} : ~('\u0027'|'\u005C'|'\u000A'|'\u000D') | ECHAR )*  '\''	
 

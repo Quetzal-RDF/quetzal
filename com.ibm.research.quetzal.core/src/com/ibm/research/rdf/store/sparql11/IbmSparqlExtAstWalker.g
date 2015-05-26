@@ -144,10 +144,10 @@ functionDecl returns [FunctionExt func]
 	@init { $func = new FunctionExt(); }
 	:	
 		^(FUNCNAME
-			^(fn=var { $func.setName(fn); } )
+			^(fn=VAR0 { $func.setName($fn.getText()); } )
 			^(INV ( inv=var { $func.addInVar(inv); } )+)
 			^(OUTV ( outv=var { $func.addOutVar(outv); } )+) 
-			^(FUNCLG (fl=var { $func.setLang(fl); } ))
+			^(FUNCLG (fl=VAR0 { $func.setLang($fl.getText()); } ))
 			(fb=functionBody { $func.setBody(fb); } )
 		)
 	;
@@ -158,7 +158,7 @@ functionBody returns [FunctionBody fb]
 	:
 	 	^(FUNCBODY
 	 		(
-	 		(f=STRING_LITERAL2 {$fb.setFlag(0); $fb.setBody(f); } )
+	 		(f=STRING_LINE_NONEOP {$fb.setFlag(0); $fb.setBody(f); } )
 	 		| 
 	 		(p=groupGraphPattern[true] {$fb.setFlag(1); $fb.setBody(p); } )
 	 		)
@@ -542,7 +542,7 @@ bind2  returns [Pattern p]
 funcCall  returns [BindFunctionCall f]
 	@init { $f = new BindFunctionCall(); }
 	:    ^( FUNCCALL 
-			(fn=var {$f.setName(fn); } )
+			(fn=VAR0 {$f.setName($fn.getText()); } )
 			(v=var {$f.addVar(v);} )+
 		)
 	;
