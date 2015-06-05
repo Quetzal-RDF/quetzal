@@ -425,7 +425,10 @@ graphPatternNewBGP[PatternSet p, Set<BlankNodeVariable> vars]
         { 
             $p.addPattern(g);
         }
-	| 	serviceGraphPattern 
+	| 	s=serviceGraphPattern 
+		{
+			$p.addPattern(s);
+		}
 	| 	b=bind
 	    {					
 			$p.addPattern(b);

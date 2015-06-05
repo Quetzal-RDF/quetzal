@@ -56,6 +56,8 @@ public class PlanNodeTemplateFactory {
 			return createValuesSQLTemplate(planNode, store, ctx, plan, wrapper);
 		} else if (planNode.getType() == PlanNodeType.SUBSELECT) {
 			return createSubselectSQLTemplate(planNode, store, ctx, plan, wrapper);
+		} else if (planNode.getType() == PlanNodeType.SERVICE) {
+			return createServiceSQLTemplate(planNode, store, ctx, plan, wrapper);
 		}
 		
 		assert planNode.getType() == PlanNodeType.AND : "cannot find template for " + planNode.getType();
@@ -66,6 +68,12 @@ public class PlanNodeTemplateFactory {
 			PlanNode planNode, Store store, Context ctx, Plan plan,
 			STPlanWrapper wrapper) {
 		return new SubSelectTemplate("sub_select", planNode, (SubSelectPattern)planNode.getPattern(), store, ctx, wrapper);
+	}
+	
+	private static AbstractSQLTemplate createServiceSQLTemplate(
+			PlanNode planNode, Store store, Context ctx, Plan plan,
+			STPlanWrapper wrapper) {
+		return new ServiceSQLTemplate("service", planNode, store, ctx, wrapper);
 	}
 
 	static AbstractSQLTemplate createTripleSQLTemplate(PlanNode planNode, Store store, Context ctx, Plan plan, STPlanWrapper wrapper) throws SQLWriterException{

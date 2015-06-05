@@ -34,7 +34,7 @@ import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
-public class ValuesSQLTemplate extends AbstractSQLTemplate {
+public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	public static void main(String[] args) {
 		 String st = "group sql;\n"
 		 		+ "values(values, values_project,  store_name) ::= << \n"
@@ -65,15 +65,13 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 		 System.out.println("string: "+template.toString());
 	}
 	
-	protected PlanNode pred;
-	
 	
 	
 	public ValuesSQLTemplate(String templateName, PlanNode planNode,
 			Store store, Context ctx, STPlanWrapper wrapper) {
 		super(templateName, store, ctx, wrapper, planNode);
+		this.planNode = planNode;
 		wrapper.mapPlanNode(planNode);
-		pred = planNode.getPredecessor(wrapper.plan);
 	}
 
 	@Override
@@ -101,9 +99,14 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 		SQLMapping tMapping = new SQLMapping("target", targetList, null);
 		mappings.add(tMapping);
 		
-		List<String> joinConstraints = getJoinConstraintMapping();
-		SQLMapping joinMapping = new SQLMapping("join_constraint", joinConstraints, null);
-		mappings.add(joinMapping);
+		if (pred != null) {
+			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
+			String rightSQLCte = "TEMP"; 
+	
+			List<String> joinConstraints = getJoinConstraintMapping(leftSQLCte, rightSQLCte);
+			SQLMapping joinMapping = new SQLMapping("join_constraint", joinConstraints, null);
+			mappings.add(joinMapping);
+		}
 		String store_name = store.getStoreName();
 		SQLMapping storeNameMapping = new SQLMapping("store_name",store_name, null);
 		mappings.add(storeNameMapping);
@@ -185,74 +188,5 @@ public class ValuesSQLTemplate extends AbstractSQLTemplate {
 		return ret;
 	}
 	
-	List<String> getTargetMapping() {
-		if (pred == null) {
-			return null;
-		}
-		return Collections.<String>singletonList(wrapper.getPlanNodeCTE(pred, true));
-	}
-		
-	List<String> getJoinConstraintMapping(){
-		if (pred == null) {
-			return null;
-		}
-		List<String> constraintMapping = new LinkedList<String>();
-		String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
-		String rightSQLCte = "TEMP"; 
-		Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 
-		Set<Variable> joinVariables = getJoinVariables();
-
-
-
-		for(Variable v : joinVariables){
-			String vPredNameLeft = wrapper.getPlanNodeVarMapping(pred,v.getName());
-			String vPredNameRight = wrapper.getPlanNodeVarMapping(planNode,v.getName());
-			String constraintV = leftSQLCte + "." + vPredNameLeft + " = " + rightSQLCte +  "." + vPredNameRight;
-			String constraintVTyp = leftSQLCte + "." + vPredNameLeft + Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS + " = " + rightSQLCte +  "." + vPredNameRight +Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
-			String undefCostraint = null;
-			assert planNode.getType() == PlanNodeType.VALUES;
-			
-			if(planNode.getUndefVariables().contains(v)){
-				undefCostraint = rightSQLCte + "." + vPredNameRight + "='NULL'";
-			}
-			if(undefCostraint == null){
-				constraintMapping.add(constraintV);
-				if(!iriBoundVariables.contains(v)){
-					constraintMapping.add(constraintVTyp);
-				}
-			}
-			else {
-				String constraint = null; 
-				if(iriBoundVariables.contains(v)){
-					constraint = "(" + constraintV + " OR " + undefCostraint + ")";
-				}
-				else{
-					constraint = "( (" + constraintV + " AND " + constraintVTyp+") OR " + undefCostraint + ")";
-				}
-				constraintMapping.add(constraint);
-			}
-		}
-		return constraintMapping;
-	}
-
-	private Set<Variable> getJoinVariables() {
-		Set<Variable> joinVariables = HashSetFactory.make();
-		Set<Variable> leftAvailable = pred.getAvailableVariables();
-		if(leftAvailable != null){
-			joinVariables.addAll(leftAvailable);
-		}
-		Set<Variable> rightAvailable = planNode.getRequiredVariables();
-		if(rightAvailable != null && !rightAvailable.isEmpty()) {
-			joinVariables.retainAll(rightAvailable);
-		}
-		// KAVITHA: In a values node, nothing might be required but if the variable that is 
-		// being produced has been produced before by the predecessor, it needs to be 
-		// joined
-		Set<Variable> rightProduced = planNode.getProducedVariables();
-		if(rightProduced != null && !rightProduced.isEmpty()) {
-			joinVariables.retainAll(rightProduced);
-		}
-		return joinVariables;
-	}
 }

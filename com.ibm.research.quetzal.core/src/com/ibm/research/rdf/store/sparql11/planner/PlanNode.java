@@ -35,6 +35,7 @@ import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.Values;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
+import com.ibm.research.rdf.store.sparql11.planner.Planner.ServiceNode;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 
@@ -229,7 +230,13 @@ public void setMaterialzedTable(String materialzedTable) {
 	   this.undefVariables = values.determineUNDEFVariables();
    }
    
-   
+   public PlanNode(ServiceNode service, Set<Variable> requiredVars) {
+	   this.producedVariables = new HashSet<Variable>();
+	   this.producedVariables.addAll(service.getProducedVariables());
+	   this.requiredVariables = requiredVars;
+	   this.pattern = service.p;
+	   this.type = PlanNodeType.SERVICE;
+   }
    
    public PlanNode(BinaryUnion<Variable, IRI> graphRestriction) {
 	super();
@@ -633,6 +640,7 @@ public void setMaterialzedTable(String materialzedTable) {
 	   case UNION:
 	   case MATERIALIZED_TABLE:
 	   case GRAPH:
+	   case SERVICE:
 	   case VALUES:{
 		   return this;
 	   }

@@ -1168,6 +1168,10 @@ public class PropertyPathRewrite {
 				ret &= true; //= rewrite((BindPattern) p, bestEffort, vargen, explicitIRIBoundVariables);
 				break;
 			}
+			case SERVICE: {
+				ret &= true; //= rewrite((BindPattern) p, bestEffort, vargen, explicitIRIBoundVariables);
+				break;
+			}
 			case  SIMPLE: {
 				throw new RuntimeException("Unknown pattern type: "+ p); // use the method for SimplePattern
 			}
