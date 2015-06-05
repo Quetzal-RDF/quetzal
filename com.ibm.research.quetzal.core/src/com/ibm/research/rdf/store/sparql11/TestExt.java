@@ -18,8 +18,10 @@ import java.util.List;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
 
 import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.Query;
@@ -33,9 +35,17 @@ public class TestExt {
     	IbmSparqlLexer lex = new IbmSparqlLexer(new ANTLRFileStream(sparqlFile,	"UTF8"));
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		IbmSparqlParser parser = new IbmSparqlParser(tokens);
+		
+		parser.setTreeAdaptor(new CommonTreeAdaptor(){
+			@Override
+			public Object create(Token t) {
+				return new XTree(t);
+			}
+		}); 
+		
 		try {
 			IbmSparqlParser.queryUnit_return ret = parser.queryUnit();
-			CommonTree ast = (CommonTree) ret.getTree();
+			XTree ast = (XTree) ret.getTree();
 			
 			//
 			System.out.println(ast.toStringTree());
@@ -58,6 +68,14 @@ public class TestExt {
     	IbmSparqlExtLexer lex = new IbmSparqlExtLexer(new ANTLRFileStream(sparqlFile,	"UTF8"));
 		CommonTokenStream tokens = new CommonTokenStream(lex);
 		IbmSparqlExtParser parser = new IbmSparqlExtParser(tokens);
+		
+		parser.setTreeAdaptor(new CommonTreeAdaptor(){
+			@Override
+			public Object create(Token t) {
+				return new XTree(t);
+			}
+		}); 
+		
 		try {
 			IbmSparqlExtParser.queryUnit_return ret = parser.queryUnit();
 			CommonTree ast = (CommonTree) ret.getTree();
