@@ -13,7 +13,7 @@
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ServicePattern extends Pattern {
@@ -26,7 +26,8 @@ public class ServicePattern extends Pattern {
 		super(EPatternSetType.SERVICE);
 		String x = null;
 		try {
-			x = URLEncoder.encode(queryText.substring(queryText.indexOf('{')), "UTF-8");
+			String str = "SELECT * WHERE " + queryText.substring(queryText.indexOf('{'));
+			x = URLEncoder.encode(str, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			assert false : e.toString();
 		}
@@ -38,86 +39,93 @@ public class ServicePattern extends Pattern {
 
 	@Override
 	public Collection<? extends Variable> getVariables() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<Variable>(pattern.getVariables());
 	}
 
 	@Override
 	public void reverse() {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public Set<BlankNodeVariable> gatherBlankNodes() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<BlankNodeVariable>(pattern.gatherBlankNodes());
 	}
 
 	@Override
 	public Set<Variable> gatherVariables() {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Variable> var = pattern.gatherVariables();
+		return new HashSet<Variable>(pattern.gatherVariables());
 	}
 
 	@Override
 	public Set<Variable> gatherOptionalVariablesWithMultipleBindings() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<Variable>(pattern.gatherOptionalVariablesWithMultipleBindings());
 	}
 
 	@Override
 	public Set<Variable> gatherVariablesWithOptional() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<Variable>(pattern.gatherVariablesWithOptional());
 	}
 
 	@Override
 	public Set<Variable> gatherIRIBoundVariables() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<Variable>(pattern.gatherIRIBoundVariables());
+	}
+
+	@Override
+	public Set<Variable> gatherVariablesInTransitiveClosure() {
+		return new HashSet<Variable>(pattern.gatherVariablesInTransitiveClosure());
 	}
 
 	@Override
 	public void replaceFilterBindings() {
-		// TODO Auto-generated method stub
-
+		pattern.replaceFilterBindings();
 	}
 
 	@Override
 	public int getNumberTriples() {
-		// TODO Auto-generated method stub
-		return 0;
+		return pattern.getNumberTriples();
 	}
 
 	@Override
 	public Set<Pattern> gatherSubPatterns(boolean includeOptionals) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Pattern> p = new HashSet<Pattern>(pattern.gatherSubPatterns(includeOptionals));
+		p.add(pattern);
+		return p;
 	}
 
 	@Override
 	public Set<Pattern> gatherSubPatternsExcluding(Pattern except,
 			boolean includeOptionals) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Pattern> p = new HashSet<Pattern>(pattern.gatherSubPatternsExcluding(except, includeOptionals));
+		return p;
 	}
 
 	@Override
 	public Set<Pattern> getSubPatterns(boolean includeOptionals) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Pattern> p = new HashSet<Pattern>(pattern.getSubPatterns(includeOptionals));
+		return p;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return pattern.isEmpty();
 	}
 
-	@Override
-	public Set<Variable> gatherVariablesInTransitiveClosure() {
-		return Collections.EMPTY_SET;
+	public QueryTripleTerm getService() {
+		return service;
 	}
 
+	public String getQueryText() {
+		return queryText;
+	}
+
+	public boolean isSilent() {
+		return silent;
+	}
+
+	public Pattern getPattern() {
+		return pattern;
+	}
 }

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
 import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
+import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
 import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
 import com.ibm.research.rdf.store.sparql11.model.Values;
@@ -123,6 +125,12 @@ public class Planner {
 				return new PlanNode(graphRestriction);
 			}
 			
+			@Override
+			public PlanNode createSTPlanNode(
+					ServiceNode service, Set<Variable> requiredVars) {
+				return new PlanNode(service, requiredVars);
+			}
+			
 			
 		}, checkMinus);
 	}
@@ -142,7 +150,7 @@ public class Planner {
 	}
 	
 	public enum Kind {
-		TRIPLE, UNION, OPTIONAL, MINUS, VALUES, BIND, NOT_EXISTS, EXISTS, JOIN, PINVARIABLE, PINKEY, BLACKBOX, SUBSELECT, STAR, REUSE,MATERIALIZED_TABLE, PARTITION, GRAPH
+		TRIPLE, UNION, OPTIONAL, MINUS, VALUES, BIND, NOT_EXISTS, EXISTS, JOIN, PINVARIABLE, PINKEY, BLACKBOX, SUBSELECT, STAR, REUSE,MATERIALIZED_TABLE, PARTITION, SERVICE, GRAPH
 	}
 
 	public interface Key {
@@ -193,6 +201,8 @@ public class Planner {
 		PlanNode createSTPlanNode(PlanNode reuseNode, Map<Variable, Variable> reuseVarMappings);
 		
 		PlanNode createSTPlanNode(Values values);
+		
+		PlanNode createSTPlanNode(ServiceNode node, Set<Variable> requiredVars);
 		
 		PlanNode  createSTPlanNode(BinaryUnion<Variable, IRI> graphRestriction);
 		
@@ -346,6 +356,12 @@ public class Planner {
 				Walker walker, List<Pattern> region, Set<Node> result) {
 			// do nothing
 		}
+		
+		void getApplicableNodesForService(Pattern p,
+				Set<Variable> availableVars, Set<Variable> liveVariables,
+				Walker walker, List<Pattern> region, Set<Node> result) {
+			// do nothing
+		}
 
 		private Set<Variable> getUnproducedVars(Pattern p ) {
 			Set<Variable> result = HashSetFactory.make();
@@ -399,6 +415,9 @@ public class Planner {
 			case VALUES:
 				getApplicableNodesForValues(p, availableVars, liveVariables, walker, region, result);
 				break;
+			case SERVICE:
+				getApplicableNodesForService(p, availableVars, liveVariables, walker, region, result);
+				break;
 			default:
 				assert p.getType() == EPatternSetType.AND;
 				break;
@@ -433,6 +452,62 @@ public class Planner {
 			newLiveVariables.addAll(key.gatherVariables());
 		}
 		return newLiveVariables;
+	}
+	
+	class ServiceNode extends AbstractNode {
+
+		private Set<Variable> availableVars;
+		
+		public ServiceNode(ServicePattern p, Set<Variable> availableVars, Set<Variable> liveVars) {
+			super(p);
+			this.availableVars = availableVars;
+		}
+		
+		@Override
+		public PlanNode augmentPlan(Query q, PlanNode currentHead,
+				NumberedGraph<PlanNode> g, List<Expression> filters,
+				Set<Variable> availableVars, Set<Variable> liveVars) {
+				// compute required vars based on what is available and whats will be produced
+				Set<Variable> producedVariables = getProducedVariables();
+				Set<Variable> requiredVariables = Collections.emptySet();
+				
+				PlanNode node = 
+					planFactory.createSTPlanNode(this, requiredVariables);
+				node.cost = getCost(g);
+				assert node.cost.fst > 0.0;
+				Set<Variable> vars = HashSetFactory.make(this.availableVars);
+				vars.addAll(producedVariables);
+				vars.retainAll(liveVars);
+				node.setAvailableVariables(vars);
+				node.setProducedVariables(producedVariables);
+				g.addNode(node);
+				if (currentHead != null) {
+					return join(JoinTypes.AND, q, g, currentHead, node, liveVars);		
+				} else {
+					return node;
+				}
+		}
+
+		@Override
+		public Kind kind() {
+			return Kind.SERVICE;
+		}
+
+		@Override
+		public Pair<Double, Double> getCost(NumberedGraph<PlanNode> g) {
+			return Pair.make(Double.MAX_VALUE, Double.MAX_VALUE);
+		}
+
+		@Override
+		public Set<Variable> getRequiredVariables() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		public Set<Variable> getProducedVariables() {
+			return new HashSet<Variable>(p.gatherVariables());
+		}
+		
 	}
 	
 	class ReUseNode implements Node {
@@ -1622,6 +1697,15 @@ public class Planner {
 				});
 		}
 
+		@Override
+		void getApplicableNodesForService(Pattern p,
+				Set<Variable> availableVars, Set<Variable> liveVariables,
+				Walker walker, List<Pattern> region, Set<Node> result) {
+			ServicePattern sp = (ServicePattern) p;
+			Set<Variable> pvs = sp.gatherVariables();			
+			result.add(new ServiceNode(sp, availableVars, liveVariables));
+		}
+		
 		@Override
 		void getApplicableNodesForScope(final Pattern scope,
 				Set<Variable> availableVars, final Set<Variable> liveVariables,
