@@ -131,32 +131,20 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 		
 		
 	}
-	private Connection con;
-
-	private Store store;
 	
 	private ResultSet rs;
 	
 	private ResultSetIterator it;
 	
-	public DB2ResultSetIterator(ResultSet rs, PreparedStatement pstmt,
-			Connection con, Store store) {
+	public DB2ResultSetIterator(ResultSet rs, Connection con, Store store) {
 		it = new ResultSetIterator(rs, new RowProcessorImpl(store, con));
 		this.rs = rs;
-		this.con = con;
-		this.store = store;
 	}
 
-	
-	
-	
 	@Override
 	public boolean hasNext() {
 		return it.hasNext();
 	}
-
-
-
 
 	@Override
 	public Triple next() {
@@ -164,24 +152,16 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 		return (Triple) ret[0];
 	}
 
-
-
-
 	@Override
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}
-
-
-
 
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
 		close();
 	}
-
-
 
 	@Override
 	public void close() {
@@ -196,12 +176,10 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 		
 	}
 
-
 	@Override
 	public <X extends Triple> ExtendedIterator<Triple> andThen(Iterator<X> other) {
 		return NiceIterator.<Triple>andThen(this, other);
 	}
-
 
 	@Override
 	public ExtendedIterator<Triple> filterDrop(final Filter<Triple> filter) {
@@ -216,13 +194,11 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 
 		 return new FilterIterator<Triple>(negFilter, this) ;
 	}
-
-
+	
 	@Override
 	public ExtendedIterator<Triple> filterKeep(Filter<Triple> filter) {
 		 return new FilterIterator<Triple>(filter, this) ;
 	}
-
 
 	@Override
 	public <U> ExtendedIterator<U> mapWith(final Map1<Triple, U> map) {
@@ -237,25 +213,18 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 		return new MapFilterIterator<Triple, U>(mf, this);
 	}
 
-
 	@Override
 	public Triple removeNext() {
 		throw new UnsupportedOperationException();
 	}
-
 
 	@Override
 	public List<Triple> toList() {
 		return NiceIterator.asList(this);
 	}
 
-
 	@Override
 	public Set<Triple> toSet() {
 		return NiceIterator.asSet(this);
 	}
-
-	
-	
-	
 }

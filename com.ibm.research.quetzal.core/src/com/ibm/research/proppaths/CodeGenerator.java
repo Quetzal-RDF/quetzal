@@ -578,7 +578,7 @@ public class CodeGenerator {
 		assert node.getTriple().getPredicate().getPath().isDirectlyRecursive() ||
 			node.getTriple().getPredicate().getPath().isDirectlyZeroOrOnePath()
 			: "The following triple has not been properly normalized\n\t"+node.getTriple();
-		assert predecessor==null || predecessor.getType().equals(PlanNodeType.MATERIALIZED_TABLE): predecessor;
+		assert predecessor==null || predecessor.getType().equals(PlanNodeType.MATERIALIZED_TABLE): predecessor.getType() + ": " + predecessor;
 		
 		// assume that constants have been replaced by variable with filter expressions
 		assert node.getTriple().getSubject().isVariable() : "The following triple has not been properly normalized\n\t"+node.getTriple(); 

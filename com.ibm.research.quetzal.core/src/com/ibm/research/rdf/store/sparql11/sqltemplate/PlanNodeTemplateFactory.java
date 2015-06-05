@@ -75,6 +75,7 @@ public class PlanNodeTemplateFactory {
 		else if(accessType == AccessType.SECONDARY_ONLY){
 			return new TripleSecondaryOnlySQLTemplate("simple_ph_exp1",planNode,store,ctx,wrapper);
 		}else if(accessType == AccessType.PRIMARY_ONLY && planNode.getTriple().getPredicate().isVariable()){
+			assert false; 
 			//return new TripleAllPredicatesSQLTemplate("triple_all_predicates",planNode,store,ctx,wrapper);
 		}
 		else if(accessType == AccessType.BOTH_OUTER_JOIN && planNode.getTriple().getPredicate().isVariable()){

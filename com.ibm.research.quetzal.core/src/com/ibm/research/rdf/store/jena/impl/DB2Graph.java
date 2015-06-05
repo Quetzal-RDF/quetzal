@@ -209,7 +209,7 @@ public class DB2Graph extends GraphBase implements GraphWithPerform
          {
          stmt = con.prepareStatement(sql.toString());
          rs = getRS(stmt, params, exception);
-         return new DB2ResultSetIterator(rs, stmt, con, store);
+         return new DB2ResultSetIterator(rs, con, store);
          }
       catch (SQLException e)
          {

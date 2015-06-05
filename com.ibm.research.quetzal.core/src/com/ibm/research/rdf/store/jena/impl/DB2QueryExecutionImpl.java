@@ -64,7 +64,8 @@ public class DB2QueryExecutionImpl implements QueryExecution
    private OWLQLSPARQLCompiler  compiler;
    private LiteralInfoResultSet rs  = null;
    QueryProcessor               qp  = null;
-
+   private boolean closed = false;
+   
    private static final Log     log = LogFactory.getLog(DB2QueryExecutionImpl.class);
 
    // query over the entire Dataset
@@ -159,7 +160,7 @@ public class DB2QueryExecutionImpl implements QueryExecution
          qp = QueryProcessorFactory.create(query.getDB2Query(), getConnection(), getStore(), getNativeContext(), compiler);
          rs = qp.execSelect();
 
-         return new DB2ResultSetImpl(rs, ds.getDefaultModel(), getStore(), getConnection(), query.getResultVars(),
+         return new DB2ResultSetImpl(rs, getStore(), getConnection(), query.getResultVars(),
                query.getProject());
          }
 
@@ -296,6 +297,7 @@ public class DB2QueryExecutionImpl implements QueryExecution
 
             }
          }
+      closed = true;
       }
 
    private Connection getConnection()

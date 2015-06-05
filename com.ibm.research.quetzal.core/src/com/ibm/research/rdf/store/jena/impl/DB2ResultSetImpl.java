@@ -42,26 +42,22 @@ import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.runtime.service.types.TypedValue;
 
-public class DB2ResultSetImpl implements ResultSet
-   {
+public class DB2ResultSetImpl implements ResultSet {
 
    private java.sql.ResultSet   set;
    private LiteralInfoResultSet liRs;
    private boolean              hasNext       = false;
    private int                  count         = 0;
    private List<String>         varList;
-   private Model                m             = null;
    private Store                store         = null;
    private Connection           connection;
-   private VarExprList          exprList      = null;
-   private DB2Binding           binding       = null;
    private boolean              hasNextCalled = false;
    private boolean              nextCalled    = true;
    private Set<String>			columnNames = new HashSet<String>();
 
    private static final Log     log           = LogFactory.getLog(DB2ResultSetImpl.class);
 
-   public DB2ResultSetImpl(LiteralInfoResultSet rs, Model m, Store store, Connection c, List<String> list, VarExprList varExprList)
+   public DB2ResultSetImpl(LiteralInfoResultSet rs, Store store, Connection c, List<String> list, VarExprList varExprList)
       {
       liRs = rs;
       set = rs.getResultSet();
@@ -80,15 +76,14 @@ public class DB2ResultSetImpl implements ResultSet
       }
       this.store = store;
       connection = c;
-      exprList = varExprList;
 
-      if (exprList.isEmpty())
+      if (varExprList.isEmpty())
          {
          varList = list;
          }
       else
          {
-         List<Var> vars = exprList.getVars();
+         List<Var> vars = varExprList.getVars();
          varList = new ArrayList<String>();
          for (int i = 0; i < vars.size(); i++)
             {
@@ -145,18 +140,18 @@ public class DB2ResultSetImpl implements ResultSet
       throw new RdfStoreException("Not supported");
       }
 
-   public Model getResourceModel()
-      {
-      return m;
-      }
+   public Model getResourceModel() {
+	   // assert false;
+	   return null;	
+   }
 
    public QuerySolution nextSolution()
       {
       return next();
       }
 
-   public Binding nextBinding()
-      {
+   public Binding nextBinding() {
+	  DB2Binding binding = new DB2Binding(null);
       nextCalled = true;
       if (!hasNextCalled)
          {
@@ -165,7 +160,6 @@ public class DB2ResultSetImpl implements ResultSet
       hasNextCalled = false;
       if (hasNext)
          {
-         binding = new DB2Binding(null);
          Map<TypedValue, String> sidMap = new HashMap<TypedValue, String>();
          try
             {
