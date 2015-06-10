@@ -1,8 +1,8 @@
 group SQLTemplates;
 
 RDF_DATATYPE(typeCol, dtTableName, iri, blankNode, plainLiteral, startOfLangLiterals, endOfLangLiterals)  ::= << 
- (SELECT CASE WHEN DATATYPE_ID \<= <endOfLangLiterals> AND DATATYPE_ID \>= <startOfLangLiterals> THEN 'rdf:langString' 
-  WHEN DATATYPE_ID = <plainLiteral> THEN 'xsd:string' ELSE 
+ (SELECT CASE WHEN DATATYPE_ID \<= <endOfLangLiterals> AND DATATYPE_ID \>= <startOfLangLiterals> THEN 'http://www.w3.org/1999/02/22-rdf-syntax-ns#langString' 
+  WHEN DATATYPE_ID = <plainLiteral> THEN 'http://www.w3.org/2001/XMLSchema#string' ELSE 
   DATATYPE_NAME END from <dtTableName> WHERE DATATYPE_ID=<typeCol> AND DATATYPE_ID \<\> <iri> AND DATATYPE_ID \<\> <blankNode> )
 >>
 
