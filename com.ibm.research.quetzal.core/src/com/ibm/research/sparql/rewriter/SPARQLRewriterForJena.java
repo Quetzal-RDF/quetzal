@@ -77,11 +77,16 @@ public class SPARQLRewriterForJena {
 
 			SPARQLRewriterForJena rewriter = new SPARQLRewriterForJena(rulesFile);
 
-			System.out
-					.println(rewriter
-							.rewrite("PREFIX : <http://example.org/> SELECT ?x WHERE { ?x a :OilDeclineVulnerableIndustry . }"));
+//			System.out
+//					.println(rewriter
+//							.rewrite("PREFIX : <http://example.org/> SELECT * WHERE { ?x a :OilDeclineVulnerableIndustry . }"));
 			
 
+			System.out
+			.println(rewriter
+					.rewrite("PREFIX : <http://example.org/> SELECT * WHERE { ?s ?p ?o. }"));
+
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

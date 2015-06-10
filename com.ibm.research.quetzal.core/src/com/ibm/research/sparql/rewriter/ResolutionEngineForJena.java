@@ -25,6 +25,7 @@ import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.core.VarExprList;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
+import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
 import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
 import com.ibm.research.sparql.rewriter.ResolutionEngine.ResolutionVisitor;
 /******************************************************************************
@@ -186,8 +187,8 @@ public class ResolutionEngineForJena {
 
 						Node exp = s.get(n);
 						assert exp instanceof Var;
-
-						expr.add((Var) exp, new ExprVar(name));
+//						ExprVar v = new ExprVar(name);
+						expr.add(Var.alloc(name) ,new NodeValueNode(exp));
 					}
 
 					Op bind = null;
