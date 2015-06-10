@@ -170,6 +170,7 @@ public class StoreManager {
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
+				throw new RuntimeException(e);
 			} finally {
 				DB2CloseObjects.close(rs, stmt);
 			}
@@ -188,6 +189,7 @@ public class StoreManager {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		} finally {
 			DB2CloseObjects.close(rs, stmt);
 		}
@@ -212,8 +214,8 @@ public class StoreManager {
 
 			s.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 		return store;

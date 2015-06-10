@@ -41,7 +41,7 @@ public class LongStringSubstitutionForBulkLoader {
 				
 		if (quads) {
 			RiotReader.parseQuads(fileName, new Sink<Quad>() {
-				private final SinkQuadOutput qo = new SinkQuadOutput(new FileOutputStream(outFile));
+				private final SinkQuadOutput qo = new SinkQuadOutput(new FileOutputStream(outFile), null, null);
 				@Override
 				public void send(Quad arg0) {
 					try {
@@ -94,7 +94,7 @@ public class LongStringSubstitutionForBulkLoader {
 			});
 		} else {
 			RiotReader.parseTriples(fileName, new Sink<Triple>() {
-				private final SinkTripleOutput to = new SinkTripleOutput(new FileOutputStream(outFile));
+				private final SinkTripleOutput to = new SinkTripleOutput(new FileOutputStream(outFile), null, null);
 				@Override
 				public void send(Triple arg0) {
 					try {

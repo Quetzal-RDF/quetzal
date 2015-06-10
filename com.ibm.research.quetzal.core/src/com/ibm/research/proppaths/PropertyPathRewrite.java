@@ -1137,7 +1137,7 @@ public class PropertyPathRewrite {
 			Pattern newp = rewrite(sp, bestEffort, vargen, hasPropPaths, explicitIRIBoundVariables, explicitNotIRIBoundVariables);
 			newp.pushFilters();
 			newp.pushGraphRestrictions();
-			boolean ret =!hasPropPaths[0];
+			boolean ret = !hasPropPaths[0];
 			query.setMainPattern(newp);
 			result = ret;
 			

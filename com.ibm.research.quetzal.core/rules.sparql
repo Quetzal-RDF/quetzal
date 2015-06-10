@@ -1,4 +1,14 @@
 
+
+PREFIX : <http://example.org/> 
+CONSTRUCT { ?x :S ?y }
+WHERE {
+  
+  	BIND (:a AS ?x) . BIND (:b AS ?y) .
+}
+
+###
+
 PREFIX : <http://example.org/> 
 CONSTRUCT { ?x :S ?y }
 WHERE {

@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION db2inst1.isNumeric(var text) RETURNS boolean AS $$
+CREATE OR REPLACE FUNCTION dawg.isNumeric(var text) RETURNS boolean AS $$
 DECLARE y NUMERIC;
 
 BEGIN

@@ -308,7 +308,7 @@ public class QuetzalQueryEngine extends QueryEngineMain {
 
 		// Execute the query and obtain results
 		ARQ.getContext().setTrue(ARQ.useSAX);
-		QuetzalQueryEngine.testData = new PSQLTestData(
+		testData = new PSQLTestData(
 				"jdbc:postgresql://helix1.pok.ibm.com:5432/lubm100m", "lubm100m",
 				"akement", "passw0rd", "db2inst2", false);
 

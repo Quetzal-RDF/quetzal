@@ -6,8 +6,10 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.rdf.store.cmd.CreateRdfStore"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="uniprot -db xivdb_c6 -host localhost -port 50000 -user db2inst1 -password ihaterc2 -schema db2inst1 -predicateMappings /tmp/predicate_mappings.load"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-base"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dcom.ibm.rdf.createStore=true -Dcom.ibm.rdf.createIndex=false -Dcom.ibm.rdf.longStringsLength=5000"/>
 </launchConfiguration>

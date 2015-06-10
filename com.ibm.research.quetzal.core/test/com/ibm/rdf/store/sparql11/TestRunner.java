@@ -202,7 +202,7 @@ public class TestRunner<D> {
 				ctx = new Context();
 				setStore();
 			} catch (Exception e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -307,7 +307,7 @@ public class TestRunner<D> {
 		return nOR;
 	}
 
-	protected int executeSparql(String sparql, int answers) {
+	public int executeSparql(String sparql, int answers) {
 		long time = System.currentTimeMillis();
 		int nOR = engine.executeStringQuery(data, sparql);
 		if (answers != -1) {

@@ -190,6 +190,9 @@ public void setMaterialzedTable(String materialzedTable) {
    //
    public PlanNode(QueryTriple triple, AccessMethod method, Pair<Set<Variable>> variablePair, Pattern pattern)
       {
+	   if (triple.getPredicate().isComplexPath()) {
+		   System.err.println("got here");
+	   }
       this.type = PlanNodeType.TRIPLE;
       this.triple = triple;
       this.method = method;
