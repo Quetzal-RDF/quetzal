@@ -69,7 +69,7 @@ public class Rule {
 				index.put(extElem.getName(), (ValueConstant) extElem.getExpr());
 			} catch (ClassCastException e) {
 				e.printStackTrace();
-				throw new RuntimeException("Unsupported construct query rule: " + constructQuery.toString());
+				throw new RuntimeException("Unsupported construct query rule: \n" + constructQuery.toString());
 			}
 		}
 		

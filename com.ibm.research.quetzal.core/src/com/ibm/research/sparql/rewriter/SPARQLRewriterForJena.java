@@ -84,7 +84,7 @@ public class SPARQLRewriterForJena {
 
 			System.out
 			.println(rewriter
-					.rewrite("PREFIX : <http://example.org/> SELECT * WHERE { ?s ?p ?o. }"));
+					.rewrite("PREFIX : <http://example.org/> SELECT * WHERE { ?s :S ?o. }"));
 
 			
 		} catch (Exception e) {

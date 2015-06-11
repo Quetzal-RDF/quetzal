@@ -19,8 +19,10 @@ import com.hp.hpl.jena.sparql.algebra.Transformer;
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
 import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
 import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
+import com.hp.hpl.jena.sparql.algebra.op.OpTable;
 import com.hp.hpl.jena.sparql.algebra.op.OpTriple;
 import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
+import com.hp.hpl.jena.sparql.algebra.table.TableUnit;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.core.VarExprList;
@@ -42,7 +44,7 @@ import com.ibm.research.sparql.rewriter.ResolutionEngine.ResolutionVisitor;
 public class ResolutionEngineForJena {
 
 	private List<RuleforJena> rules;
-	private boolean consequentsExistInDB = false;
+	private boolean consequentsExistInDB = true;
 
 	public ResolutionEngineForJena(List<RuleforJena> rules, boolean consequentsExistInDB) {
 		this.rules = rules;
@@ -81,7 +83,7 @@ public class ResolutionEngineForJena {
 		newQuery = Transformer.transform(visitor, body);
 		
 		Query q = OpAsQuery.asQuery(newQuery);
-		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
+//		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
 		return q;
 
 	}
@@ -135,7 +137,10 @@ public class ResolutionEngineForJena {
 				List<Op> alternatives = new LinkedList<Op>();
 				if (consequentsExistInDB) {
 					alternatives.add(opTriple);
-				}
+				} 
+//				else {
+//					alternatives.add(OpTable.unit());
+//				}
 				
 				for (RuleforJena rule : rules) {
 
@@ -224,6 +229,7 @@ public class ResolutionEngineForJena {
 				}
 				
 				Op union = createUnionOfOps(alternatives);	
+				union = OpJoin.create(union, OpTable.unit());
 				tripleToOp.put(triple, union);
 			}
 			if (tripleToOp.isEmpty()) {
