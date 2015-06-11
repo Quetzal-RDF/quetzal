@@ -5,7 +5,12 @@ import java.util.Map;
 import com.hp.hpl.jena.graph.Node;
 
 
-public interface SubstitutionForJena {
+
+/**
+ * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */public interface SubstitutionForJena {
 
 	boolean compose(Node original, Node substituion);
 

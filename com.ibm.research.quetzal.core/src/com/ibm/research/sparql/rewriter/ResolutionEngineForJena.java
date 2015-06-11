@@ -1,5 +1,6 @@
 package com.ibm.research.sparql.rewriter;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -7,7 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.Node_Literal;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.algebra.Algebra;
@@ -18,18 +22,26 @@ import com.hp.hpl.jena.sparql.algebra.TransformCopy;
 import com.hp.hpl.jena.sparql.algebra.Transformer;
 import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
 import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
+import com.hp.hpl.jena.sparql.algebra.op.OpGroup;
 import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
+import com.hp.hpl.jena.sparql.algebra.op.OpProject;
 import com.hp.hpl.jena.sparql.algebra.op.OpTable;
 import com.hp.hpl.jena.sparql.algebra.op.OpTriple;
 import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.algebra.table.TableUnit;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.core.VarExprList;
+import com.hp.hpl.jena.sparql.expr.E_Bound;
+import com.hp.hpl.jena.sparql.expr.E_Conditional;
+import com.hp.hpl.jena.sparql.expr.E_Str;
+import com.hp.hpl.jena.sparql.expr.E_StrConcat;
+import com.hp.hpl.jena.sparql.expr.ExprAggregator;
+import com.hp.hpl.jena.sparql.expr.ExprList;
 import com.hp.hpl.jena.sparql.expr.ExprVar;
+import com.hp.hpl.jena.sparql.expr.NodeValue;
+import com.hp.hpl.jena.sparql.expr.aggregate.AggCount;
 import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
 import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
-import com.ibm.research.sparql.rewriter.ResolutionEngine.ResolutionVisitor;
 /******************************************************************************
  * Copyright (c) 2015 IBM Corporation.
  * All rights reserved. This program and the accompanying materials
@@ -41,6 +53,11 @@ import com.ibm.research.sparql.rewriter.ResolutionEngine.ResolutionVisitor;
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
 
+/**
+ * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */
 public class ResolutionEngineForJena {
 
 	private List<RuleforJena> rules;
@@ -81,11 +98,118 @@ public class ResolutionEngineForJena {
 
 		Op newQuery = body;
 		newQuery = Transformer.transform(visitor, body);
+
+		
+		VarExprList expr = new VarExprList();	
+		E_StrConcat trace = getRuleTracingConcat(newQuery);
+		
+		if (trace!=null) {
+			expr.add(Var.alloc("trace"),trace);		
+			newQuery = OpExtend.extend(newQuery, expr);
+			newQuery = OpJoin.create(newQuery, OpTable.unit());
+			
+			if (SPARQLRewriterForJena.GENERATE_TRACE_SUMMARY) {
+				
+				VarExprList groupVars = new VarExprList();
+				groupVars.add(Var.alloc("trace"));
+				AggCount count = new AggCount();
+				ExprAggregator aggregators = new ExprAggregator(Var.alloc("trace.sum"), count);
+				List<ExprAggregator> list = new LinkedList<ExprAggregator>();
+				list.add(aggregators);
+				
+				Op groupBy = new OpGroup(newQuery, groupVars, list);
+				
+				VarExprList expr2 = new VarExprList();	
+				expr2.add(Var.alloc("sum"), new ExprVar("trace.sum"));			
+				groupBy = OpExtend.extend(groupBy, expr2);
+				List<Var> vars = new LinkedList<Var>();
+				vars.add(Var.alloc("sum"));
+				vars.add(Var.alloc("trace"));
+				OpProject project = new OpProject(groupBy, vars);
+				newQuery = project;
+				
+				
+			}
+
+		}
+		
+		
+		
+		
 		
 		Query q = OpAsQuery.asQuery(newQuery);
 //		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
 		return q;
 
+	}
+	
+	
+	/***
+	 * Collects all the variables of the form RULEID_XXX to crate a new BIND that concatenates
+	 * all of their values in a single string. The value of each RULEID_XXX column contains a number, indicating 
+	 * the rules that were applied to create that row, mulitple per row. By concatenating we have the history
+	 * trace of all the rules in a single column, which we can later use to ORDER BY and COUNT. 
+	 * @param query
+	 */
+	private E_StrConcat getRuleTracingConcat(Op query) {
+		
+		OpVariableVistor<String> collector = new OpVariableVistor<String>(query,
+				true) {
+			@Override
+			protected String processVar(Node v) {
+				if (v.getName().startsWith("RULEID"))
+				return v.getName();
+				else return null;					
+			}
+		};
+		OpWalker.walk(query, collector);
+
+		// Apart from collecting, we try to sort based on the numeric suffix, numerically. 
+		// This allows to have a concat that traces the application of the rules in the correct
+		// order
+		Set<String> bindingNames = new HashSet<String>(collector.getResult());
+		bindingNames.remove(null);
+
+		
+		if (bindingNames.size() == 0) {
+			return null;
+		} 
+		
+		List<Integer> orderedList = new LinkedList<Integer>();
+		for (String name: bindingNames) {
+			String substring = name.substring(7, name.length());
+			Integer value = Integer.valueOf(substring);
+			orderedList.add(value);
+		}
+		Collections.sort(orderedList);
+
+		List<E_Conditional> conditionals = new LinkedList<E_Conditional>();
+		for (Integer value : orderedList) {
+			
+			E_Bound condition = new E_Bound(new ExprVar("RULEID_"+value));
+			E_Str str = new E_Str(new ExprVar("RULEID_"+value));
+			NodeValue empty = NodeValueNode.makeNodeString("");
+			E_Conditional conditional = new E_Conditional(condition, str, empty);
+			conditionals.add(conditional);
+		}
+		
+		ExprList list = new ExprList();
+		for (int i = 0; i < conditionals.size(); i++) {
+			list.add(conditionals.get(i));
+
+			// Appending a spearator for the rule IDs 
+			if (i+1 < conditionals.size())
+				list.add(NodeValueNode.makeNodeString("-"));
+		}
+		E_StrConcat concat = new E_StrConcat(list);
+		
+		
+		
+		
+		return concat;
+
+
+		
 	}
 
 	public class ResolutionVisitor extends TransformCopy {

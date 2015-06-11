@@ -1,3 +1,14 @@
+/******************************************************************************
+ * Copyright (c) 2015 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *****************************************************************************/
+
 package com.ibm.research.sparql.rewriter;
 
 import java.util.HashMap;
@@ -18,6 +29,10 @@ import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.query.parser.sparql.ast.VisitorException;
 
+/**
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */
 public class Rule {
 
 	StatementPattern consequent;

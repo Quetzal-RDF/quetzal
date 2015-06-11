@@ -1,3 +1,14 @@
+/******************************************************************************
+ * Copyright (c) 2015 IBM Corporation.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     IBM Corporation - initial API and implementation
+ *****************************************************************************/
+
 package com.ibm.research.sparql.rewriter;
 
 import java.util.LinkedList;
@@ -23,6 +34,10 @@ import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.expr.Expr;
 import com.hp.hpl.jena.sparql.expr.ExprAggregator;
 
+/**
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */
 public abstract class OpVariableVistor<T> extends OpVisitorBase {
 	private final Op query;
 	private final boolean duplicates;

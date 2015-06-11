@@ -20,7 +20,12 @@ import com.hp.hpl.jena.graph.Node;
 
 
 
-public class SubstitutionImplForJena implements SubstitutionForJena {
+
+/**
+ * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */public class SubstitutionImplForJena implements SubstitutionForJena {
 
 	Map<Node, Node> map = new HashMap<Node, Node>();
 

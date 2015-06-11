@@ -18,11 +18,12 @@ import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.graph.NodeTransform;
 
 
+
 /**
- * @author Kavitha Srinivas
- *
- */
-public class SubstitutionApplierForJena implements NodeTransform {
+ * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */public class SubstitutionApplierForJena implements NodeTransform {
 
 	SubstitutionForJena s;
 

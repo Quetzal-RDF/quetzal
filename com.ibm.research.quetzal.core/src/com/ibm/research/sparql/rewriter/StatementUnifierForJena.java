@@ -16,11 +16,12 @@ import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.sparql.algebra.op.OpTriple;
 import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
 
+
 /**
- * @author Mariano Rodriguez Muro <mariano.muro@gmail.com>
+ * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
  * 
- */
-public class StatementUnifierForJena {
+ */public class StatementUnifierForJena {
 
 
 	/**

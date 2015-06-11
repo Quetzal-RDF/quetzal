@@ -24,10 +24,14 @@ import com.hp.hpl.jena.query.QueryFactory;
 
 /**
  * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
  * 
  */
 public class SPARQLRewriterForJena {
 
+	public static final boolean GENERATE_TRACE = true;
+	public static final boolean GENERATE_TRACE_SUMMARY = false;
+	
 	private File ruleFile;
 	private List<RuleforJena> rules = new LinkedList<RuleforJena>();
 	private ResolutionEngineForJena resolutionEngine;
@@ -106,40 +110,6 @@ public class SPARQLRewriterForJena {
 		return response.toString();
 	}
 
-	// class StatementPatternCollector extends QueryModelVisitorBase<Exception>
-	// {
-	// private List<StatementPattern> statementPatterns = new
-	// LinkedList<StatementPattern>();
-	// boolean done = false;
-	//
-	// @Override
-	// public void meet(StatementPattern node) throws Exception {
-	// ValueFactoryImpl fac = ValueFactoryImpl.getInstance();
-	//
-	// URI subject = fac.createURI("http://mariano1.com");
-	// URI pred = fac.createURI("http://mariano2.com");
-	// URI object = fac.createURI("http://mariano3.com");
-	//
-	//
-	// Union union = new Union();
-	// Var s = new Var("xxxxxx", subject);
-	// Var p = new Var("yyyyyy", pred);
-	// Var o = new Var("zzzzzz", object);
-	//
-	// StatementPattern st1 = new StatementPattern(s , p, o);
-	// StatementPattern st2 = new StatementPattern(s , s, s);
-	//
-	// union.setLeftArg(st1);
-	// union.setRightArg(st2);
-	//
-	// node.replaceWith(union);
-	//
-	// super.meet(node);
-	// }
-	//
-	// public List<StatementPattern> getPatterns() {
-	// return this.statementPatterns;
-	// }
-	// }
+	
 
 }

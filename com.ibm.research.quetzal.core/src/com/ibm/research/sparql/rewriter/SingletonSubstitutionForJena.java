@@ -18,7 +18,12 @@ import com.hp.hpl.jena.graph.Node;
 
 
 
-public class SingletonSubstitutionForJena implements SubstitutionForJena {
+
+/**
+ * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
+ * @author Mariano Rodriguez <mrodrig@us.ibm.com>
+ * 
+ */public class SingletonSubstitutionForJena implements SubstitutionForJena {
 	public final Node original;
 	public final Node substitution;
 
