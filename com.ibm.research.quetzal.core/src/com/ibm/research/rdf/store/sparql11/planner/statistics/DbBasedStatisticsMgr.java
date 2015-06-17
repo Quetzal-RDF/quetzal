@@ -39,7 +39,7 @@ public class DbBasedStatisticsMgr
    private Connection          con                       = null;
    private String              backend                   = null;
 
-   private static final String BASE_STAT_GRAPH           = "graph";
+   private static final String BASE_STAT_GRAPH           = "GRAPH";
    private static final String BASE_STAT_GRAPH_OBJ       = "graph_obj";
    private static final String BASE_STAT_GRAPH_OBJ_PRED  = "graph_obj_pred";
    private static final String BASE_STAT_GRAPH_PRED      = "graph_pred";
@@ -184,7 +184,7 @@ public class DbBasedStatisticsMgr
       } else {
     	  query.append(topKInsert);
       }
-      query.append(sharkEngine?"select 'graph', gid, 'null', 'null', 'null', count(*) as COUNT ": "select 'graph',gid,count(*) as COUNT ")
+      query.append(sharkEngine?"select 'graph', GID, 'null', 'null', 'null', count(*) as COUNT ": "select 'graph',gid,count(*) as COUNT ")
       	   .append(" from " + store.getDirectSecondary() + " group by GID having count(*) > "
             + String.valueOf(Constants.LID_COUNT_THRESHOLD / store.getDPrimarySize())
             + " order by "
@@ -305,7 +305,7 @@ public class DbBasedStatisticsMgr
          {
             public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                {
-               return rs.getInt("COUNT".toLowerCase());
+               return rs.getInt("COUNT");
                }
          });
 
@@ -319,7 +319,7 @@ public class DbBasedStatisticsMgr
                {
                   public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                      {
-                     return rs.getInt("COUNT".toLowerCase());
+                     return rs.getInt("COUNT");
                      }
                });
 
@@ -333,7 +333,7 @@ public class DbBasedStatisticsMgr
          {
             public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                {
-               return rs.getInt("COUNT".toLowerCase());
+               return rs.getInt("COUNT");
                }
          });
 
@@ -345,7 +345,7 @@ public class DbBasedStatisticsMgr
          {
             public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                {
-               return rs.getInt("COUNT".toLowerCase());
+               return rs.getInt("COUNT");
                }
          });
 
@@ -357,7 +357,7 @@ public class DbBasedStatisticsMgr
          {
             public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                {
-               return rs.getInt("COUNT".toLowerCase());
+               return rs.getInt("COUNT");
                }
          });
 
@@ -449,61 +449,61 @@ public class DbBasedStatisticsMgr
          while (rst.next())
             {
 
-            String type = rst.getString("type");
+            String type = rst.getString("TYPE");
 
             if (type.equalsIgnoreCase(BASE_STAT_GRAPH))
                {
-               perGraphStatistics.getTopGraphs().put(rst.getString("graph"), new BigInteger(rst.getString("cnt")));
+               perGraphStatistics.getTopGraphs().put(rst.getString("GRAPH"), new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_OBJ))
                {
-               perGraphStatistics.getTopObjects().put(rst.getString("object"), new BigInteger(rst.getString("cnt")));
+               perGraphStatistics.getTopObjects().put(rst.getString("OBJECT"), new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_OBJ))
                {
-               overallStatistics.getTopObjects().put(rst.getString("object"), new BigInteger(rst.getString("cnt")));
+               overallStatistics.getTopObjects().put(rst.getString("OBJECT"), new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_SUBJ))
                {
-               perGraphStatistics.getTopSubjects().put(rst.getString("subject"), new BigInteger(rst.getString("cnt")));
+               perGraphStatistics.getTopSubjects().put(rst.getString("SUBJECT"), new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_SUBJ))
                {
-               overallStatistics.getTopSubjects().put(rst.getString("subject"), new BigInteger(rst.getString("cnt")));
+               overallStatistics.getTopSubjects().put(rst.getString("SUBJECT"), new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_PRED))
                {
-               perGraphStatistics.getTopPredicates().put(rst.getString("predicate"), new BigInteger(rst.getString("cnt")));
+               perGraphStatistics.getTopPredicates().put(rst.getString("PREDICATE"), new BigInteger(rst.getString("CNT")));
                }
 
             else if (type.equalsIgnoreCase(BASE_STAT_PRED))
                {
-               overallStatistics.getTopPredicates().put(rst.getString("predicate"), new BigInteger(rst.getString("cnt")));
+               overallStatistics.getTopPredicates().put(rst.getString("PREDICATE"), new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_SUBJ_PRED))
                {
-               Pair<String> p = new Pair<String>(rst.getString("subject"), rst.getString("predicate"));
-               perGraphStatistics.getTopSubject_Predicate_Pairs().put(p, new BigInteger(rst.getString("cnt")));
+               Pair<String> p = new Pair<String>(rst.getString("SUBJECT"), rst.getString("PREDICATE"));
+               perGraphStatistics.getTopSubject_Predicate_Pairs().put(p, new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_SUBJ_PRED))
                {
-               Pair<String> p = new Pair<String>(rst.getString("subject"), rst.getString("predicate"));
-               overallStatistics.getTopSubject_Predicate_Pairs().put(p, new BigInteger(rst.getString("cnt")));
+               Pair<String> p = new Pair<String>(rst.getString("SUBJECT"), rst.getString("PREDICATE"));
+               overallStatistics.getTopSubject_Predicate_Pairs().put(p, new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_OBJ_PRED))
                {
-               Pair<String> p = new Pair<String>(rst.getString("object"), rst.getString("predicate"));
-               perGraphStatistics.getTopObject_Predicate_Pairs().put(p, new BigInteger(rst.getString("cnt")));
+               Pair<String> p = new Pair<String>(rst.getString("OBJECT"), rst.getString("PREDICATE"));
+               perGraphStatistics.getTopObject_Predicate_Pairs().put(p, new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_OBJ_PRED))
                {
-               Pair<String> p = new Pair<String>(rst.getString("object"), rst.getString("predicate"));
-               overallStatistics.getTopObject_Predicate_Pairs().put(p, new BigInteger(rst.getString("cnt")));
+               Pair<String> p = new Pair<String>(rst.getString("OBJECT"), rst.getString("PREDICATE"));
+               overallStatistics.getTopObject_Predicate_Pairs().put(p, new BigInteger(rst.getString("CNT")));
                }
             else if (type.equalsIgnoreCase(NUM_TRIPLES))
                {
-               overallStatistics.setTripleCount(new BigInteger(rst.getString("cnt")));
-               perGraphStatistics.setTripleCount(new BigInteger(rst.getString("cnt")));
+               overallStatistics.setTripleCount(new BigInteger(rst.getString("CNT")));
+               perGraphStatistics.setTripleCount(new BigInteger(rst.getString("CNT")));
                }
 
             }
@@ -534,53 +534,53 @@ public class DbBasedStatisticsMgr
          while (rst.next())
             {
 
-            String type = rst.getString("type");
+            String type = rst.getString("TYPE");
 
             if (type.equalsIgnoreCase(BASE_STAT_GRAPH))
                {
-               perGraphStatistics.setGraphStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               perGraphStatistics.setGraphStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_OBJ))
                {
-               perGraphStatistics.setObjectStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               perGraphStatistics.setObjectStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_OBJ))
                {
-               overallStatistics.setObjectStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               overallStatistics.setObjectStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_SUBJ))
                {
-               perGraphStatistics.setSubjectStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               perGraphStatistics.setSubjectStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_SUBJ))
                {
-               overallStatistics.setSubjectStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               overallStatistics.setSubjectStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
 
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_PRED))
                {
-               perGraphStatistics.setPredicateStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               perGraphStatistics.setPredicateStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_PRED))
                {
-               overallStatistics.setPredicateStatistic(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               overallStatistics.setPredicateStatistic(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
 
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_SUBJ_PRED))
                {
-               perGraphStatistics.setSubjectPredicatePairs(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               perGraphStatistics.setSubjectPredicatePairs(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_SUBJ_PRED))
                {
-               overallStatistics.setSubjectPredicatePairs(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               overallStatistics.setSubjectPredicatePairs(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_GRAPH_OBJ_PRED))
                {
-               perGraphStatistics.setObjectPredicatePairs(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               perGraphStatistics.setObjectPredicatePairs(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             else if (type.equalsIgnoreCase(BASE_STAT_OBJ_PRED))
                {
-               overallStatistics.setObjectPredicatePairs(new AverageStatistic(rst.getDouble("avg"), rst.getDouble("stddev")));
+               overallStatistics.setObjectPredicatePairs(new AverageStatistic(rst.getDouble("AVG"), rst.getDouble("STDDEV")));
                }
             }
          }

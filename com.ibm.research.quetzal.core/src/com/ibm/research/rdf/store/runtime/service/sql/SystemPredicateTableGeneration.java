@@ -63,8 +63,8 @@ public class SystemPredicateTableGeneration
          sql.append(")");
          }
       if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
-    	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t'; \n");
-    	  sql.append("CACHE TABLE %s");
+    	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t'");
+    	 // sql.append("CACHE TABLE %s");
       }
       return sql.toString();
       }

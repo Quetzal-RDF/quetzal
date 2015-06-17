@@ -16,11 +16,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ServicePattern extends Pattern {
+public class ServicePattern extends Pattern implements Service {
 	private final QueryTripleTerm service;
 	private final String queryText;
 	private final boolean silent;
 	private final Pattern pattern;
+	private final String originalText;
+	
 	
 	public ServicePattern(QueryTripleTerm service, String queryText, boolean silent, Pattern pattern) {
 		super(EPatternSetType.SERVICE);
@@ -31,10 +33,16 @@ public class ServicePattern extends Pattern {
 		} catch (UnsupportedEncodingException e) {
 			assert false : e.toString();
 		}
+		this.originalText = queryText;
 		this.queryText = x;
 		this.service = service;
 		this.silent = silent;
 		this.pattern = pattern;
+	}
+
+	@Override
+	public String toString() {
+		return service.toString() + " " + queryText;
 	}
 
 	@Override
@@ -127,5 +135,10 @@ public class ServicePattern extends Pattern {
 
 	public Pattern getPattern() {
 		return pattern;
+	}
+
+	@Override
+	public EServiceType getServiceType() {
+		return EServiceType.GET;
 	}
 }

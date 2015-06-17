@@ -61,7 +61,7 @@ import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
 public class ResolutionEngineForJena {
 
 	private List<RuleforJena> rules;
-	private boolean consequentsExistInDB = true;
+	private boolean consequentsExistInDB = false;
 
 	public ResolutionEngineForJena(List<RuleforJena> rules, boolean consequentsExistInDB) {
 		this.rules = rules;
@@ -138,7 +138,7 @@ public class ResolutionEngineForJena {
 		
 		
 		Query q = OpAsQuery.asQuery(newQuery);
-//		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
+		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
 		return q;
 
 	}

@@ -47,7 +47,7 @@ public class ValuesPattern extends Pattern {
 	@Override
 	public Collection<? extends Variable> getVariables() {
 		
-		System.err.println("my variables " + values.getVariables());
+	//	System.err.println("my variables " + values.getVariables());
 		
 		return values.getVariables();
 	}

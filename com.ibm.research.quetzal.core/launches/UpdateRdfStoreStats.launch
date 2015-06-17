@@ -6,10 +6,16 @@
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="1"/>
 </listAttribute>
+<<<<<<< Updated upstream
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.research.rdf.store.cmd.UpdateRdfStoreStats"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="dbp37_qd -backend shark -db default -host localhost -port 10000 -user root -password passw0rd -schema default"/>
+=======
+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.rdf.store.cmd.UpdateRdfStoreStats"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="dawg -backend db2 -db dawg -host helix1.pok.ibm.com -port 50001 -user db2inst1 -password db2inst1 -schema db2inst1"/>
+>>>>>>> Stashed changes
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-base"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>
