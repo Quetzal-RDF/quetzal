@@ -19,12 +19,11 @@ import java.util.Set;
 
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 
-public class BindFunctionPattern extends Pattern {
+public class BindFunctionPattern extends Pattern implements Service {
 
 	protected List<Variable> vars;
 	protected BindFunctionCall funcCall;
-	
-	
+
 	public BindFunctionPattern() {
 		super(EPatternSetType.BINDFUNC);
 		this.vars = new ArrayList<Variable>();
@@ -171,6 +170,20 @@ public class BindFunctionPattern extends Pattern {
 	@Override
 	public Set<Variable> gatherVariablesInTransitiveClosure() {
 		return Collections.EMPTY_SET;
+	}
+
+
+	@Override
+	public QueryTripleTerm getService() {
+		// TODO Auto-generated method stub
+		return new QueryTripleTerm(getFuncCall().getIri());
+	}
+
+
+	@Override
+	public EServiceType getServiceType() {
+		// TODO Auto-generated method stub
+		return EServiceType.POST;
 	}
 	
 }

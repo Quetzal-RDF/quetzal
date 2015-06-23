@@ -106,40 +106,7 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 		return mapBindForProject(varMap);
 	}
 
-	protected List<String> mapBindForProject(
-			Map<String, Pair<String, String>> variableMap)
-			throws SQLWriterException {
-		List<String> ret = new LinkedList<String>();
-		if (planNode.getBindPatterns() == null) {
-			return null;
-		}
-		for (BindPattern bp : planNode.getBindPatterns()) {
-			Expression e = bp.getExpression();
-			if (!planNode.getAvailableVariables().containsAll(
-					e.gatherVariables()))
-				continue;
-			String eSql = expGenerator.getSQLBind(bp, new FilterContext(
-					variableMap, wrapper.getPropertyValueTypes(), planNode));
-			ret.add(eSql);
 
-			String vType = null;
-			if (e.getReturnType() != TypeMap.BLANK_NODE_ID
-					|| e.getReturnType() != TypeMap.IRI_ID) {
-				vType = bp.getVar().getName()
-						+ Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS;
-				ret.add(e.getReturnType() + " AS " + vType);
-			}
-			String expression = expGenerator.getSQLForExpression(
-					bp.getExpression(),
-					new FilterContext(variableMap, wrapper
-							.getPropertyValueTypes(), planNode), store);
-
-			variableMap
-					.put(bp.getVar().getName(), Pair.make(expression, vType));
-		}
-
-		return ret;
-	}
 
 	abstract List<String> mapEntryForProject();
 

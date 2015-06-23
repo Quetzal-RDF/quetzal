@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * models a select query
  */
-public class SelectQueryExt {
+public class SelectQueryExt extends SelectQuery {
 	private SelectClause selectClause;
 	private List<DatasetClause> datasetClauses;
 	private Pattern graphPattern;

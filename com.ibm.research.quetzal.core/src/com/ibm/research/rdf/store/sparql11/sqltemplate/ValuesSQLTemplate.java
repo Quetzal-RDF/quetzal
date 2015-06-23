@@ -30,6 +30,7 @@ import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNodeType;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
@@ -87,13 +88,13 @@ public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		SQLMapping vpMapping=new SQLMapping("values_project", valuesProjectList, null);
 		mappings.add(vpMapping);
 
-		List<String> projectList = getProjectList();			
-		SQLMapping pMapping=new SQLMapping("project", projectList, null);
-		mappings.add(pMapping);	
-
 		List<List<String>> valuesList = getValuesList();
 		SQLMapping vMapping=new SQLMapping("values", valuesList, null);
 		mappings.add(vMapping);
+		
+		List<String> projectList = getProjectList();			
+		SQLMapping pMapping=new SQLMapping("project", projectList, null);
+		mappings.add(pMapping);	
 		
 		List<String> targetList = getTargetMapping();
 		SQLMapping tMapping = new SQLMapping("target", targetList, null);
@@ -116,9 +117,23 @@ public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 
 	List<String> getProjectList(){
 		List<String> projectList = new LinkedList<String>();
+		
+
 		for (String s: getValuesProjectList()) {
 			projectList.add("TEMP." + s + " AS " + s);
 		}
+		
+		List<String> bindMap;
+		try {
+			bindMap = mapBindForProject(varMap);
+			projectList.addAll(bindMap);
+
+		} catch (SQLWriterException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
 		if (pred != null) {
 			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
 			Set<Variable> valueVars = new HashSet(planNode.getValues().getVariables());;
@@ -156,7 +171,7 @@ public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	List<List<String>> getValuesList()  {
 		List<List<String>> ret = new LinkedList<List<String>>();
 		try {
-			Map<String, Pair<String, String>> varMap = HashMapFactory.make();
+			varMap = HashMapFactory.make();
 			
 			int k = 0;
 			List<Integer> variableIndexesNotIRIBound = new LinkedList<Integer>();

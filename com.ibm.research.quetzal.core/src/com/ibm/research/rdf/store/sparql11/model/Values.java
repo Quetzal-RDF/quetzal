@@ -54,7 +54,6 @@ public class Values {
 				k++;
 			}
 		}
-		System.out.println("undef variables:" + undefVariables);
 		return undefVariables;
 	}
 	

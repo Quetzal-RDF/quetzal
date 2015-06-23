@@ -29,7 +29,7 @@ import com.hp.hpl.jena.query.QueryFactory;
  */
 public class SPARQLRewriterForJena {
 
-	public static final boolean GENERATE_TRACE = false;
+	public static final boolean GENERATE_TRACE = true;
 	public static final boolean GENERATE_TRACE_SUMMARY = false;
 	
 	private File ruleFile;

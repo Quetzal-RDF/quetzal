@@ -18,7 +18,7 @@ import com.ibm.research.rdf.store.sparql11.model.SelectClause.ESelectModifier;
 /**
  * models a query
  */
-public class QueryExt implements com.ibm.research.rdf.store.query.Query {
+public class QueryExt extends Query {
 	
 	private String origQueryString = null;
 	
@@ -33,21 +33,25 @@ public class QueryExt implements com.ibm.research.rdf.store.query.Query {
 	private FourUnion<SelectQueryExt, AskQuery, DescribeQuery, ConstructQuery> query;
 	
 	public QueryExt(QueryPrologue p, SelectQueryExt s) {
+		super(p, s);
 		prologue = p;
 		query = new FourUnion<SelectQueryExt, AskQuery, DescribeQuery, ConstructQuery>();
 		query.setFirst(s);
 	}
 	public QueryExt(QueryPrologue p, AskQuery q) {
+		super(p, q);
 		prologue = p;
 		query = new FourUnion<SelectQueryExt, AskQuery, DescribeQuery, ConstructQuery>();
 		query.setSecond(q);
 	}
 	public QueryExt(QueryPrologue p, DescribeQuery q) {
+		super (p, q);
 		prologue = p;
 		query = new FourUnion<SelectQueryExt, AskQuery, DescribeQuery, ConstructQuery>();
 		query.setThird(q);
 	}
 	public QueryExt(QueryPrologue p, ConstructQuery q) {
+		super(p, q);
 		prologue = p;
 		query = new FourUnion<SelectQueryExt, AskQuery, DescribeQuery, ConstructQuery>();
 		query.setFourth(q);

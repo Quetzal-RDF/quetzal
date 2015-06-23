@@ -33,6 +33,7 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.Store.PredicateTable;
 import com.ibm.research.rdf.store.sparql11.model.AggregateExpression;
 import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
+import com.ibm.research.rdf.store.sparql11.model.BindFunctionPattern;
 import com.ibm.research.rdf.store.sparql11.model.BindPattern;
 import com.ibm.research.rdf.store.sparql11.model.BuiltinFunctionExpression;
 import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
@@ -50,6 +51,7 @@ import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
 import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
+import com.ibm.research.rdf.store.sparql11.model.Service;
 import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
 import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
@@ -309,6 +311,12 @@ public class Planner {
 			// do nothing
 		}
 		
+		void getApplicableNodesForBindFunc(final Pattern p,
+				Set<Variable> availableVars, Set<Variable> liveVariables, final Walker walker,
+				List<Pattern> region, Set<Node> result) {
+			// do nothing
+		}
+		
 		void getApplicableNodesForValues(final Pattern p,
 				Set<Variable> availableVars, Set<Variable> liveVariables, final Walker walker,
 				List<Pattern> region, Set<Node> result) {
@@ -418,6 +426,9 @@ public class Planner {
 			case SERVICE:
 				getApplicableNodesForService(p, availableVars, liveVariables, walker, region, result);
 				break;
+			case BINDFUNC:
+				getApplicableNodesForBindFunc(p, availableVars, liveVariables, walker, region, result);
+				break;
 			default:
 				assert p.getType() == EPatternSetType.AND;
 				break;
@@ -454,12 +465,25 @@ public class Planner {
 		return newLiveVariables;
 	}
 	
+	class BindFunctionNode extends ServiceNode {
+		public BindFunctionNode(Service p, Set<Variable> availableVars, Set<Variable> liveVars) {
+			super(p, availableVars, liveVars);
+		}
+		
+		
+		@Override
+		public Set<Variable> getRequiredVariables() {
+			assert p instanceof BindFunctionPattern;
+			return new HashSet<Variable>(((BindFunctionPattern)p).getFuncCall().getVars());
+		}
+	}
+	
 	class ServiceNode extends AbstractNode {
 
 		private Set<Variable> availableVars;
 		
-		public ServiceNode(ServicePattern p, Set<Variable> availableVars, Set<Variable> liveVars) {
-			super(p);
+		public ServiceNode(Service p, Set<Variable> availableVars, Set<Variable> liveVars) {
+			super((Pattern) p);
 			this.availableVars = availableVars;
 		}
 		
@@ -469,7 +493,7 @@ public class Planner {
 				Set<Variable> availableVars, Set<Variable> liveVars) {
 				// compute required vars based on what is available and whats will be produced
 				Set<Variable> producedVariables = getProducedVariables();
-				Set<Variable> requiredVariables = Collections.emptySet();
+				Set<Variable> requiredVariables = getRequiredVariables();
 				
 				PlanNode node = 
 					planFactory.createSTPlanNode(this, requiredVariables);
@@ -699,7 +723,10 @@ public class Planner {
 				NumberedGraph<PlanNode> g, List<Expression> filters,
 				Set<Variable> availableVars, Set<Variable> liveVars) {
 			PlanNode n = planFactory.createSTPlanNode(vp.getValues());
-			n.setAvailableVariables(producedVariables);
+			Set<Variable> vars = HashSetFactory.make();
+			// vars.addAll(availableVars);
+			vars.addAll(producedVariables);
+			n.setAvailableVariables(vars);
 			n.setRequiredVariables(requiredVariables);
 			n.cost = getCost(g);
 			n.setFilters(filters);	
@@ -771,7 +798,7 @@ public class Planner {
 			if (!bp.isIndependentBind()) {
 				assert currentHead != null;
 				PlanNode n = null;
-				// if a bind pattern exists on an AND node, we need to move it to one of the successors, and handle all its side effects (adding prodiced and available variables)
+				// if a bind pattern exists on an AND node, we need to move it to one of the successors, and handle all its side effects (adding produced and available variables)
 				// because ANDs don't have a corresponding SQL template.  This is ugly, but we cannot take the approach of doing what we do with filters or graph restrictions
 				// because binds are patterns that cannot be 'pushed' into other patterns
 				if (currentHead.getType() == PlanNodeType.AND) {
@@ -807,6 +834,15 @@ public class Planner {
 				n.cost = getCost(g);
 				n.setFilters(filters);				
 				g.addNode(n);
+				
+				if (currentHead != null) {
+					for (Variable v: availableVars) {
+						if (liveVars.contains(v)) {
+							n.getAvailableVariables().add(v);
+						}
+					}
+					return join(JoinTypes.AND, q, g, currentHead, n, liveVars);  
+				}
 
 				return n;
 			}
@@ -1619,7 +1655,7 @@ public class Planner {
 			Set<Variable> requiredVariables = HashSetFactory.make();
 			producedVariables = Collections.singleton(projectedVar);
 			requiredVariables = e.gatherVariables();
-
+			
 
 			Set<Variable> vars = new HashSet<Variable>();
 			vars.addAll(requiredVariables);
@@ -1636,7 +1672,13 @@ public class Planner {
 				result.add(new BindExpressionNode(e, requiredVariables,
 							producedVariables, stats, bp));
 			}
-
+		}
+		
+		@Override
+		void getApplicableNodesForBindFunc(Pattern p, Set<Variable> availableVars, Set<Variable> liveVars,
+				Walker walker, List<Pattern> region, Set<Node> result) {
+			final BindFunctionPattern bfunct = (BindFunctionPattern) p;
+			result.add(new BindFunctionNode(bfunct, availableVars, liveVars));
 		}
 
 		@Override
@@ -2329,8 +2371,6 @@ public class Planner {
 							}
 						}
 						
-						System.out.println("Removing keys:");
-						System.out.println(e.snd.getKeys());
 						neededKeys.removeAll(e.snd.getKeys());
 						
 						Set<Variable> oldVars = availableVars;
@@ -2343,6 +2383,7 @@ public class Planner {
 							//System.err.println("adding " + e + " available: " + availableVars + ", live: " + liveVars);
 						}
 				
+						System.out.println(e + " has available vars:" + availableVars);
 						for (Node s : getApplicableNodes(region, availableVars, liveVars, neededKeys, walker)) {
 							if (neededKeys.containsAll(s.getKeys())) {
 								orderedEdges.add(new Edge(e.snd, s));
@@ -2359,13 +2400,12 @@ public class Planner {
 				if (g == walker.topPlan()) {
 					System.err.println("fail");
 				}
-				
+								
 				throw new PlannerError("cannot make progress planning " + region + "\n"
 								+ availableVars + " --> " + neededKeys + "\n" 
 								+ "nodes: " + orderedEdges);
 			}
 			
-
 			return top;
 		}
 		
@@ -2804,6 +2844,7 @@ public class Planner {
 				System.out.println("Plan:" + p);
 			}
 		}
+		
 		TypeInference typeInf = new TypeInference(p, store, q);
 		System.out.println("After type inference:" + p);
 		

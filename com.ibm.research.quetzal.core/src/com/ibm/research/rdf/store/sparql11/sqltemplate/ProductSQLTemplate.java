@@ -50,6 +50,7 @@ public class ProductSQLTemplate extends JoinSQLTemplate {
 		
 		List<String> rightProject = new LinkedList<String>();
 		getRightProjectMapping(rightProject);
+		rightProject.addAll(mapBindForProject(varMap));
 		SQLMapping rMapping=new SQLMapping("rightProject", rightProject,null);
 		mappings.add(rMapping);
 

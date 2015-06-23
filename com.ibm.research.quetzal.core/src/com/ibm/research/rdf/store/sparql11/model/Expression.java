@@ -471,8 +471,8 @@ public abstract class Expression implements ExpressionVisitor {
 				StringTemplate t = store.getInstanceOf("RDF_CONCAT");
 				t.setAttribute("lexpr", e.visit(context, store));
 
-				e = iter.next();
 				if (iter.hasNext()) {
+					e = iter.next();
 					List<Expression> argsE = new LinkedList<Expression>();
 					argsE.add(e);
 					while (iter.hasNext()) {
@@ -984,7 +984,7 @@ public abstract class Expression implements ExpressionVisitor {
 			StringTemplate t = store.getInstanceOf(type);
 			if (e instanceof VariableExpression) {
 				String var = ((VariableExpression) e).getVariable();
-				String absType = context.getVarMap().get(var).fst;
+				String absType = context.getVarMap().containsKey(var) ? context.getVarMap().get(var).fst : var;
 				t.setAttribute("args", absType);
 			}
 			return t.toString();

@@ -138,7 +138,7 @@ public class ResolutionEngineForJena {
 		
 		
 		Query q = OpAsQuery.asQuery(newQuery);
-		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent has some rather nasty consequences
+		q.setDistinct(true);	// KAVITHA: Not setting distinct on the consequent leaves duplicates
 		return q;
 
 	}

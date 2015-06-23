@@ -24,6 +24,7 @@ public class BindFunctionCall {
 
 	protected List<Variable> vars;
 	protected String name;
+	protected IRI iri;
 	
 	
 	public BindFunctionCall() {
@@ -31,6 +32,16 @@ public class BindFunctionCall {
 		this.name = "";
 	}
 	
+
+	public IRI getIri() {
+		return iri;
+	}
+
+
+	public void setIri(IRI iri) {
+		this.iri = iri;
+	}
+
 
 	public List<Variable> getVars() {
 		return vars;

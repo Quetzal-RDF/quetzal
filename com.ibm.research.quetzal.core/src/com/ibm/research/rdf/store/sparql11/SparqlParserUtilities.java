@@ -8,7 +8,7 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
- package com.ibm.research.rdf.store.sparql11;
+package com.ibm.research.rdf.store.sparql11;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +48,7 @@ import com.ibm.research.rdf.store.sparql11.model.PathVisitor;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.PropertyTerm;
 import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.research.rdf.store.sparql11.model.QueryExt;
 import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
 import com.ibm.research.rdf.store.sparql11.model.SeqPath;
 import com.ibm.research.rdf.store.sparql11.model.SimplePath;
@@ -55,100 +56,83 @@ import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.ZeroOrMorePath;
 import com.ibm.research.rdf.store.sparql11.model.ZeroOrOnePath;
 
-
 /**
- *  utilities for parsing sparql queries
+ * utilities for parsing sparql queries
  */
-public class SparqlParserUtilities {	
-	
-	public static final Log log = LogFactory.getLog(SparqlParserUtilities.class);
-	
-	public static Query parseSparqlFile(String sparqlFile, Map<String, String> rdfStorePrefixes)  
-	{
+public class SparqlParserUtilities {
+
+	public static final Log log = LogFactory
+			.getLog(SparqlParserUtilities.class);
+	public static boolean USE_EXTENSIONS = false;
+
+	public static Query parseSparqlFile(String sparqlFile,
+			Map<String, String> rdfStorePrefixes) {
 		Query q;
 		CharStream stream;
 		try {
 			stream = new ANTLRFileStream(sparqlFile, "UTF8");
-		}
-		catch (IOException e) {
-			log.error("Error opening file "+sparqlFile);
-			throw new RuntimeException("Error opening file "+sparqlFile, e);
+		} catch (IOException e) {
+			log.error("Error opening file " + sparqlFile);
+			throw new RuntimeException("Error opening file " + sparqlFile, e);
 		}
 		q = parseSparql(stream, rdfStorePrefixes);
 		return q;
 	}
 
-	public static Query parseSparqlFile(URL sparqlFile, Map<String, String> rdfStorePrefixes)  
-	{
+	public static Query parseSparqlFile(URL sparqlFile,
+			Map<String, String> rdfStorePrefixes) {
 		Query q;
 		CharStream stream;
 		try {
 			stream = new ANTLRInputStream(sparqlFile.openStream(), "UTF8");
-		}
-		catch (IOException e) {
-			log.error("Error opening file "+sparqlFile);
-			throw new RuntimeException("Error opening file "+sparqlFile, e);
+		} catch (IOException e) {
+			log.error("Error opening file " + sparqlFile);
+			throw new RuntimeException("Error opening file " + sparqlFile, e);
 		}
 		q = parseSparql(stream, rdfStorePrefixes);
 		return q;
 	}
 
-	public static Query parseSparql(File sparqlFile, Map<String, String> rdfStorePrefixes)  
-	{
+	public static Query parseSparql(File sparqlFile,
+			Map<String, String> rdfStorePrefixes) {
 		Query q;
 		CharStream stream;
 		try {
 			// uncomment for mac
-			//String str = "/" + sparqlFile.toString();
-			//stream = new ANTLRFileStream(str , "UTF8");
+			// String str = "/" + sparqlFile.toString();
+			// stream = new ANTLRFileStream(str , "UTF8");
 			stream = new ANTLRFileStream(sparqlFile.getAbsolutePath(), "UTF8");
-		}
-		catch (IOException e) {
-			log.error("Error opening file "+sparqlFile.getPath());
-			throw new RuntimeException("Error reading file "+sparqlFile, e);
+		} catch (IOException e) {
+			log.error("Error opening file " + sparqlFile.getPath());
+			throw new RuntimeException("Error reading file " + sparqlFile, e);
 		}
 		q = parseSparql(stream, rdfStorePrefixes);
 		return q;
 	}
 
-	public static Query parseSparql(CharStream sparqlFile, Map<String, String> rdfStorePrefixes) 
-	{
+	public static Query parseSparql(CharStream sparqlFile,
+			Map<String, String> rdfStorePrefixes) {
 		try {
-			IbmSparqlLexer lex = new IbmSparqlLexer(sparqlFile);
-			CommonTokenStream tokens = new CommonTokenStream(lex);
-			IbmSparqlParser parser = new IbmSparqlParser(tokens);
-			parser.setTreeAdaptor(new CommonTreeAdaptor(){
-				@Override
-				public Object create(Token t) {
-					return new XTree(t);
-				}
-			}); 
-			IbmSparqlParser.queryUnit_return ret = parser.queryUnit();
-			CommonTree ast = (CommonTree) ret.getTree();
-			//System.out.println(ast.toStringTree());
-			BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(ast);
-			//nodes.setTokenStream(tokens);
-			//IbmSparqlAstRewriter astRewriter = new IbmSparqlAstRewriter(nodes);
-			//CommonTree ast2 = (CommonTree)astRewriter.downup(ast, false);
-			//System.out.println(ast2.toStringTree());
-			//BufferedTreeNodeStream nodes2 = new BufferedTreeNodeStream(ast2);
-			//nodes2.setTokenStream(tokens);
-			IbmSparqlAstWalker walker = new IbmSparqlAstWalker(nodes);
-			Query q = walker.queryUnit();
-			//System.out.println(q);
+			Query q;
+			if (USE_EXTENSIONS) {
+				q = getQueryExt(sparqlFile);
+			} else {
+				q = getQuery(sparqlFile);
+			}
+			// System.out.println(q);
 			q.expandPrefixes(rdfStorePrefixes);
-			//System.out.println(q);
-			//q.reverseIRIs();
-			//System.out.println("After replacement \n");
-			//System.out.println(q);
+			// System.out.println(q);
+			// q.reverseIRIs();
+			// System.out.println("After replacement \n");
+			// System.out.println(q);
 			Pattern p = q.getMainPattern();
-			if(p != null) {
-//				p.computePatternIndex();
+			if (p != null) {
+				// p.computePatternIndex();
 				p.killUnscopedAccesses();
 				p.pushFilters();
 				p.pushGraphRestrictions();
 				p.replaceFilterBindings();
-			}			
+			}
 			return q;
 		} catch (SPARQLsyntaxError se) {
 			throw se;
@@ -156,25 +140,78 @@ public class SparqlParserUtilities {
 			throw new SPARQLsyntaxError(e);
 		}
 	}
-	
-	public static Query parseSparqlString(String sparql, Map<String, String> rdfStorePrefixes) 
-	{
+
+	private static Query getQueryExt(CharStream sparqlFile)
+			throws RecognitionException {
+		// System.out.println("Parsing: "+sparqlFile+"\n");
+		IbmSparqlExtLexer lex = new IbmSparqlExtLexer(sparqlFile);
+		CommonTokenStream tokens = new CommonTokenStream(lex);
+		IbmSparqlExtParser parser = new IbmSparqlExtParser(tokens);
+
+		parser.setTreeAdaptor(new CommonTreeAdaptor() {
+			@Override
+			public Object create(Token t) {
+				return new XTree(t);
+			}
+		});
+
+		IbmSparqlExtParser.queryUnit_return ret = parser.queryUnit();
+		CommonTree ast = (CommonTree) ret.getTree();
+
+		//
+		System.out.println(ast.toStringTree());
+		// SparqlParserUtilities.dump_tree(ast, tokens, 0);
+
+		BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(ast);
+		nodes.setTokenStream(tokens);
+		IbmSparqlExtAstWalker walker = new IbmSparqlExtAstWalker(nodes);
+		QueryExt query = walker.queryUnit();
+		return query;
+	}
+
+	private static Query getQuery(CharStream sparqlFile)
+			throws RecognitionException {
+		IbmSparqlLexer lex = new IbmSparqlLexer(sparqlFile);
+		CommonTokenStream tokens = new CommonTokenStream(lex);
+		IbmSparqlParser parser = new IbmSparqlParser(tokens);
+		parser.setTreeAdaptor(new CommonTreeAdaptor() {
+			@Override
+			public Object create(Token t) {
+				return new XTree(t);
+			}
+		});
+		IbmSparqlParser.queryUnit_return ret = parser.queryUnit();
+		CommonTree ast = (CommonTree) ret.getTree();
+		// System.out.println(ast.toStringTree());
+		BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(ast);
+		// nodes.setTokenStream(tokens);
+		// IbmSparqlAstRewriter astRewriter = new IbmSparqlAstRewriter(nodes);
+		// CommonTree ast2 = (CommonTree)astRewriter.downup(ast, false);
+		// System.out.println(ast2.toStringTree());
+		// BufferedTreeNodeStream nodes2 = new BufferedTreeNodeStream(ast2);
+		// nodes2.setTokenStream(tokens);
+		IbmSparqlAstWalker walker = new IbmSparqlAstWalker(nodes);
+		Query q = walker.queryUnit();
+		return q;
+	}
+
+	public static Query parseSparqlString(String sparql,
+			Map<String, String> rdfStorePrefixes) {
 		CharStream input = new ANTLRStringStream(sparql);
 		Query q = null;
 		try {
-			q = parseSparql(input,rdfStorePrefixes);
-		} 
-		catch (SPARQLsyntaxError se) {
+			q = parseSparql(input, rdfStorePrefixes);
+		} catch (SPARQLsyntaxError se) {
 			se.setSQL(sparql);
 			throw se;
 		}
-		
+
 		return q;
 	}
-	
-	public static Query parseSparqlString(String sparql)
-	{
-		return parseSparqlString(sparql, Collections.<String, String>emptyMap());
+
+	public static Query parseSparqlString(String sparql) {
+		return parseSparqlString(sparql,
+				Collections.<String, String> emptyMap());
 	}
 
 	private static void dump_tree(CommonTree tree, TokenStream s, int depth) {
@@ -190,15 +227,15 @@ public class SparqlParserUtilities {
 			if (loc != null) {
 				ParsePosition start_position = loc.start_position;
 				ParsePosition stop_position = loc.end_position;
-				//System.out.println(tree.toString() + " ["
-				//	+ start_position.getLine() + "," + start_position.getCol()
-				//	+ "] -> [" + stop_position.getLine() + ","
-				//	+ stop_position.getCol() + "]");
+				// System.out.println(tree.toString() + " ["
+				// + start_position.getLine() + "," + start_position.getCol()
+				// + "] -> [" + stop_position.getLine() + ","
+				// + stop_position.getCol() + "]");
 			} else {
-				//System.out.println(tree.toString());
+				// System.out.println(tree.toString());
 			}
 		} else {
-			//System.out.println("<no text>\n");
+			// System.out.println("<no text>\n");
 		}
 
 		if ((tree != null) && (!tree.isNil()) && (tree.getChildCount() != 0)) {
@@ -331,11 +368,13 @@ public class SparqlParserUtilities {
 	}
 
 	public static Set<String> gatherQueryPredicates(Query q) {
-		if (q.getMainPattern() == null) { return Collections.emptySet(); }
+		if (q.getMainPattern() == null) {
+			return Collections.emptySet();
+		}
 		final Set<String> preds = new HashSet<String>();
-		for(Pattern p : q.getMainPattern().gatherSubPatterns(true)) {
+		for (Pattern p : q.getMainPattern().gatherSubPatterns(true)) {
 			if (p instanceof SimplePattern) {
-				for(QueryTriple t : ((SimplePattern)p).getQueryTriples()) {
+				for (QueryTriple t : ((SimplePattern) p).getQueryTriples()) {
 					PropertyTerm pred = t.getPredicate();
 					if (pred.isIRI()) {
 						preds.add(pred.getIRI().getValue());
@@ -345,22 +384,27 @@ public class SparqlParserUtilities {
 							public void visit(ZeroOrOnePath p) {
 								p.getSubPath().visit(this);
 							}
+
 							@Override
 							public void visit(ZeroOrMorePath p) {
 								p.getSubPath().visit(this);
 							}
+
 							@Override
 							public void visit(OneOrMorePath p) {
 								p.getSubPath().visit(this);
 							}
+
 							@Override
 							public void visit(InvPath p) {
 								p.getSubPath().visit(this);
 							}
+
 							@Override
 							public void visit(SimplePath p) {
 								preds.add(p.getIRI().getValue());
 							}
+
 							@Override
 							public void visit(NegatedProperySetPath prop) {
 								for (IRI p : prop.getFowardProperties()) {
@@ -370,12 +414,13 @@ public class SparqlParserUtilities {
 									preds.add(p.getValue());
 								}
 							}
+
 							@Override
 							public void visit(SeqPath p) {
 								p.getLeft().visit(this);
 								p.getRight().visit(this);
 							}
-							
+
 							@Override
 							public void visit(AltPath p) {
 								p.getLeft().visit(this);
@@ -384,21 +429,24 @@ public class SparqlParserUtilities {
 						};
 						pred.getPath().visit(visitor);
 					} else {
-						assert pred.isVariable(); 
-						for(Expression expr : p.getFilters()) {
-							if (expr.gatherVariables().contains(pred.getVariable())) {
+						assert pred.isVariable();
+						for (Expression expr : p.getFilters()) {
+							if (expr.gatherVariables().contains(
+									pred.getVariable())) {
 								expr.traverse(new IExpressionTraversalListener() {
 									public void startExpression(Expression e) {
 										if (e.getType() == EExpressionType.CONSTANT) {
-											Constant c = ((ConstantExpression)e).getConstant();
+											Constant c = ((ConstantExpression) e)
+													.getConstant();
 											if (c.getIRI() != null) {
 												preds.add(c.getIRI().getValue());
 											}
 										}
 									}
+
 									public void endExpression(Expression e) {
-									
-									}		
+
+									}
 								});
 							}
 						}

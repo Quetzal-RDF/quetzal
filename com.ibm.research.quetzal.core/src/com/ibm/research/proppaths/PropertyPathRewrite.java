@@ -1179,6 +1179,10 @@ public class PropertyPathRewrite {
 				ret &= rewrite((SubSelectPattern) p, bestEffort, vargen, explicitIRIBoundVariables, explicitNotIRIBoundVariables);
 				break;
 			}
+			case BINDFUNC: {
+				ret &= true; //= rewrite((BindPattern) p, bestEffort, vargen, explicitIRIBoundVariables);
+				break;
+			}
 		default:
 			throw new RuntimeException("Unknown pattern type: "+ p.getType()+"\n"+p);
 		}

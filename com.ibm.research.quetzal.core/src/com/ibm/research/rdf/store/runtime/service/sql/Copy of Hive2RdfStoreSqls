@@ -1,0 +1,250 @@
+
+storeCfgTable = CREATE TABLE %s( \
+	entry_ID BIGINT,  \
+	storeName STRING , \
+	version INT , \
+	directPrimary STRING , \
+	dPrimarySize INT , \
+	directSecondary STRING , \
+	reversePrimary STRING , \
+	rPrimarySize INT , \
+	reverseSecondary STRING , \
+	longStrings STRING , \
+	maxStringLen INT , \
+	gidMaxStringLen INT , \
+	hasLongStrings INT , \
+	basicStatsTable STRING  , \
+	topKStatsTable STRING  , \
+	lastStatsUpdated TIMESTAMP, \
+	predicateMappings STRING, \
+	systemPredicateTable STRING, \
+	status INT , \
+	dataTypeTable STRING , \
+	hasSpills INT ) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';  
+	
+		
+getDataset = SELECT * from %s WHERE storeName = ? and status = 0
+
+loadFromFile = LOAD DATA LOCAL INPATH '%c' INTO TABLE %s
+
+defaultDataset = INSERT INTO %s( storeName, version, \
+	directPrimary, dPrimarySize, directSecondary, \
+	reversePrimary, rPrimarySize, reverseSecondary, \
+	longStrings, maxStringLen, gidMaxStringLen, \
+	basicStatsTable, topKStatsTable, predicateMappings, \
+	systemPredicateTable, dataTypeTable, status) \
+	values( ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	
+sysPredEntries = INSERT INTO %s (entry_ID, colName, mapName) \
+	values (?, ?, ?)
+
+defaultPrimarys = CREATE TABLE %s( \
+	entry STRING , gid STRING , spill INT , \
+	prop0 STRING, val0  STRING, typ0 smallint ,  prop1 STRING, val1  STRING, typ1 smallint , \
+	 prop2 STRING, val2  STRING, typ2 smallint ,  prop3 STRING, val3  STRING, typ3 smallint ,  prop4 STRING, val4  STRING, typ4 smallint , \
+	 prop5 STRING, val5  STRING, typ5 smallint ,  prop6 STRING, val6  STRING, typ6 smallint ,  prop7 STRING, val7  STRING, typ7 smallint , \
+	 prop8 STRING, val8  STRING, typ8 smallint ,  prop9 STRING, val9  STRING, typ9 smallint ,  prop10 STRING, val10  STRING, typ10 smallint , \
+	 prop11 STRING, val11  STRING, typ11 smallint ,  prop12 STRING, val12  STRING, typ12 smallint ,  prop13 STRING, val13  STRING, typ13 smallint , \
+	 prop14 STRING, val14  STRING, typ14 smallint ,  prop15 STRING, val15  STRING, typ15 smallint ,  prop16 STRING, val16  STRING, typ16 smallint , \
+	 prop17 STRING, val17  STRING, typ17 smallint ,  prop18 STRING, val18  STRING, typ18 smallint ,  prop19 STRING, val19  STRING, typ19 smallint , \
+	 prop20 STRING, val20  STRING, typ20 smallint ,  prop21 STRING, val21  STRING, typ21 smallint ,  prop22 STRING, val22  STRING, typ22 smallint , \
+	 prop23 STRING, val23  STRING, typ23 smallint ,  prop24 STRING, val24  STRING, typ24 smallint ,  prop25 STRING, val25  STRING, typ25 smallint , \
+	 prop26 STRING, val26  STRING, typ26 smallint ,  prop27 STRING, val27  STRING, typ27 smallint ,  prop28 STRING, val28  STRING, typ28 smallint , \
+	 prop29 STRING, val29  STRING, typ29 smallint ,  prop30 STRING, val30  STRING, typ30 smallint ,  prop31 STRING, val31  STRING, typ31 smallint , \
+	 prop32 STRING, val32  STRING, typ32 smallint ,  prop33 STRING, val33  STRING, typ33 smallint ,  prop34 STRING, val34  STRING, typ34 smallint , \
+	 prop35 STRING, val35  STRING, typ35 smallint ,  prop36 STRING, val36  STRING, typ36 smallint ,  prop37 STRING, val37  STRING, typ37 smallint , \
+	 prop38 STRING, val38  STRING, typ38 smallint ,  prop39 STRING, val39  STRING, typ39 smallint ,  prop40 STRING, val40  STRING, typ40 smallint , \
+	 prop41 STRING, val41  STRING, typ41 smallint ,  prop42 STRING, val42  STRING, typ42 smallint ,  prop43 STRING, val43  STRING, typ43 smallint , \
+	 prop44 STRING, val44  STRING, typ44 smallint ,  prop45 STRING, val45  STRING, typ45 smallint ,  prop46 STRING, val46  STRING, typ46 smallint , \
+	 prop47 STRING, val47  STRING, typ47 smallint ,  prop48 STRING, val48  STRING, typ48 smallint ,  prop49 STRING, val49  STRING, typ49 smallint , \
+	 prop50 STRING, val50  STRING, typ50 smallint ,  prop51 STRING, val51  STRING, typ51 smallint ,  prop52 STRING, val52  STRING, typ52 smallint , \
+	 prop53 STRING, val53  STRING, typ53 smallint ,  prop54 STRING, val54  STRING, typ54 smallint ,  prop55 STRING, val55  STRING, typ55 smallint , \
+	 prop56 STRING, val56  STRING, typ56 smallint ,  prop57 STRING, val57  STRING, typ57 smallint ,  prop58 STRING, val58  STRING, typ58 smallint , \
+	 prop59 STRING, val59  STRING, typ59 smallint ,  prop60 STRING, val60  STRING, typ60 smallint ,  prop61 STRING, val61  STRING, typ61 smallint , \
+	 prop62 STRING, val62  STRING, typ62 smallint ,  prop63 STRING, val63  STRING, typ63 smallint ,  prop64 STRING, val64  STRING, typ64 smallint , \
+	 prop65 STRING, val65  STRING, typ65 smallint ,  prop66 STRING, val66  STRING, typ66 smallint ,  prop67 STRING, val67  STRING, typ67 smallint , \
+	 prop68 STRING, val68  STRING, typ68 smallint ,  prop69 STRING, val69  STRING, typ69 smallint ,  prop70 STRING, val70  STRING, typ70 smallint , \
+	 prop71 STRING, val71  STRING, typ71 smallint ,  prop72 STRING, val72  STRING, typ72 smallint ,  prop73 STRING, val73  STRING, typ73 smallint , \
+	 prop74 STRING, val74  STRING, typ74 smallint ,  prop75 STRING, val75  STRING, typ75 smallint ,  prop76 STRING, val76  STRING, typ76 smallint , \
+	 prop77 STRING, val77  STRING, typ77 smallint ,  prop78 STRING, val78  STRING, typ78 smallint ,  prop79 STRING, val79  STRING, typ79 smallint , \
+	 prop80 STRING, val80  STRING, typ80 smallint ,  prop81 STRING, val81  STRING, typ81 smallint ,  prop82 STRING, val82  STRING, typ82 smallint , \
+	 prop83 STRING, val83  STRING, typ83 smallint ,  prop84 STRING, val84  STRING, typ84 smallint ,  prop85 STRING, val85  STRING, typ85 smallint , \
+	 prop86 STRING, val86  STRING, typ86 smallint ,  prop87 STRING, val87  STRING, typ87 smallint ,  prop88 STRING, val88  STRING, typ88 smallint , \
+	 prop89 STRING, val89  STRING, typ89 smallint ,  prop90 STRING, val90  STRING, typ90 smallint ,  prop91 STRING, val91  STRING, typ91 smallint , \
+	 prop92 STRING, val92  STRING, typ92 smallint ,  prop93 STRING, val93  STRING, typ93 smallint ,  prop94 STRING, val94  STRING, typ94 smallint , \
+	 prop95 STRING, val95  STRING, typ95 smallint ,  prop96 STRING, val96  STRING, typ96 smallint ,  prop97 STRING, val97  STRING, typ97 smallint , \
+	 prop98 STRING, val98  STRING, typ98 smallint ,  prop99 STRING, val99  STRING, typ99 smallint ,  prop100 STRING, val100  STRING, typ100 smallint , \
+	 prop101 STRING, val101  STRING, typ101 smallint ,  prop102 STRING, val102  STRING, typ102 smallint ,  prop103 STRING, val103  STRING, typ103 smallint , \
+	 prop104 STRING, val104  STRING, typ104 smallint ,  prop105 STRING, val105  STRING, typ105 smallint ,  prop106 STRING, val106  STRING, typ106 smallint , \
+	 prop107 STRING, val107  STRING, typ107 smallint ,  prop108 STRING, val108  STRING, typ108 smallint ,  prop109 STRING, val109  STRING, typ109 smallint , \
+	 prop110 STRING, val110  STRING, typ110 smallint ,  prop111 STRING, val111  STRING, typ111 smallint ,  prop112 STRING, val112  STRING, typ112 smallint , \
+	 prop113 STRING, val113  STRING, typ113 smallint ,  prop114 STRING, val114  STRING, typ114 smallint ,  prop115 STRING, val115  STRING, typ115 smallint , \
+	 prop116 STRING, val116  STRING, typ116 smallint ,  prop117 STRING, val117  STRING, typ117 smallint ,  prop118 STRING, val118  STRING, typ118 smallint , \
+	 prop119 STRING, val119  STRING, typ119 smallint ,  prop120 STRING, val120  STRING, typ120 smallint ,  prop121 STRING, val121  STRING, typ121 smallint , \
+	 prop122 STRING, val122  STRING, typ122 smallint ,  prop123 STRING, val123  STRING, typ123 smallint ,  prop124 STRING, val124  STRING, typ124 smallint , \
+	 prop125 STRING, val125  STRING, typ125 smallint ,  prop126 STRING, val126  STRING, typ126 smallint ,  prop127 STRING, val127  STRING, typ127 smallint) \
+	 ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+
+	
+indexPG = CREATE INDEX idx_gid_%s   ON TABLE %s(gid)  AS 'COMPACT' WITH DEFERRED REBUILD
+
+indexPE = CREATE INDEX idx_entry_%s ON TABLE %s(entry) AS 'COMPACT' WITH DEFERRED REBUILD
+
+indexRphNumerics = CREATE INDEX idx_numentry_%s ON TABLE %s(numentry) AS 'COMPACT' WITH DEFERRED REBUILD
+
+indexRphDatetime = CREATE INDEX idx_dtentry_%s ON TABLE %s(dtentry) AS 'COMPACT' WITH DEFERRED REBUILD
+
+indexRphTyp = CREATE INDEX idx_typ_%s ON TABLE %s(typ) AS 'COMPACT' WITH DEFERRED REBUILD
+
+defaultDirectSecondary = CREATE TABLE %s(gID STRING,list_id STRING,elem STRING,typ smallint,ENTITY STRING,PROP STRING,sqltyp STRING) \
+						ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+
+	
+defaultReverseSecondary = CREATE TABLE %s( \
+	gID STRING , list_id STRING , elem STRING, \
+	ENTITY STRING, TYP SMALLINT, PROP STRING) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+
+	
+indexRS = CREATE  INDEX lid_gid_%s ON TABLE %s(list_id,gid,  elem) AS 'COMPACT' WITH DEFERRED REBUILD
+indexLidElemDS = CREATE  INDEX lid_elem_typ_%s ON TABLE %s(list_id, elem, typ) AS 'COMPACT' WITH DEFERRED REBUILD
+indexLidElemRS = CREATE  INDEX lid_elem_%s ON TABLE %s(list_id, elem) AS 'COMPACT' WITH DEFERRED REBUILD
+indexDS = CREATE  INDEX lid_gid_%s ON TABLE %s(list_id, gid, elem, typ) AS 'COMPACT' WITH DEFERRED REBUILD
+
+defaultLongStrings = CREATE TABLE %s( \
+	short_string STRING , long_string STRING , typ SMALLINT) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';  
+
+
+
+indexLS = CREATE  INDEX lstr_%s ON TABLE %s(short_string, typ)  AS 'COMPACT' WITH DEFERRED REBUILD
+
+basicStats = CREATE TABLE %s(TYPE STRING, AVG DOUBLE , STDDEV DOUBLE , \
+	MIN INT, MAX INT ) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+
+	
+topKStats = CREATE TABLE %s(TYPE STRING, GRAPH STRING, \
+	SUBJECT STRING, PREDICATE STRING, OBJECT STRING, \
+	CNT INT ) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+	
+	
+insertBasicStats = LOAD DATA LOCAL INPATH '%c' INTO TABLE %s
+
+insertLoad =  LOAD DATA LOCAL INPATH '%c' INTO TABLE %s
+
+distinctCountQuery = SELECT COUNT(DISTINCT %type) AS COUNT FROM %table
+	
+insertTopK = INSERT INTO TABLE %s 
+ 
+getBasicStats = SELECT TYPE, AVG, STDDEV, MIN, MAX FROM %s order by type
+getTopKStats = SELECT TYPE, GRAPH, SUBJECT, PREDICATE, OBJECT, CNT FROM %s order by type
+updateStatsTS = UPDATE %s set lastStatsUpdated = current timestamp
+
+optimizedDataset = INSERT INTO %s( storeName, version, \
+	directPrimary, dPrimarySize, directSecondary, \
+	reversePrimary,rPrimarySize,reverseSecondary, \
+	longStrings, maxStringLen, gidMaxStringLen,basicStatsTable,topKStatsTable, predicateMappings, systemPredicateTable, status, dataTypeTable) \
+	values( ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
+	
+defaultReversePrimary = CREATE TABLE %s( \
+	entry STRING , numentry DOUBLE  , dtentry TIMESTAMP , typ SMALLINT , gid STRING , spill INT , \
+	prop0 STRING, val0  STRING, prop1 STRING, val1  STRING, prop2 STRING, val2  STRING,  \
+	prop3 STRING, val3  STRING, prop4 STRING, val4  STRING, prop5 STRING, val5  STRING,  \
+	prop6 STRING, val6  STRING, prop7 STRING, val7  STRING, prop8 STRING, val8  STRING,  \
+	prop9 STRING, val9  STRING, prop10 STRING, val10  STRING, prop11 STRING, val11  STRING,  \
+	prop12 STRING, val12  STRING, prop13 STRING, val13  STRING, prop14 STRING, val14  STRING,  \
+	prop15 STRING, val15  STRING, prop16 STRING, val16  STRING, prop17 STRING, val17  STRING, \
+	prop18 STRING, val18  STRING, prop19 STRING, val19  STRING, prop20 STRING, val20  STRING, \
+	prop21 STRING, val21  STRING, prop22 STRING, val22  STRING, prop23 STRING, val23  STRING, \
+	prop24 STRING, val24  STRING, prop25 STRING, val25  STRING, prop26 STRING, val26  STRING, \
+	prop27 STRING, val27  STRING, prop28 STRING, val28  STRING, prop29 STRING, val29  STRING, \
+	prop30 STRING, val30  STRING, prop31 STRING, val31  STRING, prop32 STRING, val32  STRING) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';  
+
+	
+storeSwitchForward = UPDATE %s SET status=status-1
+storeSwitchRollback = UPDATE %s SET status=status+1
+getDatasetForStatus = SELECT * from %s WHERE storeName = ? and status = ?
+
+defaultPredInfoTable = CREATE TABLE %s_preds( \
+    pred STRING, \
+    onetoone smallint , \
+    spills smallint , \
+    num_hashes smallint , \
+    hash0 smallint , \
+    hash1 smallint, \
+    hash2 smallint, \
+    hash3 smallint, \
+    db2type STRING ) \
+    ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+
+indexPREDINFO = CREATE  INDEX pred_%s_preds ON TABLE %s_preds(pred)  AS 'COMPACT' WITH DEFERRED REBUILD
+
+defaultDataTypeTable = CREATE TABLE %s( \
+	datatype_id SMALLINT , datatype_name STRING) \
+	ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t' ;  
+
+	
+indexDATATYPE = CREATE  INDEX datatype_%s ON TABLE %s(datatype_id, datatype_name) AS 'COMPACT' WITH DEFERRED REBUILD
+	
+defaultDataTypeEntry = INSERT INTO %s (\
+	datatype_id, datatype_name) \
+	VALUES(?, ?)
+	
+defaultDataTypeSequence = CREATE SEQUENCE %s_type_seq START WITH 1500 \
+	INCREMENT BY 1 \
+	MAXVALUE 9999 \
+	CYCLE \
+	CACHE 10
+	
+defaultDataLangSequence = CREATE SEQUENCE %s_lang_seq START WITH 10600 \
+	INCREMENT BY 1 \
+	MAXVALUE 12000 \
+	CYCLE \
+	CACHE 10
+
+detailStats = ALTER TABLE %s.%t ALTER %s SET STATISTICS 5000
+
+dphRphRunStats = VACUUM VERBOSE ANALYZE %s.%t
+
+dsRsLsRunStats = VACUUM VERBOSE ANALYZE %s.%t 
+
+setAutoStats = UPDATE DB CONFIG USING AUTO_MAINT ON AUTO_TBL_MAINT ON AUTO_RUNSTATS ON
+
+sysPredIndices = CREATE INDEX idx_syspred_%s ON %t(%c)
+
+tablespaceQuery = select TBSPACE from SYSCAT.TABLES where TABNAME = '%s'
+
+typeofFuntion = CREATE OR REPLACE FUNCTION typeof(lit STRING) RETURNS STRING AS $$ \
+ DECLARE v FLOAT; \
+         d TIMESTAMP; \
+BEGIN \
+        BEGIN \
+                BEGIN \
+                v := lit::float; \
+                EXCEPTION WHEN OTHERS THEN \
+                        BEGIN \
+                        d := lit::timestamp; \
+                        EXCEPTION WHEN OTHERS THEN \
+                                BEGIN \
+                                RETURN 'V'; \
+                                END; \
+                        END; \
+                        RETURN 'T'; \
+                END; \
+                RETURN 'D'; \
+        END; \
+END; \
+$$ LANGUAGE plpgsql;
+
+triggerFunction = CREATE OR REPLACE FUNCTION typeof_insert() RETURNS trigger AS $$ \
+BEGIN \
+	NEW.sqltyp := typeof(NEW.elem); \
+	RETURN NEW; \
+END; \
+$$ LANGUAGE plpgsql;
+
+typeofTrigger = CREATE TRIGGER typeof_trigger BEFORE INSERT OR UPDATE ON %s FOR EACH ROW EXECUTE PROCEDURE typeof_insert();
