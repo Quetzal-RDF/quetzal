@@ -71,7 +71,7 @@ query returns [JSONObject o] throws JSONException
 	
 
 prologue  throws JSONException
-	:  	 ^(PROLOGUE baseDecl?  prefixDecl)
+	:  	 ^(PROLOGUE baseDecl?  prefixDecl*)
 	;
 
 				

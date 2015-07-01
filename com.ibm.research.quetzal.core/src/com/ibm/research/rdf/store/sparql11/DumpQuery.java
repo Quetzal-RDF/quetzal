@@ -9,20 +9,28 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DumpQuery {
 
 	public static void main(String[] args) throws RecognitionException, IOException, JSONException {
+		System.err.println(queryToJSON(args[0]));
+	}
+
+	public static JSONObject queryToJSON(String query) throws IOException,
+			RecognitionException, JSONException {
 		ANTLRStringStream sparql;
-		if (new File(args[0]).exists()) {
-			sparql = new ANTLRFileStream(args[0], "UTF8");
+		if (new File(query).exists()) {
+			sparql = new ANTLRFileStream(query, "UTF8");
 		} else {
-			sparql = new ANTLRStringStream(args[0]);			
+			System.err.println(query);
+			sparql = new ANTLRStringStream(query);			
 		}
 		
 		CommonTree ast = SparqlParserUtilities.getParseTree(sparql);
 		JSONWriter writer = new JSONWriter(new BufferedTreeNodeStream(ast));
-		System.err.println(writer.queryUnit());
+		JSONObject jsonOutput = writer.queryUnit();
+		return jsonOutput;
 	}
 
 }
