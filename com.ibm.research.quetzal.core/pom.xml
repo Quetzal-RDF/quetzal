@@ -191,12 +191,12 @@
   	<dependency>
   		<groupId>org.antlr</groupId>
   		<artifactId>antlr</artifactId>
-  		<version>3.3</version>
+  		<version>3.4</version>
   	</dependency>
   	<dependency>
   		<groupId>org.antlr</groupId>
   		<artifactId>antlr-runtime</artifactId>
-  		<version>3.3</version>
+  		<version>3.4</version>
   	</dependency>
    	<dependency>
   		<groupId>commons-dbutils</groupId>
@@ -217,6 +217,11 @@
 	  <groupId>ant-contrib</groupId>
 	  <artifactId>ant-contrib</artifactId>
 	  <version>1.0b3</version>
+	</dependency>
+	<dependency>
+	  <groupId>com.cedarsoftware</groupId>
+	  <artifactId>json-io</artifactId>
+	  <version>4.0.0</version>
 	</dependency>
   </dependencies>
     

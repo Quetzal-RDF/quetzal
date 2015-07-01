@@ -169,7 +169,7 @@ public class SparqlParserUtilities {
 		return query;
 	}
 
-	private static Query getQuery(CharStream sparqlFile)
+	static Query getQuery(CharStream sparqlFile)
 			throws RecognitionException {
 		IbmSparqlLexer lex = new IbmSparqlLexer(sparqlFile);
 		CommonTokenStream tokens = new CommonTokenStream(lex);
