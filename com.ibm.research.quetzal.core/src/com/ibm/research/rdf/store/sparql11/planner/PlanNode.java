@@ -92,7 +92,8 @@ public class PlanNode
    
    private Set<Variable> undefVariables;
    
-   
+   private boolean post = false;			// flag to indicate if the service is a post or a get
+      
    //
    // The cost of the STPlanNode
    //
@@ -233,10 +234,10 @@ public void setMaterialzedTable(String materialzedTable) {
 	   this.undefVariables = values.determineUNDEFVariables();
    }
    
-   public PlanNode(ServiceNode service, Set<Variable> requiredVars) {
+   public PlanNode(ServiceNode service) {
 	   this.producedVariables = new HashSet<Variable>();
 	   this.producedVariables.addAll(service.getProducedVariables());
-	   this.requiredVariables = requiredVars;
+	   this.requiredVariables = service.getRequiredVariables();
 	   this.pattern = service.p;
 	   this.type = PlanNodeType.SERVICE;
    }
@@ -851,6 +852,15 @@ public void setMaterialzedTable(String materialzedTable) {
 		}
 	}
 	
+	public boolean isPost() {
+		return post;
+	}
+
+	public void setPost(boolean post) {
+		this.post = post;
+	}
+
+
 	static class TypeCheckInformation {
 		private Variable var;
 		private TypeMap.TypeCategory type;

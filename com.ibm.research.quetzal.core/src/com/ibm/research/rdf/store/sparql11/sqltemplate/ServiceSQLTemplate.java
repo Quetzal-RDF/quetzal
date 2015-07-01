@@ -38,13 +38,15 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		ServicePattern sp = (ServicePattern) planNode.getPattern();
 		
 		mappings.add(new SQLMapping("sql_id",wrapper.getPlanNodeId(planNode), null));
-		String queryText = sp.getQueryText();
-		mappings.add(new SQLMapping("queryText", "&query=" + queryText, null));
+		if (!planNode.isPost()) {
+			String queryText = sp.getQueryText();
+			mappings.add(new SQLMapping("queryText", "&query=" + queryText, null));
+		}
 		assert sp.getService().isIRI();
 		String service = sp.getService().getIRI().toString();
 		mappings.add(new SQLMapping("service", service, null));
 
-		Set<Variable> vars = sp.getPattern().gatherVariables();
+		Set<Variable> vars = planNode.getProducedVariables();
 		Set<String> cols = HashSetFactory.make();
 		Set<String> firstProjectCols = HashSetFactory.make();
 		
@@ -70,22 +72,10 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		for (String s : firstProjectCols) {
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + s);
 		}
-		
+			
 		secondProjectCols.addAll(getProjectedVariablesFromPredecessor());
-		
-		mappings.add(new SQLMapping("dtCols", dtCols, null));
-		mappings.add(new SQLMapping("dtConstraints", dtConstraints, null));
-		mappings.add(new SQLMapping("dtTable", this.store.getDataTypeTable(), null));
-		
-		mappings.add(new SQLMapping("cols", cols, null));
-		mappings.add(new SQLMapping("firstProjectCols", firstProjectCols, null));
 		mappings.add(new SQLMapping("secondProjectCols", secondProjectCols, null));
-
-
-		List<String> targetList = getTargetMapping();
-		SQLMapping tMapping = new SQLMapping("target", targetList, null);
-		mappings.add(tMapping);
-		
+			
 		if (pred != null) {
 			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
 			String rightSQLCte = wrapper.getPlanNodeCTE(planNode, false) + "_TMP"; 
@@ -93,7 +83,30 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			SQLMapping joinMapping = new SQLMapping("join_constraint", joinConstraints, null);
 			mappings.add(joinMapping);
 		}
+
+		if (planNode.isPost()) {
+			List<String> postedColumns = new LinkedList<String>();
+			for (Variable v : planNode.getRequiredVariables()) {
+				postedColumns.add(v.getName());
+			}
+			mappings.add(new SQLMapping("postColumns", postedColumns, null));
+			mappings.add(new SQLMapping("htmlHeader", "", null));
+		} 
 		
+		
+		mappings.add(new SQLMapping("dtCols", dtCols, null));
+		mappings.add(new SQLMapping("dtConstraints", dtConstraints, null));
+		mappings.add(new SQLMapping("dtTable", this.store.getDataTypeTable(), null));
+		
+		mappings.add(new SQLMapping("cols", cols, null));
+		mappings.add(new SQLMapping("firstProjectCols", firstProjectCols, null));
+
+
+		List<String> targetList = getTargetMapping();
+		SQLMapping tMapping = new SQLMapping("target", targetList, null);
+		mappings.add(tMapping);
+		
+
 		return mappings;
 	}	
 	

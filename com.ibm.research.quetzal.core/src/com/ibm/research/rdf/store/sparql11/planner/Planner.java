@@ -129,8 +129,15 @@ public class Planner {
 			
 			@Override
 			public PlanNode createSTPlanNode(
-					ServiceNode service, Set<Variable> requiredVars) {
-				return new PlanNode(service, requiredVars);
+					ServiceNode service) {
+				PlanNode p = new PlanNode(service);
+				if (service instanceof BindFunctionNode) {
+					BindFunctionNode b = (BindFunctionNode) service;
+					p.setPost(true);
+				}
+				p.setProducedVariables(service.getProducedVariables());
+
+				return p;
 			}
 			
 			
@@ -204,7 +211,7 @@ public class Planner {
 		
 		PlanNode createSTPlanNode(Values values);
 		
-		PlanNode createSTPlanNode(ServiceNode node, Set<Variable> requiredVars);
+		PlanNode createSTPlanNode(ServiceNode node);
 		
 		PlanNode  createSTPlanNode(BinaryUnion<Variable, IRI> graphRestriction);
 		
@@ -496,14 +503,13 @@ public class Planner {
 				Set<Variable> requiredVariables = getRequiredVariables();
 				
 				PlanNode node = 
-					planFactory.createSTPlanNode(this, requiredVariables);
+					planFactory.createSTPlanNode(this);
 				node.cost = getCost(g);
 				assert node.cost.fst > 0.0;
 				Set<Variable> vars = HashSetFactory.make(this.availableVars);
 				vars.addAll(producedVariables);
 				vars.retainAll(liveVars);
 				node.setAvailableVariables(vars);
-				node.setProducedVariables(producedVariables);
 				g.addNode(node);
 				if (currentHead != null) {
 					return join(JoinTypes.AND, q, g, currentHead, node, liveVars);		
@@ -813,6 +819,7 @@ public class Planner {
 					if (n != null) {
 						n.addBindPattern(bp);
 						n.addProducedVariables(bp.getVariables());
+						n.addAvailableVariables(availableVars);
 						n.addAvailableVariables(bp.getVariables());
 					}
 				} 
