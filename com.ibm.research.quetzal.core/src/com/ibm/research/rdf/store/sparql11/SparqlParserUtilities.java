@@ -171,17 +171,7 @@ public class SparqlParserUtilities {
 
 	static Query getQuery(CharStream sparqlFile)
 			throws RecognitionException {
-		IbmSparqlLexer lex = new IbmSparqlLexer(sparqlFile);
-		CommonTokenStream tokens = new CommonTokenStream(lex);
-		IbmSparqlParser parser = new IbmSparqlParser(tokens);
-		parser.setTreeAdaptor(new CommonTreeAdaptor() {
-			@Override
-			public Object create(Token t) {
-				return new XTree(t);
-			}
-		});
-		IbmSparqlParser.queryUnit_return ret = parser.queryUnit();
-		CommonTree ast = (CommonTree) ret.getTree();
+		CommonTree ast = getParseTree(sparqlFile);
 		// System.out.println(ast.toStringTree());
 		BufferedTreeNodeStream nodes = new BufferedTreeNodeStream(ast);
 		// nodes.setTokenStream(tokens);
@@ -193,6 +183,22 @@ public class SparqlParserUtilities {
 		IbmSparqlAstWalker walker = new IbmSparqlAstWalker(nodes);
 		Query q = walker.queryUnit();
 		return q;
+	}
+
+	static CommonTree getParseTree(CharStream sparqlFile)
+			throws RecognitionException {
+		IbmSparqlLexer lex = new IbmSparqlLexer(sparqlFile);
+		CommonTokenStream tokens = new CommonTokenStream(lex);
+		IbmSparqlParser parser = new IbmSparqlParser(tokens);
+		parser.setTreeAdaptor(new CommonTreeAdaptor() {
+			@Override
+			public Object create(Token t) {
+				return new XTree(t);
+			}
+		});
+		IbmSparqlParser.queryUnit_return ret = parser.queryUnit();
+		CommonTree ast = (CommonTree) ret.getTree();
+		return ast;
 	}
 
 	public static Query parseSparqlString(String sparql,

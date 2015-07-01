@@ -71,7 +71,7 @@ query returns [JSONObject o] throws JSONException
 	
 
 prologue  throws JSONException
-	:  	 ^(PROLOGUE baseDecl  prefixDecl)
+	:  	 ^(PROLOGUE baseDecl?  prefixDecl)
 	;
 
 				
@@ -237,7 +237,10 @@ bindingValue  throws JSONException
 	;
 	
 groupGraphPattern returns [JSONObject r] throws JSONException
-	:   ^(GROUP_GRAPH_PATTERN groupGraphPatternSub?)  
+	:   ^(GROUP_GRAPH_PATTERN
+          (g=groupGraphPatternSub
+            { $r = new JSONObject();
+              $r.put("group", g); } )?)  
 	|	s=subSelect	{ $r = s; }
     ;
 	
