@@ -670,7 +670,6 @@ public void setMaterialzedTable(String materialzedTable) {
 			case AND:
 			case NOT_EXISTS:
 			case EXISTS:
-
 			case LEFT: {
 				int i = 0;
 				Iterator<PlanNode> ss= p.getPlanTree().getSuccNodes(parent);
