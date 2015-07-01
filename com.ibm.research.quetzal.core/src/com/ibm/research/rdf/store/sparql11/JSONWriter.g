@@ -89,7 +89,7 @@ selectQuery	returns [JSONObject o] throws JSONException
 		^(SELECT  
 			(s=selectClause[$o]  )
 			(d=dataset				{ $o.put("datasets", d);    }  )?
-			(w=whereClause			{ $o.put("where", w);      }  )?
+			( whereClause[$o] )?
 			( solutionModifier[$o] )  
 		)
 	;
@@ -108,7 +108,7 @@ subSelect returns [JSONObject sp] throws JSONException
 		    $sp = new JSONObject();
 	      }
 			s=selectClause[$sp]
-			(w=whereClause			{ $sp.put("where", w);      }  )?
+			(w=whereClause[$sp] )?
 			( solutionModifier[$sp] )
             (d=inlineData           { $sp.put("bindings", d); })?
 		)
@@ -159,9 +159,9 @@ sourceSelector returns [IRI  r] throws JSONException
 	:  	 i=iRIref	{ $r = i; }
 	;
 
-whereClause	returns [JSONObject o] throws JSONException
+whereClause[JSONObject o] throws JSONException
 	:  	
-		^(WHERE g=groupGraphPattern?)  {$o = new JSONObject(); $o.put("where", g); }
+		^(WHERE g=groupGraphPattern?)  { $o.put("where", g); }
 	;
 	
 solutionModifier[JSONObject o] throws JSONException
@@ -248,7 +248,7 @@ groupGraphPatternSub returns [JSONArray p] throws JSONException
     @init {
       $p = new JSONArray();
     }
-	:	(     sp=triplesBlock { $p.put(sp); }
+	:	(     triplesBlock[$p]
 	    |     f=filter 					
               { 
                 if (f != null) { $p.put(f); }
@@ -257,12 +257,11 @@ groupGraphPatternSub returns [JSONArray p] throws JSONException
         )+
     ;
 
-triplesBlock returns [JSONArray sp] throws JSONException
+triplesBlock [JSONArray sp] throws JSONException
     :   ^( TRIPLES_BLOCK
-           { $sp = new JSONArray(); }
 		   (
 		       s=triples    { $sp.put(s); } 
-			 | s2=triples2  { for(int i = 0; i < s2.length(); i++) { $sp.put(s2.get(i)); } }
+			 | s2=triples2[$sp]
 		   )+ 
 		 ) 
    ;
@@ -281,10 +280,7 @@ triples returns [JSONObject qt] throws JSONException
 		)
 	;
 
-triples2 returns [JSONArray qt] throws JSONException
-	@init { 
-				$qt = new JSONArray();
-		  }
+triples2[JSONArray qt] throws JSONException
 	:   ^(TRIPLE2 ^(SUBJECT	s=triplesNode )
 			( ^(PROPERTY_LIST 
 			    ^(PREDICATE	p=predicate)  
