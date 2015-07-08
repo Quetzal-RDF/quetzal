@@ -18,9 +18,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.ibm.wala.util.collections.HashMapFactory;
 
 /**
  * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
@@ -34,6 +36,8 @@ public class SPARQLRewriterForJena {
 	
 	private File ruleFile;
 	private List<RuleforJena> rules = new LinkedList<RuleforJena>();
+	private static int counter = 0;
+
 	private ResolutionEngineForJena resolutionEngine;
 
 
@@ -43,18 +47,28 @@ public class SPARQLRewriterForJena {
 	 */
 	public SPARQLRewriterForJena(File rulesFile) throws Exception {
 		this.ruleFile = rulesFile;
-		String rulesstr = readFile(ruleFile);
-		rules = parseRules(rulesstr);
+		if (ruleFile.getAbsolutePath().endsWith("sparql")) {
+			String rulesstr = readFile(ruleFile);
+			rules = parseRules(rulesstr);
+		} else if (ruleFile.getAbsolutePath().endsWith(".ttl")) {
+			rules = SPINRuleParser.parseRules(ruleFile);
+		}
+
 		resolutionEngine = new ResolutionEngineForJena(rules);
 	}
 
 
-	public String rewrite(String selectQuery) throws Exception {
+	public Query rewrite(String selectQuery) throws Exception {
 
-		return resolutionEngine.unfold(parseToJenaQuery(selectQuery)).toString();
+		return resolutionEngine.unfold(parseToJenaQuery(selectQuery));
 
 	}
 	
+	public List<RuleforJena> getRules() {
+		return rules;
+	}
+
+
 	public static Query parseToJenaQuery(String queryString)  {
 		return QueryFactory.create(queryString);
 	}
@@ -66,13 +80,14 @@ public class SPARQLRewriterForJena {
 
 			Query query = parseToJenaQuery(rule);
 
-			RuleforJena r = new RuleforJena(query);
+			RuleforJena r = new RuleforJena(query, counter++);
 			result.add(r);
 		}
 		return result;
 
 	}
 	
+
 
 	public static void main(String args[]) {
 		File rulesFile = new File(args[0]);

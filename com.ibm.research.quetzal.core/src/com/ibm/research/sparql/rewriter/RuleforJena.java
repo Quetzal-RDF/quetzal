@@ -35,16 +35,38 @@ import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
  * 
  */
 public class RuleforJena {
-	OpTriple consequent;
-	Op antecedent;
-	static int count = 0;
-	int id = 0;
+	protected OpTriple consequent;
+	protected Op antecedent;
+	private static int count = 0;
+	private int id = -1;
+	private String description;
+	private String label;
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public int getId() {
+		return id;
+	}
+
 
 	private static int ID_COUNTER = 0;
 
-	public RuleforJena(Query constructQuery) {
-		this.id = ID_COUNTER++;
-
+	public RuleforJena(Query constructQuery, int id) {
+		this.id = id;
 		antecedent = Algebra.compile(constructQuery);
 		// KAVITHA: the consequent should be a single triple
 		List<Triple> list = constructQuery.getConstructTemplate().getBGP()
