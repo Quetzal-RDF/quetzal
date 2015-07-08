@@ -2995,6 +2995,7 @@ public class Planner {
 				if (t.getPredicate().isIRI() &&
 					(forwardPreds.getHashes(t.getPredicate().getIRI().getValue()) == null ||
 					reversePreds.getHashes(t.getPredicate().getIRI().getValue()) == null)) {
+					System.out.println("WARNING: " + t.getPredicate().getIRI().getValue() + " does not appear in the database");
 					return true;
 				}
 			}
