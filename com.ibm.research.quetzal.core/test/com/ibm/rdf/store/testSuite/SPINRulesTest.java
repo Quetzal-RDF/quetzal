@@ -40,11 +40,12 @@ public class SPINRulesTest {
 	public static List<RuleforJena> parseRules(String rulesString) {
 		String[] rules = rulesString.split("###");
 		List<RuleforJena> result = new LinkedList<RuleforJena>();
+		int counter = 0;
 		for (String rule : rules) {
 
 			Query query = parseToJenaQuery(rule);
 
-			RuleforJena r = new RuleforJena(query);
+			RuleforJena r = new RuleforJena(query, counter++);
 			result.add(r);
 		}
 		return result;
