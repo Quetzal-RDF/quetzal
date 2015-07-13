@@ -256,6 +256,8 @@ public class TestRunner<D> {
 		int execute(D data, String file, boolean isDescribeWithoutRows);
 
 		int executeSQLTest(D data, String file, String sqlCode);
+		
+		com.hp.hpl.jena.query.ResultSet getResultSetForQuery();
 
 	}
 
@@ -318,6 +320,11 @@ public class TestRunner<D> {
 		System.err.println("query has : " + nOR + " rows");
 		return nOR;
 	}
+	
+	public com.hp.hpl.jena.query.ResultSet getResultSetForQuery() {
+		return engine.getResultSetForQuery();
+	}
+	
 
 	public static class DB2Engine extends AbstractEngine<DB2TestData> {
 		private OWLQLSPARQLCompiler compiler;
@@ -342,6 +349,7 @@ public class TestRunner<D> {
 		protected OWLQLSPARQLCompiler compiler;
 		// protected boolean isWrapperEnabled = true;
 		protected boolean isWrapperEnabled = true;
+		protected com.hp.hpl.jena.query.ResultSet  resultSet;
 
 		protected boolean print = false;
 		
@@ -370,6 +378,7 @@ public class TestRunner<D> {
 			}
 		}
 
+		
 		public int execute(D data, String file, boolean isDescribeWithoutRows) {
 			if (isWrapperEnabled) {
 				return executeWith(data, file, isDescribeWithoutRows);
@@ -407,14 +416,14 @@ public class TestRunner<D> {
 						new Boolean(true));
 
 			if (q.isSelectType()) {
-				com.hp.hpl.jena.query.ResultSet rs = qe.execSelect();
+				resultSet = qe.execSelect();
 				if (print) {
-					rs = new ResultSetMem(rs);
-					ResultSetFormatter.outputAsCSV(rs);
-					((ResultSetMem)rs).rewind();
+					resultSet = new ResultSetMem(resultSet);
+					ResultSetFormatter.outputAsCSV(resultSet);
+					((ResultSetMem)resultSet).rewind();
 				} 
-				while (rs.hasNext()) {
-					rs.next();
+				while (resultSet.hasNext()) {
+					resultSet.next();
 					count++;
 				}
 			} else if (q.isDescribeType()) {
@@ -434,6 +443,11 @@ public class TestRunner<D> {
 
 			qe.close();
 			return count;
+		}
+		
+		public com.hp.hpl.jena.query.ResultSet getResultSetForQuery() {
+			((ResultSetMem) resultSet).rewind();
+			return resultSet;
 		}
 
 		public int executeSQLTest(D data, String file, String sqlCode) {

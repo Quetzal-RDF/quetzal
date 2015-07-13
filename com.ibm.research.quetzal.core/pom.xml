@@ -223,6 +223,11 @@
 	  <artifactId>json-io</artifactId>
 	  <version>4.0.0</version>
 	</dependency>
+	<dependency>
+		<groupId>org.topbraid</groupId>
+		<artifactId>spin</artifactId>
+		<version>1.4.0</version>
+	</dependency>
   </dependencies>
     
   <repositories>
@@ -236,6 +241,10 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+          <repository>
+        <id>org.topbraid</id>
+        <url>http://topquadrant.com/repository/spin</url>
+    </repository>
   </repositories>
 
 </project>

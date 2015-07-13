@@ -6,6 +6,8 @@ db2 "CREATE DATABASE QUETZAL"
 # and long strings for URIS
 # db2 "CREATE DATABASE QUETZAL PAGESIZE 32 K"
 
+
+
 cd /data
 
 mkdir -p tmp
@@ -22,8 +24,9 @@ else
     export FILETYPE=nq
 fi
 
-f=`wc -l $DATAFILE`
-if [[$f > 10000]]; then
+f=`cat DATAFILE | wc -l | awk '{print $1}'`
+echo $f
+if [[ ($f -gt 100) ]] ; then
 	PARALLEL="--parallel $PROCESSOR"
 fi
 
@@ -34,6 +37,7 @@ export DB2_USER=db2inst1
 export DB2_PASSWORD=db2inst1
 export DB2_SCHEMA=db2inst1
 export KNOWLEDGE_BASE=kb
+
 
 echo $FILETYPE
 echo $DATAFILE

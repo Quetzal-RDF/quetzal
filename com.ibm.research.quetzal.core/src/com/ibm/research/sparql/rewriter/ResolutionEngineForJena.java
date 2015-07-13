@@ -101,7 +101,8 @@ public class ResolutionEngineForJena {
 
 		
 		VarExprList expr = new VarExprList();	
-		E_StrConcat trace = getRuleTracingConcat(newQuery);
+	//	E_StrConcat trace = getRuleTracingConcat(newQuery);
+		E_StrConcat trace = null;
 		
 		if (trace!=null) {
 			expr.add(Var.alloc("trace"),trace);		
