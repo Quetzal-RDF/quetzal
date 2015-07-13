@@ -27,7 +27,7 @@ public class DumpQuery {
 			sparql = new ANTLRStringStream(query);			
 		}
 		
-		CommonTree ast = SparqlParserUtilities.getParseTree(sparql);
+		XTree ast = SparqlParserUtilities.getParseTree(sparql);
 		JSONWriter writer = new JSONWriter(new BufferedTreeNodeStream(ast));
 		JSONObject jsonOutput = writer.queryUnit();
 		return jsonOutput;
