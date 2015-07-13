@@ -53,13 +53,13 @@ import org.json.*;
 
 		
 queryUnit returns [JSONObject o] throws JSONException
-	:     ^(ROOT x=query)  	{ $o = x; }
+	:     ^(q=ROOT x=query)  	{ $o = x; }
 	;
 	
 query returns [JSONObject o] throws JSONException
-	: ^(QUERY 
+	: ^(q=QUERY 
 			( p=prologue )      
-			(	( s=selectQuery  	{ $o = s; } )
+			(	( s=selectQuery  	{ $o = s; $o.put("source", q.matched); } )
 			    ( b=bindingsClause  
                   { 
                     $o.put("bindings", b);

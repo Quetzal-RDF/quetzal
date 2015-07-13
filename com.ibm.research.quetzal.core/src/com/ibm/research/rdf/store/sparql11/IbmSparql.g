@@ -122,6 +122,7 @@ queryUnit
 	;
 			
 query 
+    @after { $query.tree.matched = $query.text; }
 	:	p=prologue
 		( s=selectQuery | c=constructQuery | d=describeQuery | a=askQuery )
 		b=bindingsClause?
