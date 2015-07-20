@@ -45,6 +45,7 @@ public class CommandLineDriver {
 
 	private static Class<? extends TestData> getDataClass() {
 		String dataClass = System.getenv("DB_ENGINE");
+		System.out.println("DB_ENGINE is set to:" + System.getenv("DB_ENGINE"));
 		if (dataClass.contains("db2")) {
 			return DB2TestData.class;
 		} else if (dataClass.contains("postgresql")) {
@@ -60,6 +61,7 @@ public class CommandLineDriver {
 	protected static TestData getData() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		String dataset = System.getenv("KNOWLEDGE_BASE");
 		Class<? extends TestData> cls = getDataClass();
+		System.out.println("connecting to:" + "jdbc:" + getProtocol() + "://" + System.getenv("DB2_HOST") + ":" + System.getenv("DB2_PORT") + "/" + System.getenv("DB2_DB"));
 		Constructor<? extends TestData> factory = cls.getConstructor(String.class, String.class, String.class, String.class, String.class, boolean.class);
 		return (TestData) factory.newInstance(
 			"jdbc:" + getProtocol() + "://" + System.getenv("DB2_HOST") + ":" + System.getenv("DB2_PORT") + "/" + System.getenv("DB2_DB"), 
@@ -70,6 +72,44 @@ public class CommandLineDriver {
 			false);
 	}
 
+	public static void checkEnvironment() {
+		if (System.getenv("KNOWLEDGE_BASE") == null) {
+			System.out.println("KNOWLEDGE_BASE is not set in environment");
+		} else {
+			System.out.println("KNOWLEDGE_BASE is set to:" + System.getenv("KNOWLEDGE_BASE"));
+		}
+		if (System.getenv("DB2_HOST") == null) {
+			System.out.println("DB2_HOST is not set in environment");
+		} else {
+			System.out.println("DB2_HOST is set to:" + System.getenv("DB2_HOST"));
+		}
+		if (System.getenv("DB2_PORT") == null) {
+			System.out.println("DB2_PORT is not set in environment");
+		} else {
+			System.out.println("DB2_PORT is set to:" + System.getenv("DB2_PORT"));
+		}
+		if (System.getenv("DB2_DB") == null) {
+			System.out.println("DB2_DB is not set in environment");
+		} else {
+			System.out.println("DB2_DB is set to:" + System.getenv("DB2_DB"));
+		}
+		if (System.getenv("DB2_USER") == null) {
+			System.out.println("DB2_USER is not set in environment");
+		} else {
+			System.out.println("DB2_USER is set to:" + System.getenv("DB2_USER"));
+		}
+		if (System.getenv("DB2_PASSWORD") == null) {
+			System.out.println("DB2_PASSWORD is not set in environment");
+		} else {
+			System.out.println("DB2_PASSWORD is set to:" + System.getenv("DB2_PASSWORD"));
+		}
+		if (System.getenv("DB2_SCHEMA") == null) {
+			System.out.println("DB2_SCHEMA is not set in environment");
+		} else {
+			System.out.println("DB2_SCHEMA is set to:" + System.getenv("DB2_SCHEMA"));
+		}
+	}
+	
 	protected static int[] getAnswers(String answers) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 		Field f = TestConstants.class.getField(answers);
 		return (int[])f.get(null);

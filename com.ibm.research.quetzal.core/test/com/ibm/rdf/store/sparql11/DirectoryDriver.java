@@ -17,7 +17,7 @@ import com.ibm.wala.util.functions.VoidFunction;
 
 public class DirectoryDriver extends TestCase {
 
-	  public static void recurseFiles(VoidFunction<File> action, final Predicate<File> filter, File top) {
+	public static void recurseFiles(VoidFunction<File> action, final Predicate<File> filter, File top) {
 		  	if (top.isDirectory()) {
 		  		for(File f : top.listFiles(new FileFilter() {
 		  			@Override
@@ -33,6 +33,7 @@ public class DirectoryDriver extends TestCase {
 		  }
 
 	public static OrderedTestSuite suite() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+		CommandLineDriver.checkEnvironment();
 		final TestData data = getData();
 		@SuppressWarnings("rawtypes")
 		final DatabaseEngine engine = getEngine(data, false);
