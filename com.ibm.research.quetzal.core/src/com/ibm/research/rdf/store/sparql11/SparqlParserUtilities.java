@@ -185,7 +185,7 @@ public class SparqlParserUtilities {
 		return q;
 	}
 
-	static CommonTree getParseTree(CharStream sparqlFile)
+	static XTree getParseTree(CharStream sparqlFile)
 			throws RecognitionException {
 		IbmSparqlLexer lex = new IbmSparqlLexer(sparqlFile);
 		CommonTokenStream tokens = new CommonTokenStream(lex);
@@ -197,7 +197,7 @@ public class SparqlParserUtilities {
 			}
 		});
 		IbmSparqlParser.queryUnit_return ret = parser.queryUnit();
-		CommonTree ast = (CommonTree) ret.getTree();
+		XTree ast = (XTree) ret.getTree();
 		return ast;
 	}
 
