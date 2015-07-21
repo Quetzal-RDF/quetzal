@@ -60,7 +60,11 @@ public class SPINRuleParser {
             			rule.setDescription(stmt2.next().getObject().toString());
             		}
             		
-            		
+              		stmt2 = q.getStatement().getObject().asResource().listProperties(baseModel.getProperty("http://example.org/displayText"));
+              		
+             		while (stmt2.hasNext()) {		
+            			rule.setDisplayText(stmt2.next().getObject().toString());
+            		}
             		l.add(rule);
             		rule.setLabel(r.getLocalName());
         		}    		

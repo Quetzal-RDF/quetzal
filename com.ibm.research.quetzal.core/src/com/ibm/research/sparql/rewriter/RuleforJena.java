@@ -35,12 +35,15 @@ import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
  * 
  */
 public class RuleforJena {
+
+
 	protected OpTriple consequent;
 	protected Op antecedent;
 	private static int count = 0;
 	private int id = -1;
 	private String description;
 	private String label;
+	private String displayText;
 
 	public String getDescription() {
 		return description;
@@ -141,6 +144,18 @@ public class RuleforJena {
 			aliases.put(var, var2);
 			return var2;
 		}
+	}
+
+	public Op getAntecedent() {
+		return antecedent;
+	}
+
+	public String getDisplayText() {
+		return displayText;
+	}
+
+	public void setDisplayText(String displayText) {
+		this.displayText = displayText;
 	}
 
 }

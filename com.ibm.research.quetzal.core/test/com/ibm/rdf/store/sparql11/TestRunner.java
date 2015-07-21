@@ -202,6 +202,7 @@ public class TestRunner<D> {
 				ctx = new Context();
 				setStore();
 			} catch (Exception e) {
+				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 		}
@@ -414,11 +415,12 @@ public class TestRunner<D> {
 			if (data.ctx.get(Context.unionDefaultGraph) != null)
 				qe.getContext().set(Context.unionDefaultGraph,
 						new Boolean(true));
-
+			
 			if (q.isSelectType()) {
 				resultSet = qe.execSelect();
 				if (print) {
 					resultSet = new ResultSetMem(resultSet);
+					System.err.println("RESULTS:");
 					ResultSetFormatter.outputAsCSV(resultSet);
 					((ResultSetMem)resultSet).rewind();
 				} 

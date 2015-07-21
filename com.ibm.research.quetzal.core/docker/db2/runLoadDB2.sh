@@ -1,3 +1,7 @@
+DIR=`dirname $0`
+. $DIR/../dockerEnvt.sh
+. $DIR/db2Envt.sh
+
 db2set DB2COMM=TCPIP
 db2set DB2_COMPATIBILITY_VECTOR=MYS
 db2start
@@ -7,41 +11,10 @@ db2 "CREATE DATABASE QUETZAL"
 # and long strings for URIS
 # db2 "CREATE DATABASE QUETZAL PAGESIZE 32 K"
 
-
-
 cd /data
 
 mkdir -p tmp
 
-export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
-DIR=`dirname $0`
-
-
-if ls *.nt; then
-    export DATAFILE=`ls /data/*.nt`
-    export FILETYPE=nt
-else
-    export DATAFILE=`ls /data/*.nq`
-    export FILETYPE=nq
-fi
-
-f=`cat DATAFILE | wc -l | awk '{print $1}'`
-echo $f
-if [[ ($f -gt 100) ]] ; then
-	PARALLEL="--parallel $PROCESSOR"
-fi
-
-export DB2_HOST=localhost
-export DB2_PORT=50000
-export DB2_DB=quetzal
-export DB2_USER=db2inst1
-export DB2_PASSWORD=db2inst1
-export DB2_SCHEMA=db2inst1
-export KNOWLEDGE_BASE=kb
-
-
-echo $FILETYPE
-echo $DATAFILE
 
 bash $DIR/../../scripts/build-load-files.sh --db-engine db2 $PARALLEL --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
