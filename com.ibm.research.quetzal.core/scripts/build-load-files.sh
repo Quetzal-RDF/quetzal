@@ -300,11 +300,9 @@ function load_parallel_tables() {
 		cat >> $NT_FILE.db2_cmds <<EOF
 \COPY ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_$3 FROM '$LOAD_PATH' WITH (FORMAT CSV, DELIMITER '	', QUOTE '');
 EOF
-		elif  [[ $4 == "shark" ]]; then
+	    elif  [[ $4 == "shark" ]]; then
 		cat >> $NT_FILE.db2_cmds <<EOF
 LOAD DATA LOCAL INPATH '$LOAD_PATH' INTO TABLE ${DB2_SCHEMA}.${KNOWLEDGE_BASE}_$3  ;
-CACHE TABLE ${KNOWLEDGE_BASE}_$3  ;
-
 EOF
  	    elif [[ $3 == "DS" ]]; then
 		fields="gID list_id elem typ"
@@ -341,6 +339,11 @@ LOAD FROM $loadFile OF DEL MODIFIED BY fastparse keepblanks chardel0x07 coldel0x
 EOF
 		fi
 	done
+	if  [[ $4 == "shark" ]]; then
+	    cat >> $NT_FILE.db2_cmds <<EOF
+CACHE TABLE ${KNOWLEDGE_BASE}_$3 ;
+EOF
+	fi
     fi
 }
     
