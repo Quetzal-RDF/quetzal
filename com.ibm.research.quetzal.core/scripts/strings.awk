@@ -16,7 +16,7 @@ function trimString(str) {
 
 function fixBrackets(str) {
     if (index(str, "<") == 1) {
-	return gensub(/^<([^>]*)+>$/, "\\1", "", str);
+	return gensub(/^<([^>]*)+>$/, "\\1", "g", str);
     } else {
 	return str;
     }
