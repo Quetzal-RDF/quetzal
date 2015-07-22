@@ -117,7 +117,7 @@ public class SystemPredicateTableGeneration
          }
       if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
     	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';\n");
-    	  sql.append("CACHE TABLE %s");
+    	//  sql.append("CACHE TABLE %s");
       }
       return sql.toString();
       }
