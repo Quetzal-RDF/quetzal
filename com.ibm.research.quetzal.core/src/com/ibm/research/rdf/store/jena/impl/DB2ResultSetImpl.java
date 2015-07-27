@@ -168,7 +168,8 @@ public class DB2ResultSetImpl implements ResultSet {
                String colName = varList.get(i);
                String result = null;
 
-               result = set.getString(colName.toLowerCase());
+              // result = set.getString(colName.toLowerCase());
+               result = set.getString(colName);
 
                if (result != null)
                   {
