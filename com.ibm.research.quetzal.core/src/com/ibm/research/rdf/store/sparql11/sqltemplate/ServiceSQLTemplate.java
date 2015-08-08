@@ -10,6 +10,8 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,6 +20,11 @@ import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.research.rdf.store.sparql11.model.BindFunctionCall;
+import com.ibm.research.rdf.store.sparql11.model.BindFunctionPattern;
+import com.ibm.research.rdf.store.sparql11.model.IRI;
+import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
@@ -35,23 +42,38 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	Set<SQLMapping> populateMappings() {		
 		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
 
-		ServicePattern sp = (ServicePattern) planNode.getPattern();
+		Pattern sp = planNode.getPattern();
 		
 		mappings.add(new SQLMapping("sql_id",wrapper.getPlanNodeId(planNode), null));
+		
 		if (!planNode.isPost()) {
-			String queryText = sp.getQueryText();
+			assert sp instanceof ServicePattern;
+			assert ((ServicePattern)sp).getService().isIRI();
+			String queryText = ((ServicePattern)sp).getQueryText();
 			mappings.add(new SQLMapping("queryText", "&query=" + queryText, null));
+			String service = ((ServicePattern)sp).getService().getIRI().toString();
+			mappings.add(new SQLMapping("service", service, null));
+		} else {
+			BindFunctionCall bfp = ((BindFunctionPattern)sp).getFuncCall();
+			IRI f = bfp.getIri();
+			mappings.add(new SQLMapping("service", f.toString(), null));
+			try {
+				String body = bfp.getFunction().getBody().getStringBody();
+				mappings.add(new SQLMapping("queryText", "funcName=" + URLEncoder.encode(f.getValue().substring(f.getValue().indexOf('#')+1), "UTF-8") + "&funcBody=" + URLEncoder.encode(body, "UTF-8") + "&funcData=", null));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}			
 		}
-		assert sp.getService().isIRI();
-		String service = sp.getService().getIRI().toString();
-		mappings.add(new SQLMapping("service", service, null));
-
+		
+		Set<Variable> req = planNode.getRequiredVariables();
 		Set<Variable> vars = planNode.getProducedVariables();
 		Set<String> cols = HashSetFactory.make();
 		Set<String> firstProjectCols = HashSetFactory.make();
+		Set<String> secondProjectCols = HashSetFactory.make();
 		
 		for (Variable v : vars) {
-			firstProjectCols.add(v.getName());
+			firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + v.getName());
+			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + v.getName());
 			cols.add(v.getName() + " VARCHAR (128) PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
 					+ "xs:string(./x:binding[./@name=\"" + v.getName() + "\"])'" );
 		}
@@ -62,17 +84,13 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 
 		for (Variable v : literalVars) {
 			String vt = v.getName() + "_TYP";
-			firstProjectCols.add(vt);
-			cols.add(v.getName() + "_TYP" + " VARCHAR (128) PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
+			firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + vt);
+			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + vt);
+			cols.add(v.getName() + "_TYP" + " VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
 					+ "./x:binding[./@name=\"" + v.getName() + "\"]/x:literal/@datatype'");
-			dtConstraints.add("(" + vt + " IS NOT NULL AND " + vt + " = " + "DATATYPE_NAME) OR (" + vt + " IS NULL AND DATATYPE_NAME='SIMPLE_LITERAL_ID')");
+			dtConstraints.add("((" + vt + " IS NOT NULL AND " + vt + " = " + "DATATYPE_NAME) OR (" + vt + " IS NULL AND DATATYPE_NAME='SIMPLE_LITERAL_ID'))");
 		}
-		
-		Set<String> secondProjectCols = HashSetFactory.make();
-		for (String s : firstProjectCols) {
-			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + s);
-		}
-			
+					
 		secondProjectCols.addAll(getProjectedVariablesFromPredecessor());
 		mappings.add(new SQLMapping("secondProjectCols", secondProjectCols, null));
 			
@@ -85,11 +103,29 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		}
 
 		if (planNode.isPost()) {
+			List<String> indexColumns = new LinkedList<String>();
 			List<String> postedColumns = new LinkedList<String>();
+			List<String> postedTypes = new LinkedList<String>();
 			for (Variable v : planNode.getRequiredVariables()) {
 				postedColumns.add(v.getName());
+				indexColumns.add(v.getName());
+				if (wrapper.getIRIBoundVariables().contains(v) ) {
+					postedTypes.add("'xs:string'");
+				} else {
+					indexColumns.add(v.getName() + "_TYP");
+					postedTypes.add("(case when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_DECIMAL_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:decimal' " 
+							      + "when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_NUMERICS_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:integer' "
+							      + "else 'xs:string' end)");
+				}
 			}
+			postedColumns.add("index");
+			postedTypes.add("'xs:int'");			
+			cols.add("index VARCHAR (128) PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
+					+ "xs:string(./x:binding[./@name=\"index\"])'" );
+
+			mappings.add(new SQLMapping("indexColumns", indexColumns, null));
 			mappings.add(new SQLMapping("postColumns", postedColumns, null));
+			mappings.add(new SQLMapping("postTypes", postedTypes, null));
 			mappings.add(new SQLMapping("htmlHeader", "", null));
 		} 
 		

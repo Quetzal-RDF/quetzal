@@ -11,27 +11,31 @@
  package com.ibm.research.rdf.store.sparql11.model;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
-import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.research.rdf.store.sparql11.XTree;
 
 public class BindFunctionCall {
 
 	protected List<Variable> vars;
 	protected String name;
 	protected IRI iri;
+	protected FunctionExt body;
 	
 	
 	public BindFunctionCall() {
 		this.vars = new ArrayList<Variable>();
-		this.name = "";
 	}
 	
+
+	public FunctionExt getFunction() {
+		return body;
+	}
+
+
+	public void setFunction(FunctionExt body) {
+		this.body = body;
+	}
 
 	public IRI getIri() {
 		return iri;
@@ -54,18 +58,7 @@ public class BindFunctionCall {
 	public void addVar(String v) {
 		vars.add(new Variable(v));
 	}
-	
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String s) {
-		name = s;
-	}
-	
-	public void setName(XTree s) {
-		name = s.getText();
-	}
+		
 	
 	public Set<Variable> getVariables() {
 		Set<Variable> ret = new HashSet<Variable>();

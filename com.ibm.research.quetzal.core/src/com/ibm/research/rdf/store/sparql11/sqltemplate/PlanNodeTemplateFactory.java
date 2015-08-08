@@ -73,7 +73,7 @@ public class PlanNodeTemplateFactory {
 	private static AbstractSQLTemplate createServiceSQLTemplate(
 			PlanNode planNode, Store store, Context ctx, Plan plan,
 			STPlanWrapper wrapper) {
-		return new ServiceSQLTemplate("service", planNode, store, ctx, wrapper);
+		return new ServiceSQLTemplate(planNode.isPost()? "servicePost": "service", planNode, store, ctx, wrapper);
 	}
 
 	static AbstractSQLTemplate createTripleSQLTemplate(PlanNode planNode, Store store, Context ctx, Plan plan, STPlanWrapper wrapper) throws SQLWriterException{

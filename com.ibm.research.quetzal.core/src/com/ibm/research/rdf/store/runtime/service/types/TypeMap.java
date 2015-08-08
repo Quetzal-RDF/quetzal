@@ -74,6 +74,7 @@ public class TypeMap {
 	public static final String PINTEGER_IRI = "http://www.w3.org/2001/XMLSchema#positiveInteger";
 
 	private static final String FIRST_NUMERIC_IRI;
+	private static final String FIRST_DECIMAL_IRI;
 	private static final String LAST_NUMERIC_IRI;
 
 	private static Map<String, Short> dataTypeIDMap = new HashMap<String, Short>();
@@ -100,7 +101,7 @@ public class TypeMap {
 		USHORT_IRI ,
 		UBYTE_IRI ,
 		INTEGER_IRI,
-		DECIMAL_IRI,	
+		FIRST_DECIMAL_IRI = DECIMAL_IRI,	
 		FLOAT_IRI ,
 		LAST_NUMERIC_IRI = DOUBLE_IRI
 	};
@@ -141,6 +142,7 @@ public class TypeMap {
 	}
 
 	public static final short DATATYPE_NUMERICS_IDS_START = idForIRI(FIRST_NUMERIC_IRI);
+	public static final short DATATYPE_DECIMAL_IDS_START = idForIRI(FIRST_DECIMAL_IRI);
 	public static final short DATATYPE_NUMERICS_IDS_END = idForIRI(LAST_NUMERIC_IRI);
 
 	public static final short STRING_ID = idForIRI("http://www.w3.org/2001/XMLSchema#string");

@@ -22,7 +22,7 @@ import com.ibm.wala.util.collections.HashSetFactory;
 
 public class FunctionExt {
 	
-	private String name;
+	private IRI name;
 	private String lang;
 	private FunctionBody fb;
 	
@@ -31,22 +31,22 @@ public class FunctionExt {
 	
 	public FunctionExt()
 	{
-		name = "";
+		name = null;
 		lang = "";
 		fb = null;
 		inVariables = new ArrayList<Variable>();
 		outVariables = new ArrayList<Variable>();
 	}
 	
-	public void setName(String s) {
+	public void setName(IRI s) {
 		name = s;
 	}
 	
 	public void setName(XTree s) {
-		name = s.getText();
+		name = new IRI(s.getText());
 	}
 	
-	public String getName() {
+	public IRI getName() {
 		return name;
 	}
 	
