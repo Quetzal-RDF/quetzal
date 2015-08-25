@@ -1,15 +1,17 @@
 export DB2_HOST=localhost
 export DB2_DB=quetzal
-export KNOWLEDGE_BASE=kb
+if [ -z "$KNOWLEDGE_BASE" ]; then
+	export KNOWLEDGE_BASE=kb
+fi 
 
 export PROCESSOR=`cat /proc/cpuinfo | grep 'processor' | wc -l`
 
-if ls *.nt; then
+if ls /data/*.nt; then
     export DATAFILE=`ls /data/*.nt`
     export FILETYPE=nt
 else
     export DATAFILE=`ls /data/*.nq`
-    export FILETYPE=nq
+    export FILETYPE=quad
 fi
 
 echo "filetype:" $FILETYPE

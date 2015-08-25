@@ -18,6 +18,6 @@ mkdir -p tmp
 
 bash $DIR/../../scripts/build-load-files.sh --db-engine db2 $PARALLEL --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
-bash $DIR/../../scripts/load-load-files.sh --db-engine db2 $PARALLEL --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
+bash $DIR/../../scripts/load-load-files.sh --drop --db-engine db2 $PARALLEL --sort-options "--buffer-size=25%" --db2-config /dev/null --tmpdir /data/tmp $FILETYPE $DATAFILE
 
 rm -rf /data/tmp

@@ -316,9 +316,9 @@ public class QueryProcessorImpl implements QueryProcessor
                      //sql = gen.toSQLWithoutStoreProcedureSQL();
                 	  SQLGenerator gen = new SQLGenerator(plan,query,store,ctx);
                       sql=gen.toSQL();
-                      if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
-                    	  sql = new CTEToNestedQueryConverter(Store.Backend.shark).transform(sql);
-                      }
+                     // if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+                    //  sql = new CTEToNestedQueryConverter(Store.Backend.shark).transform(sql);
+                     // }
                      }
                   // SQLGenerator gen = new SQLGenerator(plan,query,store,ctx);
                   // sql=gen.toSQL();
