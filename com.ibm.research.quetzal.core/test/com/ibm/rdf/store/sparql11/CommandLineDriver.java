@@ -58,7 +58,7 @@ public class CommandLineDriver {
 		}
 	}
 
-	protected static TestData getData() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
+	public static TestData getData() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		String dataset = System.getenv("KNOWLEDGE_BASE");
 		Class<? extends TestData> cls = getDataClass();
 		System.out.println("connecting to:" + "jdbc:" + getProtocol() + "://" + System.getenv("DB2_HOST") + ":" + System.getenv("DB2_PORT") + "/" + System.getenv("DB2_DB"));
