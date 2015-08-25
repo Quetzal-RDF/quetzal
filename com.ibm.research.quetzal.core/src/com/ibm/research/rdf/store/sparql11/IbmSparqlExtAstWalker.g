@@ -14,6 +14,7 @@ import java.util.*;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 import com.ibm.research.rdf.store.sparql11.model.*;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 }	
@@ -49,6 +50,8 @@ import com.ibm.wala.util.collections.Pair;
     }
 
     private int blankNodeCount = 0;
+
+    private final Map<IRI, FunctionExt> functions = HashMapFactory.make();
 }
 
 @rulecatch {
@@ -144,7 +147,7 @@ functionDecl returns [FunctionExt func]
 	@init { $func = new FunctionExt(); }
 	:	
 		^(FUNCNAME
-			^(fn=VAR0 { $func.setName($fn.getText()); } )
+			^(fn=iRIref { $func.setName(fn); functions.put(fn, $func); } )
 			^(INV ( inv=var { $func.addInVar(inv); } )+)
 			^(OUTV ( outv=var { $func.addOutVar(outv); } )+) 
 			^(FUNCLG (fl=VAR0 { $func.setLang($fl.getText()); } ))
@@ -545,7 +548,7 @@ bind2  returns [Pattern p]
 funcCall  returns [BindFunctionCall f]
 	@init { $f = new BindFunctionCall(); }
 	:    ^( FUNCCALL 
-			(fn=VAR0 {$f.setName($fn.getText()); } )
+			(fn=iRIref {$f.setIri(fn); $f.setFunction(functions.get(fn)); } )
 			(v=var {$f.addVar(v);} )+
 		)
 	;

@@ -12,6 +12,7 @@ import junitx.framework.OrderedTestSuite;
 
 import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;
 import com.ibm.rdf.store.sparql11.TestRunner.TestData;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.wala.util.Predicate;
 import com.ibm.wala.util.functions.VoidFunction;
 
@@ -34,6 +35,7 @@ public class DirectoryDriver extends TestCase {
 
 	public static OrderedTestSuite suite() throws ClassNotFoundException, NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
 		CommandLineDriver.checkEnvironment();
+		CommandLineDriver.checkExtensions();
 		final TestData data = getData();
 		@SuppressWarnings("rawtypes")
 		final DatabaseEngine engine = getEngine(data, false);

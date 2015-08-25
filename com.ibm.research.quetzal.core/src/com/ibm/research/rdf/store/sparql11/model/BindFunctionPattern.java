@@ -135,7 +135,7 @@ public class BindFunctionPattern extends Pattern implements Service {
 	public void renamePrefixes(String base, Map<String, String> declared,
 			Map<String, String> internal) {
 		super.renamePrefixes(base, declared, internal);
-		//expr.renamePrefixes(base, declared, internal);
+		funcCall.getIri().rename(base, declared, internal);
 	}
 	
 	@Override

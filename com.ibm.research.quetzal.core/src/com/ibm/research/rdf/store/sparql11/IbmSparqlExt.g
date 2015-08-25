@@ -168,7 +168,7 @@ selectQuery
 	
 //added by wensun
 functionDecl
-	:	FUNCTION fn=VAR0 OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=VAR0 fb=functionBody
+	:	FUNCTION fn=iRIref OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=VAR0 fb=functionBody
 	  -> ^( FUNCNAME $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb )
 	;
 
@@ -498,7 +498,7 @@ bind2
 	;
 	
 funcCall
-	:    fn=VAR0 OPEN_BRACE v+=var+ CLOSE_BRACE
+	:    fn=iRIref OPEN_BRACE v+=var+ CLOSE_BRACE
 		->  ^( FUNCCALL  $fn  $v* )
 	;
 

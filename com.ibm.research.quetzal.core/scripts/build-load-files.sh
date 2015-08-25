@@ -341,7 +341,7 @@ EOF
 	done
 	if  [[ $4 == "shark" ]]; then
 	    cat >> $NT_FILE.db2_cmds <<EOF
-CACHE TABLE ${KNOWLEDGE_BASE}_$3  ;
+CACHE TABLE ${KNOWLEDGE_BASE}_$3 ;
 EOF
 	fi
     fi

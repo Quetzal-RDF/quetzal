@@ -26,8 +26,16 @@ import com.ibm.rdf.store.sparql11.TestRunner.PSQLTestData;
 import com.ibm.rdf.store.sparql11.TestRunner.SharkEngine;
 import com.ibm.rdf.store.sparql11.TestRunner.SharkTestData;
 import com.ibm.rdf.store.sparql11.TestRunner.TestData;
+import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 
 public class CommandLineDriver {
+
+	public static void checkExtensions() {
+		String ext = System.getenv("QUETZAL_EXTENSIONS");
+		if (ext != null && Boolean.parseBoolean(ext)) {
+			SparqlParserUtilities.USE_EXTENSIONS = true;
+		}
+	}
 
 	private static String getProtocol() {
 		String dataClass = System.getenv("DB_ENGINE");
