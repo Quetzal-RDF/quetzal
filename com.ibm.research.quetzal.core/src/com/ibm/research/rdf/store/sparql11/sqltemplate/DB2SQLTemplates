@@ -65,8 +65,8 @@ QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
          DOCUMENT 
            DB2XML.HTTPPOSTBLOB('<service>', CAST ('<htmlHeader>' AS CLOB(1K)), CAST('<queryText>' AS BLOB) || (select doc from QS<sql_id>_POST))) as "results"
            COLUMNS 
-            <cols; separator=",">
-            <if(dtCols)>, <dtCols; separator=","> <endif>) AS xml, QS<sql_id>_INDEX AS pred WHERE xml.index = pred.index),
+            <cols:{c| <c> VARCHAR (128) PATH 'declare namespace x="http://www.w3.org/2005/sparql-results#"; xs:string(./x:binding[./@name="<c>"])'}; separator=",">
+            <if(dtCols)>, <dtCols:{c|<c>_TYP VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH 'declare namespace x="http://www.w3.org/2005/sparql-results#"; ./x:binding[./@name="<c>"]/x:literal/@datatype'}; separator=","> <endif>) AS xml, QS<sql_id>_INDEX AS pred WHERE xml.index = pred.index),
 QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP 
    <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
 >>

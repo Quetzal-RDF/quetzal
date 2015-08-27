@@ -74,8 +74,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		for (Variable v : vars) {
 			firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + v.getName());
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + v.getName());
-			cols.add(v.getName() + " VARCHAR (128) PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
-					+ "xs:string(./x:binding[./@name=\"" + v.getName() + "\"])'" );
+			cols.add(v.getName());
 		}
 		
 		List<Variable> literalVars = getAllLiteralVars(vars);
@@ -86,8 +85,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			String vt = v.getName() + "_TYP";
 			firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + vt);
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + vt);
-			cols.add(v.getName() + "_TYP" + " VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
-					+ "./x:binding[./@name=\"" + v.getName() + "\"]/x:literal/@datatype'");
+			dtCols.add(v.getName());
 			dtConstraints.add("((" + vt + " IS NOT NULL AND " + vt + " = " + "DATATYPE_NAME) OR (" + vt + " IS NULL AND DATATYPE_NAME='SIMPLE_LITERAL_ID'))");
 		}
 					
@@ -120,8 +118,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			}
 			postedColumns.add("index");
 			postedTypes.add("'xs:int'");			
-			cols.add("index VARCHAR (128) PATH 'declare namespace x=\"http://www.w3.org/2005/sparql-results#\"; "
-					+ "xs:string(./x:binding[./@name=\"index\"])'" );
+			cols.add("index" );
 
 			mappings.add(new SQLMapping("indexColumns", indexColumns, null));
 			mappings.add(new SQLMapping("postColumns", postedColumns, null));

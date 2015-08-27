@@ -55,3 +55,16 @@ QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> EXCEPT
 SELECT <right_project; separator=","> FROM <right_target>)
 >>
 
+servicePost(firstProjectCols, secondProjectCols, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
+
+QS<sql_id>_INDEX AS (select ROW_NUMBER() OVER () AS index, <indexColumns; separator=","> FROM <target>),
+QS<sql_id>_POST AS (select xmlelement( name "data", xmlagg(xmlelement( name "row" , <postColumns,postTypes:{c,t |xmlelement( name "<c>", xmlattributes( <t> AS "type" ), QS<sql_id>_INDEX.<c>)}; separator=" , "> )))::text AS doc from QS<sql_id>_INDEX),
+QS<sql_id>_RAW AS (select UNNEST( xpath('//s:result', xmlparse( DOCUMENT ( select content from dawg.http_post('<service>', '<queryText>' || (select dawg.urlencode(doc) from QS<sql_id>_POST), 'application/x-www-form-urlencoded'))), ARRAY[ARRAY['s', 'http://www.w3.org/2005/sparql-results#']])) as row), 
+QS<sql_id>_XML AS (select <cols:{c| (xpath('//s:binding[@name="<c>"]//text()', row, ARRAY[ARRAY['s', 'http://www.w3.org/2005/sparql-results#']]))[1]::varchar AS <c>}; separator=",">
+  <if(dtCols)>, <dtCols:{c| (xpath('//s:binding[name="<c>"]//@datatype', row, ARRAY[ARRAY['s', 'http://www.w3.org/2005/sparql-results#']]))[1]::varchar AS <c>_TYP}; separator=","> <endif>
+  FROM QS<sql_id>_RAW),
+QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
+   FROM QS<sql_id>_XML AS xml, QS<sql_id>_INDEX AS pred WHERE xml.index::int = pred.index),
+QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP 
+   <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
+>>
