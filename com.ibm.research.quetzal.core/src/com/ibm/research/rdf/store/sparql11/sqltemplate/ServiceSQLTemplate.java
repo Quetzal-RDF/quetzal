@@ -60,6 +60,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			try {
 				String body = bfp.getFunction().getBody().getStringBody();
 				mappings.add(new SQLMapping("queryText", "funcName=" + URLEncoder.encode(f.getValue().substring(f.getValue().indexOf('#')+1), "UTF-8") + "&funcBody=" + URLEncoder.encode(body, "UTF-8") + "&funcData=", null));
+				mappings.add(new SQLMapping("functionBody", body, null));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}			
@@ -71,8 +72,12 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		Set<String> firstProjectCols = HashSetFactory.make();
 		Set<String> secondProjectCols = HashSetFactory.make();
 		
+		List<String> allColumns = new LinkedList<String>();
+
 		for (Variable v : vars) {
 			firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + v.getName());
+			allColumns.add(v.getName());
+			allColumns.add(v.getName()+ "_TYP");
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + v.getName());
 			cols.add(v.getName());
 		}
@@ -111,10 +116,12 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 					postedTypes.add("'xs:string'");
 				} else {
 					indexColumns.add(v.getName() + "_TYP");
+					allColumns.add(v.getName() + "_TYP");
 					postedTypes.add("(case when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_DECIMAL_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:decimal' " 
 							      + "when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_NUMERICS_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:integer' "
 							      + "else 'xs:string' end)");
 				}
+				allColumns.add(v.getName());
 			}
 			postedColumns.add("index");
 			postedTypes.add("'xs:int'");			
@@ -123,6 +130,8 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			mappings.add(new SQLMapping("indexColumns", indexColumns, null));
 			mappings.add(new SQLMapping("postColumns", postedColumns, null));
 			mappings.add(new SQLMapping("postTypes", postedTypes, null));
+			
+			mappings.add(new SQLMapping("allColumns", allColumns, null));
 			mappings.add(new SQLMapping("htmlHeader", "", null));
 		} 
 		

@@ -55,7 +55,7 @@ QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> EXCEPT
 SELECT <right_project; separator=","> FROM <right_target>)
 >>
 
-servicePost(firstProjectCols, secondProjectCols, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
+servicePost(firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
 
 QS<sql_id>_INDEX AS (select ROW_NUMBER() OVER () AS index, <indexColumns; separator=","> FROM <target>),
 QS<sql_id>_POST AS (select xmlelement( name "data", xmlagg(xmlelement( name "row" , <postColumns,postTypes:{c,t |xmlelement( name "<c>", xmlattributes( <t> AS "type" ), QS<sql_id>_INDEX.<c>)}; separator=" , "> )))::text AS doc from QS<sql_id>_INDEX),

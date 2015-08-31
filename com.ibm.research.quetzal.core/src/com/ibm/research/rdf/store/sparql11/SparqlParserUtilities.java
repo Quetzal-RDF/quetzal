@@ -63,7 +63,7 @@ public class SparqlParserUtilities {
 
 	public static final Log log = LogFactory
 			.getLog(SparqlParserUtilities.class);
-	public static boolean USE_EXTENSIONS = false;
+	public static boolean USE_EXTENSIONS = true;
 
 	public static Query parseSparqlFile(String sparqlFile,
 			Map<String, String> rdfStorePrefixes) {

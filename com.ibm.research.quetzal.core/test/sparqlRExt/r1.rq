@@ -1,0 +1,13 @@
+prefix fn: <http://9.80.84.12:8081/callRCode#>
+
+function fn:foo (?a ?b -> ?a ?c ) language R {
+\SOP
+`__input`["l"] = stri_length(`__input`[["y"]]); `__input`
+\EOP
+}
+
+select distinct * where {
+?x a ?y .
+BIND( fn:foo(?x ?y) AS ( ?y ?l ) )
+} 
+

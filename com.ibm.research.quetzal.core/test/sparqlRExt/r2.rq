@@ -1,0 +1,12 @@
+prefix fn: <http://localhost:8082/callRCode#>
+
+function fn:foo (?l ?age -> ?x ) language R {
+\SOP
+d <- as.numeric(`__input`$age); df <- data.frame(d - (mean(d))); colnames(df) <- c(\"x\"); df$index <- `__input`$index; df
+\EOP
+}
+
+select distinct * where {
+	?l <http://hasAge> ?age .
+BIND( fn:foo(?l ?age) AS ( ?x ) )
+}
