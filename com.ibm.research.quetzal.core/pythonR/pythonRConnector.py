@@ -44,6 +44,49 @@ rUtils = ('options(warn=-1)',
 													  }
 													  return(toString(xml))
 													}''', 
+					'''convertDataFrameToXMLwithType <- function(df,name)
+													{
+													  xml <- xmlNode(name, namespaceDefinitions = c("s" = "http://www.w3.org/2005/sparql-results#", "xsi"="http://www.w3.org/2001/XMLSchema-instance", "xs"="http://www.w3.org/2001/XMLSchema"))
+													  for (i in 1:nrow(df)) {
+													    t0 <- xmlNode("s:result")
+													    for (j in names(df)) {
+													      t0 <- addChildren(t0, xmlNode("s:binding", attrs=c("name" = j, "xsi:type" = get_xml_datatype(df[i,j])), df[i,j]))
+													    }
+													    xml <- addChildren(xml, t0)
+													  }
+													  return(toString(xml))
+													}''', 
+					'''get_xml_datatype <- function(val)
+													{
+													  ret = 'xs:unknown'
+													  tp = typeof(val)
+													  tc = class(val)
+													  if(length(val) > 1)
+													  {
+													    ret = 'xs:unknownArray'
+													  }
+													  if(tc == 'Date')
+													  {
+													    ret = 'xs:date'
+													  }
+													  else if('POSIXct' %in% tc || 'POSIXt' %in% tc)
+													  {
+													    ret = 'xs:dateTime'
+													  }
+													  else if(tp == 'numeric' || tp == 'double')
+													  {
+													    ret = 'xs:decimal'
+													  }
+													  else if(tp == 'integer')
+													  {
+													    ret = 'xs:integer'
+													  }
+													  else if(tp == 'character')
+													  {
+													    ret = 'xs:string'
+													  }
+													  return(ret)
+													}''', 
 					'''parseXML <- function(inData, root="data")
 						{
 						  doc=parseXMLAndAdd(inData, top=root)
@@ -72,19 +115,19 @@ def callRFunction(func, inData):
 	print('got here 0')
 	robjects.r('`__input` <- autoTypeConversion(parseXML("'+inData+'"))')
 	print('got here 1')
-	ret = robjects.r('convertDataFrameToXML('+func+'(__input)'+', "data")')
+	ret = robjects.r('convertDataFrameToXMLwithType('+func+'(__input)'+', "data")')
 	print('got here 2')
 	return ret
-	#print(robjects.r('convertDataFrameToXML('+func+'()'+', "data")'))
+	#print(robjects.r('convertDataFrameToXMLwithType('+func+'()'+', "data")'))
 
 def callRFunctionWithXMLDoc(func, inData):
 	print('in call R function with xml doc')
 	robjects.r("`__input` <- autoTypeConversion(parseXMLDoc('"+inData+"'))")
 	print('parsed XML doc')
-	ret = robjects.r('convertDataFrameToXML('+func+'(`__input`)'+', "data")')
+	ret = robjects.r('convertDataFrameToXMLwithType('+func+'(`__input`)'+', "data")')
 	print('converted data frame back to xml')
 	return ret
-	#print(robjects.r('convertDataFrameToXML('+func+'()'+', "data")'))
+	#print(robjects.r('convertDataFrameToXMLwithType('+func+'()'+', "data")'))
 
 def callRFunction1(func, inData):
 	robjects.r('`__input` <- parseXML("'+inData+'")')
