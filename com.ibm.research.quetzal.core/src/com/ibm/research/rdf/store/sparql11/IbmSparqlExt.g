@@ -74,6 +74,9 @@ tokens {
     FUNCBODY;
     FUNCNAME;
     FUNCLG;
+
+    PARAM;
+    PARAMS;
 }
 
 @header { 
@@ -156,7 +159,7 @@ baseDecl
 
 prefixDecl	  
 	:  	PREFIX p=PNAME_NS i=iRIref
-	
+        
 		->  ^( PREFIX ^(PREFIXED_NS $p) $i )
 	;
 
@@ -168,8 +171,13 @@ selectQuery
 	
 //added by wensun
 functionDecl
-	:	FUNCTION fn=iRIref OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE FUNCLANG fl=VAR0 fb=functionBody
-	  -> ^( FUNCNAME $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb )
+	:	FUNCTION fn=iRIref OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE
+        ( FUNCLANG fl=VAR0 fb=functionBody
+    	  -> ^( FUNCNAME $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
+        |
+        ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET ( params+=( param=string ARROW value=( expression | groupGraphPattern ) -> ^(PARAM $param $value) ) )* CLOSE_SQ_BRACKET ARROW rowdef=string ':' ( col+=string )+
+          -> ^( FUNCNAME ^(SERVICE $s) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
+        )
 	;
 
 //added by wensun

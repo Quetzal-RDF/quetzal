@@ -111,4 +111,24 @@ public class FunctionExt {
 		sb.append("\n}\n");
 		return sb.toString();
 	}
+	
+	public void setService(QueryTripleTerm service) {
+		
+	}
+	
+	public void addServiceParam(String name, Expression value) {
+		
+	}
+
+	public void addServiceParam(String name, Pattern value) {
+		
+	}
+	
+	public void setServiceRowXPath(String rowPath) {
+		
+	}
+
+	public void addServiceColumnXPath(String colPath) {
+		
+	}
 }

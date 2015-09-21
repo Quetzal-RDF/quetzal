@@ -147,11 +147,38 @@ functionDecl returns [FunctionExt func]
 	@init { $func = new FunctionExt(); }
 	:	
 		^(FUNCNAME
-			^(fn=iRIref { $func.setName(fn); functions.put(fn, $func); } )
+			(
+                ^(fn=iRIref { $func.setName(fn); functions.put(fn, $func); } )
+            |
+                ^(SERVICE s=varOrIRIref { $func.setService(s); } )
+            )
 			^(INV ( inv=var { $func.addInVar(inv); } )+)
-			^(OUTV ( outv=var { $func.addOutVar(outv); } )+) 
-			^(FUNCLG (fl=VAR0 { $func.setLang($fl.getText()); } ))
-			(fb=functionBody { $func.setBody(fb); } )
+			^(OUTV ( outv=var { $func.addOutVar(outv); } )+)
+            (
+                (
+                    ^(FUNCLG (fl=VAR0 { $func.setLang($fl.getText()); } ) )
+                    (fb=functionBody { $func.setBody(fb); } )
+                )
+            |
+                (
+                    ^(PARAMS
+                        (
+                            ^(PARAM
+                                param=string
+                                (
+                                    value=expression
+                                    { $func.addServiceParam(param, value); } 
+                                |
+                                    pattern=groupGraphPattern[true]
+                                    { $func.addServiceParam(param, pattern); }
+                                ) 
+                            )
+                        )+
+                    )
+                    rowdef=string { $func.setServiceRowXPath(rowdef); }
+                    ( coldef=string { $func.addServiceColumnXPath(coldef); } )+
+                )
+            )
 		)
 	;
 
