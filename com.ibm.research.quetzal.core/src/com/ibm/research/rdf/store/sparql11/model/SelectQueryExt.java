@@ -24,7 +24,7 @@ public class SelectQueryExt extends SelectQuery {
 	private Pattern graphPattern;
 	private SolutionModifiers solutionModifier;
 	
-	private List<FunctionExt> functions;
+	private List<FunctionBase> functions;
 	
 	public SelectQueryExt() {
 		selectClause = new SelectClause();
@@ -32,16 +32,16 @@ public class SelectQueryExt extends SelectQuery {
 		graphPattern = null;
 		solutionModifier = null;
 		
-		functions = new ArrayList<FunctionExt>();
+		functions = new ArrayList<FunctionBase>();
 		
 		ProjectedVariable.resetId();
 	}
 
-	public List<FunctionExt> getFunctions() {
+	public List<FunctionBase> getFunctions() {
 		return functions;
 	}
 	
-	public void setFunctions(List<FunctionExt> fl) {
+	public void setFunctions(List<FunctionBase> fl) {
 		functions = fl;
 	}
 	
@@ -102,7 +102,7 @@ public class SelectQueryExt extends SelectQuery {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for(FunctionExt f: functions) 
+		for(FunctionBase f: functions) 
 			sb.append(f.toString() + "\n");
 		sb.append(selectClause.toString());
 		sb.append("\n");

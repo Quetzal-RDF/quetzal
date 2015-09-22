@@ -20,7 +20,7 @@ public class BindFunctionCall {
 	protected List<Variable> vars;
 	protected String name;
 	protected IRI iri;
-	protected FunctionExt body;
+	protected FunctionBase body;
 	
 	
 	public BindFunctionCall() {
@@ -28,12 +28,12 @@ public class BindFunctionCall {
 	}
 	
 
-	public FunctionExt getFunction() {
+	public FunctionBase getFunction() {
 		return body;
 	}
 
 
-	public void setFunction(FunctionExt body) {
+	public void setFunction(FunctionBase body) {
 		this.body = body;
 	}
 

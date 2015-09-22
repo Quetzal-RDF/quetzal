@@ -23,6 +23,7 @@ import com.ibm.research.rdf.store.Store.Db2Type;
 import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.PropertyTerm;
+import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
 import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
@@ -48,15 +49,17 @@ public class STPlanWrapper {
 	Map<Variable, Variable> variableToRenamedVariable;
 	Set<Variable> iriBoundVariablesInQuery = null;
 	Map<String,Db2Type> propertyValueTypes = null;
+	private final Query q;
 	
-	public STPlanWrapper(Plan plan, Map<Variable, Variable> variableToRenamedVariable){
-		this(plan, variableToRenamedVariable, 1);
+	public STPlanWrapper(Query q, Plan plan, Map<Variable, Variable> variableToRenamedVariable){
+		this(q, plan, variableToRenamedVariable, 1);
 	}
 		
-	public STPlanWrapper(Plan plan, Map<Variable, Variable> variableToRenamedVariable, int startCTEId ) {
+	public STPlanWrapper(Query q, Plan plan, Map<Variable, Variable> variableToRenamedVariable, int startCTEId ) {
 		lastId = startCTEId;
 		nodeMap=new HashMap<PlanNode,Integer>();
 		aliasMap=new HashMap<PlanNode,Integer>();
+		this.q = q;
 		this.plan = plan;
 		this.variableToRenamedVariable = variableToRenamedVariable;
 		if(plan != null)
@@ -102,10 +105,13 @@ public class STPlanWrapper {
 		lastMappedNode = p;
 	}
 
-	Plan getPlan(){
+	public Plan getPlan(){
 		return plan;
 	}
 	
+	public Query getQuery() {
+		return q;
+	}
 	
 	public Integer getPlanNodeId(PlanNode p){
 		return nodeMap.get(p);

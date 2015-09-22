@@ -49,7 +49,7 @@ public class SQLGenerator {
 	 */
 	public Pair<Pair<String, String>, Integer> toSQLDetailed(Map<Variable, Variable> var2NewName, Set<Variable> explicitIRIBoundVariables ) throws Exception{
 		
-		this.wrapper = new STPlanWrapper(plan,  var2NewName, cteStartID);
+		this.wrapper = new STPlanWrapper(q, plan,  var2NewName, cteStartID);
 		
 		StringBuffer cteDefinitions =  new StringBuffer();
 		if(plan != null)
@@ -76,7 +76,7 @@ public class SQLGenerator {
 	}
 	public String toSQL(Map<Variable, Variable> var2NewName) throws Exception{
 		
-		this.wrapper = new STPlanWrapper(plan,  var2NewName, cteStartID);
+		this.wrapper = new STPlanWrapper(q, plan,  var2NewName, cteStartID);
 		
 		StringBuffer cteDefinitions =  new StringBuffer();
 		if(plan != null)
@@ -112,7 +112,7 @@ public class SQLGenerator {
 	 * @throws Exception
 	 */
 	public Pair<Pair<String, String>, Integer> toSQLWithRootDetailed(PlanNode n, List<Variable> project, Set<Variable> explicitIRIBoundVariables) throws Exception{
-		this.wrapper = new STPlanWrapper(plan, null, cteStartID);
+		this.wrapper = new STPlanWrapper(q, plan, null, cteStartID);
 		StringBuffer cteDefinitions =  new StringBuffer();
 		if(plan != null) {
 			// make sure that all direct or indirect predecessors have been properly defined

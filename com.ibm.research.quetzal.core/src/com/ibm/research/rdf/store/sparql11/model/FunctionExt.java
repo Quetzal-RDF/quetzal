@@ -11,23 +11,12 @@
  package com.ibm.research.rdf.store.sparql11.model;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.ibm.research.rdf.store.sparql11.XTree;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
-import com.ibm.wala.util.collections.HashMapFactory;
-import com.ibm.wala.util.collections.HashSetFactory;
 
-public class FunctionExt {
+public class FunctionExt extends FunctionBase {
 	
-	private IRI name;
 	private String lang;
 	private FunctionBody fb;
-	
-	private List<Variable> inVariables;
-	private List<Variable> outVariables;
 	
 	public FunctionExt()
 	{
@@ -36,18 +25,6 @@ public class FunctionExt {
 		fb = null;
 		inVariables = new ArrayList<Variable>();
 		outVariables = new ArrayList<Variable>();
-	}
-	
-	public void setName(IRI s) {
-		name = s;
-	}
-	
-	public void setName(XTree s) {
-		name = new IRI(s.getText());
-	}
-	
-	public IRI getName() {
-		return name;
 	}
 	
 	public void setLang(String s) {
@@ -70,30 +47,6 @@ public class FunctionExt {
 		return fb;
 	}
 	
-	public void addInVar(Variable v) {
-		inVariables.add(v);
-	}
-
-	public void addInVar(String v) {
-		inVariables.add(new Variable(v));
-	}
-	
-	public List<Variable> getInVariables() {
-		return inVariables;
-	}
-
-	public void addOutVar(Variable v) {
-		outVariables.add(v);
-	}
-	
-	public void addOutVar(String v) {
-		outVariables.add(new Variable(v));
-	}
-	
-	public List<Variable> getOutVariables() {
-		return outVariables;
-	}
-		
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -112,23 +65,4 @@ public class FunctionExt {
 		return sb.toString();
 	}
 	
-	public void setService(QueryTripleTerm service) {
-		
-	}
-	
-	public void addServiceParam(String name, Expression value) {
-		
-	}
-
-	public void addServiceParam(String name, Pattern value) {
-		
-	}
-	
-	public void setServiceRowXPath(String rowPath) {
-		
-	}
-
-	public void addServiceColumnXPath(String colPath) {
-		
-	}
 }

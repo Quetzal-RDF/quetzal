@@ -23,6 +23,7 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionCall;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionPattern;
+import com.ibm.research.rdf.store.sparql11.model.FunctionExt;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
@@ -39,7 +40,9 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() {		
+	Set<SQLMapping> populateMappings() {	
+		// wrapper.getQuery().getPrologue().getPrefixes();
+		
 		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
 
 		Pattern sp = planNode.getPattern();
@@ -58,7 +61,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			IRI f = bfp.getIri();
 			mappings.add(new SQLMapping("service", f.toString(), null));
 			try {
-				String body = bfp.getFunction().getBody().getStringBody();
+				String body = ((FunctionExt)bfp.getFunction()).getBody().getStringBody();
 				mappings.add(new SQLMapping("queryText", "funcName=" + URLEncoder.encode(f.getValue().substring(f.getValue().indexOf('#')+1), "UTF-8") + "&funcBody=" + URLEncoder.encode(body, "UTF-8") + "&funcData=", null));
 				mappings.add(new SQLMapping("functionBody", body, null));
 			} catch (UnsupportedEncodingException e) {

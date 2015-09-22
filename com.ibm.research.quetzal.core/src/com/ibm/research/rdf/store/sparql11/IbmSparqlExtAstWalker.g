@@ -51,7 +51,7 @@ import com.ibm.wala.util.collections.Pair;
 
     private int blankNodeCount = 0;
 
-    private final Map<IRI, FunctionExt> functions = HashMapFactory.make();
+    private final Map<IRI, FunctionBase> functions = HashMapFactory.make();
 }
 
 @rulecatch {
@@ -134,8 +134,8 @@ selectQuery	returns [SelectQueryExt sq]
 	;
 	
 	//added by wensun
-functionSet returns [List<FunctionExt> funcs]
-	@init { funcs = new ArrayList<FunctionExt>(); }
+functionSet returns [List<FunctionBase> funcs]
+	@init { funcs = new ArrayList<FunctionBase>(); }
 	:	
 		^(FUNCTION
 			(f=functionDecl {funcs.add(f);} )+
@@ -143,21 +143,22 @@ functionSet returns [List<FunctionExt> funcs]
 	;
 
 	//added by wensun
-functionDecl returns [FunctionExt func]
-	@init { $func = new FunctionExt(); }
+functionDecl returns [FunctionBase func]
+	@init { FunctionExt ext = null; ServiceFunction svc = null; }
 	:	
 		^(FUNCNAME
 			(
-                ^(fn=iRIref { $func.setName(fn); functions.put(fn, $func); } )
+                ^(fn=iRIref { $func = ext = new FunctionExt(); ext.setName(fn);  } )
             |
-                ^(SERVICE s=varOrIRIref { $func.setService(s); } )
+                ^(SERVICE s=varOrIRIref { $func = svc = new ServiceFunction(); svc.setService(s); } )
             )
+            { functions.put(fn, $func); }
 			^(INV ( inv=var { $func.addInVar(inv); } )+)
 			^(OUTV ( outv=var { $func.addOutVar(outv); } )+)
             (
                 (
-                    ^(FUNCLG (fl=VAR0 { $func.setLang($fl.getText()); } ) )
-                    (fb=functionBody { $func.setBody(fb); } )
+                    ^(FUNCLG (fl=VAR0 { ext.setLang($fl.getText()); } ) )
+                    (fb=functionBody { ext.setBody(fb); } )
                 )
             |
                 (
@@ -167,16 +168,16 @@ functionDecl returns [FunctionExt func]
                                 param=string
                                 (
                                     value=expression
-                                    { $func.addServiceParam(param, value); } 
+                                    { svc.addServiceParam(param, value); } 
                                 |
                                     pattern=groupGraphPattern[true]
-                                    { $func.addServiceParam(param, pattern); }
+                                    { svc.addServiceParam(param, pattern); }
                                 ) 
                             )
                         )+
                     )
-                    rowdef=string { $func.setServiceRowXPath(rowdef); }
-                    ( coldef=string { $func.addServiceColumnXPath(coldef); } )+
+                    rowdef=string { svc.setServiceRowXPath(rowdef); }
+                    ( coldef=string { svc.addServiceColumnXPath(coldef); } )+
                 )
             )
 		)
