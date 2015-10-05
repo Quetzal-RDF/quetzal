@@ -7,14 +7,30 @@ import com.ibm.research.rdf.store.sparql11.XTree;
 
 public class FunctionBase {
 
+	public enum ServiceKind { GET, POST };
+	
 	protected IRI name;
 	protected List<Variable> inVariables;
 	protected List<Variable> outVariables;
 
+	private ServiceKind requestKind;
+	
 	public FunctionBase() {
 		name = null;
 		inVariables = new ArrayList<Variable>();
 		outVariables = new ArrayList<Variable>();
+	}
+
+	public ServiceKind kind() {
+		return requestKind;
+	}
+	
+	public void setGet() {
+		requestKind = ServiceKind.GET;
+	}
+	
+	public void setPost() {
+		requestKind = ServiceKind.POST;
 	}
 
 	public void setName(IRI s) {

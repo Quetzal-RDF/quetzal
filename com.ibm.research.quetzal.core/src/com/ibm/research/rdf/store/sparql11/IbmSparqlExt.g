@@ -77,6 +77,7 @@ tokens {
 
     PARAM;
     PARAMS;
+    KIND;
 }
 
 @header { 
@@ -171,12 +172,12 @@ selectQuery
 	
 //added by wensun
 functionDecl
-	:	FUNCTION fn=iRIref OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE
+	:	FUNCTION fn=iRIref kind=(POST | GET)? OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE
         ( FUNCLANG fl=VAR0 fb=functionBody
-    	  -> ^( FUNCNAME $fn ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
+    	  -> ^( FUNCNAME $fn ^(KIND $kind) ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
         |
         ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET ( params+=( param=string ARROW value=( expression | groupGraphPattern ) -> ^(PARAM $param $value) ) )* CLOSE_SQ_BRACKET ARROW rowdef=string ':' ( col+=string )+
-          -> ^( FUNCNAME ^(SERVICE $s) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
+          -> ^( FUNCNAME ^(SERVICE $s) ^(KIND $kind) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
         )
 	;
 
@@ -1239,6 +1240,10 @@ REPLACE : R E P L A C E;
 UUID : U U I D ;
 
 STRUUID : S T R U U I D ;
+
+POST : P O S T;
+
+GET : G E T ;
 
 SOP  : '\\' S O P ;
 

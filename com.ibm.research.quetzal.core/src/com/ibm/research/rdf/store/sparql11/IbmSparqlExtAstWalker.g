@@ -153,6 +153,8 @@ functionDecl returns [FunctionBase func]
                 ^(SERVICE s=varOrIRIref { $func = svc = new ServiceFunction(); svc.setService(s); } )
             )
             { functions.put(fn, $func); }
+            ( ^(KIND ( ( POST { $func.setPost(); } ) |
+                       ( GET { $func.setGet(); } ) ) ) | )
 			^(INV ( inv=var { $func.addInVar(inv); } )+)
 			^(OUTV ( outv=var { $func.addOutVar(outv); } )+)
             (
