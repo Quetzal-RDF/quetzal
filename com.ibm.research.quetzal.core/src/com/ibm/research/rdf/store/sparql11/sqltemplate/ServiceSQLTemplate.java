@@ -63,7 +63,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			try {
 				String body = ((FunctionExt)bfp.getFunction()).getBody().getStringBody();
 				mappings.add(new SQLMapping("queryText", "funcName=" + URLEncoder.encode(f.getValue().substring(f.getValue().indexOf('#')+1), "UTF-8") + "&funcBody=" + URLEncoder.encode(body, "UTF-8") + "&funcData=", null));
-				mappings.add(new SQLMapping("functionBody", body, null));
+				//mappings.add(new SQLMapping("functionBody", body, null));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}			
@@ -134,7 +134,7 @@ public class ServiceSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			mappings.add(new SQLMapping("postColumns", postedColumns, null));
 			mappings.add(new SQLMapping("postTypes", postedTypes, null));
 			
-			mappings.add(new SQLMapping("allColumns", allColumns, null));
+			// mappings.add(new SQLMapping("allColumns", allColumns, null));
 			mappings.add(new SQLMapping("htmlHeader", "", null));
 		} 
 		
