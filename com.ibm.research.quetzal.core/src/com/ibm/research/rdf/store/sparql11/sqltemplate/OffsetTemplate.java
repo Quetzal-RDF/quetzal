@@ -14,6 +14,7 @@
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -23,6 +24,7 @@ import com.ibm.research.rdf.store.sparql11.model.BlankNodeVariable;
 import com.ibm.research.rdf.store.sparql11.model.ProjectedVariable;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.wala.util.collections.HashMapFactory;
 
 public class OffsetTemplate extends SolutionModifierBaseTemplate {
 
@@ -35,26 +37,26 @@ public class OffsetTemplate extends SolutionModifierBaseTemplate {
 		wrapper.incrementCteIdForSolutionModifier();
 	}
 
-	Set<SQLMapping> populateMappings() throws Exception{
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+	Map<String, SQLMapping> populateMappings() throws Exception{
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		SQLMapping qidSqlParams=new SQLMapping("sql_id", getSQLIDMapping(),null);
-		mappings.add(qidSqlParams);
+		mappings.put("sql_id", qidSqlParams);
 			
 		SQLMapping limitSqlParams=new SQLMapping("limit", getLimitSqlParams() ,null);
-		mappings.add(limitSqlParams);
+		mappings.put("limit", limitSqlParams);
 		
 		SQLMapping offsetSqlParams=new SQLMapping("offset", getOffsetSqlParams() ,null);
-		mappings.add(offsetSqlParams);
+		mappings.put("offset", offsetSqlParams);
 		
 		List<String> projectList = getProjectMapping();
 		if(projectList.size() == 0) projectList.add("*");	
 		SQLMapping projectMapping=new SQLMapping("project", projectList,null);
-		mappings.add(projectMapping);
+		mappings.put("project", projectMapping);
 			
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		return mappings;
 	}

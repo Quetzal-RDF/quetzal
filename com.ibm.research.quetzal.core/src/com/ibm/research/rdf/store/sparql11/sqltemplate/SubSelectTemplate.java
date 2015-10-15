@@ -13,6 +13,7 @@
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -61,13 +62,13 @@ public class SubSelectTemplate extends AbstractSelectTemplate {
 
 
 	@Override
-	Set<SQLMapping> populateMappings() throws Exception {
-		Set<SQLMapping> mappings = super.populateMappings();
+	Map<String, SQLMapping> populateMappings() throws Exception {
+		Map<String, SQLMapping> mappings = super.populateMappings();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 		
 		return mappings;
 	}

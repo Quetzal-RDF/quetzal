@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -32,6 +33,7 @@ import com.ibm.research.rdf.store.sparql11.planner.AccessMethod;
 import com.ibm.research.rdf.store.sparql11.planner.AccessMethodType;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.Pair;
 
 /**
@@ -46,46 +48,46 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() throws SQLWriterException {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 		
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		projectedInSecondary = new HashSet<Variable>();
 		varMap = new HashMap<String, Pair<String, String>>();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());		
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 		
 	
 		List<String> projectSqlParams = getProjectedSQLClause();
 		if(projectSqlParams.size()==0)projectSqlParams.add("*");
 		SQLMapping pMapping=new SQLMapping("project", projectSqlParams,null);
-		mappings.add(pMapping);
+		mappings.put("project", pMapping);
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		SQLMapping eMapping=new SQLMapping("entry_constraint",getEntrySQLConstraint(),null);
-		mappings.add(eMapping);
+		mappings.put("entry_constraint", eMapping);
 		
 		SQLMapping gMapping=new SQLMapping("graph_constraint", getGraphSQLConstraint(),null);
-		mappings.add(gMapping);
+		mappings.put("graph_constraint", gMapping);
 	
 		SQLMapping vMapping=new SQLMapping("val_constraint",getValueSQLConstraint(),null);
-		mappings.add(vMapping);
+		mappings.put("val_constraint", vMapping);
 		
 		SQLMapping predicateMapping=new SQLMapping("predicate_constraint",getPropSQLConstraint(),null);
-		mappings.add(predicateMapping);
+		mappings.put("predicate_constraint",predicateMapping);
 		
 		List<String> filterConstraint = getFilterSQLConstraint();
 		SQLMapping filterMapping = new SQLMapping("filter_constraint", filterConstraint,null);
-		mappings.add(filterMapping);
+		mappings.put("filter_constraint", filterMapping);
 		
 		List<String> sep = new LinkedList<String>();
 		sep.add(" OR ");
 		SQLMapping sepMapping=new SQLMapping("sep",sep,null);
-		mappings.add(sepMapping);
+		mappings.put("sep", sepMapping);
 		
 		
 		return mappings;

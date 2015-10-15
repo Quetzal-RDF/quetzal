@@ -176,7 +176,7 @@ functionDecl
         ( ( FUNCLANG fl=VAR0 fb=functionBody
     	  -> ^( FUNCNAME $fn ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
         |
-        ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET ( params+=( ( param=string ARROW ( valueE=expression | valueP=groupGraphPattern ) ) -> ^(PARAM $param $valueE? $valueP?) ) )* CLOSE_SQ_BRACKET ARROW rowdef=string ':' ( col+=string )+
+        ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET ( params+=( ( param=string ARROW ( valueE=expression | valueP=groupGraphPattern ) ) -> ^(PARAM $param $valueE? $valueP?) ) )* CLOSE_SQ_BRACKET ARROW rowdef=string '::' ( col+=string )+
           -> ^( FUNCNAME ^(SERVICE $s) ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
         ) )
 	;
@@ -1304,7 +1304,7 @@ LT
     );
 	
 PNAME_NS	  
-	:  	p=PN_PREFIX? ':'      
+	:  	PN_PREFIX? ':'      
 	;
 	
 PNAME_LN	  

@@ -11,9 +11,9 @@
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -22,6 +22,7 @@ import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.Pair;
 
 public class LeftSQLTemplate extends AbstractSQLTemplate {
@@ -37,28 +38,28 @@ public class LeftSQLTemplate extends AbstractSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() throws SQLWriterException {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 		varMap = new HashMap<String, Pair<String, String>>();
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 		
 		SQLMapping pMapping=new SQLMapping("project", getProjectMapping(),null);
-		mappings.add(pMapping);
+		mappings.put("project", pMapping);
 		
 		List<String> target = getTargetMapping();
 		SQLMapping tMapping=new SQLMapping("target", target,null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		SQLMapping oMapping=new SQLMapping("op_constraint", getOperatorConstraintMapping() ,null);
-		mappings.add(oMapping);
+		mappings.put("op_constraint", oMapping);
 		
 		List<String> filterConstraint = getFilterSQLConstraint();
 		SQLMapping filterMapping = new SQLMapping("filter_constraint", filterConstraint,null);
-		mappings.add(filterMapping);
+		mappings.put("filter_constraint", filterMapping);
 
 		return mappings;
 	}

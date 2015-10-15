@@ -12,7 +12,6 @@
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,12 +27,9 @@ import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
-import com.ibm.research.rdf.store.sparql11.planner.PlanNodeType;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.HashMapFactory;
-import com.ibm.wala.util.collections.HashSetFactory;
-import com.ibm.wala.util.collections.Pair;
 
 public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	public static void main(String[] args) {
@@ -76,29 +72,29 @@ public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() {
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+	Map<String, SQLMapping> populateMappings() {
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 	
 		List<String> valuesProjectList = getValuesProjectList();			
 		SQLMapping vpMapping=new SQLMapping("values_project", valuesProjectList, null);
-		mappings.add(vpMapping);
+		mappings.put("values_project", vpMapping);
 
 		List<List<String>> valuesList = getValuesList();
 		SQLMapping vMapping=new SQLMapping("values", valuesList, null);
-		mappings.add(vMapping);
+		mappings.put("values", vMapping);
 		
 		List<String> projectList = getProjectList();			
 		SQLMapping pMapping=new SQLMapping("project", projectList, null);
-		mappings.add(pMapping);	
+		mappings.put("project", pMapping);	
 		
 		List<String> targetList = getTargetMapping();
 		SQLMapping tMapping = new SQLMapping("target", targetList, null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		if (pred != null) {
 			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);
@@ -106,11 +102,11 @@ public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	
 			List<String> joinConstraints = getJoinConstraintMapping(leftSQLCte, rightSQLCte);
 			SQLMapping joinMapping = new SQLMapping("join_constraint", joinConstraints, null);
-			mappings.add(joinMapping);
+			mappings.put("join_constraint", joinMapping);
 		}
 		String store_name = store.getStoreName();
 		SQLMapping storeNameMapping = new SQLMapping("store_name",store_name, null);
-		mappings.add(storeNameMapping);
+		mappings.put("store_name", storeNameMapping);
 	
 		return mappings;
 	}

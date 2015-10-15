@@ -58,13 +58,13 @@ public abstract class AbstractSQLTemplate {
 	}
 	
 	public String createSQLString() throws Exception{
-		Set<SQLMapping> mappings = populateMappings();
+		Map<String, SQLMapping> mappings = populateMappings();
 		SQLTemplateManager.setStoreTemplate(this.store);
-		return SQLTemplateManager.getSQLString(templateName, mappings);
+		return SQLTemplateManager.getSQLString(templateName, mappings.values());
 	}
 	
 
-	abstract Set<SQLMapping> populateMappings() throws Exception;
+	abstract Map<String, SQLMapping> populateMappings() throws Exception;
 
 	protected List<String> getFilterSQLConstraint() throws SQLWriterException {
 		List<String> filterSQLConstraint = new LinkedList<String>();

@@ -55,42 +55,42 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() throws SQLWriterException {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 		
 		
 		projectedInPrimary = new HashSet<Variable>();
 		varMap = new HashMap<String, Pair<String, String>>();
 		sVarMap = new HashMap<String, Pair<String, String>>();
 		
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidSqlParams=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidSqlParams);
+		mappings.put("sql_id", qidSqlParams);
 		//,  hasMultipleTargets)
 		List<String> targets = getTargetSQLClause();
 		SQLMapping tMapping=new SQLMapping("target", targets ,null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		Boolean multipleTargets = targets.size()>1?true: false;
 		SQLMapping mtMapping=new SQLMapping("hasMultipleTargets", multipleTargets ,null);
-		mappings.add(mtMapping);
+		mappings.put("hasMultipleTargets", mtMapping);
 		
 		
 		SQLMapping eMapping=new SQLMapping("entry_constraint", getEntrySQLConstraint(),null);
-		mappings.add(eMapping);
+		mappings.put("entry_constraint", eMapping);
 		
 		SQLMapping gMapping=new SQLMapping("graph_constraint", getGraphSQLConstraint(), null);
-		mappings.add(gMapping);
+		mappings.put("graph_constraint", gMapping);
 		
 		SQLMapping vMapping=new SQLMapping("val_constraint", getValueSQLConstraint(), null);
-		mappings.add(vMapping);
+		mappings.put("val_constraint", vMapping);
 	
 		List<String> propSqlConstraint = getPropSQLConstraint();
 		if (! propSqlConstraint.isEmpty()) {
 			SQLMapping predicateMapping=new SQLMapping("predicate_constraint", propSqlConstraint, null);
-			mappings.add(predicateMapping);
+			mappings.put("predicate_constraint", predicateMapping);
 		}
 		
 		List<String> projectSqlParams = getProjectedSQLClause();
@@ -120,34 +120,34 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		}
 		//
 		SQLMapping pMapping=new SQLMapping("project", projectSqlParams,null);
-		mappings.add(pMapping);
+		mappings.put("project", pMapping);
 		
 		List<String> pfilterConstraint = getPFilterSQLConstraint();
 		if (!pfilterConstraint.isEmpty()) {
 			SQLMapping pfilterMapping = new SQLMapping("pfilter_constraint", pfilterConstraint,null);
-			mappings.add(pfilterMapping);
+			mappings.put("pfilter_constraint", pfilterMapping);
 		}
 		
 		List<String> predicateColumns = getPredColumnsSQLParams();
 		SQLMapping predicateColumnsSQLParams = new SQLMapping("columns", predicateColumns,null);
-		mappings.add(predicateColumnsSQLParams);
+		mappings.put("columns", predicateColumnsSQLParams);
 		
 		List<String> projectTypeParamsList=projectTypesSQLParam();
 		if(projectTypeParamsList!=null){
 			SQLMapping projectTypeSQLParams = new SQLMapping("project_type", projectTypeParamsList,null);
-			mappings.add(projectTypeSQLParams);
+			mappings.put("project_type", projectTypeSQLParams);
 		}
 		
 		SQLMapping isRPHSqlParam = new SQLMapping("is_rph",isRPHSQLParam(), null);
-		mappings.add(isRPHSqlParam);
+		mappings.put("is_rph", isRPHSqlParam);
 		
 		SQLMapping tSMapping=new SQLMapping("s_target", getTargetSecondarySQLName(), null);
-		mappings.add(tSMapping);		
+		mappings.put("s_target", tSMapping);		
 	
 		List<String> projectSecondarySqlParams = getProjectedSQLClauseInSecondary();
 		if(projectSecondarySqlParams.size()==0)projectSecondarySqlParams.add("*");
 		SQLMapping pSMapping=new SQLMapping("s_project", projectSecondarySqlParams,null);
-		mappings.add(pSMapping);
+		mappings.put("s_project", pSMapping);
 
 		List<String> sfilterConstraint = getSFilterSQLConstraint();
 
@@ -171,7 +171,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		}
 		
 		SQLMapping sfilterMapping = new SQLMapping("sfilter_constraint", sfilterConstraint,null);
-		mappings.add(sfilterMapping);
+		mappings.put("sfilter_constraint", sfilterMapping);
 
 				
 		return mappings;

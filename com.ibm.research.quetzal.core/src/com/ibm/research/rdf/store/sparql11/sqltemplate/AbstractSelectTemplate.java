@@ -12,7 +12,6 @@
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,14 +70,14 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 	protected HashMap<String, Pair<String, String>> varMap = new HashMap<String, Pair<String, String>>();
 
 	
-	Set<SQLMapping> populateMappings() throws Exception{
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+	Map<String, SQLMapping> populateMappings() throws Exception{
+		Map<String,SQLMapping> mappings = HashMapFactory.make();
 		
 		
 		List<String> selectDistinctMap = getSelectDistinctMapping();
 		if(selectDistinctMap != null){			
 			SQLMapping selectDistinctMapping=new SQLMapping("distinct", selectDistinctMap, null);
-			mappings.add(selectDistinctMapping);
+			mappings.put("distinct", selectDistinctMapping);
 		}
 		List<String> projectAliasNames = new LinkedList<String>();
 		Pair<List<String>, Set<String>> selectProjectMapping = getSelectProjectMapping(projectAliasNames) ;
@@ -92,10 +91,10 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 			projectAll = true;
 		} 
 		SQLMapping projectAliasNameMapping=new SQLMapping("project_alias_name", projectAliasNames,null);
-		mappings.add(projectAliasNameMapping);
+		mappings.put("project_alias_name", projectAliasNameMapping);
 		
 		SQLMapping projectMapping=new SQLMapping("project", projectList,null);
-		mappings.add(projectMapping);
+		mappings.put("project", projectMapping);
 		
 		SolutionModifiers solMod = getSolutionModifiers();
 		if (!projectAll && store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name()) 
@@ -121,24 +120,24 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 			}
 			SQLMapping project_orderByVarsMapping =  new SQLMapping("project_orderby_vars", 
 					vars, null);
-			mappings.add(project_orderByVarsMapping);
+			mappings.put("project_orderby_vars", project_orderByVarsMapping);
 		} else {
 			SQLMapping project_orderByVarsMapping =  new SQLMapping("project_orderby_vars", 
 					null, null);
-			mappings.add(project_orderByVarsMapping);
+			mappings.put("project_orderby_vars", project_orderByVarsMapping);
 		}
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 	
 		String solnModifiers = getSolutionModifiersMappings();
 		if (solnModifiers != null && solnModifiers.length() != 0) {
-			mappings.add(new SQLMapping("endModifiers", solnModifiers, null));
+			mappings.put("endModifiers", new SQLMapping("endModifiers", solnModifiers, null));
 		}
 		
 		Set<String> outerProject = selectProjectMapping != null ? selectProjectMapping.snd : null;
 		if (outerProject != null) {
-			mappings.add(new SQLMapping("outerProject", outerProject, null));
+			mappings.put("outerProject", new SQLMapping("outerProject", outerProject, null));
 		}
 
 		

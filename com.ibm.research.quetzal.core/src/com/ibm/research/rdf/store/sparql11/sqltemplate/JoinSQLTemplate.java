@@ -11,9 +11,9 @@
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -22,6 +22,7 @@ import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
@@ -38,22 +39,22 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() throws SQLWriterException {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 		
 		varMap = new HashMap<String, Pair<String, String>>();
 		
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam, null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 		
 		SQLMapping pMapping=new SQLMapping("project", getProjectMapping(),null);
-		mappings.add(pMapping);
+		mappings.put("project", pMapping);
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetMapping(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		List<String> filterConstraint = getFilterSQLConstraint();
 		List<String> joinConstraint = getJoinConstraintMapping();
@@ -67,7 +68,7 @@ public class JoinSQLTemplate extends AbstractSQLTemplate {
 		}
 		if (!combinedConstraints.isEmpty()) {
 			SQLMapping joinMapping = new SQLMapping("op_constraint", combinedConstraints, null);
-			mappings.add(joinMapping);
+			mappings.put("op_constraint", joinMapping);
 		}
 		
 		return mappings;
