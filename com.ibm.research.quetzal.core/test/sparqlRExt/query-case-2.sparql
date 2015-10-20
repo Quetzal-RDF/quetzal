@@ -1,0 +1,48 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+prefix fn: <http://localhost:8082/callRCode#>
+
+function fn:travel_rank (?c0_lat ?c0_long ?c1_lat ?c1_long ?c2_lat ?c2_long ?c3_lat ?c3_long -> ?itinerary_score) language R { 
+	\SOP
+	
+	tmp_df = data.frame(t(`__input`))
+	tmp_result = lapply(c5, function(x){ ret = 0; temp = rep(0,length(x)/2); for(i in 1 : as.integer(length(x)/2)){ tmp_weather = try(GNfindNearByWeather(as.numeric(x[i*2-1]),as.numeric(x[i*2]))); if("try-error" %in% class(tmp_weather)) ret = -1 else temp[i] = as.numeric(tmp_weather$temperature);}; if(ret < 0) ret = 0 else ret = sd(temp); ret})
+	`__output` = data.frame(t(data.frame(tmp_result)))
+	colnames(`__output`)=c('itinerary_score')
+	`__output`
+	
+	\EOP
+}
+
+SELECT distinct ?c1 ?c2 ?c3 ?itinerary_score
+WHERE {
+  <http://dbpedia.org/resource/Beijing> geo:lat ?cs_lat .
+  <http://dbpedia.org/resource/Beijing> geo:long ?cs_long .
+  
+  ?c1 rdf:type dbo:City.
+  ?c1 geo:lat ?c1_lat .
+  ?c1 geo:long ?c1_long .
+  
+  ?c2 rdf:type dbo:City.
+  ?c2 geo:lat ?c2_lat .
+  ?c2 geo:long ?c2_long .
+  
+  ?c3 rdf:type dbo:City.
+  ?c3 geo:lat ?c3_lat .
+  ?c3 geo:long ?c3_long .
+  
+  FILTER ( ?c1_long > ?cs_long - 2 && ?c1_long < ?cs_long + 2 &&
+?c1_lat > ?cs_lat - 2 && ?c1_lat < ?cs_lat + 2).
+
+  FILTER ( ?c2_long > ?c1_long - 2 && ?c2_long < ?c1_long + 2 &&
+?c2_lat > ?c1_lat - 2 && ?c2_lat < ?c1_lat + 2).
+
+  FILTER ( ?c3_long > ?c2_long - 2 && ?c3_long < ?c2_long + 2 &&
+?c3_lat > ?c2_lat - 2 && ?c3_lat < ?c2_lat + 2).
+
+  FILTER ( ?c1 != ?c2 && ?c1 != ?c3 &&
+?c3 != ?c2).
+
+  BIND ( fn:travel_rank (?cs_lat ?cs_long ?c1_lat ?c1_long ?c2_lat ?c2_long ?c3_lat ?c3_long) AS ( ?itinerary_score )) 
+} ORDER BY DESC(?itinerary_score) limit 10
