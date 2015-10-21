@@ -23,8 +23,8 @@ public class TestSparkHttpServices {
 	@Test
 	public void testPostToService() throws HiveException {
 		WebServicePostUDAF udaf = new WebServicePostUDAF();
-		udaf.initialize(inputParams);
-		udaf.process(argsToProcess);
+//		udaf.initialize(inputParams);
+//		udaf.process(argsToProcess);
 
 	}
 	
