@@ -1,10 +1,20 @@
 import cherrypy
 import urllib
 import warnings
+import xpathTest
 
 class PythonEval(object):
     @cherrypy.expose
-    def callPython(self, funcBody):
+    def getDrugBank(self):
+        return xpathTest.extractDrugBank()
+
+    @cherrypy.expose
+    def postData(self, funcBody, funcData):
+        cherrypy.log("function data:" + funcData)
+        return xpathTest.extractPost(funcData)
+
+    @cherrypy.expose
+    def evalPython(self, funcBody):
         cherrypy.log("function body:" + funcBody)
         ns = {}
         code = compile(funcBody, '<string>', 'exec')
