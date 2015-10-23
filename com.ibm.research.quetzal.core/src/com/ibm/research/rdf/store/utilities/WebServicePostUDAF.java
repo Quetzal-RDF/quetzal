@@ -42,7 +42,7 @@ import org.xml.sax.InputSource;
 
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 
-public class WebServiceUDAF extends AbstractGenericUDAFResolver {
+public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 	@Override
 	public GenericUDAFEvaluator getEvaluator(GenericUDAFParameterInfo info) throws SemanticException {
