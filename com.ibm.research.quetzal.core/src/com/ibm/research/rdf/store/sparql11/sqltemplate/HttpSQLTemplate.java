@@ -15,7 +15,7 @@ import com.ibm.wala.util.collections.HashSetFactory;
 
 public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 
-	public HttpSQLTemplate(String templateName, Store store, Context ctx,
+	public HttpSQLTemplate(List<String> templateName, Store store, Context ctx,
 			STPlanWrapper wrapper, PlanNode planNode) {
 		super(templateName, store, ctx, wrapper, planNode);
 		this.planNode = planNode;
@@ -69,7 +69,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		
 		Set<Variable> req = planNode.getRequiredVariables();
 		Set<Variable> vars = planNode.getProducedVariables();
-		Set<String> cols = HashSetFactory.make();
+		List<String> cols = new LinkedList<String>();
 		Set<String> firstProjectCols = HashSetFactory.make();
 		Set<String> secondProjectCols = HashSetFactory.make();
 		
@@ -96,6 +96,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		}
 					
 		secondProjectCols.addAll(getProjectedVariablesFromPredecessor());
+		mappings.put("firstProjectCols", new SQLMapping("firstProjectCols", firstProjectCols, null));
 		mappings.put("secondProjectCols", new SQLMapping("secondProjectCols", secondProjectCols, null));
 			
 		if (pred != null) {
@@ -106,6 +107,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			mappings.put("join_constraint", joinMapping);
 		}
 
+		mappings.put("cols", new SQLMapping("cols", cols, null));
 		mappings.put("dtCols", new SQLMapping("dtCols", dtCols, null));
 		mappings.put("dtConstraints", new SQLMapping("dtConstraints", dtConstraints, null));
 		mappings.put("dtTable", new SQLMapping("dtTable", this.store.getDataTypeTable(), null));

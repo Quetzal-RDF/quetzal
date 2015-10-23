@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
@@ -54,15 +54,20 @@ public class SQLTemplateManager
          }
       }
 
-   public static <T> String getSQLString(String templateName, Collection<SQLMapping> collection)
+   public static String getSQLString(List<String> templateNames, Collection<SQLMapping> collection)
       {
-      StringTemplate t = sql.getInstanceOf(templateName);
-      if (collection != null) {
-	      for (SQLMapping m : collection)
-	      {
-	    	  t.setAttribute(m.getName(), m.getValues());
-	      }
-      }
-      return t.toString();
+	   StringBuffer result = new StringBuffer();
+	   for (String templateName : templateNames) {
+		   StringTemplate t = sql.getInstanceOf(templateName);
+		   if (collection != null) {
+			   for (SQLMapping m : collection) {
+				   if (t.getFormalArgument(m.getName()) != null) {
+					   t.setAttribute(m.getName(), m.getValues());
+				   }
+			   }
+		   }
+		   result.append(t.toString());
+	   }
+	   return result.toString();
       }
    }

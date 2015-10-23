@@ -64,7 +64,7 @@ public class ValuesSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	
 	
 	
-	public ValuesSQLTemplate(String templateName, PlanNode planNode,
+	public ValuesSQLTemplate(List<String> templateName, PlanNode planNode,
 			Store store, Context ctx, STPlanWrapper wrapper) {
 		super(templateName, store, ctx, wrapper, planNode);
 		this.planNode = planNode;

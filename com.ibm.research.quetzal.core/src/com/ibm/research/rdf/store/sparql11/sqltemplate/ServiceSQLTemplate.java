@@ -29,16 +29,14 @@ import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 
 public class ServiceSQLTemplate extends HttpSQLTemplate {
-	public ServiceSQLTemplate(String templateName, PlanNode planNode,
+	public ServiceSQLTemplate(List<String> templateName, PlanNode planNode,
 			Store store, Context ctx, STPlanWrapper wrapper) {
 		super(templateName, store, ctx, wrapper, planNode);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	Map<String, SQLMapping> populateMappings() {	
 		// wrapper.getQuery().getPrologue().getPrefixes();
-		
 		Map<String, SQLMapping> mappings = super.populateMappings();
 
 		Pattern sp = planNode.getPattern();
@@ -64,41 +62,37 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		}
 		
 		if (planNode.isPost()) {
-			List<String> allColumns = (List<String>)mappings.get("allColumns").getValues();
-			List<String> cols = (List<String>)mappings.get("cols").getValues();
-			List<String> indexColumns = new LinkedList<String>();
-			List<String> postedColumns = new LinkedList<String>();
-			List<String> postedTypes = new LinkedList<String>();
-			for (Variable v : planNode.getRequiredVariables()) {
-				postedColumns.add(v.getName());
-				indexColumns.add(v.getName());
-				if (wrapper.getIRIBoundVariables().contains(v) ) {
-					postedTypes.add("'xs:string'");
-				} else {
-					indexColumns.add(v.getName() + "_TYP");
-					allColumns.add(v.getName() + "_TYP");
-					postedTypes.add("(case when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_DECIMAL_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:decimal' " 
-							      + "when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_NUMERICS_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:integer' "
-							      + "else 'xs:string' end)");
-				}
-				allColumns.add(v.getName());
-			}
-			postedColumns.add("index");
-			postedTypes.add("'xs:int'");			
-			cols.add("index" );
-
-			mappings.put("indexColumns", new SQLMapping("indexColumns", indexColumns, null));
-			mappings.put("postColumns", new SQLMapping("postColumns", postedColumns, null));
-			mappings.put("postTypes", new SQLMapping("postTypes", postedTypes, null));
+			setupPostData(mappings);
 			
-			mappings.put("allColumns", new SQLMapping("allColumns", allColumns, null));
 			mappings.put("htmlHeader", new SQLMapping("htmlHeader", "", null));
-			mappings.put("cols", new SQLMapping("cols", cols, null));
 		} 
 		
-				
-		//mappings.add(new SQLMapping("firstProjectCols", firstProjectCols, null));
-
 		return mappings;
+	}
+
+	private void setupPostData(Map<String, SQLMapping> mappings) {
+		@SuppressWarnings("unchecked")
+		List<String> cols = (List<String>) mappings.get("cols").values;
+		cols.add("index" );
+		mappings.put("cols", new SQLMapping("cols", cols, null));
+
+		List<String> indexColumns = new LinkedList<String>();
+		List<String> postedColumns = new LinkedList<String>();
+		List<String> postedTypes = new LinkedList<String>();
+		for (Variable v : planNode.getRequiredVariables()) {
+			indexColumns.add(v.getName());
+			postedColumns.add(v.getName());
+			if (wrapper.getIRIBoundVariables().contains(v) ) {
+				postedTypes.add("'xs:string'");
+			} else {
+				indexColumns.add(v.getName() + "_TYP");
+				postedTypes.add("(case when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_DECIMAL_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:decimal' " 
+						      + "when " + v.getName() + "_TYP between " + TypeMap.DATATYPE_NUMERICS_IDS_START + " and " + TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:integer' "
+						      + "else 'xs:string' end)");
+			}
+		}
+		mappings.put("indexColumns", new SQLMapping("indexColumns", indexColumns, null));
+		mappings.put("postColumns", new SQLMapping("postColumns", postedColumns, null));
+		mappings.put("postTypes", new SQLMapping("postTypes", postedTypes, null));
 	}
 }
