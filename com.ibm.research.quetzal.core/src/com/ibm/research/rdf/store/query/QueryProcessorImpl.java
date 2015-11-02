@@ -240,7 +240,9 @@ public class QueryProcessorImpl implements QueryProcessor
                   {
             	  Set<SQLMapping> mappings = HashSetFactory.make();
             	  mappings.add(new SQLMapping("store_name", store.getStoreName(), null));
-                  sql = SQLTemplateManager.getSQLString("dummy", mappings);
+            	  List<String> l = Collections.singletonList("dummy"); 	  
+
+                  sql = SQLTemplateManager.getSQLString(l, mappings);
                   }
                else
                   {
@@ -337,7 +339,9 @@ public class QueryProcessorImpl implements QueryProcessor
                   {
             	  Set<SQLMapping> mappings = HashSetFactory.make();
              	  mappings.add(new SQLMapping("store_name", store.getStoreName(), null));
-                  sql = SQLTemplateManager.getSQLString ("dummy", mappings);
+            	  List<String> l = Collections.singletonList("dummy"); 	  
+
+                  sql = SQLTemplateManager.getSQLString (l, mappings);
                   }
                else
                   {
