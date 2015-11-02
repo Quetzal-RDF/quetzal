@@ -37,34 +37,38 @@ import com.ibm.wala.util.collections.Pair;
 
 public abstract class AbstractSQLTemplate {
 	
-	String templateName;	
+	List<String> templateNames;	
 	Store store;
 	Context ctx;
 	STPlanWrapper wrapper;
 	protected PlanNode planNode;
 	protected Map<String, Pair<String, String>> varMap;
 	protected final SPARQLToSQLExpression expGenerator = new SPARQLToSQLExpression();
-	
-	public AbstractSQLTemplate(String templateName, Store store, Context ctx, STPlanWrapper wrapper, PlanNode planNode) {
-		this.templateName = templateName;
+
+	public AbstractSQLTemplate(List<String> templateNames, Store store, Context ctx, STPlanWrapper wrapper, PlanNode planNode) {
+		this.templateNames = templateNames;
 		this.store = store;
 		this.ctx = ctx;
 		this.wrapper = wrapper;
 		this.planNode = planNode;
 	}
 
+	public AbstractSQLTemplate(String templateName, Store store, Context ctx, STPlanWrapper wrapper, PlanNode planNode) {
+		this(Collections.singletonList(templateName), store, ctx, wrapper, planNode);
+	}
+	
 	public AbstractSQLTemplate(String templateName, Store store, Context ctx, STPlanWrapper wrapper) {
 		this(templateName, store, ctx, wrapper, null);
 	}
 	
 	public String createSQLString() throws Exception{
-		Set<SQLMapping> mappings = populateMappings();
+		Map<String, SQLMapping> mappings = populateMappings();
 		SQLTemplateManager.setStoreTemplate(this.store);
-		return SQLTemplateManager.getSQLString(templateName, mappings);
+		return SQLTemplateManager.getSQLString(templateNames, mappings.values());
 	}
 	
 
-	abstract Set<SQLMapping> populateMappings() throws Exception;
+	abstract Map<String, SQLMapping> populateMappings() throws Exception;
 
 	protected List<String> getFilterSQLConstraint() throws SQLWriterException {
 		List<String> filterSQLConstraint = new LinkedList<String>();

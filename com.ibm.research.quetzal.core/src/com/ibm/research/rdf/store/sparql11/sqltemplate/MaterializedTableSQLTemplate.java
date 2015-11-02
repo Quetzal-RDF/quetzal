@@ -10,7 +10,7 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
-import java.util.Set;
+import java.util.Map;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
@@ -25,7 +25,7 @@ public class MaterializedTableSQLTemplate extends AbstractSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() {		
+	Map<String, SQLMapping> populateMappings() {		
 		return null;
 	}
 

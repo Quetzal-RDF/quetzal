@@ -28,8 +28,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
 	  <includes>
             <include>src/**/*.java</include>
             <include>test/**/*.java</include>
@@ -37,6 +37,19 @@
           </includes>
         </configuration>
       </plugin>
+      <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <addClasspath>true</addClasspath>
+                        <mainClass>com.ibm.rdf.store.sparql11.CommandLineDriver</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>

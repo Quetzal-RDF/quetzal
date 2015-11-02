@@ -11,12 +11,12 @@
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.sparql11.model.Query;
+import com.ibm.wala.util.collections.HashMapFactory;
 
 public class AskTemplate extends SolutionModifierBaseTemplate {
 
@@ -29,12 +29,12 @@ public class AskTemplate extends SolutionModifierBaseTemplate {
 		wrapper.incrementCteIdForSolutionModifier();
 	}
 
-	Set<SQLMapping> populateMappings() throws Exception{
+	Map<String, SQLMapping> populateMappings() throws Exception{
 		
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String,SQLMapping> mappings = HashMapFactory.make();
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		return mappings;
 	}

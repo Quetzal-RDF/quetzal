@@ -42,24 +42,24 @@ public class NotExistsSQLTemplate extends AbstractSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() {
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+	Map<String, SQLMapping> populateMappings() {
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		varMap = HashMapFactory.make();
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 		
 		
 		SQLMapping pMapping=new SQLMapping("left_project", getLeftProjectMapping(),null);
-		mappings.add(pMapping);
+		mappings.put("left_project", pMapping);
 		
 		SQLMapping tMapping=new SQLMapping("left_target", getLeftTargetMapping(),null);
-		mappings.add(tMapping);		
+		mappings.put("left_target", tMapping);		
 			
 			
 		SQLMapping filterConstraintsMapping=new SQLMapping("filter_constraints", getFilterConstraints(), null);
-		mappings.add(filterConstraintsMapping);					
+		mappings.put("filter_constraints", filterConstraintsMapping);					
 		
 		return mappings;
 	}

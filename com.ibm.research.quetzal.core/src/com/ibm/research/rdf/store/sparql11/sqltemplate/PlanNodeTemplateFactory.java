@@ -10,6 +10,8 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -73,7 +75,11 @@ public class PlanNodeTemplateFactory {
 	private static AbstractSQLTemplate createServiceSQLTemplate(
 			PlanNode planNode, Store store, Context ctx, Plan plan,
 			STPlanWrapper wrapper) {
-		return new ServiceSQLTemplate(planNode.isPost()? "servicePost": "service", planNode, store, ctx, wrapper);
+		if (planNode.isPost()) {
+			return new ServiceSQLTemplate(Arrays.asList("xmlPostData", "serviceHttpPost", "serviceMerge"), planNode, store, ctx, wrapper);
+		} else {
+			return new ServiceSQLTemplate(Collections.singletonList("service"), planNode, store, ctx, wrapper);
+		}
 	}
 
 	static AbstractSQLTemplate createTripleSQLTemplate(PlanNode planNode, Store store, Context ctx, Plan plan, STPlanWrapper wrapper) throws SQLWriterException{
@@ -134,7 +140,7 @@ public class PlanNodeTemplateFactory {
 	}
 	
 	static AbstractSQLTemplate createValuesSQLTemplate(PlanNode planNode, Store store, Context ctx, Plan plan, STPlanWrapper wrapper){
-		return new ValuesSQLTemplate("values", planNode,store, ctx,  wrapper);		
+		return new ValuesSQLTemplate(Collections.singletonList("values"), planNode,store, ctx,  wrapper);		
 	}
 	static AbstractSQLTemplate createUnionSQLTemplate(PlanNode planNode, Store store, Context ctx, Plan plan, STPlanWrapper wrapper){
 		Iterator<PlanNode> successors = plan.getPlanTree().getSuccNodes(planNode);

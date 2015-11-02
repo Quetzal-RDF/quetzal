@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -35,6 +36,7 @@ import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.MonitoredStringBuffer;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.Pair;
 
 /**
@@ -52,64 +54,64 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() throws SQLWriterException {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 		
 		projectedInPrimary = new HashSet<Variable>();
 		projectedInSecondary = new HashSet<Variable>();
 		varMap = new HashMap<String, Pair<String, String>>();
 		sVarMap = new HashMap<String, Pair<String, String>>();
 		
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidSqlParams=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidSqlParams);
+		mappings.put("sql_id", qidSqlParams);
 		
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 		
 		SQLMapping eMapping=new SQLMapping("entry_constraint", getEntrySQLConstraint(),null);
-		mappings.add(eMapping);
+		mappings.put("entry_constraint", eMapping);
 		
 		SQLMapping vMapping=new SQLMapping("val_constraint", getValueSQLConstraint(),null);
-		mappings.add(vMapping);
+		mappings.put("val_constraint", vMapping);
 		
 		SQLMapping predicateMapping=new SQLMapping("predicate_constraint", getPropSQLConstraint(),null);
-		mappings.add(predicateMapping);
+		mappings.put("predicate_constraint", predicateMapping);
 		
 		List<String> sep = new LinkedList<String>();
 		sep.add(" AND ");
 		SQLMapping sepMapping=new SQLMapping("sep",sep,null);
-		mappings.add(sepMapping);
+		mappings.put("sep", sepMapping);
 		
 		List<String> projectSqlParams = getProjectedSQLClause();
 		if(projectSqlParams.size()==0)projectSqlParams.add("*");
 		SQLMapping pMapping=new SQLMapping("project", projectSqlParams,null);
-		mappings.add(pMapping);
+		mappings.put("project", pMapping);
 		
 		List<String> filterConstraint = getFilterSQLConstraint();
 		SQLMapping filterMapping = new SQLMapping("filter_constraint", filterConstraint,null);
-		mappings.add(filterMapping);
+		mappings.put("filter_constraint", filterMapping);
 	
 		List<String> projectSqlParamsForSecondary = getProjectedSQLClauseForSecondary();
 		if(projectSqlParamsForSecondary.size()==0)projectSqlParamsForSecondary.add("*");
 		SQLMapping pMappingForSecondary=new SQLMapping("s_project", projectSqlParamsForSecondary,null);
-		mappings.add(pMappingForSecondary);
+		mappings.put("s_project", pMappingForSecondary);
 	
 		SQLMapping tMappingForSecondary=new SQLMapping("s_target", getTargetSQLClauseForSecondary(),null);
-		mappings.add(tMappingForSecondary);
+		mappings.put("s_target", tMappingForSecondary);
 
 		SQLMapping vMappingForSecondary=new SQLMapping("s_val_constraint",getValueSQLConstraintForSecondary(),null);
-		mappings.add(vMappingForSecondary);
+		mappings.put("s_val_constraint", vMappingForSecondary);
 
 		List<String> filterConstraintForSecondary = getFilterSQLConstraintForSecondary();
 		SQLMapping filterMappingForSecondary = new SQLMapping("s_filter_constraint", filterConstraintForSecondary,null);
-		mappings.add(filterMappingForSecondary);
+		mappings.put("s_filter_constraint", filterMappingForSecondary);
 		
 		List<String> multivaluedIds = getMultivaluedIds();
 		SQLMapping multivaluedIdsMapping = new SQLMapping("multivalued_ids", multivaluedIds,null);
-		mappings.add(multivaluedIdsMapping);
+		mappings.put("multivalued_ids",multivaluedIdsMapping);
 				
 		return mappings;
 	}

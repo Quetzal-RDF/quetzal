@@ -2,20 +2,12 @@ package com.ibm.research.rdf.store.utilities;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -24,25 +16,22 @@ import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.parse.SemanticException;
 import org.apache.hadoop.hive.ql.udf.generic.AbstractGenericUDAFResolver;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.AggregationBuffer;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDAFParameterInfo;
 import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantStringObjectInspector;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.wala.util.collections.Pair;
 
-public class WebServiceUDAF extends AbstractGenericUDAFResolver {
+public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 	@Override
 	public GenericUDAFEvaluator getEvaluator(GenericUDAFParameterInfo info) throws SemanticException {
@@ -50,14 +39,16 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 		return new TestUDFEvaluator();
 	}
 
-	public static class TestUDFEvaluator extends GenericUDAFEvaluator {
+	public static class TestUDFEvaluator extends GenericUDAFEvaluator implements WebServiceInterface {
 
 		private String urlForService = null;
 		private String functionBody = null;
+		private String xpathForRows = null;
+		private NamespaceResolver resolver;
+		private List<Pair<String, Pair<String, String>>> xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
 
 		private Map<String, Integer> outputColumnNames = new HashMap<String, Integer>();
 		private List<String> inputColumnNames = new ArrayList<String>();
-		private List<String> outputColumnTypes = new ArrayList<String>();
 
 		@SuppressWarnings("deprecation")
 		public static class TableAggregator implements AggregationBuffer {
@@ -71,15 +62,20 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 				data.add(datum);
 			}
 		}
+		
+		public List<Pair<String, Pair<String, String>>> getXpathForColumns() {
+			return xPathForColumns;
+		}
 
 		@Override
 		/**
-		 * Assumption: parameters are passed in the following order:
-		 * urlForService, functionName, functionBody, columnNames separated by
-		 * '|', and all output parameters. All of these parameters will be
-		 * passed in as WritableConstantStringObjectInspectors. All input
-		 * parameters are passed in after WritableConstantStringParameters, so
-		 * the separation is based on types.
+		 * Assumption: parameters are passed in the following order:  
+		 * All input parameters which are NOT constants and hence not writableConstantStringParameters,
+		 * followed by a set of constants to denote:
+		 * urlForService, functionBody, input columnNames separated by
+		 * ',', and output parameters separated by ',', namespace parameters as defined by "key1=val1, key2=val2..",
+		 * xpath for rows, xpath for columns as specified by col1name, xpathForCol1, xpathForCol1Type etc. All of these parameters will be
+		 * passed in as WritableConstantStringObjectInspectors. 
 		 */
 		public ObjectInspector init(Mode m, ObjectInspector[] parameters) throws HiveException {
 			// TODO Auto-generated method stub
@@ -87,32 +83,41 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			ArrayList<ObjectInspector> foi = new ArrayList<ObjectInspector>();
 
 			int i = 0;
-			for (ObjectInspector p : parameters) {
-				PrimitiveObjectInspector param = (PrimitiveObjectInspector) p;
-
-				// parameters are either input parameters, or constants. the
-				// first constant is the url, function name, function body & followed by the output parameter
-				// names
+			int k = 0;
+			while (i < parameters.length) {
+				PrimitiveObjectInspector param = (PrimitiveObjectInspector) parameters[i];
 				if (param instanceof WritableConstantStringObjectInspector) {
 					WritableConstantStringObjectInspector wc = (WritableConstantStringObjectInspector) param;
-					if (i == 0) {
-						urlForService = wc.getWritableConstantValue().toString();
-					} else if (i == 1) {
-						functionBody = wc.getWritableConstantValue().toString();
-					} else if (i == 2) {
-						StringTokenizer tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), "|");
-						while (tokenizer.hasMoreTokens()) {
-							inputColumnNames.add(tokenizer.nextToken());
-						}
-					} else {
-						String str = wc.getWritableConstantValue().toString();
-						if (str.equals("index")) {
-							continue;				// KAVITHA: The other systems need an index column passed in to the function.  Ignore it.
-						}
-						handleOutputTypeSpecification(foi, i, str);
+					switch(k) {
+						case 0:
+							urlForService = wc.getWritableConstantValue().toString();
+							break;
+						case 1:
+							functionBody = wc.getWritableConstantValue().toString();
+							break;
+						case 2:
+							StringTokenizer tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
+							while (tokenizer.hasMoreTokens()) {
+								inputColumnNames.add(tokenizer.nextToken());
+							}
+							break;
+						case 3:
+							String str = wc.getWritableConstantValue().toString();
+							handleOutputTypeSpecification(foi, str);
+							break;
+						case 4:
+							resolver = createNamespaces(wc.getWritableConstantValue().toString());
+							break;
+						case 5:
+							xpathForRows = wc.getWritableConstantValue().toString();
+							break;			
+						default: 
+							addColXpathTuple(parameters, i);
+							i+=2;
 					}
-					i++;
+					k++;
 				} 
+				i++;
 			}
 			
 			// add all input columns to output because that will be returned by this function along with output columns.  
@@ -131,40 +136,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			return ObjectInspectorFactory.getStandardListObjectInspector(ObjectInspectorFactory.getStandardStructObjectInspector(l, foi));
 		}
 
-		private void handleOutputTypeSpecification(ArrayList<ObjectInspector> foi, int indexOfCol, String outputColSpec) {
-			int sep = outputColSpec.indexOf(":");
-			String outName = null;
-			if (sep != -1) {
-				outName = outputColSpec.substring(0, sep);
 
-				String type = outputColSpec.substring(sep + 1);
-				if (type.equals("Decimal")) {
-					outputColumnTypes.add("decimal");
-				} else if (type.equals("Date")) {
-					outputColumnTypes.add("date");
-				} else if (type.equals("Timestamp")) {
-					outputColumnTypes.add("timestamp");
-				} else if (type.equals("int")) {
-					outputColumnTypes.add("int");
-				} else if (type.equals("float")) {
-					outputColumnTypes.add("float");
-				} else if (type.equals("double")) {
-					outputColumnTypes.add("double");
-				} else if (type.equals("boolean")) {
-					outputColumnTypes.add("boolean");
-				} else if (type.equals("short")) {
-					outputColumnTypes.add("short");
-				} else {
-					outputColumnTypes.add("string");
-				}
-			}  else {
-				outName = outputColSpec;
-			}
-			outputColumnNames.put(outName, indexOfCol - 3); 	
-			outputColumnNames.put(outName + "_TYP", indexOfCol - 2);
-			foi.add(PrimitiveObjectInspectorFactory.writableStringObjectInspector);			// output column name
-			foi.add(PrimitiveObjectInspectorFactory.writableShortObjectInspector);			// output column type as a type map
-		}
 
 		@SuppressWarnings("deprecation")
 		@Override
@@ -186,11 +158,11 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			TableAggregator agg = (TableAggregator) arg0;
 
 			Object[] s = new Object[inputColumnNames.size()];
-			for (int i = 3; i < inputColumnNames.size() + 3; i++) {
+			for (int i = 0; i < inputColumnNames.size(); i++) {
 				if (arg1[i] instanceof String) {
-					s[i - 3] = new Text((String) arg1[i]);	
+					s[i] = new Text((String) arg1[i]);	
 				} else {
-					s[i - 3] = arg1[i];
+					s[i] = arg1[i];
 				}
 			}
 			agg.add(s);
@@ -313,7 +285,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 
 			}
 			System.out.println("Returned table:");
-			prettyPrint(ret);
+			WebServiceInterface.prettyPrint(ret);
 			return ret;
 		}
 
@@ -333,7 +305,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			List<Object[]> r = ((TableAggregator) arg0).data;
 			
 			System.out.println("printing input");
-			prettyPrint(r);
+			WebServiceInterface.prettyPrint(r);
 
 			// add row numbers to table. This step is used to join the table
 			// that is returned to the input table.
@@ -358,7 +330,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 					// still consume the response body
 					method.getResponseBodyAsString();
 				} else {
-					result = parseResponse(method.getResponseBodyAsStream());
+					result = parseResponse(method.getResponseBodyAsStream(), resolver, xpathForRows, xPathForColumns, true);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -373,90 +345,6 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			}
 			result = join(rs, result);
 			return result;
-		}
-
-		private void printDocument(Document doc) throws Exception {
-			OutputFormat format = new OutputFormat(doc);
-			format.setIndenting(true);
-			XMLSerializer serializer = new XMLSerializer(System.out, format);
-			serializer.serialize(doc);
-		}
-
-		private List<Object[]> parseResponse(InputStream is) throws Exception {
-			BufferedReader br;
-			br = new BufferedReader(new InputStreamReader(is));
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(br));
-			printDocument(doc);
-
-			XPath xPath = XPathFactory.newInstance().newXPath();
-
-			System.out.println("In parse response");
-			
-			NodeList rows = (NodeList) xPath.compile("//*[local-name()='result']").evaluate(doc,
-					XPathConstants.NODESET);
-
-			List<Object[]> result = new LinkedList<Object[]>();
-			for (int i = 0; i < rows.getLength(); i++) {
-				Node row = rows.item(i);
-				NodeList cells = (NodeList) xPath.compile("./*[local-name()='binding']").evaluate(row,
-						XPathConstants.NODESET);
-
-				Object[] k = new Object[outputColumnNames.size() + 1];		// return from function will always return an index column.  So the extra element in the k array reflects that		
-
-				IntWritable indexValue = null;
-				for (int j = 0; j < cells.getLength(); j++) {						
-					String value = cells.item(j).getTextContent();
-					assert cells.item(j).getAttributes() != null
-							&& cells.item(j).getAttributes().getNamedItem("name") != null;
-
-					String colName = cells.item(j).getAttributes().getNamedItem("name").getTextContent();
-					if (colName.equals("index")) {
-						indexValue = new IntWritable();
-						indexValue.set(Integer.parseInt(value));
-						continue;
-					}
-					k[j * 2] = new Text(value);
-					ShortWritable st = new ShortWritable();
-					st.set(getTypedValue(value, j));
-					k[(j * 2) +1] =  st;
-				}
-				// add index at very end
-				k[k.length - 1] = indexValue;
-				result.add(k);
-			}
-			System.out.println("Parsed response");
-			prettyPrint(result);
-			return result;
-		}
-
-		private short getTypedValue(String value, int index) {
-			if (outputColumnTypes.isEmpty()) {
-				return TypeMap.SIMPLE_LITERAL_ID;
-			}
-			String colType = outputColumnTypes.get(index);
-			return getTypedValue(value, colType);
-		}
-
-		private short getTypedValue(String value, String colType) {
-			if (colType.equals("decimal")) {
-				return TypeMap.DECIMAL_ID;
-			} else if (colType.equals("Date")) {
-				return TypeMap.DATE_ID;
-			} else if (colType.equals("Timestamp")) {
-				return TypeMap.DATETIME_ID;
-			} else if (colType.equals("int")) {
-				return TypeMap.INT_ID;
-			} else if (colType.equals("float")) {
-				return TypeMap.FLOAT_ID;
-			} else if (colType.equals("double")) {
-				return TypeMap.DOUBLE_ID;
-			} else if (colType.equals("boolean")) {
-				return TypeMap.BOOLEAN_ID;
-			} else {
-				return TypeMap.SIMPLE_LITERAL_ID;
-			}
 		}
 
 		@SuppressWarnings("deprecation")
@@ -485,27 +373,77 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			buf.append("</data>");
 			return buf.toString();
 		}
+
+
+
+		@Override
+		public Map<String, Integer> getOutputColumnNames() {
+			// TODO Auto-generated method stub
+			return outputColumnNames;
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
-		TestUDFEvaluator eval = new TestUDFEvaluator();
-		// testSerialize(eval);
-		// testDeserialize(eval);
-		testJoin(eval);
+		test();
 	}
 	
-	private static void prettyPrint(List<Object[]> table) {
-		for (Object[] row : table) {
-			for (Object r : row) {
-				if (r == null) {
-					System.out.print(r + " ");
-					continue;
+	public static void test() throws HiveException {
+		ObjectInspector[] inputParameters = new ObjectInspector[15];
+		
+		TestUDFEvaluator eval = new TestUDFEvaluator();
+		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("http://localhost:8082/postData"));
+		inputParameters[0] = sc;
+		// leave function body open for now
+		sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("{print foo;}"));
+		inputParameters[1] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name,age"));
+		inputParameters[2] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name,age,sum"));
+		inputParameters[3] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text(""));
+		inputParameters[4] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("//row"));
+		inputParameters[5] = sc;
+		
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name"));
+		inputParameters[6] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./name"));
+		inputParameters[7] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<string>"));
+		inputParameters[8] = sc;
+
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("age"));
+		inputParameters[9] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./age"));
+		inputParameters[10] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<int>"));
+		inputParameters[11] = sc;
+		
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("sum"));
+		inputParameters[12] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./sum"));
+		inputParameters[13] = sc;
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<int>"));
+		inputParameters[14] = sc;
+		eval.init(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode.COMPLETE, inputParameters);
+		
+		Object[][] data = new Object[3][2];
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 2; j++) {
+				if (j == 0) {
+					data[i][j] = "name_" + i;
+				} else {
+					data[i][j] = i + 40;
 				}
-				System.out.print(r + "-" + r.getClass() + " ");
 			}
-			System.out.println("");
 		}
-		System.out.println("*******************");
+		AggregationBuffer buf = eval.getNewAggregationBuffer();
+		for (int i = 0; i < 3; i++) {
+			Object[] row = data[i];
+			eval.iterate(buf, row);
+		}
+		eval.terminate(buf);
+		
 	}
 
 	private static void testJoin(TestUDFEvaluator eval) {
@@ -526,7 +464,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			output.add(row);
 		}
 		
-		prettyPrint(eval.join(input, output));
+		WebServiceInterface.prettyPrint(eval.join(input, output));
 		output = new LinkedList<Object[]>();
 		for (int i = 3; i < 4; i++) {
 			Object[] row = new Object[2];
@@ -534,7 +472,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			row[1] = i;
 			output.add(row);
 		}
-		prettyPrint(eval.join(input, output));
+		WebServiceInterface.prettyPrint(eval.join(input, output));
 
 		output = new LinkedList<Object[]>();
 		for (int i = 0; i < 5; i += 2) {
@@ -543,7 +481,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 			row[1] = i;
 			output.add(row);
 		}
-		prettyPrint(eval.join(input, output));
+		WebServiceInterface.prettyPrint(eval.join(input, output));
 
 	}
 
@@ -554,11 +492,7 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 		eval.outputColumnNames.put("p", 1);
 		eval.outputColumnNames.put("o", 2);
 
-		eval.outputColumnTypes.add("string");
-		eval.outputColumnTypes.add("string");
-		eval.outputColumnTypes.add("string");
-
-		System.out.println(eval.parseResponse(fi));
+		// System.out.println(eval.parseResponse(fi));
 	}
 
 	private static void testSerialize(TestUDFEvaluator eval) {
@@ -576,4 +510,6 @@ public class WebServiceUDAF extends AbstractGenericUDAFResolver {
 		}
 		System.out.println(eval.serialize(data));
 	}
+	
+
 }

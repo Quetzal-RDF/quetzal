@@ -148,13 +148,13 @@ functionDecl returns [FunctionBase func]
 	:	
 		^(FUNCNAME
 			(
-                ^(fn=iRIref { $func = ext = new FunctionExt(); ext.setName(fn);  } )
+                (fn=iRIref { $func = ext = new FunctionExt(); ext.setName(fn);  } )
             |
                 ^(SERVICE s=varOrIRIref { $func = svc = new ServiceFunction(); svc.setService(s); } )
             )
             { functions.put(fn, $func); }
-            ( ^(KIND ( ( POST { $func.setPost(); } ) |
-                       ( GET { $func.setGet(); } ) ) ) | )
+            ^(KIND ( ( POST { $func.setPost(); } ) |
+                     ( GET { $func.setGet(); } ) )? )
 			^(INV ( inv=var { $func.addInVar(inv); } )+)
 			^(OUTV ( outv=var { $func.addOutVar(outv); } )+)
             (
@@ -176,7 +176,7 @@ functionDecl returns [FunctionBase func]
                                     { svc.addServiceParam(param, pattern); }
                                 ) 
                             )
-                        )+
+                        )*
                     )
                     rowdef=string { svc.setServiceRowXPath(rowdef); }
                     ( coldef=string { svc.addServiceColumnXPath(coldef); } )+

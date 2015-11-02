@@ -12,9 +12,9 @@
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -22,6 +22,7 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
+import com.ibm.wala.util.collections.HashMapFactory;
 
 public class UnionSQLTemplate extends AbstractSQLTemplate {
 	PlanNode left;
@@ -37,13 +38,13 @@ public class UnionSQLTemplate extends AbstractSQLTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() {
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+	Map<String, SQLMapping> populateMappings() {
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = new LinkedList<String>();
 		qidSqlParam.add(getQIDMapping());
 		SQLMapping qidMapping=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidMapping);
+		mappings.put("sql_id", qidMapping);
 		
 		HashMap<String,String> projectSQLClauseMapping = getLeftProjectMapping();		
 		List<String> projectedVariables = new LinkedList<String>();
@@ -54,10 +55,10 @@ public class UnionSQLTemplate extends AbstractSQLTemplate {
 			projectSqlParams.add(projectSQLClauseMapping.get(pVar)+" AS "+pVar);
 		}	
 		SQLMapping pMapping=new SQLMapping("left_project", projectSqlParams,null);
-		mappings.add(pMapping);
+		mappings.put("left_project", pMapping);
 		
 		SQLMapping tMapping=new SQLMapping("left_target", getLeftTargetMapping(), null);
-		mappings.add(tMapping);		
+		mappings.put("left_target", tMapping);		
 			
 		HashMap<String,String> projectRightSQLClauseMapping = getRightProjectMapping();
 		List<String> rightProjectSqlParams = new LinkedList<String>();		
@@ -68,10 +69,10 @@ public class UnionSQLTemplate extends AbstractSQLTemplate {
 			rightProjectSqlParams.add(projectRightSQLClauseMapping.get(pVar)+" AS "+pVar);
 		}
 		SQLMapping pRightMapping=new SQLMapping("right_project", rightProjectSqlParams,null);
-		mappings.add(pRightMapping);
+		mappings.put("right_project", pRightMapping);
 		
 		SQLMapping tRightMapping=new SQLMapping("right_target", getRightTargetMapping(), null);
-		mappings.add(tRightMapping);		
+		mappings.put("right_target", tRightMapping);		
 	
 		return mappings;
 	}

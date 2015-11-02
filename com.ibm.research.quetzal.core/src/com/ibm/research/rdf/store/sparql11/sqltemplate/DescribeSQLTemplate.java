@@ -11,9 +11,9 @@
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
@@ -24,6 +24,7 @@ import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Query;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
 
 /**
  * @author mbornea
@@ -40,26 +41,26 @@ public class DescribeSQLTemplate extends SolutionModifierBaseTemplate {
 	}
 
 	@Override
-	Set<SQLMapping> populateMappings() throws SQLWriterException {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 		
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+		Map<String,SQLMapping> mappings = HashMapFactory.make();
 		
 		List<String> qidSqlParam = getSQLIDMapping();
 		SQLMapping qidSqlParams=new SQLMapping("sql_id", qidSqlParam,null);
-		mappings.add(qidSqlParams);
+		mappings.put("sql_id", qidSqlParams);
 		
 				
 		SQLMapping tMapping=new SQLMapping("target", getTargetSQLClause(),null);
-		mappings.add(tMapping);
+		mappings.put("target", tMapping);
 			
 		SQLMapping eMapping=new SQLMapping("entry_constraint", getEntrySQLConstraint(),null);
-		mappings.add(eMapping);	
+		mappings.put("entry_constraint", eMapping);	
 		
 		SQLMapping predicateColumnsSQLParams = new SQLMapping("columns", getPredColumnsSQLParams(),null);
-		mappings.add(predicateColumnsSQLParams);
+		mappings.put("columns", predicateColumnsSQLParams);
 			
 		SQLMapping tSMapping=new SQLMapping("s_target", getTargetSecondarySQLName(),null);
-		mappings.add(tSMapping);
+		mappings.put("s_target", tSMapping);
 		
 		return mappings;
 	}

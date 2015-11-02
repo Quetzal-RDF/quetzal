@@ -10,11 +10,10 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
@@ -24,6 +23,7 @@ import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.Pair;
 
 /**
@@ -48,12 +48,12 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 		this.varMap = mainTemplate.varMap;
 	}	
 
-	Set<SQLMapping> populateMappings() throws Exception {
-		HashSet<SQLMapping> mappings = new HashSet<SQLMapping>();
+	Map<String, SQLMapping> populateMappings() throws Exception {
+		Map<String, SQLMapping> mappings = HashMapFactory.make();
 
 		SQLMapping qidSqlParams = new SQLMapping("sql_id", getSQLIDMapping(),
 				null);
-		mappings.add(qidSqlParams);
+		mappings.put("sql_id", qidSqlParams);
 		
 		addSolutionModifiersMappings(mappings);
 
@@ -70,7 +70,7 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 
 
 
-	protected String addSolutionModifiersMappings(Set<SQLMapping> mappings) {
+	protected String addSolutionModifiersMappings(Map<String, SQLMapping> mappings) {
 		StringBuffer solnModifiers = new StringBuffer();
 		if (modifiers == null) {
 			return null;
@@ -104,23 +104,23 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 					String str = expGenerator.getSQLExpression(o.getExpression(), context, store);
 					orders.add(str + " " + o.getType());
 				}
-				mappings.add(new SQLMapping("orderBy", orders, null));
+				mappings.put("orderBy", new SQLMapping("orderBy", orders, null));
 			}
 			if (modifiers.getLimitOffset() != null) {
 				int limit = modifiers.getLimitOffset().getLimit();
 				int offset = modifiers.getLimitOffset().getOffset();
 
 				if (limit > -1) {
-					mappings.add(new SQLMapping("limit", limit, null));
+					mappings.put("limit", new SQLMapping("limit", limit, null));
 				}
 				if (limit > -1 && offset > -1) {
-					mappings.add(new SQLMapping("offset", offset, null));
+					mappings.put("offset", new SQLMapping("offset", offset, null));
 				} else if (limit == -1 && offset > -1) {
 					// KAVITHA DB2 is super annoying about needing limits to be
 					// specified if offsets are
 					// this is an egregious hack to give it a 'limit
-					mappings.add(new SQLMapping("limit", Integer.MAX_VALUE, null));
-					mappings.add(new SQLMapping("offset", offset, null));
+					mappings.put("limit", new SQLMapping("limit", Integer.MAX_VALUE, null));
+					mappings.put("offset", new SQLMapping("offset", offset, null));
 				}
 			}
 		} catch (Exception e) {
@@ -130,7 +130,7 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 		return solnModifiers.toString();
 	}
 
-	private void handleExpressionsInModifiers(String mappingVal, Set<SQLMapping> mappings, FilterContext context, List<Expression> expressions)
+	private void handleExpressionsInModifiers(String mappingVal, Map<String, SQLMapping> mappings, FilterContext context, List<Expression> expressions)
 			throws SQLWriterException {
 		Iterator<Expression> it = expressions.iterator();
 		List<String> ret = new LinkedList<String>();
@@ -149,7 +149,7 @@ public class SolutionModifierTemplate extends AbstractSQLTemplate {
 			ret.add(expGenerator.getSQLExpression(e, context, store));
 			
 		}
-		mappings.add(new SQLMapping(mappingVal, ret, null));
+		mappings.put(mappingVal, new SQLMapping(mappingVal, ret, null));
 	}
 
 }

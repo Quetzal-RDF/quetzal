@@ -17,7 +17,7 @@ public abstract class JoinNonSchemaTablesSQLTemplate extends AbstractSQLTemplate
 
 	protected PlanNode pred;
 
-	public JoinNonSchemaTablesSQLTemplate(String templateName, Store store,
+	public JoinNonSchemaTablesSQLTemplate(List<String> templateName, Store store,
 			Context ctx, STPlanWrapper wrapper, PlanNode planNode) {
 		super(templateName, store, ctx, wrapper, planNode);
 		pred = planNode.getPredecessor(wrapper.plan);
