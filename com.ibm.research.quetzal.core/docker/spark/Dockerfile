@@ -2,6 +2,9 @@ FROM sequenceiq/spark
 
 MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
 
+ENV JAVA_VERSION 8u31 
+ENV BUILD_VERSION b13 
+
 RUN curl -O http://gnu.mirrorcatalogs.com/coreutils/coreutils-8.24.tar.xz \
     && tar -xJf coreutils-8.24.tar.xz \
 	&& export FORCE_UNSAFE_CONFIGURE=1 \
@@ -15,12 +18,12 @@ RUN curl -O http://gnu.mirrorcatalogs.com/coreutils/coreutils-8.24.tar.xz \
 	&& cd ./gawk-4.1.3 \
 	&& ./configure \
 	&& yum -y install wget \
-	&& wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-$BUILD_VERSION/jdk-$JAVA_VERSION-linux-x64.rpm" -O /tmp/jdk-8-linux-x64.rpm
-	&& yum -y install /tmp/jdk-8-linux-x64.rpm
-	&& RUN alternatives --install /usr/bin/java jar /usr/java/latest/bin/java 200000
-	&& RUN alternatives --install /usr/bin/javaws javaws /usr/java/latest/bin/javaws 200000
-	&& RUN alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000
-	&& ENV JAVA_HOME /usr/java/latest
+	&& wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/$JAVA_VERSION-$BUILD_VERSION/jdk-$JAVA_VERSION-linux-x64.rpm" -O /tmp/jdk-8-linux-x64.rpm \
+	&& yum -y install /tmp/jdk-8-linux-x64.rpm \
+	&& alternatives --install /usr/bin/java jar /usr/java/latest/bin/java 200000 \
+	&& alternatives --install /usr/bin/javaws javaws /usr/java/latest/bin/javaws 200000 \
+	&& alternatives --install /usr/bin/javac javac /usr/java/latest/bin/javac 200000 \
+	&& export JAVA_HOME=/usr/java/latest \
 	&& make \
 	&& make install \
 	&& export PATH=/usr/local/bin:$PATH && cd .. \
