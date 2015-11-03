@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y python-software-properties software-pro
 && apt-get install -y realpath \
 && mkdir /data && chown -R postgres /data
 
+RUN echo debconf shared/accepted-oracle-license-v1-1 select true | \
+  sudo debconf-set-selections && sudo apt-get install -y oracle-java8-installer
+
+
 USER postgres
 
 # This image does nothing much other than set a volume where the data directory # is: i.e., where the nt file sits.  For now the assumption is that
