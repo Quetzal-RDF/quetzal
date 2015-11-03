@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.proppaths.CTENameMgr;
-import com.ibm.research.proppaths.CTEToNestedQueryConverter;
 import com.ibm.research.proppaths.CodeGenerator;
 import com.ibm.research.proppaths.DefaultStoreProcedureManager;
 import com.ibm.research.proppaths.DefaultTemporaryTableMgr;
