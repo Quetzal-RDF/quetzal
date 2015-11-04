@@ -207,29 +207,9 @@ public class OWLQLCompiler implements IOWLQLCompiler {
 		return NormalizedOWLQLTbox.toTriple(lhsConcept, var, varGen, tbox.getFactory());
 		
 	}
-	protected boolean isGeneratedRole(String uri) {
-		return tbox.getNormalizer().isGeneratedRole(uri);
-	}
-	
-	protected boolean isGeneratedClass(String uri) {
-		return tbox.getNormalizer().isGeneratedClass(uri);
-	}
-	
-	protected boolean isTripleAbsentFromAbox(Triple qt) {
-		Node pred = qt.getPredicate();
-		if (pred.isURI() && isGeneratedRole(pred.getURI())) {
-			return true;
-		} else if (pred.isURI() && pred.getURI().equals(RDFConstants.RDF_TYPE)) {
-			Node obj = qt.getObject();
-			if (obj.isURI() && isGeneratedClass(obj.getURI())) {
-				return true;
-			}
-		}
-		return false;
-	}
 	protected boolean hasTripleAbsentFromAbox(ConjunctiveQuery cq) {
 		for (Triple qt: cq.getTriples()) {
-			if (isTripleAbsentFromAbox(qt)) {
+			if (tbox.isTripleAbsentFromAbox(qt)) {
 				return true;
 			}
 		}
@@ -290,7 +270,7 @@ public class OWLQLCompiler implements IOWLQLCompiler {
 		results = new HashSet<Triple>();
 		Set<Triple> ts = singleStepTriplesSubstitution(t, varGen);
 		for (Triple nt : ts) {
-			if (allowTriplesAbsentFromAbox || !isTripleAbsentFromAbox(nt)) {
+			if (allowTriplesAbsentFromAbox || !tbox.isTripleAbsentFromAbox(nt)) {
 				results.add(nt);
 			}
 		}
@@ -299,7 +279,7 @@ public class OWLQLCompiler implements IOWLQLCompiler {
 				results.addAll(computeRecursiveTriplesSubstitution(nt, varGen, allowTriplesAbsentFromAbox, alreadyFound,triple2Results));
 			}
 		}
-		if (allowTriplesAbsentFromAbox || !isTripleAbsentFromAbox(t)) {
+		if (allowTriplesAbsentFromAbox || !tbox.isTripleAbsentFromAbox(t)) {
 			triple2Results.put(t,results);
 		}
 		return results;

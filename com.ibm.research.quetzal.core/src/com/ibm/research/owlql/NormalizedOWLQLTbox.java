@@ -1127,6 +1127,42 @@ public class NormalizedOWLQLTbox {
 		return newNegClos == null;
 		
 	}
+	
+	protected boolean isGeneratedRole(String uri) {
+		return getNormalizer().isGeneratedRole(uri);
+	}
+
+	protected boolean isGeneratedClass(String uri) {
+		return getNormalizer().isGeneratedClass(uri);
+	}
+
+	protected boolean isTripleAbsentFromAbox(Triple qt) {
+		Node pred = qt.getPredicate();
+		if (pred.isURI() && isGeneratedRole(pred.getURI())) {
+			return true;
+		} else if (pred.isURI() && pred.getURI().equals(RDFConstants.RDF_TYPE)) {
+			Node obj = qt.getObject();
+			if (obj.isURI() && isGeneratedClass(obj.getURI())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected void addOnlyAboxTriples(ElementUnion patterns, List<Triple> triples){
+		boolean isAbsentFromAbox = false;
+		ElementTriplesBlock sp = new ElementTriplesBlock();
+		for (Triple t : triples) {
+			if (isTripleAbsentFromAbox(t)) {
+				isAbsentFromAbox = true;
+				break;
+			}
+			sp.addTriple(t);
+		}
+		if (!isAbsentFromAbox)
+			patterns.addElement(sp);
+	}
+	
 	/**
 	 * returns <code> null</code> if the Tbox entails an inconsistent KB;otherwise, returns a boolean query which, when evaluated against the Abox, returns <code>true</code> to indicate 
 	 * that the KB is inconsistent.
@@ -1183,11 +1219,8 @@ public class NormalizedOWLQLTbox {
 								newtriples.add(toTriple(prop, x, x, varGen));
 							}
 						}	
-						ElementTriplesBlock sp = new ElementTriplesBlock();
-						for (Triple t: newtriples) {
-							sp.addTriple(t);
-						}
-						patterns.addElement(sp);
+						
+						addOnlyAboxTriples(patterns, newtriples);
 					}
 				}
 				
@@ -1203,11 +1236,8 @@ public class NormalizedOWLQLTbox {
 			} else {
 				assert false : "Invalid axiom type in negative closure: "+ ax;
 			}
-			ElementTriplesBlock sp = new ElementTriplesBlock();
-			for (Triple t: triples) {
-				sp.addTriple(t);
-			}
-			patterns.addElement(sp);
+			
+			addOnlyAboxTriples(patterns, triples);
 		}
 		
 		// handle irreflexive properties
@@ -1230,8 +1260,11 @@ public class NormalizedOWLQLTbox {
 					} else {
 						ElementTriplesBlock sp = new ElementTriplesBlock();
 						Node x = Node.createVariable(varGen.createNewVariable());
-						sp.addTriple(toTriple(subp, x, x, varGen));
-						patterns.addElement(sp);
+						Triple triple = toTriple(subp, x, x, varGen);
+						if (!isTripleAbsentFromAbox(triple)) {
+							sp.addTriple(toTriple(subp, x, x, varGen));
+							patterns.addElement(sp);
+						}
 					}
 				}
 			}		
