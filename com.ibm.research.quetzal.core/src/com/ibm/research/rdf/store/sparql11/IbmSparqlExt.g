@@ -507,7 +507,7 @@ bind2
 	;
 	
 funcCall
-	:    fn=iRIref OPEN_BRACE v+=var+ CLOSE_BRACE
+	:    fn=iRIref OPEN_BRACE v+=var* CLOSE_BRACE
 		->  ^( FUNCCALL  $fn  $v* )
 	;
 
