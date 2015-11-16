@@ -579,7 +579,7 @@ funcCall  returns [BindFunctionCall f]
 	@init { $f = new BindFunctionCall(); }
 	:    ^( FUNCCALL 
 			(fn=iRIref {$f.setIri(fn); $f.setFunction(functions.get(fn)); } )
-			(v=var {$f.addVar(v);} )+
+			(v=var {$f.addVar(v);} )*
 		)
 	;
 	
