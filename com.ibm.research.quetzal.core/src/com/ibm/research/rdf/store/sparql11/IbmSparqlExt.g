@@ -172,7 +172,7 @@ selectQuery
 	
 //added by wensun
 functionDecl
-	:	FUNCTION fn=iRIref kind=(POST | GET)? OPEN_BRACE inv+=var+ ARROW outv+=var+ CLOSE_BRACE
+	:	FUNCTION fn=iRIref kind=(POST | GET)? OPEN_BRACE inv+=var* ARROW outv+=var* CLOSE_BRACE
         ( ( FUNCLANG fl=VAR0 fb=functionBody
     	  -> ^( FUNCNAME $fn ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
         |

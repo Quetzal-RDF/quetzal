@@ -155,8 +155,8 @@ functionDecl returns [FunctionBase func]
             { functions.put(fn, $func); }
             ^(KIND ( ( POST { $func.setPost(); } ) |
                      ( GET { $func.setGet(); } ) )? )
-			^(INV ( inv=var { $func.addInVar(inv); } )+)
-			^(OUTV ( outv=var { $func.addOutVar(outv); } )+)
+			^(INV ( inv=var { $func.addInVar(inv); } )*)
+			^(OUTV ( outv=var { $func.addOutVar(outv); } )*)
             (
                 (
                     ^(FUNCLG (fl=VAR0 { ext.setLang($fl.getText()); } ) )
