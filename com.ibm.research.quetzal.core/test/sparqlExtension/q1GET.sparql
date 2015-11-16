@@ -1,0 +1,12 @@
+prefix fn: <http://localhost:8082/getDrugBank#>
+
+function fn:foo (-> ?drug ?id ?action) language R {
+\SOP
+`__input`["l"] = stri_length(`__input`[["y"]]); `__input`
+\EOP
+}
+
+select distinct * where {
+?drug ?id ?action .
+BIND (fn:foo() AS ( ?drug ?id ?action ))
+} 
