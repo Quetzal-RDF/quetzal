@@ -26,7 +26,7 @@ def extractPost(funcData):
 
 
 def extractDrugBank():
-    root = etree.parse("/Users/ksrinivs/Downloads/drugbank.xml")
+    root = etree.parse("drugbank.xml")
     rows = root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
 
     result = '<?xml version="1.0"?>'

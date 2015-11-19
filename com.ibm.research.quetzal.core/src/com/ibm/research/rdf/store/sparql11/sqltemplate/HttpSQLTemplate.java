@@ -69,7 +69,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		
 		Set<Variable> req = planNode.getRequiredVariables();
 		Set<Variable> vars = planNode.getProducedVariables();
-		List<String> cols = new LinkedList<String>();
+		List<String> outputColumns = new LinkedList<String>();
 		Set<String> firstProjectCols = HashSetFactory.make();
 		Set<String> secondProjectCols = HashSetFactory.make();
 		
@@ -80,7 +80,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			allColumns.add(v.getName());
 			allColumns.add(v.getName()+ "_TYP");
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + v.getName());
-			cols.add(v.getName());
+			outputColumns.add(v.getName());
 		}
 		
 		List<Variable> literalVars = getAllLiteralVars(vars);
@@ -106,8 +106,13 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			SQLMapping joinMapping = new SQLMapping("join_constraint", joinConstraints, null);
 			mappings.put("join_constraint", joinMapping);
 		}
+		List<String> postedColumns = new LinkedList<String>();
+		for (Variable v : planNode.getRequiredVariables()) {
+			postedColumns.add(v.getName());
+		}
+		mappings.put("outputColumns", new SQLMapping("outputColumns", outputColumns, null));
+		mappings.put("postedColumns", new SQLMapping("postedColumns", outputColumns, null));
 
-		mappings.put("cols", new SQLMapping("cols", cols, null));
 		mappings.put("dtCols", new SQLMapping("dtCols", dtCols, null));
 		mappings.put("dtConstraints", new SQLMapping("dtConstraints", dtConstraints, null));
 		mappings.put("dtTable", new SQLMapping("dtTable", this.store.getDataTypeTable(), null));

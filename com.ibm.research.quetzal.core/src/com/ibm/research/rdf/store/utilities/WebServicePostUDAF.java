@@ -42,7 +42,6 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 	public static class TestUDFEvaluator extends GenericUDAFEvaluator implements WebServiceInterface {
 
 		private String urlForService = null;
-		private String functionBody = null;
 		private String xpathForRows = null;
 		private NamespaceResolver resolver;
 		private List<Pair<String, Pair<String, String>>> xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
@@ -93,22 +92,19 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 							urlForService = wc.getWritableConstantValue().toString();
 							break;
 						case 1:
-							functionBody = wc.getWritableConstantValue().toString();
-							break;
-						case 2:
 							StringTokenizer tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
 							while (tokenizer.hasMoreTokens()) {
 								inputColumnNames.add(tokenizer.nextToken());
 							}
 							break;
-						case 3:
+						case 2:
 							String str = wc.getWritableConstantValue().toString();
 							handleOutputTypeSpecification(foi, str);
 							break;
-						case 4:
+						case 3:
 							resolver = createNamespaces(wc.getWritableConstantValue().toString());
 							break;
-						case 5:
+						case 4:
 							xpathForRows = wc.getWritableConstantValue().toString();
 							break;			
 						default: 
@@ -317,7 +313,6 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			HttpClient client = new HttpClient();
 
 			PostMethod method = new PostMethod(urlForService);
-			method.setParameter("funcBody", functionBody);
 			method.setParameter("funcData", serialize(rs));
 			BufferedReader br = null;
 			List<Object[]> result = null;
@@ -388,43 +383,40 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 	}
 	
 	public static void test() throws HiveException {
-		ObjectInspector[] inputParameters = new ObjectInspector[15];
+		ObjectInspector[] inputParameters = new ObjectInspector[14];
 		
 		TestUDFEvaluator eval = new TestUDFEvaluator();
-		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("http://localhost:8082/postData"));
+		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("http://localhost:8083/postData"));
 		inputParameters[0] = sc;
-		// leave function body open for now
-		sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("{print foo;}"));
-		inputParameters[1] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name,age"));
-		inputParameters[2] = sc;
+		inputParameters[1] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name,age,sum"));
-		inputParameters[3] = sc;
+		inputParameters[2] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text(""));
-		inputParameters[4] = sc;
+		inputParameters[3] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("//row"));
-		inputParameters[5] = sc;
+		inputParameters[4] = sc;
 		
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name"));
-		inputParameters[6] = sc;
+		inputParameters[5] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./name"));
-		inputParameters[7] = sc;
+		inputParameters[6] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<string>"));
-		inputParameters[8] = sc;
+		inputParameters[7] = sc;
 
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("age"));
-		inputParameters[9] = sc;
+		inputParameters[8] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./age"));
-		inputParameters[10] = sc;
+		inputParameters[9] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<int>"));
-		inputParameters[11] = sc;
+		inputParameters[10] = sc;
 		
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("sum"));
-		inputParameters[12] = sc;
+		inputParameters[11] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./sum"));
-		inputParameters[13] = sc;
+		inputParameters[12] = sc;
 		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<int>"));
-		inputParameters[14] = sc;
+		inputParameters[13] = sc;
 		eval.init(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode.COMPLETE, inputParameters);
 		
 		Object[][] data = new Object[3][2];

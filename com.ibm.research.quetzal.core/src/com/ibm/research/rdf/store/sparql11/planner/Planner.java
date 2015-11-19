@@ -41,6 +41,7 @@ import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
 import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
+import com.ibm.research.rdf.store.sparql11.model.FunctionBase.ServiceKind;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.LogicalExpression;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
@@ -133,7 +134,7 @@ public class Planner {
 				PlanNode p = new PlanNode(service);
 				if (service instanceof BindFunctionNode) {
 					BindFunctionNode b = (BindFunctionNode) service;
-					p.setPost(true);
+					p.setPost(b.isPost());
 				}
 				p.setProducedVariables(service.getProducedVariables());
 
@@ -477,6 +478,9 @@ public class Planner {
 			super(p, availableVars, liveVars);
 		}
 		
+		public boolean isPost() {
+			return ((BindFunctionPattern)p).getFuncCall().getFunction().kind() == ServiceKind.POST;
+		}
 		
 		@Override
 		public Set<Variable> getRequiredVariables() {
