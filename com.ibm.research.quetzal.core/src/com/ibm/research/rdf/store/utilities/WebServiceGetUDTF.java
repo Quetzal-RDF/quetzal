@@ -23,6 +23,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.Pr
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantStringObjectInspector;
+import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.io.Text;
 
 import com.ibm.wala.util.collections.Pair;
@@ -34,10 +35,11 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 	private String queryText = null;
 	private enum httpMethod {GET, POST};
 	private httpMethod method;
-	List<String> inputColumns =  new LinkedList<String>();
-	private List<Pair<String, Pair<String, String>>> xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
+	List<String> inputColumns;
+	private List<Pair<String, Pair<String, String>>> xPathForColumns;
 
-	private Map<String, Integer> outputColumnNames = new HashMap<String, Integer>();
+	private Map<String, Integer> outputColumnNames;
+	private int indexOfInput = -1;
 
 	@Override
 	public void close() throws HiveException {
@@ -48,9 +50,13 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 	@Override
 	public StructObjectInspector initialize(ObjectInspector[] parameters) throws UDFArgumentException {
 		List<ObjectInspector> foi = new ArrayList<ObjectInspector>();
-
+		inputColumns =  new LinkedList<String>();
+		xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
+		outputColumnNames = new HashMap<String, Integer>();
+		
 		int i = 0;
 		int k = 0;
+		int numWritableConstants = 0;
 		while (i < parameters.length) {
 			PrimitiveObjectInspector param = (PrimitiveObjectInspector) parameters[i];
 
@@ -91,9 +97,11 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 					i += 2;
 				}
 				k++;
+				numWritableConstants = i;
 			}
 			i++;
 		}
+		indexOfInput = numWritableConstants + 1;		// Input starts where writable constants end
 
 		return ObjectInspectorFactory.getStandardStructObjectInspector(new LinkedList<String>(outputColumnNames.keySet()), foi);
 
@@ -101,16 +109,16 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 
 	@Override
 	public void process(Object[] arg0) throws HiveException {
-		String url = PrimitiveObjectInspectorFactory.javaStringObjectInspector.getPrimitiveJavaObject(arg0[0]);
+		String url = PrimitiveObjectInspectorFactory.javaStringObjectInspector.getPrimitiveJavaObject(arg0[indexOfInput]);
 		try {
 
 			List<Object[]> result = null;
 			InputStream stream = getResponseAsStream(url, arg0);
 			result = parseResponse(stream, resolver, xpathForRows, xPathForColumns, false);
-			stream.close();
 			for (Object[] record : result) {
 				forward(record);
 			}
+			stream.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -140,7 +148,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 					url = url + "?";
 				}
 				
-				for (int i = 1; i < arg0.length; i++) {
+				for (int i = indexOfInput + 1; i < arg0.length; i++) {
 					url = url + "&" + URLEncoder.encode(PrimitiveObjectInspectorFactory.javaStringObjectInspector.getPrimitiveJavaObject(arg0[i]), "UTF-8");
 				}
 				
@@ -149,7 +157,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 				stream = getMethod.getResponseBodyAsStream();
 			} else {
 				PostMethod postMethod = new PostMethod(url);	
-				for (int i = 0; i < inputColumns.size(); i++) {
+				for (int i = indexOfInput + 1; i < inputColumns.size(); i++) {
 					postMethod.setParameter(inputColumns.get(i), PrimitiveObjectInspectorFactory.writableStringObjectInspector.getPrimitiveJavaObject(arg0[i]));
 				}
 				client.executeMethod(postMethod);
@@ -188,7 +196,8 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 	
 	public static ObjectInspector[] createInput() {
 		ObjectInspector[] inputParams = new ObjectInspector[15];
-		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("drug,id,action"));
+		ObjectInspector sc =  PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+		/*
 		inputParams[0] = sc;
 		sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("url"));
 		inputParams[1] = sc;
@@ -217,7 +226,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 		sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./action"));
 		inputParams[13] = sc;
 		sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<string>"));
-		inputParams[14] = sc;
+		inputParams[14] = sc; */
 		return inputParams;
 	} 
 

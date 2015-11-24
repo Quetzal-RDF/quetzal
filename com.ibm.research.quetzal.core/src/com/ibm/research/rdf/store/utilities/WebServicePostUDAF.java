@@ -384,7 +384,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 	
 	public static void test() throws HiveException {
 		ObjectInspector[] inputParameters = new ObjectInspector[14];
-		
+		/*
 		TestUDFEvaluator eval = new TestUDFEvaluator();
 		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("http://localhost:8083/postData"));
 		inputParameters[0] = sc;
@@ -434,7 +434,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			Object[] row = data[i];
 			eval.iterate(buf, row);
 		}
-		eval.terminate(buf);
+		eval.terminate(buf); */
 		
 	}
 

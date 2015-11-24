@@ -10,8 +10,6 @@
  *****************************************************************************/
 package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -23,7 +21,6 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionCall;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionPattern;
-import com.ibm.research.rdf.store.sparql11.model.FunctionExt;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.ServiceFunction;
@@ -70,7 +67,6 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			for (Variable v : planNode.getRequiredVariables()) {
 				xPathForCols.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"]//@datatype");
 			}
-
 		} else {
 			// this supports extensions to service which allow a GET/POST with parameters from an input table, in which case the GET
 			// or POST work row by row, or a POST ALL which means the contents of the entire table get posted over.
@@ -84,6 +80,16 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				xPathForCols.add(it.next());
 				xPathForColTypes.add(it.next());
 			}
+			List<String> inputCols = new LinkedList<String>();
+			if (sf.service().isVariable()) {
+				inputCols.add(sf.service().getVariable().getName());
+			} else {
+				inputCols.add("url");
+			}
+			for (Variable v : sf.getInVariables()) {
+				inputCols.add(v.getName());
+			}
+			mappings.put("inputCols", new SQLMapping("inputCols", inputCols, null));
 			mappings.put("xPathForCols", new SQLMapping("xPathForCols", xPathForCols, null));
 			mappings.put("xPathForColTypes", new SQLMapping("xPathForColTypes", xPathForColTypes, null));
 		}
@@ -91,6 +97,9 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		if (planNode.isPost()) {
 			setupPostData(mappings);
 			mappings.put("htmlHeader", new SQLMapping("htmlHeader", "", null));
+			mappings.put("httpMethod",new SQLMapping("htmlMethod", "POST", null));
+		} else {
+			mappings.put("httpMethod",new SQLMapping("htmlMethod", "GET", null));
 		}
 		return mappings;
 	}

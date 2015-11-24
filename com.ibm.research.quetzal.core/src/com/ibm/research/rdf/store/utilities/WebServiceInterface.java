@@ -121,18 +121,22 @@ public interface WebServiceInterface {
 	
 	public static void prettyPrint(List<Object[]> table) {
 		for (Object[] row : table) {
-			for (Object r : row) {
-				if (r == null) {
-					System.out.print(r + " ");
-					continue;
-				}
-				System.out.print(r  + " ");
-			}
-			System.out.println("");
+			prettyPrintRecord(row);
 		}
 		System.out.println("*******************");
 	}
 	
+	public static void prettyPrintRecord(Object[] row) {
+		for (Object r : row) {
+			if (r == null) {
+				System.out.print(r + " ");
+				continue;
+			}
+			System.out.print(r  + " ");
+		}
+		System.out.println("");
+	}
+
 	default short getTypedValue(String value, String colType) {
 		if (colType.equals("decimal")) {
 			return TypeMap.DECIMAL_ID;

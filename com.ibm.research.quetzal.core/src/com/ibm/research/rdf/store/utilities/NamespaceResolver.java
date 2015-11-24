@@ -20,7 +20,7 @@ public class NamespaceResolver implements NamespaceContext {
         } else if (namespaces.containsKey(prefix)) {
             return namespaces.get(prefix);
         } else {
-            return XMLConstants.NULL_NS_URI;
+            return XMLConstants.DEFAULT_NS_PREFIX;
         }
     }
 
