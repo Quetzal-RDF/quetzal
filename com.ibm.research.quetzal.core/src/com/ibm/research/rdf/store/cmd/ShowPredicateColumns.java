@@ -15,6 +15,7 @@ import java.sql.Connection;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.Store.Backend;
 
 public class ShowPredicateColumns extends AbstractRdfCommand
    {
@@ -70,7 +71,7 @@ public class ShowPredicateColumns extends AbstractRdfCommand
          return;
          }
 
-      Store store = StoreManager.connectStore(conn, params.get("-backend"), params.get("-schema"), storeName,
+      Store store = StoreManager.connectStore(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName,
             Context.defaultContext);
 
       int columns[] = store.getDirectPredicates().getHashes(finalArg);

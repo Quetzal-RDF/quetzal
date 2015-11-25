@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 
 public class UpdateRdfStoreStats extends AbstractRdfCommand {
@@ -33,7 +34,7 @@ public class UpdateRdfStoreStats extends AbstractRdfCommand {
 	@Override
 	public void doWork(Connection conn) {
 		try {
-			StoreManager.runStats(conn, params.get("-backend"), params.get("-schema"), storeName, Context.defaultContext);
+			StoreManager.runStats(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName, Context.defaultContext);
 		}
 		catch(RdfStoreException e) {
 			log.error(e);

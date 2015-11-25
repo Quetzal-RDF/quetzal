@@ -19,6 +19,7 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.Store.Db2Type;
 import com.ibm.research.rdf.store.Store.PredicateTable;
 import com.ibm.research.rdf.store.config.Constants;
@@ -49,7 +50,7 @@ public class StoreManager {
 	 * @return Store object
 	 */
 	public static Store createStoreWithPredicateMappings(Connection conn,
-			String backend, String schemaName, String storeName,
+			Backend backend, String schemaName, String storeName,
 			String predicateMappings, String tableSpaceName) {
 		//
 		// If the schema does not exist in the database, we need to create it
@@ -62,14 +63,14 @@ public class StoreManager {
 		StoreHelper.setSchema(conn, backend, schemaName);
 
 		boolean changedAutoCommit = false;
-		if (!Store.Backend.shark.name().equalsIgnoreCase(backend)) {
+		if (!(Store.Backend.shark == backend)) {
 			changedAutoCommit = StoreHelper.setupAutoCommit(conn);
 		}
 		//
 		// There is a typeof function that is used in the DDL and must be loaded
 		// at this point
 		//
-		if (!Store.Backend.shark.name().equalsIgnoreCase(backend)) {
+		if (!(Store.Backend.shark == backend)) {
 			StoreHelper.createFunctions(conn, backend);
 		}
 
@@ -80,7 +81,7 @@ public class StoreManager {
 
 		Store store = StoreHelper.createDefaultStore(conn, backend, schemaName,
 				storeName, predicateMappings, tableSpaceName);
-		if (!Store.Backend.shark.name().equalsIgnoreCase(backend)) {
+		if (!(Store.Backend.shark == backend)) {
 			StoreHelper.releaseAutoCommit(conn, changedAutoCommit);
 		}
 		return store;
@@ -147,7 +148,7 @@ public class StoreManager {
 	 * @datasetName a unique identifier for the dataset in the DB/Schema
 	 * @return Store object
 	 */
-	public static Store connectStore(Connection conn, String backend,
+	public static Store connectStore(Connection conn, Backend backend,
 			String schemaName, String storeName, Context context) {
 
 		StoreImpl store = (StoreImpl) initialConnect(conn, backend, schemaName,
@@ -217,6 +218,8 @@ public class StoreManager {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+		store.getStoreBackend();
+		
 
 		return store;
 
@@ -250,7 +253,7 @@ public class StoreManager {
 	 *             exists
 	 * @datasetName a unique identifier for the dataset in the DB/Schema
 	 */
-	public static void runStats(Connection conn, String backend,
+	public static void runStats(Connection conn, Backend backend,
 			String schemaName, String storeName, Context context) {
 
 		// update the internal statistics maintained as well as run
@@ -281,7 +284,7 @@ public class StoreManager {
 	 *                       predicateMapping is to be stored.
 	 */
 	public static void generatePredicateMappings(Connection conn,
-			String backend, String schemaName, String storeName,
+			Backend backend, String schemaName, String storeName,
 			OutputStream predicateMappings, Context context) {
 
 		Store store = initialConnect(conn, backend, schemaName, storeName,
@@ -296,7 +299,7 @@ public class StoreManager {
 	 *             exists
 	 * @datasetName a unique identifier for the dataset in the DB/Schema
 	 */
-	public static void dropRDFStore(Connection conn, String backend,
+	public static void dropRDFStore(Connection conn, Backend backend,
 			String schemaName, String storeName, Context context) {
 
 		StoreHelper.setSchema(conn, backend, schemaName);
@@ -312,7 +315,7 @@ public class StoreManager {
 		 */
 	}
 
-	private static Store initialConnect(Connection conn, String backend,
+	private static Store initialConnect(Connection conn, Backend backend,
 			String schemaName, String storeName, Context context) {
 		StoreHelper.setSchema(conn, backend, schemaName);
 		Store store = StoreHelper.connectStore(conn, backend, schemaName,

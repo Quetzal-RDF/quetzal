@@ -39,8 +39,7 @@ public abstract class SimplePatternSQLTemplate extends AbstractSQLTemplate {
 			Context ctx, STPlanWrapper wrapper, PlanNode planNode) {
 		super(templateName, store, ctx, wrapper, planNode);
 		this.wrapper.mapPlanNode(planNode);
-		if (store.getStoreBackend()
-				.equalsIgnoreCase(Store.Backend.shark.name())) {
+		if (store.getStoreBackend() == Store.Backend.shark) {
 			tTableColumnPrefix = "T.";
 		} else {
 			tTableColumnPrefix = "";

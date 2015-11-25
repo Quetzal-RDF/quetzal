@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.BinaryUnion;
@@ -132,13 +133,13 @@ public class CodeGenerator {
 		//planNode2ReferenceTempTables = HashMapFactory.make();
 	}
 	public static boolean isDB2Backend(Store store) {
-		return store.getStoreBackend().equals("db2");
+		return store.getStoreBackend() == Backend.db2;
 	}
 	public boolean isDB2Backend() {
 		return isDB2Backend(store);
 	}
 	public  static boolean isPostGresBackend(Store store) {
-		return store.getStoreBackend().equals("postgresql");
+		return store.getStoreBackend() == Backend.postgresql;
 	}
 	public  boolean isPostGresBackend() {
 		return isPostGresBackend(store);

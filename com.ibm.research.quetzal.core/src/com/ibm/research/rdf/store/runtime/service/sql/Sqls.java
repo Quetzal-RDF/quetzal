@@ -16,6 +16,7 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 
 public class Sqls extends Properties
    {
@@ -26,7 +27,7 @@ public class Sqls extends Properties
    private static final long serialVersionUID = 1L;
    private static Sqls       props            = null;
 
-   public static Sqls getSqls(String backend)
+   public static Sqls getSqls(Backend backend)
       {
 
       if (props == null)
@@ -34,7 +35,7 @@ public class Sqls extends Properties
          props = new Sqls();
          InputStream in;
 
-         if (backend.equalsIgnoreCase(Store.Backend.postgresql.name()))
+         if (backend == Store.Backend.postgresql)
             {
             in = props
                   .getClass()
@@ -42,7 +43,7 @@ public class Sqls extends Properties
                   .getResourceAsStream(
                         "com/ibm/research/rdf/store/runtime/service/sql/PostgreSQLRdfStoreSqls");
             }
-         else if (backend.equalsIgnoreCase(Store.Backend.db2.name()))
+         else if (backend == Store.Backend.db2)
             {
             in = props
                   .getClass()
@@ -52,7 +53,7 @@ public class Sqls extends Properties
             }
          else
          { 
-        	 assert backend.equalsIgnoreCase(Store.Backend.shark.name()) : "Unsupported backend: "+backend;
+        	 assert backend == Store.Backend.shark : "Unsupported backend: "+backend;
         	 in = props
                      .getClass()
                      .getClassLoader()

@@ -27,6 +27,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
@@ -96,7 +97,7 @@ public class QueryRdfStore extends ShowPredicateColumns
 
       try
          {
-         Store store = StoreManager.connectStore(conn, params.get("-backend"), params.get("-schema"), storeName,
+         Store store = StoreManager.connectStore(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName,
                Context.defaultContext);
          String unionDef = params.get("-uniondefaultgraph");
          if (unionDef != null && unionDef.equalsIgnoreCase("true"))
@@ -104,7 +105,7 @@ public class QueryRdfStore extends ShowPredicateColumns
             store.getContext().set(Context.unionDefaultGraph, true);
             }
 
-         Dataset ds = RdfStoreFactory.connectDataset(store, conn, params.get("-backend"));
+         Dataset ds = RdfStoreFactory.connectDataset(store, conn, Backend.valueOf(params.get("-backend")));
          Query q = RdfStoreQueryFactory.create(query);
          QueryExecution qe = RdfStoreQueryExecutionFactory.create(q, ds);
 

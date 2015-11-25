@@ -35,7 +35,7 @@ import com.ibm.research.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
 public class StoreImpl implements Store {
 
 	private String storeName;
-	private String storeBackend;
+	private Backend storeBackend;
 	private String directPrimary;
 	private String directSecondary;
 	private String reversePrimary;
@@ -92,7 +92,7 @@ public class StoreImpl implements Store {
 		return storeName;
 	}
 
-	public String getStoreBackend() {
+	public Backend getStoreBackend() {
 		return storeBackend;
 	}
 
@@ -164,18 +164,18 @@ public class StoreImpl implements Store {
 		this.regexUdf = name + Constants.NAME_UDF_REGEX;
 	}
 
-	public void setStoreBackend(String storeBackend) {
+	public void setStoreBackend(Backend storeBackend) {
 		this.storeBackend = storeBackend;
 		String templatesFile = null;
 		String dataTypesFile = null;
 		try {
-			if (storeBackend.equalsIgnoreCase(Store.Backend.postgresql.name()))
+			if (storeBackend==Store.Backend.postgresql)
 			{
 				templatesFile = PSQLtemplatesFile;
 				dataTypesFile = PostgresqlDatatypesFile;
 			
 			}
-			else if (storeBackend.equalsIgnoreCase(Store.Backend.shark.name()))
+			else if (storeBackend==Store.Backend.shark)
 			{
 				templatesFile = SharktemplatesFile;
 				dataTypesFile = SharkDatatypesFile;

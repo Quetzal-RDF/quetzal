@@ -97,7 +97,7 @@ public abstract class AbstractSelectTemplate extends SolutionModifierBaseTemplat
 		mappings.put("project", projectMapping);
 		
 		SolutionModifiers solMod = getSolutionModifiers();
-		if (!projectAll && store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name()) 
+		if (!projectAll && (store.getStoreBackend() == Store.Backend.shark) 
 			&& solMod!=null && solMod.getOrderClause()!=null && solMod.getOrderClause().size()>0) {
 			Set<Variable> varsInOrderBy = HashSetFactory.make();
 			for (OrderCondition order : solMod.getOrderClause()) {

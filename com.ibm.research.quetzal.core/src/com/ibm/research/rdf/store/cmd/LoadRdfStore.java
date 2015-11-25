@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.query.Dataset;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
 
@@ -43,8 +44,8 @@ public class LoadRdfStore  extends ShowPredicateColumns {
 		
 		try {
 		
-			Store store = StoreManager.connectStore(conn, params.get("-backend"), params.get("-schema"), storeName, Context.defaultContext);
-			Dataset db2DS = RdfStoreFactory.connectDataset(store, conn, params.get("-backend"));
+			Store store = StoreManager.connectStore(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName, Context.defaultContext);
+			Dataset db2DS = RdfStoreFactory.connectDataset(store, conn, Backend.valueOf(params.get("-backend")));
 		
 //			Lang lang = Lang. Lang.guess(finalArg);
 //			long timeTaken;

@@ -50,7 +50,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 	
 	public TripleAllPredicatesBothSQLTemplate(String templateName, PlanNode planNode, Store store, Context ctx, STPlanWrapper wrapper) {
 		super(templateName, store, ctx, wrapper, planNode);		
-		ltTempTable = store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())? "LT.nstruct":"LT";
+		ltTempTable = store.getStoreBackend() == Store.Backend.shark ? "LT.nstruct":"LT";
 		
 	}
 
@@ -99,7 +99,7 @@ public class TripleAllPredicatesBothSQLTemplate extends SimplePatternBothSQLTemp
 		// so, we first create a CTE Q<sql_id>Prime that first join T and predecessor.
 		// We then need to replace references to the predecessor CTE in the project by references to the 
 		// intermediate CTE Q<sql_id>Prime		
-		if (targets.size()>1 && store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+		if (targets.size()>1 && store.getStoreBackend() == Store.Backend.shark) {
 			String target = null;
 			PlanNode predecessor = planNode.getPredecessor(wrapper.getPlan());
 			if(predecessor!=null){

@@ -22,6 +22,7 @@ import java.sql.SQLException;
 
 import com.ibm.research.proppaths.CTEToNestedQueryConverter;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.config.Statistics;
 import com.ibm.research.rdf.store.config.StatisticsImpl;
@@ -37,7 +38,7 @@ public class DbBasedStatisticsMgr
 
    private Store               store                     = null;
    private Connection          con                       = null;
-   private String              backend                   = null;
+   private Backend              backend                   = null;
 
    private static final String BASE_STAT_GRAPH           = "GRAPH";
    private static final String BASE_STAT_GRAPH_OBJ       = "graph_obj";
@@ -54,7 +55,7 @@ public class DbBasedStatisticsMgr
 
    private int                 nrTriples                 = 0;
 
-   public DbBasedStatisticsMgr(Connection con, String backend, Store store)
+   public DbBasedStatisticsMgr(Connection con, Backend backend, Store store)
       {
       super();
       this.store = store;
@@ -69,7 +70,7 @@ public class DbBasedStatisticsMgr
 
    public void populateStatsSchema()
       {
-	   if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+	   if (store.getStoreBackend() == Store.Backend.shark) {
 			  int reducers = Store.SHARK_REDUCERS;
 			  String prop = System.getProperty("mapred.reduce.tasks");
 			  if (prop!=null) {
@@ -92,13 +93,13 @@ public class DbBasedStatisticsMgr
       }
 
    private boolean isSharkEngine() {
-	   return  this.backend.equalsIgnoreCase(Store.Backend.shark.name());
+	   return  this.backend == Store.Backend.shark;
    }
    private boolean isPostgresqlEngine() {
-	   return  this.backend.equalsIgnoreCase(Store.Backend.postgresql.name());
+	   return  this.backend == Store.Backend.postgresql;
    }
    private boolean isDB2Engine() {
-	   return  this.backend.equalsIgnoreCase(Store.Backend.db2.name());
+	   return  this.backend == Store.Backend.db2;
    }
    private void populateTopKStats()
       {
@@ -125,7 +126,7 @@ public class DbBasedStatisticsMgr
       try {
     	  SQLExecutor.executeUpdate(con, query.toString());
       } catch (RuntimeException e) {
-    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+    	  if (isSharkEngine()
 				   && (e.getCause() instanceof SQLException)
 					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
 					e.printStackTrace();
@@ -146,7 +147,7 @@ public class DbBasedStatisticsMgr
       try {
     	  SQLExecutor.executeUpdate(con, query.toString());
       } catch (RuntimeException e) {
-    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+    	  if (isSharkEngine()
 				   && (e.getCause() instanceof SQLException)
 					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
 					e.printStackTrace();
@@ -167,7 +168,7 @@ public class DbBasedStatisticsMgr
       try {
     	  SQLExecutor.executeUpdate(con, query.toString());
       } catch (RuntimeException e) {
-    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+    	  if (isSharkEngine()
 				   && (e.getCause() instanceof SQLException)
 					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
 					e.printStackTrace();
@@ -193,7 +194,7 @@ public class DbBasedStatisticsMgr
       try {
     	  SQLExecutor.executeUpdate(con, query.toString());
       } catch (RuntimeException e) {
-    	  if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())
+    	  if (isSharkEngine()
 				   && (e.getCause() instanceof SQLException)
 					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
 					e.printStackTrace();
@@ -284,7 +285,7 @@ public class DbBasedStatisticsMgr
       int distinctObjects = 0;
 
       // first delete all stats
-      if (backend.equalsIgnoreCase("postgresql"))
+      if (isPostgresqlEngine())
          {
          SQLExecutor.executeUpdate(con, "delete from " + store.getSchemaName() + "." + store.getBasicStatsTable());
          }
@@ -373,7 +374,7 @@ public class DbBasedStatisticsMgr
       System.err.println("triplesPerGraph " + triplesPerGraph);
       System.err.println("triplesPerSubject " + triplesPerSubject);
       System.err.println("triplesPerObject " + triplesPerObject);
-      if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+      if (isSharkEngine()) {
     	  Object[] stats = new Object[]{BASE_STAT_GRAPH, triplesPerGraph,BASE_STAT_SUBJ, triplesPerSubject, BASE_STAT_OBJ, triplesPerObject};
     	  for (int i=0; i<stats.length/2;i++) {
     		  loadValuesToShark("loadBasicStats", store.getBasicStatsTable(), stats[2*i], stats[2*i+1]);
@@ -398,7 +399,7 @@ public class DbBasedStatisticsMgr
 
       }
    private void loadValuesToShark(String optionalTempFilePrefix, String table,  Object... values) {
-	   String insertBasics = Sqls.getSqls(Store.Backend.shark.name()).getSql("insertLoad").replaceFirst("%s", table);
+	   String insertBasics = Sqls.getSqls(Store.Backend.shark).getSql("insertLoad").replaceFirst("%s", table);
 	   try {
  		  File loadFile = File.createTempFile(optionalTempFilePrefix!=null?optionalTempFilePrefix:"load", ".load");
 			  BufferedWriter out = new BufferedWriter(new FileWriter(loadFile, false));
@@ -601,7 +602,7 @@ public class DbBasedStatisticsMgr
       int maxPreds = (direct) ? store.getDPrimarySize() : store.getRPrimarySize();
       query.append(" FROM \n");
 
-      if (this.backend.equalsIgnoreCase("postgresql"))
+      if (isPostgresqlEngine())
          {
          query.append(" (SELECT ENTRY, GID, UNNEST(ARRAY_REMOVE(ARRAY[");
          int nrPreds = 0;
@@ -632,7 +633,7 @@ public class DbBasedStatisticsMgr
          
          query.append(" FROM " + ((direct)?store.getDirectPrimary():store.getReversePrimary()) + ") AS LT");
          }
-      else if (this.backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+      else if (isSharkEngine()) {
     	  query.append("( ");
     	  if (predOnly) {
 	    	  query.append("select entry, gid, prop");

@@ -17,6 +17,7 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.jena.impl.DB2Dataset;
 import com.ibm.research.rdf.store.jena.impl.DB2Graph;
@@ -35,10 +36,10 @@ public class RdfStoreFactory extends DatasetFactory
     * @return the default Model/Graph of the created dataset
     */
 
-   public static Dataset connectDataset(Store store, Connection connection, String backend)
+   public static Dataset connectDataset(Store store, Connection connection, Backend backend)
       {
       StoreHelper.setSchema(connection, backend, store.getSchemaName());
-      if (backend.equalsIgnoreCase("db2"))
+      if (backend == Backend.db2)
          {
          StoreHelper.setPath(connection, store.getSchemaName());
          }

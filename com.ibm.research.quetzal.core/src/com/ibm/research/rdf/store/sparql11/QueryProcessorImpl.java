@@ -35,6 +35,7 @@ import com.ibm.research.proppaths.StoreProcedure;
 import com.ibm.research.proppaths.TemporaryTableMgr;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.query.QueryProcessor;
 import com.ibm.research.rdf.store.runtime.service.sql.StoreImpl;
 import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
@@ -259,7 +260,7 @@ public class QueryProcessorImpl implements QueryProcessor
                    */
                   if (!hasNoPropertyPath)
                      {
-                	 TemporaryTableMgr tmptableMgr = store.getStoreBackend().equals("db2") ? DefaultTemporaryTableMgr
+                	 TemporaryTableMgr tmptableMgr = store.getStoreBackend() == Backend.db2 ? DefaultTemporaryTableMgr
                               .get("tmpspace") : new CTENameMgr("cte");
                      DefaultStoreProcedureManager procMgr = new DefaultStoreProcedureManager("genproc");
                      CodeGenerator gen = new CodeGenerator(store, stats, ctx, query, greedyPlan, tmptableMgr, procMgr, 0);
@@ -301,7 +302,7 @@ public class QueryProcessorImpl implements QueryProcessor
                         // st.executeBatch();
                         sql = proc.getSqlInvocatiionCode();
                         }
-                     else if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+                     else if (store.getStoreBackend() == Store.Backend.shark) {
                     	 //TODO
                     	 throw new RuntimeException("Recursive Property Paths not supported yet in Hive/Shark backend!"); 
                      } else {
@@ -374,7 +375,7 @@ public class QueryProcessorImpl implements QueryProcessor
         	if (st == null) {
         		 st = connection.createStatement();
         	}
-        	if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+        	if (store.getStoreBackend() == Store.Backend.shark) {
         		int reducers = Store.SHARK_REDUCERS;
        		 	String prop = System.getProperty("mapred.reduce.tasks");
        		 	if (prop!=null) {

@@ -21,6 +21,7 @@ import org.openjena.riot.RiotWriter;
 import com.hp.hpl.jena.query.Dataset;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
@@ -44,8 +45,8 @@ public class DumpRdfStore extends AbstractRdfCommand {
 		// create the store.
 		try {
 			
-			Store store = StoreManager.connectStore(conn, params.get("-backend"), params.get("-schema"), storeName, Context.defaultContext);
-			Dataset ds = RdfStoreFactory.connectDataset(store, conn, params.get("-backend"));
+			Store store = StoreManager.connectStore(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName, Context.defaultContext);
+			Dataset ds = RdfStoreFactory.connectDataset(store, conn, Backend.valueOf(params.get("-backend")));
 			
 			PrintStream ps = new PrintStream(new BufferedOutputStream(System.out,1000000));
 			RiotWriter.writeNQuads(ps, ds.asDatasetGraph());

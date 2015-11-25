@@ -43,7 +43,7 @@ public interface Store {
 	
 	public String getStoreName();
 
-   public String getStoreBackend();
+   public Backend getStoreBackend();
 
 	public String getDirectPrimary();
 

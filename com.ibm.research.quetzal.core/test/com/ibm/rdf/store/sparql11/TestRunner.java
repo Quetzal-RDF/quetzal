@@ -85,11 +85,11 @@ public class TestRunner<D> {
 		public abstract TestData cloneAndResetStore(String dataset);
 		
 		protected void setStore() {
-			store = StoreManager.connectStore(conn, getBackend().name(), schemaName,
+			store = StoreManager.connectStore(conn, getBackend(), schemaName,
 					dataset, ctx);
 			if (defUnionGraph)
 				ctx.set(Context.unionDefaultGraph, Boolean.TRUE);
-			ds = RdfStoreFactory.connectDataset(store, conn, getBackend().name());
+			ds = RdfStoreFactory.connectDataset(store, conn, getBackend());
 		}
 				
 		/**

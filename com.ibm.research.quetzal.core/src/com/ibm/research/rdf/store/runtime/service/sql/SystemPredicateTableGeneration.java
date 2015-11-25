@@ -11,6 +11,7 @@
 package com.ibm.research.rdf.store.runtime.service.sql;
 
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.config.Constants;
 
 public class SystemPredicateTableGeneration
@@ -30,11 +31,11 @@ public class SystemPredicateTableGeneration
       return actualBucketSize;
       }
 
-   public String getDirectPrimaryTableStatement(String backend, int gidLenght, int colLenght, int maxBucketNumber)
+   public String getDirectPrimaryTableStatement(Backend backend, int gidLenght, int colLenght, int maxBucketNumber)
       {
       int length = 0;
       StringBuffer sql = new StringBuffer();
-      boolean isSharkBackend= backend.equalsIgnoreCase(Store.Backend.shark.name());
+      boolean isSharkBackend= backend == Backend.shark;
       sql.append("CREATE TABLE %s(");
       sql.append(Constants.NAME_COLUMN_ENTRY + (isSharkBackend? " STRING, ": " VARCHAR(" + colLenght + ") NOT NULL, "));
       sql.append(Constants.NAME_COLUMN_GRAPH_ID +(isSharkBackend? " STRING, ": " VARCHAR(" + gidLenght + ") NOT NULL, "));
@@ -54,7 +55,7 @@ public class SystemPredicateTableGeneration
          sql.append(Constants.NAME_COLUMN_PREFIX_TYPE + i + " smallint ");
          }
 
-      if (backend.equalsIgnoreCase("db2"))
+      if (backend == Store.Backend.db2)
          {
          sql.append(") VALUE COMPRESSION COMPRESS YES NOT LOGGED INITIALLY");
          }
@@ -62,28 +63,28 @@ public class SystemPredicateTableGeneration
          {
          sql.append(")");
          }
-      if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+      if (isSharkBackend) {
     	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t'");
     	 // sql.append("CACHE TABLE %s");
       }
       return sql.toString();
       }
 
-   public String getReversePrimaryTableStatement(String backend, int gidLenght, int colLenght, int maxBucketNumber)
+   public String getReversePrimaryTableStatement(Backend backend, int gidLenght, int colLenght, int maxBucketNumber)
       {
       int length = 0;
       StringBuffer sql = new StringBuffer();
-      boolean isSharkBackend= backend.equalsIgnoreCase(Store.Backend.shark.name());
+      boolean isSharkBackend= (backend == Store.Backend.shark);
       
       sql.append("CREATE TABLE %s(");
       sql.append(Constants.NAME_COLUMN_ENTRY +(isSharkBackend? " STRING, ":  " VARCHAR(" + colLenght + ") NOT NULL, "));
       sql.append(Constants.NAME_COLUMN_GRAPH_ID +(isSharkBackend? " STRING, ":  " VARCHAR(" + gidLenght + ") NOT NULL, "));
       sql.append(Constants.NAME_COLUMN_SPILL +  (isSharkBackend?" INT, ":" INTEGER DEFAULT 0, "));
-      if (backend.equalsIgnoreCase("db2"))
+      if (backend == Store.Backend.db2)
          {
          sql.append(Constants.NAME_COLUMN_ENTRY_NUMERIC + " DECFLOAT(34) , ");
          }
-      if (backend.equalsIgnoreCase("postgresql"))
+      if (backend == Store.Backend.postgresql)
          {
          sql.append(Constants.NAME_COLUMN_ENTRY_NUMERIC + " DOUBLE PRECISION , ");
          }
@@ -107,7 +108,7 @@ public class SystemPredicateTableGeneration
          sql.append(Constants.NAME_COLUMN_PREFIX_VALUE + i + (isSharkBackend? " STRING ": " VARCHAR(" + colLenght + ")"));
          }
 
-      if (backend.equalsIgnoreCase("db2"))
+      if (backend == Store.Backend.db2)
          {
          sql.append(") VALUE COMPRESSION COMPRESS YES NOT LOGGED INITIALLY");
          }
@@ -115,7 +116,7 @@ public class SystemPredicateTableGeneration
          {
          sql.append(")");
          }
-      if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+      if (backend == Store.Backend.shark) {
     	  sql.append(" ROW FORMAT DELIMITED FIELDS TERMINATED BY '\\t';\n");
     	//  sql.append("CACHE TABLE %s");
       }

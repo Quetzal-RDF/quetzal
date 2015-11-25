@@ -19,6 +19,7 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
 import com.ibm.research.rdf.store.jena.RdfStoreQueryExecutionFactory;
@@ -48,7 +49,7 @@ public class SPRQLParser {
 				String schema = "db2inst2";
 		//	 String schema = "";
 				store = null;
-				store = StoreManager.connectStore(conn, "db2", schema, storeName, Context.defaultContext);
+				store = StoreManager.connectStore(conn, Backend.valueOf("db2"), schema, storeName, Context.defaultContext);
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -67,7 +68,7 @@ public class SPRQLParser {
 			Query q = RdfStoreQueryFactory.create(query);
 
 			
-			Dataset ds = RdfStoreFactory.connectDataset(store, conn, "db2");
+			Dataset ds = RdfStoreFactory.connectDataset(store, conn, Backend.valueOf("db2"));
 		
 			QueryExecution qe = RdfStoreQueryExecutionFactory.create(q, ds);
 			

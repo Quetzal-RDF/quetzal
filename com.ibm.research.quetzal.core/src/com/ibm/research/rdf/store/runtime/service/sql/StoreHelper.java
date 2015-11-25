@@ -34,7 +34,6 @@ import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
-import com.ibm.research.rdf.store.cmd.UpdateRdfStoreStats;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.hashing.GraphColoringHashingFamily;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
@@ -76,7 +75,7 @@ public class StoreHelper
    protected static void
          ensureExistenceOfUserTablespaceAndBuiltInRecursiveStoreProcedure(Connection con, Store store) throws RdfStoreException
       {
-      if (!store.getStoreBackend().equals("db2"))
+      if (!(store.getStoreBackend() == Backend.db2))
          {
          // TODO for postgres
          return;
@@ -139,7 +138,7 @@ public class StoreHelper
     * @param systemPredicates
     * @return
     */
-   public static boolean createRdfStoreTable(Connection conn, String backend, String schemaName, String storeName,
+   public static boolean createRdfStoreTable(Connection conn, Backend backend, String schemaName, String storeName,
          String tablespaceName, String predicateMappings)
       {
 
@@ -150,7 +149,7 @@ public class StoreHelper
       //
       // For PostgreSQL, a sequence must be defined for the master table
       //
-      if (backend.equalsIgnoreCase("postgresql"))
+      if (backend == Store.Backend.postgresql)
          {
          String newSeq = Sqls.getSqls(backend).getSql("entry_id_seq");
          newSeq = newSeq.replaceFirst("%s", storeName);
@@ -160,7 +159,7 @@ public class StoreHelper
       long length = new File(predicateMappings).length();
       String t = Sqls.getSqls(backend).getSql("storeCfgTable");
       t = t.replaceFirst("%s", storeName);
-      if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+      if  (Backend.shark == backend) {
      	 t = t.replaceFirst("%s",storeName); // needed for shark in "CACHE TABLE %s"
       }
 
@@ -172,7 +171,7 @@ public class StoreHelper
       // In DB2, there is a CLOB object to hold the predicate mappings. We need to replace the %s with the size of the predicate_mappings file.
       // In PostgreSQL, the same attribute has type TEXT. So, no need to set it's size
       //
-      if (backend.equalsIgnoreCase("db2"))
+      if (backend == Backend.db2)
          {
          t = t.replaceFirst("%s", predicateMappings == null ? "2M" : String.valueOf(Math.round(length * 1.2)));
          }
@@ -180,7 +179,7 @@ public class StoreHelper
       //
       // In PostgreSQL, entry_ID is a sequence, so we need to properly set it. This is where the second %s appears in PostgreSQL
       //
-      if (backend.equalsIgnoreCase("postgresql"))
+      if (backend == Backend.postgresql)
          {
          t = t.replace("%s", storeName);
          }
@@ -208,7 +207,7 @@ public class StoreHelper
     * @param datasetName
     * @param names
     */
-   public static Store createDefaultStore(Connection conn, String backend, String schemaName, String datasetName,
+   public static Store createDefaultStore(Connection conn, Backend backend, String schemaName, String datasetName,
          String predicateMappings, String tablespaceName)
       {
       boolean storeCreation = checkProperty("com.ibm.rdf.createStore");
@@ -251,7 +250,7 @@ public class StoreHelper
             }
          currentObj = names.getProperty(Constants.NAME_TABLE_DIRECT_PRIMARY_HASH);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -274,7 +273,7 @@ public class StoreHelper
             t = Sqls.getSqls(backend).getSql("defaultReversePrimary");
             }
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -289,7 +288,7 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultDirectSecondary");
          currentObj = names.getProperty(Constants.NAME_TABLE_DIRECT_SECONDARY_HASH);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -298,7 +297,7 @@ public class StoreHelper
             }
          doSql(conn, backend, t);
 
-         if (backend.equalsIgnoreCase("postgresql"))
+         if (backend == Backend.postgresql)
             {
             t = Sqls.getSqls(backend).getSql("triggerFunction");
             doSql(conn, backend, t);
@@ -314,7 +313,7 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultReverseSecondary");
          currentObj = names.getProperty(Constants.NAME_TABLE_REVERSE_SECONDARY_HASH);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -329,7 +328,7 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultLongStrings");
          currentObj = names.getProperty(Constants.NAME_TABLE_LONG_STRINGS);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          t = t.replaceFirst("%s", System.getProperty("com.ibm.rdf.longStringsLength", "2600"));
@@ -344,7 +343,7 @@ public class StoreHelper
          //
          t = Sqls.getSqls(backend).getSql("defaultPredInfoTable");
          t = t.replaceFirst("%s", datasetName + "_direct");
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s",datasetName + "_direct"); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -358,7 +357,7 @@ public class StoreHelper
          //
          t = Sqls.getSqls(backend).getSql("defaultPredInfoTable");
          t = t.replaceFirst("%s", datasetName + "_reverse");
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark==backend) {
         	 t = t.replaceFirst("%s",datasetName + "_reverse"); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -373,7 +372,7 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("basicStats");
          currentObj = names.getProperty(Constants.NAME_TABLE_BASIC_STATS);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark == backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -388,7 +387,7 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("topKStats");
          currentObj = names.getProperty(Constants.NAME_TABLE_TOPK_STATS);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark==backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -403,7 +402,7 @@ public class StoreHelper
          t = Sqls.getSqls(backend).getSql("defaultDataTypeTable");
          currentObj = names.getProperty(Constants.NAME_TABLE_DATATYPE);
          t = t.replaceFirst("%s", currentObj);
-         if  (Backend.shark.name().equalsIgnoreCase(backend)) {
+         if  (Backend.shark==backend) {
         	 t = t.replaceFirst("%s", currentObj); // needed for shark in "CACHE TABLE %s"
          }
          if (tablespaceName != null)
@@ -412,7 +411,7 @@ public class StoreHelper
             }
          doSql(conn, backend, t);
 
-         if (!backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+         if (!(backend == Store.Backend.shark)) {
 	         //
 	         // crerate the datatype sequences
 	         //
@@ -429,7 +428,7 @@ public class StoreHelper
          }
 
          // insert into Config table
-         if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+         if (backend == Store.Backend.shark) {
         	 BufferedWriter out = null;
         	 try {
 				File loadFile = File.createTempFile("loadKBMetaDataRow", ".hiveql");
@@ -534,7 +533,7 @@ public class StoreHelper
 
          if (!generateSqlOnly)
             {
-            if (backend.equalsIgnoreCase("db2"))
+            if (backend == Backend.db2)
                {
                setupRunStatsProfile(conn, backend, names.getProperty(Constants.NAME_TABLE_DIRECT_PRIMARY_HASH),
                      names.getProperty(Constants.NAME_TABLE_DIRECT_SECONDARY_HASH),
@@ -562,7 +561,7 @@ public class StoreHelper
          }
       }
 
-   private static void doSql(Connection conn, String backend, String t)
+   private static void doSql(Connection conn, Backend backend, String t)
       {
       String generateSqlOnly = System.getProperty("com.ibm.rdf.generateStoreSQL");
       if (generateSqlOnly != null) {
@@ -570,8 +569,8 @@ public class StoreHelper
 			FileWriter fw = new FileWriter(generateSqlOnly, true);
 			fw.append(t);
 			fw.append(
-				backend.equalsIgnoreCase(Store.Backend.postgresql.name())
-				|| backend.equalsIgnoreCase(Store.Backend.shark.name())?
+				backend == Store.Backend.postgresql
+				|| backend == Store.Backend.shark ?
 					";\n":
 					"\n");
 			fw.close();
@@ -586,7 +585,7 @@ public class StoreHelper
          }
       }
 
-   public static void createIndexes(Connection conn, String backend, java.util.Properties names, String datasetName )
+   public static void createIndexes(Connection conn, Backend backend, java.util.Properties names, String datasetName )
       {
       String t;
       // create primary indexes
@@ -628,7 +627,7 @@ public class StoreHelper
       t = t.replaceAll("%s", names.getProperty(Constants.NAME_TABLE_LONG_STRINGS));
       doSql(conn, backend, t);
       
-      if (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+      if (backend == Store.Backend.shark) {
     	  //index to replace primary key (pred) of defaultPredInfoTable 
     	  // primary key not supported in hive ql
     	  t = Sqls.getSqls(backend).getSql("indexPREDINFO");
@@ -645,7 +644,7 @@ public class StoreHelper
       
       }
 
-   public static Store connectStore(Connection conn, String backend, String schemaName, String datasetName, Context context)
+   public static Store connectStore(Connection conn, Backend backend, String schemaName, String datasetName, Context context)
       {
 
       StoreImpl store = null;
@@ -664,7 +663,7 @@ public class StoreHelper
       return store;
       }
 
-   public static void deleteStore(Connection conn, String backend, String schemaName, String datasetName, Context context)
+   public static void deleteStore(Connection conn, Backend backend, String schemaName, String datasetName, Context context)
       {
       String curTable = new String();
 
@@ -718,24 +717,24 @@ public class StoreHelper
          doSql(conn, backend, "drop sequence " + s.getDataTypeTable() + "_lang_seq");
          }
 
-      if (backend.equalsIgnoreCase("postgresql"))
+      if (backend == Backend.postgresql)
          {
          doSql(conn, backend, "drop sequence " + datasetName + "_entry_id_seq");
          }
       }
 
-   private static void setupRunStatsProfile(Connection conn, String backend, String dphName, String dsName, String rphName,
+   private static void setupRunStatsProfile(Connection conn, Backend backend, String dphName, String dsName, String rphName,
          String rsName, String lstrName, int bucketSizeDPH, int bucketSizeRPH, String schema)
       {
 
-      if (backend.equalsIgnoreCase("postgresql"))
+      if (backend == Backend.postgresql)
          {
          String dbRunStatsSql = Sqls.getSqls(backend).getSql("dphRphRunStats");
          dbRunStatsSql = dbRunStatsSql.replaceFirst("%s", schema);
          dbRunStatsSql = dbRunStatsSql.replaceFirst("%t", dphName);
          SQLExecutor.executeCall(conn, dbRunStatsSql);
          }
-      if (backend.equalsIgnoreCase("db2"))
+      if (backend == Backend.db2)
          {
          String dbRunStatsSql = Sqls.getSqls(backend).getSql("dphRphRunStats");
          dbRunStatsSql = dbRunStatsSql.replaceFirst("%s", schema);
@@ -843,10 +842,10 @@ public class StoreHelper
          }
       }
 
-   public static void createSchema(Connection conn, String backend, String schemaName)
+   public static void createSchema(Connection conn, Backend backend, String schemaName)
       {
-      if (backend.equalsIgnoreCase(Store.Backend.postgresql.name()) 
-    	|| backend.equalsIgnoreCase(Store.Backend.shark.name()))
+      if (backend == Store.Backend.postgresql 
+    	|| backend == Store.Backend.shark)
          {
          doSql(conn, backend, "CREATE SCHEMA IF NOT EXISTS " + schemaName);
          }
@@ -876,19 +875,19 @@ public class StoreHelper
 
       }
 
-   public static void setSchema(Connection conn, String backend, String schemaName)
+   public static void setSchema(Connection conn, Backend backend, String schemaName)
       {
       if (schemaName != null && schemaName.length() > 0)
          {
-         if (backend.equalsIgnoreCase(Store.Backend.postgresql.name()))
+         if (backend == Store.Backend.postgresql)
             {
             doSql(conn, backend, "SET SCHEMA '" + schemaName + "'");
             }
-         else if (backend.equalsIgnoreCase(Store.Backend.db2.name()))
+         else if (backend == Store.Backend.db2)
             {
             doSql(conn, backend, "SET SCHEMA " + schemaName);
             }
-         else if (backend.equalsIgnoreCase(Store.Backend.shark.name()))
+         else if (backend == Store.Backend.shark)
          {
         	 //Do nothing
          }
@@ -940,7 +939,7 @@ public class StoreHelper
                });
       }
 
-   public static void createFunctions(Connection conn, String backend)
+   public static void createFunctions(Connection conn, Backend backend)
       {
       String functionString = Sqls.getSqls(backend).getSql("typeofFuntion");
 

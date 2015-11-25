@@ -26,6 +26,7 @@ import com.ibm.rdf.store.testing.RandomizedRepeat;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.query.QueryProcessor;
 import com.ibm.research.rdf.store.query.QueryProcessorFactory;
 import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
@@ -59,7 +60,7 @@ public class DB2SP2BTest
          {
          Class.forName("com.ibm.db2.jcc.DB2Driver");
          conn = DriverManager.getConnection(jdbcUri, username, passwd);
-         store = StoreManager.connectStore(conn, "db2", schemaname, datasetName, Context.defaultContext);
+         store = StoreManager.connectStore(conn, Backend.valueOf("db2"), schemaname, datasetName, Context.defaultContext);
 
          }
       catch (ClassNotFoundException e)

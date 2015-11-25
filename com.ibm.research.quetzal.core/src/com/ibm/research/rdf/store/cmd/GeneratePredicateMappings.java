@@ -19,6 +19,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.StoreManager;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 
 /**
@@ -40,7 +41,7 @@ public class GeneratePredicateMappings extends AbstractRdfCommand {
 			
 			PrintStream ps = new PrintStream(new BufferedOutputStream(System.out,1000000));
 			
-			StoreManager.generatePredicateMappings(conn, params.get("-backend"), params.get("-schema"),
+			StoreManager.generatePredicateMappings(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"),
 					storeName, ps, Context.defaultContext);
 			ps.close();
 			

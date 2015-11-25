@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.query.QueryProcessor;
 import com.ibm.research.rdf.store.query.QueryProcessorFactory;
@@ -46,7 +47,7 @@ public class SPARQLBaseTests {
 					"jdbc:db2://min-1.watson.ibm.com:50001/RDFJAZZ", username,
 					passwd);
 			
-			store = StoreManager.connectStore(conn, "db2", null, datasetName, Context.defaultContext);
+			store = StoreManager.connectStore(conn, Backend.valueOf("db2"), null, datasetName, Context.defaultContext);
 						
 
 		} catch (ClassNotFoundException e) {

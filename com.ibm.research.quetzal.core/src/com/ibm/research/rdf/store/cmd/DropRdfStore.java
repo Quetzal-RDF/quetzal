@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.ibm.research.rdf.store.Context;
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 
@@ -35,7 +36,7 @@ public class DropRdfStore extends AbstractRdfCommand
       {
       try
          {
-         StoreManager.dropRDFStore(conn, params.get("-backend"), params.get("-schema"), storeName, Context.defaultContext);
+         StoreManager.dropRDFStore(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName, Context.defaultContext);
          }
       catch (RdfStoreException e)
          {

@@ -114,7 +114,7 @@ public class LeftSQLTemplate extends AbstractSQLTemplate {
 		List<String> constraintMapping = new LinkedList<String>();
 		Set<Variable> operatorVariables=left.getAvailableVariables();
 		for(Variable v : operatorVariables){
-			if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+			if (store.getStoreBackend() == Store.Backend.shark) {
 				constraintMapping.add("(" + wrapper.getPlanNodeCTE(right, false)+"."+v.getName()+" <=> "+wrapper.getPlanNodeCTE(left, false)+"."+v.getName()+")");
 			} else {
 				constraintMapping.add("(" + wrapper.getPlanNodeCTE(right, false)+"."+v.getName()+" = "+wrapper.getPlanNodeCTE(left, false)+"."+v.getName() + " OR (" + wrapper.getPlanNodeCTE(right, false)+"."+v.getName()+" is null and "+wrapper.getPlanNodeCTE(left, false)+"."+v.getName() + " is null))");

@@ -31,15 +31,15 @@ public class SQLTemplateManager
       try
          {
          InputStream configStream = null;
-         if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.db2.name()))
+         if (store.getStoreBackend() == Store.Backend.db2)
             {
             configStream = SQLTemplateManager.class.getResourceAsStream("DB2SQLTemplates");
             }
-         else if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.postgresql.name()))
+         else if (store.getStoreBackend() == Store.Backend.postgresql)
             {
             configStream = SQLTemplateManager.class.getResourceAsStream("PSQLSQLTemplates");
             }
-         else if (store.getStoreBackend().equalsIgnoreCase(Store.Backend.shark.name())) {
+         else if (store.getStoreBackend() == Store.Backend.shark) {
         	 configStream = SQLTemplateManager.class.getResourceAsStream("SharkSQLTemplates");
          }
          

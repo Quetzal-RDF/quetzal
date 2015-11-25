@@ -15,6 +15,7 @@ import java.sql.Connection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 
@@ -54,7 +55,7 @@ public class CreateRdfStore extends AbstractRdfCommand
          //
          // create the store.
          //
-         StoreManager.createStoreWithPredicateMappings(conn, params.get("-backend"), params.get("-schema"), storeName,
+         StoreManager.createStoreWithPredicateMappings(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName,
                predicateMappings, params.get("-tablespace"));
          }
       catch (RdfStoreException e)
