@@ -30,7 +30,7 @@ def extractDrugBank():
     rows = root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
 
     result = '<?xml version="1.0"?>'
-    result += '<data>'
+    result += '<data xmlns="http://www.drugbank.ca">'
     for row in rows:
         drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
         transporters = row.xpath('./x:transporters/x:transporter', namespaces={'x': 'http://www.drugbank.ca'})
