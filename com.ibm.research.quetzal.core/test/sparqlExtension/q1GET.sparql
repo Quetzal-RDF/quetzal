@@ -1,5 +1,5 @@
 
-prefix fn: <http://localhost:8082/>
+prefix fn: <http://localhost:8083/>
 prefix x: <http://www.drugbank.ca>
 prefix xs: <http://www.w3.org/2001/XMLSchema>
 

@@ -44,16 +44,15 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			names.add(prefix.getKey());
 			iris.add(prefix.getValue().getValue());
 		}
-		names.add("sparql");
-		iris.add("http://www.w3.org/2005/sparql-results#");
-		mappings.put("ns", new SQLMapping("ns", names, null));
-		mappings.put("iris", new SQLMapping("iris", iris, null));
 
 		Pattern sp = planNode.getPattern();
 		LinkedList<String> xPathForCols = new LinkedList<String>();
 		LinkedList<String> xPathForColTypes = new LinkedList<String>();
 
 		if (sp instanceof ServicePattern) {
+			names.add("sparql");
+			iris.add("http://www.w3.org/2005/sparql-results#");
+
 			// this supports the regular SPARQL service call right now
 			assert ((ServicePattern) sp).getService().isIRI();
 			String queryText = ((ServicePattern) sp).getQueryText();
@@ -93,6 +92,9 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			mappings.put("xPathForCols", new SQLMapping("xPathForCols", xPathForCols, null));
 			mappings.put("xPathForColTypes", new SQLMapping("xPathForColTypes", xPathForColTypes, null));
 		}
+
+		mappings.put("ns", new SQLMapping("ns", names, null));
+		mappings.put("iris", new SQLMapping("iris", iris, null));
 
 		if (planNode.isPost()) {
 			setupPostData(mappings);
