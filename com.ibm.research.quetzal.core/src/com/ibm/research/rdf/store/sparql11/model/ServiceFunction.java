@@ -3,6 +3,7 @@ package com.ibm.research.rdf.store.sparql11.model;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ibm.wala.util.collections.HashMapFactory;
 
@@ -33,8 +34,19 @@ public class ServiceFunction extends FunctionBase {
 		rowXPath = rowPath;
 	}
 
+	private static boolean isQuoted(String s) {
+		return s.startsWith("\"");
+	}
+	
+	private static String trim(String x) {
+		 return x.substring(1, x.length()-1);
+	}
+	
+	private String maybeTrim(String x) {
+		return isQuoted(x)? trim(x): x;
+	}
 	public String rowXPath() {
-		return rowXPath;
+		return maybeTrim(rowXPath);
 	}
 	
 	public void addServiceColumnXPath(String colPath) {
@@ -42,6 +54,6 @@ public class ServiceFunction extends FunctionBase {
 	}
 
 	public Iterable<String> columns() {
-		return colXPaths;
+		return colXPaths.stream().map((String x) -> maybeTrim(x)).collect(Collectors.toList());
 	}
 }
