@@ -90,16 +90,17 @@ QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP
    <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
 >>
 
-service(firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, outputColumns, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable) ::= <<
+service(ns, iris, xPathForRows, xPathForCols, xPathForColTypes, firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, outputColumns, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable) ::= <<
 QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
-   FROM XMLTABLE('declare namespace x="http://www.w3.org/2005/sparql-results#"; $results//x:result' 
+   FROM XMLTABLE('<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> $results<xPathForRows>' 
       PASSING XMLPARSE(
          DOCUMENT 
            DB2XML.HTTPGETBLOB('<service><queryText>','')
       ) as "results"
          COLUMNS 
-            <outputColumns; separator=",">
-            <if(dtCols)>, <dtCols; separator=","> <endif>)
+            <outputColumns,xPathForCols:{c,x|<c> VARCHAR(128) PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
+}; separator=","> <if(dtCols)>           ,<dtCols,xPathForColTypes:{c,x|<c>_TYP VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
+            }; separator=","><endif>) AS xml
    <if(dtConstraints)>, <dtTable> WHERE <dtConstraints; separator=" AND "><endif>),
 QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP 
    <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
