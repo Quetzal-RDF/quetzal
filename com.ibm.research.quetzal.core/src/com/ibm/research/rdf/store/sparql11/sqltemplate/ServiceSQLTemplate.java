@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
@@ -41,8 +42,10 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		List<String> names = new ArrayList<String>();
 		List<String> iris = new ArrayList<String>();
 		for (Map.Entry<String, IRI> prefix : wrapper.getQuery().getPrologue().getPrefixes().entrySet()) {
-			names.add(prefix.getKey());
-			iris.add(prefix.getValue().getValue());
+			if (! "".equals(prefix.getKey())) {
+				names.add(prefix.getKey());
+				iris.add(prefix.getValue().getValue());
+			}
 		}
 
 		Pattern sp = planNode.getPattern();
@@ -60,11 +63,12 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			String service = ((ServicePattern) sp).getService().getIRI().toString();
 			mappings.put("service", new SQLMapping("service", service, null));
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", "//sparql:result", null));
-			for (Variable v : planNode.getRequiredVariables()) {
-				xPathForCols.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"]");
+			Set<Variable> producedVars = planNode.getProducedVariables();
+			for (Variable v : producedVars) {
+				xPathForCols.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"])");
 			}
-			for (Variable v : planNode.getRequiredVariables()) {
-				xPathForCols.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"]//@datatype");
+			for (Variable v : getAllLiteralVars(producedVars)) {				
+				xPathForColTypes.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"]//@datatype)");
 			}
 		} else {
 			// this supports extensions to service which allow a GET/POST with parameters from an input table, in which case the GET
@@ -77,6 +81,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			Iterator<String> it = sf.columns().iterator();
 			while (it.hasNext()) {
 				xPathForCols.add(it.next());
+	
 				xPathForColTypes.add(it.next());
 			}
 			List<String> inputCols = new LinkedList<String>();
@@ -89,9 +94,10 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				inputCols.add(v.getName());
 			}
 			mappings.put("inputCols", new SQLMapping("inputCols", inputCols, null));
-			mappings.put("xPathForCols", new SQLMapping("xPathForCols", xPathForCols, null));
-			mappings.put("xPathForColTypes", new SQLMapping("xPathForColTypes", xPathForColTypes, null));
 		}
+
+		mappings.put("xPathForCols", new SQLMapping("xPathForCols", xPathForCols, null));
+		mappings.put("xPathForColTypes", new SQLMapping("xPathForColTypes", xPathForColTypes, null));
 
 		mappings.put("ns", new SQLMapping("ns", names, null));
 		mappings.put("iris", new SQLMapping("iris", iris, null));
