@@ -106,11 +106,11 @@ QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP
 )
 >>
 
-service(sql_id, urlTable, inputCols, service, httpMethod, queryText, names, iris, postedColumns, outputColumns, xPathForRows, xPathForColumns, xPathForColumnTypes) ::= <<
+service(sql_id, urlTable, inputCols, service, httpMethod, queryText, ns, iris, postedColumns, outputColumns, allColumns, xPathForRows, xPathForCols, xPathForColTypes) ::= <<
 <if(urlTable)>
 	QS<sql_id>_URLS AS (select * from <urlTable>),
 <else>
 	QS<sql_id>_URLS AS (select explode(array('<service>')) as url),
 <endif>
-QS<sql_id> AS (select httpGet('<outputColumns; separator=",">', '<inputCols>', '<httpMethod>', '<queryText>', '<names, iris:{n, i | <n>=<i>}; separator=",">', '<xPathForRows; separator=",">', '<outputColumns, xPathForColumns, xPathForColumnTypes:{o, c, t | <o> <c> <t>}; separator=" ">', url) as (<outputColumns; separator=",">) from QS<sql_id>_URLS)
+QS<sql_id> AS (select httpGet('<outputColumns; separator=",">', '<inputCols>', '<queryText>', '<httpMethod>', '<ns, iris:{n, iri | <n>=<iri>}; separator=",">', '<xPathForRows; separator=",">', <outputColumns, xPathForCols, xPathForColTypes:{o, c, t | '<o>', '<c>', '<t>'}; separator=",">, url) as (<allColumns; separator=",">) from QS<sql_id>_URLS)
 >>

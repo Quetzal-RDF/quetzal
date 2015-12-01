@@ -105,9 +105,9 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		if (planNode.isPost()) {
 			setupPostData(mappings);
 			mappings.put("htmlHeader", new SQLMapping("htmlHeader", "", null));
-			mappings.put("httpMethod",new SQLMapping("htmlMethod", "POST", null));
+			mappings.put("httpMethod",new SQLMapping("httpMethod", "POST", null));
 		} else {
-			mappings.put("httpMethod",new SQLMapping("htmlMethod", "GET", null));
+			mappings.put("httpMethod",new SQLMapping("httpMethod", "GET", null));
 		}
 		return mappings;
 	}

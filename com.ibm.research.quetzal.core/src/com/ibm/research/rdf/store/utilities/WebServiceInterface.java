@@ -4,13 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -88,11 +86,13 @@ public interface WebServiceInterface {
 						XPathConstants.NODE);
 				String value = column.getTextContent();
 				String type = null;
-				if (!xPathForColType.startsWith("<")) {
+				Node t = ((Node) xPath.compile(xPathForColType).evaluate(row,
+						XPathConstants.NODE));
+				if (t != null) {
 					type = ((Node) xPath.compile(xPathForColType).evaluate(row,
 						XPathConstants.NODE)).getTextContent();
 				} else {
-					type = xPathForColType.substring(1, xPathForColType.length() - 1);
+					type = xPathForColType;
 				}
 				
 				k[j * 2] = new Text(value);
@@ -138,23 +138,23 @@ public interface WebServiceInterface {
 	}
 
 	default short getTypedValue(String value, String colType) {
-		if (colType.equals("decimal")) {
+		if (colType.endsWith("decimal")) {
 			return TypeMap.DECIMAL_ID;
-		} else if (colType.equals("Date")) {
+		} else if (colType.endsWith("Date")) {
 			return TypeMap.DATE_ID;
-		} else if (colType.equals("Timestamp")) {
+		} else if (colType.endsWith("Timestamp")) {
 			return TypeMap.DATETIME_ID;
-		} else if (colType.equals("int")) {
+		} else if (colType.endsWith("int")) {
 			return TypeMap.INT_ID;
-		} else if (colType.equals("integer")) {
+		} else if (colType.endsWith("integer")) {
 			return TypeMap.INTEGER_ID;
-		} else if (colType.equals("short")) {
+		} else if (colType.endsWith("short")) {
 			return TypeMap.SHORT_ID;
-		} else if (colType.equals("float")) {
+		} else if (colType.endsWith("float")) {
 			return TypeMap.FLOAT_ID;
-		} else if (colType.equals("double")) {
+		} else if (colType.endsWith("double")) {
 			return TypeMap.DOUBLE_ID;
-		} else if (colType.equals("boolean")) {
+		} else if (colType.endsWith("boolean")) {
 			return TypeMap.BOOLEAN_ID;
 		} else {
 			return TypeMap.SIMPLE_LITERAL_ID;

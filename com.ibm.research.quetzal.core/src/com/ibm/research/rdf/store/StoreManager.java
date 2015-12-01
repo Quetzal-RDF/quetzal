@@ -220,7 +220,14 @@ public class StoreManager {
 		}
 		store.getStoreBackend();
 		
-
+		if (store.getStoreBackend() == Backend.shark) {
+			sql = "create temporary function httpGet as 'com.ibm.research.rdf.store.utilities.WebServiceGetUDTF'";
+			try {
+				conn.createStatement().executeQuery(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return store;
 
 		/*

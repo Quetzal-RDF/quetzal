@@ -98,6 +98,8 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		secondProjectCols.addAll(getProjectedVariablesFromPredecessor());
 		mappings.put("firstProjectCols", new SQLMapping("firstProjectCols", firstProjectCols, null));
 		mappings.put("secondProjectCols", new SQLMapping("secondProjectCols", secondProjectCols, null));
+		mappings.put("allColumns", new SQLMapping("allColumns", allColumns, null));
+
 			
 		if (pred != null) {
 			String leftSQLCte = wrapper.getPlanNodeCTE(pred, false);

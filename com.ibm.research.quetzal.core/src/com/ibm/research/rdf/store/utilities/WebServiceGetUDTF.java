@@ -1,5 +1,7 @@
 package com.ibm.research.rdf.store.utilities;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -19,13 +21,11 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantStringObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
-import org.apache.hadoop.io.Text;
 
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.Pair;
 
 public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterface {
@@ -185,11 +185,37 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 		argsToProcess[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector.create("http://localhost:8081/getDrugBank");
 		// argsToProcess[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector.create("file:///tmp/foo");
 
-		ObjectInspector[] inputParams = createInput(); 
+		// ObjectInspector[] inputParams = createInput(); 
 		
 		WebServiceGetUDTF udtf = new WebServiceGetUDTF();
-		udtf.initialize(inputParams);
-		udtf.process(argsToProcess);
+		//udtf.initialize(inputParams);
+		// udtf.process(argsToProcess);
+		udtf.outputColumnNames = new HashMapFactory().make();
+		udtf.outputColumnNames.put("drug", new Integer(0));
+		udtf.outputColumnNames.put("drug_typ", new Integer(1));
+
+		udtf.outputColumnNames.put("id", new Integer(2));
+		udtf.outputColumnNames.put("id_typ", new Integer(3));
+		
+		udtf.outputColumnNames.put("action", new Integer(4));
+		udtf.outputColumnNames.put("action_typ", new Integer(5));
+
+		Map h = new HashMap<String, String>();
+		h.put("x", "http://www.drugbank.ca");
+		h.put("xs", "http://www.w3.org/2001/XMLSchema");
+
+		NamespaceResolver namespace = new NamespaceResolver(h);
+		List<Pair<String, Pair<String, String>>> xPathForEachColumn = new LinkedList<Pair<String, Pair<String, String>>>();
+		Pair<String, String> p = Pair.make("./x:drug", "xs:string");
+		Pair<String, Pair<String, String>> pk = Pair.make("drug", p);
+		xPathForEachColumn.add(pk);
+		p = Pair.make("./x:id", "xs:string");
+		pk = Pair.make("id", p);
+		xPathForEachColumn.add(pk);
+		p = Pair.make("./x:action", "xs:string");
+		pk = Pair.make("action", p);
+		xPathForEachColumn.add(pk);
+		udtf.parseResponse(new FileInputStream(new File(args[0])), namespace, "//x:row", xPathForEachColumn, false);
 		
 	}
 
