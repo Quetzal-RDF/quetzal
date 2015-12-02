@@ -36,6 +36,6 @@ WORKDIR /data
 
 RUN git clone https://github.com/Quetzal-RDF/quetzal \
 	&& cd /data/quetzal/com.ibm.research.quetzal.core/ \ 
-	&&  /apache-maven-3.3.3/bin/mvn verify -DskipTests
+	&&  /apache-maven-3.3.3/bin/mvn assembly:assembly -DdescriptorId=jar-with-dependencies -DskipTests=true
 
 EXPOSE 10000

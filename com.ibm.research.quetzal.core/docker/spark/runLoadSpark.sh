@@ -11,7 +11,8 @@ DIR=`dirname $0`
 # inaccessible.  The HDFS default is to write to /tmp, start thriftserver from there.
 cd /tmp
 
-/usr/local/spark/sbin/start-thriftserver.sh
+# Unfortunately the way you add jars into Hive varies by Spark version.  This only works for 4.0. --jars works with 4.1 for fun and so on.
+/usr/local/spark/sbin/start-thriftserver.sh --driver-classpath /data/quetzal/com.ibm.research.quetzal.core/target/quetzal-RDF-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 cd /data
 
