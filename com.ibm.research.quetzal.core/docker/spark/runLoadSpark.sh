@@ -12,7 +12,7 @@ DIR=`dirname $0`
 cd /tmp
 
 # Unfortunately the way you add jars into Hive varies by Spark version.  This only works for 4.0. --jars works with 4.1 for fun and so on.
-/usr/local/spark/sbin/start-thriftserver.sh --driver-classpath /data/quetzal/com.ibm.research.quetzal.core/target/quetzal-RDF-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+/usr/local/spark/sbin/start-thriftserver.sh --driver-class-path /data/quetzal/com.ibm.research.quetzal.core/target/quetzal-RDF-0.0.1-SNAPSHOT-jar-with-dependencies.jar
 
 cd /data
 
