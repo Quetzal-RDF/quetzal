@@ -7,6 +7,22 @@ class PythonEval(object):
     @cherrypy.expose
     def getDrugBank(self):
         return xpathTest.extractDrugBank()
+    
+    @cherrypy.expose
+    def getDrugBankNames(self):
+        return xpathTest.extractDrugNames()
+
+    @cherrypy.expose
+    def getDrugTransporters(self, drugName):
+        return xpathTest.extractTransporters(drugName)
+
+    @cherrypy.expose
+    def getSMILES(self, drugName):
+        return xpathTest.extractSMILES(drugName)
+
+    @cherrypy.expose
+    def getDrugTargets(self, drugName):
+        return xpathTest.extractTargets(drugName)
 
     @cherrypy.expose
     def postData(self, funcData):

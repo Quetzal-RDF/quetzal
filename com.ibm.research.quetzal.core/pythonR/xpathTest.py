@@ -76,6 +76,24 @@ def extractTransporters(drugName):
 
     return result
 
+def extractTargets(drugName):
+    root = etree.parse("../../drugbank.xml")
+    rows = root.xpath('/x:drugbank/x:drug[./x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"][./x:name/text()="'+ drugName + '"]', namespaces={'x': 'http://www.drugbank.ca'})
+
+    result = '<?xml version="1.0"?>'
+    result += '<data xmlns="http://www.drugbank.ca">'
+    for row in rows:
+        targets = row.xpath('./x:targets/x:target', namespaces={'x': 'http://www.drugbank.ca'})
+        for transporter in transporters:
+            actions = transporter.xpath('./x:actions/x:action', namespaces={'x': 'http://www.drugbank.ca'})
+            for action in actions:
+                act = action.xpath('./text()', namespaces={'x': 'http://www.drugbank.ca'})
+                id = transporter.xpath('./x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', namespaces={'x': 'http://www.drugbank.ca'})
+                result += "<row>" + "<drug>" + drugName + "</drug> <id>" + id[0] + "</id> <action>" + act[0] + "</action> </row>"
+    result += '</data>'
+
+    return result
+
 def extractDrugBank():
     root = etree.parse("db_small.xml")
     rows = root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
