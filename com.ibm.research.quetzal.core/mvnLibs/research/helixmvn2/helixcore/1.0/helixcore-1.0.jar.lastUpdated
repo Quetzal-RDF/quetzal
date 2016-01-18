@@ -1,0 +1,7 @@
+#NOTE: This is an internal implementation file, its format can be changed without prior notice.
+#Fri Feb 13 10:08:35 EST 2015
+default-http\://repo.aduna-software.org/maven2/releases/.lastUpdated=1423840114968
+http\://download.java.net/maven/2/.lastUpdated=1423840115103
+http\://helix1.pok.ibm.com\:8081/nexus/content/groups/public/.lastUpdated=1423840115163
+http\://repo.aduna-software.org/maven2/releases/.error=Could not transfer artifact com.ibm.research.helixmvn2\:helixcore\:jar\:1.0 from/to sesame-official-repository (http\://repo.aduna-software.org/maven2/releases)\: Remotely Closed [id\: 0x2cbfcaef, /0\:0\:0\:0\:0\:0\:0\:1\:54930 \:> repo.aduna-software.org/82.94.239.126\:80]
+http\://download.java.net/maven/2/.error=
