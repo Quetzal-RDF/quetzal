@@ -1,0 +1,18 @@
+
+prefix fn: <http://localhost:8083/>
+prefix x: <http://www.drugbank.ca>
+prefix xs: <http://www.w3.org/2001/XMLSchema>
+
+function fn:getDrugBankNames GET ( -> ?x ) 
+service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
+
+function fn:getDrugTranporters GET ( ?x -> ?y ) 
+service fn:getDrugTranporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:id" "xs:string" 
+
+select ?transporter where {
+
+BIND( fn:getDrugBankNames() AS ( ?drug ) )
+
+BIND( fn:getDrugBankTransporters( ?drug ) AS ( ?transporter ) )
+
+}
