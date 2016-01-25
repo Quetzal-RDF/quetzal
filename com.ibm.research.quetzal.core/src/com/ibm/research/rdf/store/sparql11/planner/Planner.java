@@ -482,10 +482,17 @@ public class Planner {
 			return ((BindFunctionPattern)p).getFuncCall().getFunction().kind() == ServiceKind.POST;
 		}
 		
+		
 		@Override
 		public Set<Variable> getRequiredVariables() {
 			assert p instanceof BindFunctionPattern;
-			return new HashSet<Variable>(((BindFunctionPattern)p).getFuncCall().getVars());
+			return new HashSet<Variable>(((BindFunctionPattern)p).getFuncCall().getVariables());
+		}
+
+		@Override
+		public Set<Variable> getProducedVariables() {
+			assert p instanceof BindFunctionPattern;
+			return new HashSet<Variable>(((BindFunctionPattern)p).getVariables());
 		}
 	}
 	
@@ -1689,7 +1696,10 @@ public class Planner {
 		void getApplicableNodesForBindFunc(Pattern p, Set<Variable> availableVars, Set<Variable> liveVars,
 				Walker walker, List<Pattern> region, Set<Node> result) {
 			final BindFunctionPattern bfunct = (BindFunctionPattern) p;
-			result.add(new BindFunctionNode(bfunct, availableVars, liveVars));
+			BindFunctionNode node = new BindFunctionNode(bfunct, availableVars, liveVars);
+			if (availableVars.containsAll(node.getRequiredVariables())) {
+				result.add(node);
+			}
 		}
 
 		@Override
