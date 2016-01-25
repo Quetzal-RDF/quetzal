@@ -5,7 +5,7 @@ MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
 ENV JAVA_VERSION 8u31 
 ENV BUILD_VERSION b13 
 
-RUN curl -O http://gnu.mirrorcatalogs.com/coreutils/coreutils-8.24.tar.xz \
+RUN curl -O http://ftp.gnu.org/gnu/coreutils/coreutils-8.24.tar.xz \
     && tar -xJf coreutils-8.24.tar.xz \
 	&& export FORCE_UNSAFE_CONFIGURE=1 \
 	&& cd ./coreutils-8.24 \
