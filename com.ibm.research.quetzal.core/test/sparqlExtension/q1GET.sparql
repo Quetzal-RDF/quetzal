@@ -4,7 +4,7 @@ prefix x: <http://www.drugbank.ca>
 prefix xs: <http://www.w3.org/2001/XMLSchema>
 
 function fn:getDrugBank GET ( -> ?x ?y ?z ) 
-service fn:getDrugBank [ ] -> "//x:row" :: "./x:drug" "xs:string" "./x:id" "xs:string" "./x:action" "xs:string"
+service fn:getDrugBank [ ] -> "//x:row" :: "./x:drug" "xs:string" "./x:id|./x:action" "xs:string" "./x:action" "xs:string"
 
 select * where {
 

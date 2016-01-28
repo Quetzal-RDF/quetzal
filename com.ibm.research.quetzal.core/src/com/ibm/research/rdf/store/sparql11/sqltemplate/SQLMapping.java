@@ -28,5 +28,8 @@ public class SQLMapping {
 	public Object getValues() {
 		return values;
 	}
-		
+	
+	public String toString() {
+		return name + "->" + values;
+	}
 }

@@ -15,19 +15,27 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
+import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionCall;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionPattern;
+import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
+import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
 import com.ibm.research.rdf.store.sparql11.model.ServiceFunction;
 import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.FilterContext;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
+import com.ibm.wala.util.collections.HashMapFactory;
+import com.ibm.wala.util.collections.Pair;
 
 public class ServiceSQLTemplate extends HttpSQLTemplate {
 	public ServiceSQLTemplate(List<String> templateName, PlanNode planNode, Store store, Context ctx,
@@ -52,6 +60,19 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		LinkedList<String> xPathForCols = new LinkedList<String>();
 		LinkedList<String> xPathForColTypes = new LinkedList<String>();
 
+		if (! planNode.getRequiredVariables().isEmpty()) {
+			varMap = HashMapFactory.make();
+			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
+			Iterator<Variable> fps = ((ServiceFunction)bfp.getFunction()).getInVariables().iterator();
+			PlanNode pred = planNode.getPredecessor(wrapper.plan);
+			String predCte = wrapper.getPlanNodeCTE(pred, false);
+			for(Variable v : planNode.getRequiredVariables()){
+				String vPredName = wrapper.getPlanNodeVarMapping(pred,v.getName());
+				//projectMapping.add(predCte+"."+vPredName+" AS "+v.getName());
+				varMap.put(fps.next().getName(), Pair.make(predCte+"."+vPredName, null));
+			}
+		}
+		
 		if (sp instanceof ServicePattern) {
 			names.add("sparql");
 			iris.add("http://www.w3.org/2005/sparql-results#");
@@ -59,6 +80,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			// this supports the regular SPARQL service call right now
 			assert ((ServicePattern) sp).getService().isIRI();
 			String queryText = ((ServicePattern) sp).getQueryText();
+			
 			mappings.put("queryText", new SQLMapping("queryText", "&query=" + queryText, null));
 			String service = ((ServicePattern) sp).getService().getIRI().toString();
 			mappings.put("service", new SQLMapping("service", service, null));
@@ -74,8 +96,34 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			// this supports extensions to service which allow a GET/POST with parameters from an input table, in which case the GET
 			// or POST work row by row, or a POST ALL which means the contents of the entire table get posted over.
 			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
-			IRI f = bfp.getIri();
-			mappings.put("service", new SQLMapping("service", f.toString(), null));
+			
+			String service = bfp.getIri().toString();
+			
+			if (bfp.getFunction() instanceof ServiceFunction) {
+				boolean amp = false;
+				for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
+					if (p.getValue() instanceof Expression) {
+						try {
+							FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
+							String eSql = expGenerator.getSQLExpression((Expression)p.getValue(),context, store);
+							if (!amp) {
+								amp = true;
+								service += "?";
+							} else {
+								service += "&";
+							}
+							service += p.getKey().replaceAll("\"", "");
+							service += "='||" + eSql + "||'";
+						} catch (SQLWriterException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			
+
+			mappings.put("service", new SQLMapping("service", service, null));
 			ServiceFunction sf = ((ServiceFunction) bfp.getFunction());
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", sf.rowXPath(), null));
 			Iterator<String> it = sf.columns().iterator();
@@ -115,6 +163,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		} else {
 			mappings.put("httpMethod",new SQLMapping("httpMethod", "GET", null));
 		}
+
 		return mappings;
 	}
 	
