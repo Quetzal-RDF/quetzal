@@ -70,27 +70,31 @@ public abstract class AbstractSQLTemplate {
 
 	abstract Map<String, SQLMapping> populateMappings() throws Exception;
 
+	protected String getExprCode(Expression e) throws SQLWriterException {
+		FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
+		List<Expression> constants = getConstantsThatNeedTypeCheck(e);
+		for (Expression c : constants) {
+			context.addConstantNeedsTypeCheck(c);
+		}
+		// KAVITHA: This is bad, but if you enter a boolean constant expression as an filter, DB2 will not like it because booleans aren't supported in WHERE clauses
+		String eSql;
+		if (e instanceof ConstantExpression && e.getReturnType() == TypeMap.BOOLEAN_ID) {
+			if (((ConstantExpression) e).getConstant().toDataString().equals("true")) {
+				eSql = "0=0";
+			} else {
+				eSql = "1=0";
+			}
+		} else {
+			eSql = expGenerator.getSQLForExpression(e,context, store);
+		}
+		return eSql;
+	}
+	
 	protected List<String> getFilterSQLConstraint() throws SQLWriterException {
 		List<String> filterSQLConstraint = new LinkedList<String>();
 		for(Expression e :planNode.getApplicableFilters(wrapper.getPlan())){
 			if( ! planNode.getAvailableVariables().containsAll(e.gatherVariables()))continue ;	
-			FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
-			List<Expression> constants = getConstantsThatNeedTypeCheck(e);
-			for (Expression c : constants) {
-				context.addConstantNeedsTypeCheck(c);
-			}
-			// KAVITHA: This is bad, but if you enter a boolean constant expression as an filter, DB2 will not like it because booleans aren't supported in WHERE clauses
-			if (e instanceof ConstantExpression && e.getReturnType() == TypeMap.BOOLEAN_ID) {
-				if (((ConstantExpression) e).getConstant().toDataString().equals("true")) {
-					filterSQLConstraint.add("0=0");
-				} else {
-					filterSQLConstraint.add("1=0");
-				}
-			} else {
-				String eSql = expGenerator.getSQLForExpression(e,context, store);
-				filterSQLConstraint.add(eSql);
-			}
-			
+			filterSQLConstraint.add(getExprCode(e));
 		}
 		return filterSQLConstraint;
 	}

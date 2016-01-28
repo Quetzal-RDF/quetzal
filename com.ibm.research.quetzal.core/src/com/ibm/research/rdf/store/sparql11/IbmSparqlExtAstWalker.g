@@ -170,7 +170,7 @@ functionDecl returns [FunctionBase func]
                                 param=string
                                 (
                                     value=expression
-                                    { svc.addServiceParam(param, value); } 
+                                    { System.err.println("adding " + param + " and " + value + " to " + svc); svc.addServiceParam(param, value); } 
                                 |
                                     pattern=groupGraphPattern[true]
                                     { svc.addServiceParam(param, pattern); }

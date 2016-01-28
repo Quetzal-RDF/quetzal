@@ -254,7 +254,7 @@ public class VariableExpression extends Expression {
 	@Override
 	public String visit(FilterContext context, Store store) {
 		String v = getVariable();
-		if (context.getVarMap().keySet().contains(v)) {
+		if (context.getVarMap() != null && context.getVarMap().keySet().contains(v)) {
 			String e = null;
 			if (getExpression() != null) {
 				try {

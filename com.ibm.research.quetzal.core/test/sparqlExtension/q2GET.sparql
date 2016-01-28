@@ -9,7 +9,7 @@ service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 function fn:getDrugTransporters GET ( ?x -> ?y ) 
 service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:id" "xs:string" 
 
-select ?transporter where {
+select ?drug ?transporter where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 

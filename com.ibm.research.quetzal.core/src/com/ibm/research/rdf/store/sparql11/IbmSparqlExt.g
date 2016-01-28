@@ -170,13 +170,18 @@ selectQuery
 		->  ^(FUNCTION $f*)? ^(SELECT $s ^(DATASET $d*)? $w? $m? )
 	;
 	
+functionParam
+    :  param=string ARROW ( valueE=expression | valueP=groupGraphPattern )
+       -> ^(PARAM $param $valueE? $valueP?) 
+;
+
 //added by wensun
 functionDecl
 	:	FUNCTION fn=iRIref kind=(POST ALL? | GET)? OPEN_BRACE inv+=var* ARROW outv+=var* CLOSE_BRACE
         ( ( FUNCLANG fl=VAR0 fb=functionBody
     	  -> ^( FUNCNAME $fn ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
         |
-        ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET ( params+=( ( param=string ARROW ( valueE=expression | valueP=groupGraphPattern ) ) -> ^(PARAM $param $valueE? $valueP?) ) )* CLOSE_SQ_BRACKET ARROW rowdef=string '::' ( col+=string )+
+        ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET params+=functionParam* CLOSE_SQ_BRACKET ARROW rowdef=string '::' ( col+=string )+
           -> ^( FUNCNAME ^(SERVICE $s $fn) ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
         ) )
 	;

@@ -14,6 +14,10 @@ public class ServiceFunction extends FunctionBase {
 	private String rowXPath;
 	private List<String> colXPaths = new ArrayList<String>();
 	
+	public String toString() {
+		return "SERVICE " + service() + " " + parameters;
+	}
+	
 	public void setService(QueryTripleTerm service) {
 		this.service = service;
 	}

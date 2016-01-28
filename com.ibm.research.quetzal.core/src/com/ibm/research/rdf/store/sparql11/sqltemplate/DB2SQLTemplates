@@ -90,12 +90,12 @@ QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP
    <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
 >>
 
-service(ns, iris, xPathForRows, xPathForCols, xPathForColTypes, firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, outputColumns, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable) ::= <<
+service(ns, iris, xPathForRows, xPathForCols, xPathForColTypes, firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, outputColumns, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postedColumns) ::= <<
 QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
-   FROM XMLTABLE('<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> $results<xPathForRows>' 
+   FROM <if(target)><target>, <endif>XMLTABLE('<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> $results<xPathForRows>' 
       PASSING XMLPARSE(
          DOCUMENT 
-           DB2XML.HTTPGETBLOB('<service><queryText>','')
+           DB2XML.HTTPGETBLOB('<service>','')
       ) as "results"
          COLUMNS 
             <outputColumns,xPathForCols:{c,x|<c> VARCHAR(128) PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
