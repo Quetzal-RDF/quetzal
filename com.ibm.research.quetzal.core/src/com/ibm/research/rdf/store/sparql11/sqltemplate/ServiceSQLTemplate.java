@@ -11,6 +11,7 @@
 package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,14 +21,13 @@ import java.util.Set;
 
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
-import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionCall;
 import com.ibm.research.rdf.store.sparql11.model.BindFunctionPattern;
-import com.ibm.research.rdf.store.sparql11.model.ConstantExpression;
 import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.Pattern;
+import com.ibm.research.rdf.store.sparql11.model.QueryPrologue;
 import com.ibm.research.rdf.store.sparql11.model.ServiceFunction;
 import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
@@ -96,33 +96,45 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			// this supports extensions to service which allow a GET/POST with parameters from an input table, in which case the GET
 			// or POST work row by row, or a POST ALL which means the contents of the entire table get posted over.
 			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
-			
-			String service = bfp.getIri().toString();
+			String service;
 			
 			if (bfp.getFunction() instanceof ServiceFunction) {
-				boolean amp = false;
-				for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
-					if (p.getValue() instanceof Expression) {
-						try {
-							FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
-							String eSql = expGenerator.getSQLExpression((Expression)p.getValue(),context, store);
+				try {
+					boolean amp = false;
+					Expression svc = ((ServiceFunction)bfp.getFunction()).service();
+					FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
+					service = expGenerator.getSQLExpression(svc,context, store);
+
+					Map<String,String> ns = HashMapFactory.make();
+					QueryPrologue qp = wrapper.getQuery().getPrologue();
+					for(String key: qp.getPrefixes().keySet()) 
+						ns.put(key, qp.getPrefixes().get(key).getValue());
+					String base = (qp.getBase() == null) ? null : qp.getBase().getValue();
+					svc.renamePrefixes(base, ns, Collections.<String,String>emptyMap());
+
+					for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
+						if (p.getValue() instanceof Expression) {
+							FilterContext context1 = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
+							String eSql = expGenerator.getSQLExpression((Expression)p.getValue(),context1, store);
 							if (!amp) {
 								amp = true;
-								service += "?";
+								service += "||'?";
 							} else {
-								service += "&";
+								service += "||'&";
 							}
 							service += p.getKey().replaceAll("\"", "");
-							service += "='||" + eSql + "||'";
-						} catch (SQLWriterException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+							service += "='||" + eSql;
 						}
 					}
-				}
+				} catch (SQLWriterException e) {
+					// TODO Auto-generated catch block
+					service = bfp.getIri().toString();
+					e.printStackTrace();
+				}				
+			} else {
+				service = bfp.getIri().toString();
 			}
 			
-
 			mappings.put("service", new SQLMapping("service", service, null));
 			ServiceFunction sf = ((ServiceFunction) bfp.getFunction());
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", sf.rowXPath(), null));
@@ -133,8 +145,11 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				xPathForColTypes.add(it.next());
 			}
 			List<String> inputCols = new LinkedList<String>();
-			if (sf.service().isVariable()) {
-				inputCols.add(sf.service().getVariable().getName());
+			Set<Variable> vs = sf.service().gatherVariables();
+			if (! vs.isEmpty()) {
+				for(Variable v : vs) {
+					inputCols.add(v.getName());
+				}
 			} else {
 				inputCols.add("url");
 			}
