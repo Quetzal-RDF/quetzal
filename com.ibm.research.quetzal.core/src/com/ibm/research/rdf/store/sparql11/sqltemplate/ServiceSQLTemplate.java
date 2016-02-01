@@ -113,7 +113,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 								service += "&";
 							}
 							service += p.getKey().replaceAll("\"", "");
-							service += "='||" + eSql + "||'";
+							service += "=\"||" + eSql + "||\"";
 						} catch (SQLWriterException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -138,7 +138,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			} else {
 				inputCols.add("url");
 			}
-			addPredecessorVariables(inputCols, false);
+			addPredecessorVariables(inputCols, true);
 			
 			List<String> outputCols = new LinkedList<String>();
 			for (Variable v: planNode.getProducedVariables()) {

@@ -502,7 +502,7 @@ public class Planner {
 		
 		public ServiceNode(Service p, Set<Variable> availableVars, Set<Variable> liveVars) {
 			super((Pattern) p);
-			this.availableVars = availableVars;
+			this.availableVars  = availableVars;
 		}
 		
 		@Override
