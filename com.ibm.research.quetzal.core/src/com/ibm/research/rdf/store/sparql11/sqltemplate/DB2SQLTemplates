@@ -95,7 +95,7 @@ QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
    FROM <if(target)><target>, <endif>XMLTABLE('<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> $results<xPathForRows>' 
       PASSING XMLPARSE(
          DOCUMENT 
-           DB2XML.HTTPGETBLOB('<service>','')
+           DB2XML.HTTPGETBLOB(<service>,'')
       ) as "results"
          COLUMNS 
             <outputColumns,xPathForCols:{c,x|<c> VARCHAR(128) PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
