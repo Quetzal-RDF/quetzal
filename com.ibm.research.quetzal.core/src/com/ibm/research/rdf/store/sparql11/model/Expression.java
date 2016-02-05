@@ -468,23 +468,16 @@ public abstract class Expression implements ExpressionVisitor {
 				Iterator<Expression> iter = ((BuiltinFunctionExpression) exp)
 						.getArguments().iterator();
 				Expression e = iter.next();
-				StringTemplate t = store.getInstanceOf("RDF_CONCAT");
-				t.setAttribute("lexpr", e.visit(context, store));
-
-				if (iter.hasNext()) {
-					e = iter.next();
-					List<Expression> argsE = new LinkedList<Expression>();
-					argsE.add(e);
-					while (iter.hasNext()) {
-						argsE.add(iter.next());
-					}
-					Expression rexp = new BuiltinFunctionExpression(
-							EBuiltinType.CONCAT, argsE);
-					t.setAttribute("rexpr", rexp.visit(context, store));
-				} else {
-					t.setAttribute("rexpr", e.visit(context, store));
+				String lhs = e.visit(context, store);
+				
+				while (iter.hasNext()) {
+					StringTemplate t = store.getInstanceOf("RDF_CONCAT");
+					t.setAttribute("lexpr", lhs);
+					t.setAttribute("rexpr", iter.next().visit(context, store));
+					lhs = t.toString();
 				}
-				return t.toString();
+				
+				return lhs;
 			}
 		},
 		SUB_STRING_EXP {

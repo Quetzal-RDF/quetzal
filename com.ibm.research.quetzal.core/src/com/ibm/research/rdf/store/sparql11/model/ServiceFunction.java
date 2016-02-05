@@ -9,7 +9,7 @@ import com.ibm.wala.util.collections.HashMapFactory;
 
 public class ServiceFunction extends FunctionBase {
 
-	private QueryTripleTerm service;
+	private Expression service;
 	private Map<String,Object> parameters = HashMapFactory.make();
 	private String rowXPath;
 	private List<String> colXPaths = new ArrayList<String>();
@@ -18,11 +18,11 @@ public class ServiceFunction extends FunctionBase {
 		return "SERVICE " + service() + " " + parameters;
 	}
 	
-	public void setService(QueryTripleTerm service) {
+	public void setService(Expression service) {
 		this.service = service;
 	}
 	
-	public QueryTripleTerm service() {
+	public Expression service() {
 		return service;
 	}
 	
