@@ -14,6 +14,7 @@ class PythonEval(object):
 
     @cherrypy.expose
     def getDrugTransporters(self, drugName):
+        cherrypy.log("transporter request for:" + drugName)
         return xpathTest.extractTransporters(drugName)
 
     @cherrypy.expose

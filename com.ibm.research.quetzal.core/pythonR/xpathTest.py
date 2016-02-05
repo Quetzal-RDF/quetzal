@@ -45,7 +45,7 @@ def extractSMILES(drugName):
     return result
 
 def extractDrugNames():
-    root = etree.parse("../../drugbank.xml")
+    root = etree.parse("db_small.xml")
     rows = root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
 
     result = '<?xml version="1.0"?>'
@@ -59,7 +59,7 @@ def extractDrugNames():
 
 
 def extractTransporters(drugName):
-    root = etree.parse("../../drugbank.xml")
+    root = etree.parse("db_small.xml")
     rows = root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"][./x:name/text()="'+ drugName + '"]', namespaces={'x': 'http://www.drugbank.ca'})
 
     result = '<?xml version="1.0"?>'
@@ -84,12 +84,51 @@ def extractTargets(drugName):
     result += '<data xmlns="http://www.drugbank.ca">'
     for row in rows:
         targets = row.xpath('./x:targets/x:target', namespaces={'x': 'http://www.drugbank.ca'})
-        for transporter in transporters:
-            actions = transporter.xpath('./x:actions/x:action', namespaces={'x': 'http://www.drugbank.ca'})
+        for target in targets:
+            actions = target.xpath('./x:actions/x:action', namespaces={'x': 'http://www.drugbank.ca'})
             for action in actions:
                 act = action.xpath('./text()', namespaces={'x': 'http://www.drugbank.ca'})
-                id = transporter.xpath('./x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', namespaces={'x': 'http://www.drugbank.ca'})
-                result += "<row>" + "<drug>" + drugName + "</drug> <id>" + id[0] + "</id> <action>" + act[0] + "</action> </row>"
+                id = target.xpath('./x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', namespaces={'x': 'http://www.drugbank.ca'})
+                if len(id) > 0 and len(act) > 0:
+                    result += "<row>" + "<drug>" + drugName + "</drug> <id>" + id[0] + "</id> <action>" + act[0] + "</action> </row>"
+    result += '</data>'
+
+    return result
+
+def extractDrugBankTargetsInNT():
+    root = etree.parse("../../drugbank.xml")
+    rows = root.xpath('/x:drugbank/x:drug[./x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
+
+    result = '<?xml version="1.0"?>'
+    result += '<data xmlns="http://www.drugbank.ca">'
+    for row in rows:
+        drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
+        targets= row.xpath('./x:targets/x:target', namespaces={'x': 'http://www.drugbank.ca'})
+        for target in targets:
+            actions = target.xpath('./x:actions/x:action', namespaces={'x': 'http://www.drugbank.ca'})
+            for action in actions:
+                act = action.xpath('./text()', namespaces={'x': 'http://www.drugbank.ca'})
+                id = target.xpath('./x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', namespaces={'x': 'http://www.drugbank.ca'})
+                if len(id) > 0 and len(act) > 0:
+                    print "<http://www.research.ibm.com/Tiresias/entity/bio/DRUG/" + drug[0] + "> <http://www.research.ibm.com/Tiresias/prop/target> <http://purl.uniprot.org/uniprot/" + id[0] + "> ."
+
+
+def extractDrugBankTargets():
+    root = etree.parse("../../drugbank.xml")
+    rows = root.xpath('/x:drugbank/x:drug[./x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
+
+    result = '<?xml version="1.0"?>'
+    result += '<data xmlns="http://www.drugbank.ca">'
+    for row in rows:
+        drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
+        targets= row.xpath('./x:targets/x:target', namespaces={'x': 'http://www.drugbank.ca'})
+        for target in targets:
+            actions = target.xpath('./x:actions/x:action', namespaces={'x': 'http://www.drugbank.ca'})
+            for action in actions:
+                act = action.xpath('./text()', namespaces={'x': 'http://www.drugbank.ca'})
+                id = target.xpath('./x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', namespaces={'x': 'http://www.drugbank.ca'})
+                if len(id) > 0 and len(act) > 0:
+                    result += "<row>" + "<drug>" + drug[0] + "</drug> <id>" + id[0] + "</id> <action>" + act[0] + "</action> </row>"
     result += '</data>'
 
     return result
@@ -113,6 +152,7 @@ def extractDrugBank():
 
     return result
 
-print extractSMILES('Ibuprofen')
-print extractTransporters('Ibuprofen')
-print extractDrugNames()
+#print extractSMILES('Ibuprofen')
+print extractTransporters('Vasopressin')
+#print extractDrugNames()
+# extractDrugBankTargetsInNT()

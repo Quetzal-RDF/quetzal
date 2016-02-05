@@ -153,10 +153,16 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			} else {
 				inputCols.add("url");
 			}
-			for (Variable v : sf.getInVariables()) {
-				inputCols.add(v.getName());
+			addPredecessorVariables(inputCols, true);
+			
+			List<String> outputCols = new LinkedList<String>();
+			for (Variable v: planNode.getProducedVariables()) {
+				outputCols.add(v.getName());
 			}
+			addPredecessorVariables(outputCols, false);
+		
 			mappings.put("inputCols", new SQLMapping("inputCols", inputCols, null));
+			mappings.put("outputCols", new SQLMapping("outputCols", outputCols, null));
 		}
 
 		mappings.put("xPathForCols", new SQLMapping("xPathForCols", xPathForCols, null));

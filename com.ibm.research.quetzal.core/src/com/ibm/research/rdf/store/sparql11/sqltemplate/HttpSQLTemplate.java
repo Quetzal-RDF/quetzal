@@ -82,6 +82,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + v.getName());
 			outputColumns.add(v.getName());
 		}
+		addPredecessorVariables(allColumns, true);
 		
 		List<Variable> literalVars = getAllLiteralVars(vars);
 		Set<String> dtCols = HashSetFactory.make();
@@ -120,5 +121,17 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		mappings.put("dtTable", new SQLMapping("dtTable", this.store.getDataTypeTable(), null));
 
 		return mappings;
+	}
+
+	protected void addPredecessorVariables(List<String> columns, boolean addType) {
+		// Need to add all the variables carried so far as input columns as well, if pred is not null
+		if (pred != null) {
+			for (Variable v: pred.getAvailableVariables()) {
+				columns.add(v.getName());
+				if (addType) {
+					columns.add(v.getName()+ "_TYP");
+				}
+			}
+		}
 	}
 }
