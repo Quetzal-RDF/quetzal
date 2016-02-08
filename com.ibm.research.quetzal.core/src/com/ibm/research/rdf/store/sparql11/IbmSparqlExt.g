@@ -181,8 +181,8 @@ functionDecl
         ( ( FUNCLANG fl=VAR0 fb=functionBody
     	  -> ^( FUNCNAME $fn ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(FUNCLG $fl) $fb ) )
         |
-        ( SERVICE s=varOrIRIref OPEN_SQ_BRACKET params+=functionParam* CLOSE_SQ_BRACKET ARROW rowdef=string '::' ( col+=string )+
-          -> ^( FUNCNAME ^(SERVICE $s $fn) ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
+        ( ( x=SERVICE | x=TABLE ) s=expression OPEN_SQ_BRACKET params+=functionParam* CLOSE_SQ_BRACKET ARROW rowdef=string '::' ( col+=string )+
+          -> ^( FUNCNAME ^($x $s $fn) ^(KIND $kind?) ^(INV $inv*) ^(OUTV $outv*) ^(PARAMS $params*) $rowdef $col* )
         ) )
 	;
 
@@ -1247,6 +1247,8 @@ UUID : U U I D ;
 STRUUID : S T R U U I D ;
 
 POST : P O S T;
+
+TABLE : T A B L E ;
 
 GET : G E T ;
 

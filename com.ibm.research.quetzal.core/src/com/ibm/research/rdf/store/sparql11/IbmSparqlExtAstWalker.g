@@ -150,7 +150,9 @@ functionDecl returns [FunctionBase func]
 			(
                 (fn=iRIref { $func = ext = new FunctionExt(); ext.setName(fn);  } )
             |
-                ^(SERVICE s=varOrIRIref fn=iRIref { $func = svc = new ServiceFunction(); svc.setService(s); } )
+                ^(SERVICE s=expression fn=iRIref { $func = svc = new ServiceFunction(); svc.setService(s); } )
+            |
+                ^(TABLE s=expression fn=iRIref { $func = svc = new ServiceFunction(); svc.setService(s); svc.setTableFunction(true); } )
             )
             { functions.put(fn, $func); }
             ^(KIND ( ( POST { $func.setPost(); } ) |
