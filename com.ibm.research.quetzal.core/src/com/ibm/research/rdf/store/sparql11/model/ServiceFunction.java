@@ -9,6 +9,7 @@ import com.ibm.wala.util.collections.HashMapFactory;
 
 public class ServiceFunction extends FunctionBase {
 
+	private boolean tableFunction;
 	private Expression service;
 	private Map<String,Object> parameters = HashMapFactory.make();
 	private String rowXPath;
@@ -18,6 +19,17 @@ public class ServiceFunction extends FunctionBase {
 		return "SERVICE " + service() + " " + parameters;
 	}
 	
+	
+	public boolean tableFunction() {
+		return tableFunction;
+	}
+
+
+	public void setTableFunction(boolean tableFunction) {
+		this.tableFunction = tableFunction;
+	}
+
+
 	public void setService(Expression service) {
 		this.service = service;
 	}
