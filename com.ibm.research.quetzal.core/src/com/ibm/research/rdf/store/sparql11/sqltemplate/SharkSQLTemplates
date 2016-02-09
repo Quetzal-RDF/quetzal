@@ -110,7 +110,7 @@ service(sql_id, urlTable, target, inputCols, service, httpMethod, queryText, ns,
 <if(urlTable)>
 	QS<sql_id>_URLS AS (select * from <urlTable> <if(target)> ,<target> <endif>),
 <else>
-	QS<sql_id>_URL AS (select explode(array('<service>')) as url), QS<sql_id>_URLS AS (select * from QS<sql_id>_URL<if(target)> ,<target> <endif>), 
+	QS<sql_id>_URL AS (select explode(array(<service>)) as url <if(inputCols)>, <inputCols; separator=","> <endif> <if(target)> from <target> <endif>), QS<sql_id>_URLS AS (select * from QS<sql_id>_URL), 
 <endif>
 QS<sql_id> AS (select httpGet('<outputCols; separator=",">', '<inputCols; separator=",">', '<queryText>', '<httpMethod>', '<ns, iris:{n, iri | <n>=<iri>}; separator=",">', '<xPathForRows; separator=",">', <outputColumns, xPathForCols, xPathForColTypes:{o, c, t | '<o>', '<c>', '<t>'}; separator=",">, <inputCols; separator=",">) as (<allColumns; separator=",">) from QS<sql_id>_URLS)
 >>
