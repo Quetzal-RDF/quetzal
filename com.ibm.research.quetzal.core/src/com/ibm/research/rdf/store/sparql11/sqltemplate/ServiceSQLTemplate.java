@@ -112,6 +112,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 					String base = (qp.getBase() == null) ? null : qp.getBase().getValue();
 					svc.renamePrefixes(base, ns, Collections.<String,String>emptyMap());
 
+					boolean useConcat = false;
 					boolean concat = false;
 					
 					for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
@@ -121,16 +122,16 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 							String eSql = expGenerator.getSQLExpression((Expression)p.getValue(),context1, store);
 							if (!amp) {
 								amp = true;
-								service += ",'?";
+								service += (useConcat? ",": "||") + "'?";
 							} else {
-								service += ",'&";
+								service += (useConcat? ",": "||") + "'&";
 							}
 							service += p.getKey().replaceAll("\"", "");
-							service += "='," + eSql;
+							service += "='" + (useConcat? ",": "||") + eSql;
 						}
 					}
 					
-					if (concat) {
+					if (concat && useConcat) {
 						service = "concat(" + service + ")";
 					}
 					
