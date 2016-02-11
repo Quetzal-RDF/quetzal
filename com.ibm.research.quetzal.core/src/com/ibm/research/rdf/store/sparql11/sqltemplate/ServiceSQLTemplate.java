@@ -112,20 +112,28 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 					String base = (qp.getBase() == null) ? null : qp.getBase().getValue();
 					svc.renamePrefixes(base, ns, Collections.<String,String>emptyMap());
 
+					boolean concat = false;
+					
 					for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
 						if (p.getValue() instanceof Expression) {
+							concat = true;
 							FilterContext context1 = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
 							String eSql = expGenerator.getSQLExpression((Expression)p.getValue(),context1, store);
 							if (!amp) {
 								amp = true;
-								service += "||'?";
+								service += ",'?";
 							} else {
-								service += "||'&";
+								service += ",'&";
 							}
 							service += p.getKey().replaceAll("\"", "");
-							service += "='||" + eSql;
+							service += "='," + eSql;
 						}
 					}
+					
+					if (concat) {
+						service = "concat(" + service + ")";
+					}
+					
 				} catch (SQLWriterException e) {
 					// TODO Auto-generated catch block
 					service = bfp.getIri().toString();
