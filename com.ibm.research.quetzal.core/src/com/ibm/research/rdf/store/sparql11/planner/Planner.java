@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.hadoop.hdfs.server.common.HdfsServerConstants.NodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +40,7 @@ import com.ibm.research.rdf.store.sparql11.model.Expression;
 import com.ibm.research.rdf.store.sparql11.model.Expression.EBuiltinType;
 import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
 import com.ibm.research.rdf.store.sparql11.model.Expression.ERelationalOp;
+import com.ibm.research.rdf.store.sparql11.model.FunctionBase;
 import com.ibm.research.rdf.store.sparql11.model.FunctionBase.ServiceKind;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.LogicalExpression;
@@ -53,6 +53,7 @@ import com.ibm.research.rdf.store.sparql11.model.QueryTriple;
 import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.RelationalExpression;
 import com.ibm.research.rdf.store.sparql11.model.Service;
+import com.ibm.research.rdf.store.sparql11.model.ServiceFunction;
 import com.ibm.research.rdf.store.sparql11.model.ServicePattern;
 import com.ibm.research.rdf.store.sparql11.model.SimplePattern;
 import com.ibm.research.rdf.store.sparql11.model.SubSelectPattern;
@@ -479,7 +480,9 @@ public class Planner {
 		}
 		
 		public boolean isPost() {
-			return ((BindFunctionPattern)p).getFuncCall().getFunction().kind() == ServiceKind.POST;
+			FunctionBase fun = ((BindFunctionPattern)p).getFuncCall().getFunction();
+			return fun.kind() == ServiceKind.POST || 
+				   (fun instanceof ServiceFunction && ((ServiceFunction)fun).tableFunction()) ;
 		}
 		
 		

@@ -190,9 +190,11 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		mappings.put("outputColumns", new SQLMapping("outputColumns", cols, null));
 
 		List<String> indexColumns = new LinkedList<String>();
+		List<String> postedColumns = new LinkedList<String>();
 		List<String> postedTypes = new LinkedList<String>();
 		for (Variable v : planNode.getRequiredVariables()) {
 			indexColumns.add(v.getName());
+			postedColumns.add(v.getName());
 			if (wrapper.getIRIBoundVariables().contains(v)) {
 				postedTypes.add("'xs:string'");
 			} else {
@@ -204,6 +206,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			}
 		}
 		mappings.put("indexColumns", new SQLMapping("indexColumns", indexColumns, null));
+		mappings.put("postedColumns", new SQLMapping("postedColumns", postedColumns, null));
 		mappings.put("postTypes", new SQLMapping("postTypes", postedTypes, null));
 	}
 }
