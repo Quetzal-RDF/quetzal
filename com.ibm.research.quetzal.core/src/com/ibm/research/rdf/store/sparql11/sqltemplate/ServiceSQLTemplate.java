@@ -45,6 +45,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 	@Override
 	Map<String, SQLMapping> populateMappings() {
+
 		Map<String, SQLMapping> mappings = super.populateMappings();
 
 		List<String> names = new ArrayList<String>();
@@ -114,7 +115,12 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 					boolean useConcat = false;
 					boolean concat = false;
-					
+	
+					if (store.getStoreBackend()==Store.Backend.shark) {
+						useConcat = true;
+						concat = true;
+					}
+				
 					for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
 						if (p.getValue() instanceof Expression) {
 							concat = true;
@@ -154,14 +160,20 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				xPathForColTypes.add(it.next());
 			}
 			List<String> inputCols = new LinkedList<String>();
-			Set<Variable> vs = sf.service().gatherVariables();
+		//	Set<Variable> vs = sf.service().gatherVariables();
+			Set<Variable> vs = bfp.gatherVariables();
+
+			/*
+			System.out.println("KAVITHA: sf" + vs);
+			System.out.println("KAVITHA: bfp" + bfp.gatherVariables());
 			if (! vs.isEmpty()) {
 				for(Variable v : vs) {
 					inputCols.add(v.getName());
 				}
 			} else {
 				inputCols.add("url");
-			}
+			} */
+			inputCols.add("url");
 			addPredecessorVariables(inputCols, true);
 			
 			List<String> outputCols = new LinkedList<String>();
