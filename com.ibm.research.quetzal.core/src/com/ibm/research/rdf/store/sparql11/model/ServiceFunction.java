@@ -12,23 +12,29 @@ public class ServiceFunction extends FunctionBase {
 	private boolean tableFunction;
 	private Expression service;
 	private Map<String,Object> parameters = HashMapFactory.make();
+	private String tableParameter;
 	private String rowXPath;
 	private List<String> colXPaths = new ArrayList<String>();
 	
 	public String toString() {
 		return "SERVICE " + service() + " " + parameters;
 	}
-	
-	
+		
+	public String tableParam() {
+		return tableParameter;
+	}
+
+	public void setTableParam(String tableParameter) {
+		this.tableParameter = tableParameter;
+	}
+
 	public boolean tableFunction() {
 		return tableFunction;
 	}
 
-
 	public void setTableFunction(boolean tableFunction) {
 		this.tableFunction = tableFunction;
 	}
-
 
 	public void setService(Expression service) {
 		this.service = service;

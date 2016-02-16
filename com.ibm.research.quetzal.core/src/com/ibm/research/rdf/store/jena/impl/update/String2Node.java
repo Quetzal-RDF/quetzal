@@ -81,7 +81,7 @@ public class String2Node
          return;
          }
 
-      if (datatype == TypeMap.SIMPLE_LITERAL_ID)
+      if (datatype == TypeMap.SIMPLE_LITERAL_ID || datatype == 0)
          {
          node = ResourceFactory.createPlainLiteral(value);
          return;

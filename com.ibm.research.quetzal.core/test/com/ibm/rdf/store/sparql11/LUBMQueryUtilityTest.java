@@ -310,13 +310,13 @@ public class LUBMQueryUtilityTest<D> extends TestRunner<D> {
 	// @RandomizedRepeat(1)
 	public static class DB2LUBMHelix1 extends LUBMQueryUtilityTest<DB2TestData> {
 		private static final DB2TestData data = new DB2TestData(
-				"jdbc:db2://helix1.pok.ibm.com:50001/lubm100m", "lubm100m",
-				"db2inst1", "db2inst1", "db2inst2", false);
+				"jdbc:db2://helix1.pok.ibm.com:50001/lubm", "lubm_100m_r",
+				"db2inst1", "db2admin", "db2inst1", false);
 
 		public DB2LUBMHelix1() {
 			super(new DB2Engine(), data,
 					TestConstants.lubm100mAnswers,
-					"../rdfstore-data/lubm_queries_QL_reversed/");
+					System.getProperty("dataDir") + "/lubm_queries_QL_reversed/");
 		}
 	}
 
