@@ -99,10 +99,16 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
 			String service;
 			
+			ServiceFunction serviceFunction = (ServiceFunction)bfp.getFunction();
 			if (bfp.getFunction() instanceof ServiceFunction) {
 				try {
 					boolean amp = false;
-					Expression svc = ((ServiceFunction)bfp.getFunction()).service();
+					Expression svc = serviceFunction.service();
+			
+					if (serviceFunction.tableParam() != null) {
+						mappings.put("queryText", new SQLMapping("queryText", serviceFunction.tableParam().replaceAll("\"", "") + "=", ""));
+					}
+					
 					FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
 					service = expGenerator.getSQLExpression(svc,context, store);
 
@@ -115,13 +121,13 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 					boolean useConcat = false;
 					boolean concat = false;
-	
+
 					if (store.getStoreBackend()==Store.Backend.shark) {
 						useConcat = true;
 						concat = true;
 					}
 				
-					for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
+					for(Entry<String,Object> p : serviceFunction.parameters()) {
 						if (p.getValue() instanceof Expression) {
 							concat = true;
 							FilterContext context1 = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
@@ -151,7 +157,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			}
 			
 			mappings.put("service", new SQLMapping("service", service, null));
-			ServiceFunction sf = ((ServiceFunction) bfp.getFunction());
+			ServiceFunction sf = serviceFunction;
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", sf.rowXPath(), null));
 			Iterator<String> it = sf.columns().iterator();
 			while (it.hasNext()) {

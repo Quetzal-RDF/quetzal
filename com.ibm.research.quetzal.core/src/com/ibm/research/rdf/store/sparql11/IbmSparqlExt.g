@@ -171,7 +171,7 @@ selectQuery
 	;
 	
 functionParam
-    :  param=string ARROW ( valueE=expression | valueP=groupGraphPattern )
+    :  param=string ARROW ( valueE=expression | valueP=groupGraphPattern | POST DATA )
        -> ^(PARAM $param $valueE? $valueP?) 
 ;
 
