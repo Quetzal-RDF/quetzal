@@ -67,21 +67,17 @@ QS<sql_id>_POST AS
 }; separator=",">     ) AS CLOB), null)))) AS BLOB) AS doc from QS<sql_id>_INDEX),
 >>
 
-serviceHttpPost(sql_id, firstProjectCols, queryText, service, outputColumns, dtCols, htmlHeader) ::= <<
+serviceHttpPost(ns, iris, xPathForRows, xPathForCols, xPathForColTypes, sql_id, firstProjectCols, queryText, service, outputColumns, dtCols, htmlHeader) ::= <<
 
 QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
-   FROM XMLTABLE('declare namespace x="http://www.w3.org/2005/sparql-results#"; $results//x:result' 
+   FROM XMLTABLE('<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> $results<xPathForRows>' 
       PASSING XMLPARSE(
          DOCUMENT 
            DB2XML.HTTPPOSTBLOB(<service>, CAST ('<htmlHeader>' AS CLOB(1K)), CAST('<queryText>' AS BLOB) || (select doc from QS<sql_id>_POST))) as "results"
            COLUMNS 
-             <outputColumns:{c|<c> VARCHAR (128) PATH 'declare namespace x="http://www.w3.org/2005/sparql-results#"; xs:string(./x:binding[./@name="<c>"])'
-}; separator=","><if(dtCols)>             ,<dtCols:{c|<c>_TYP VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH 'declare namespace x="http://www.w3.org/2005/sparql-results#"; ./x:binding[./@name="<c>"]/x:literal/@datatype'
-             }; separator=","> <endif>
-           ) 
-           AS xml, 
-           QS<sql_id>_INDEX AS pred 
-           WHERE xml.index = pred.index),
+             <outputColumns,xPathForCols:{c,x|<c> VARCHAR(128) PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
+}; separator=","> <if(dtCols)>           ,<dtCols,xPathForColTypes:{c,x|<c>_TYP VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
+            }; separator=","><endif>) AS xml),
 >>
 
 serviceMerge(firstProjectCols, secondProjectCols, queryText, service, outputColumns, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postedColumns, postTypes, htmlHeader, indexColumns) ::= <<
@@ -100,8 +96,7 @@ QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
          COLUMNS 
             <outputColumns,xPathForCols:{c,x|<c> VARCHAR(128) PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
 }; separator=","> <if(dtCols)>           ,<dtCols,xPathForColTypes:{c,x|<c>_TYP VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
-            }; separator=","><endif>) AS xml
-   <if(dtConstraints)>, <dtTable> WHERE <dtConstraints; separator=" AND "><endif>),
+            }; separator=","><endif>) AS xml),
 QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP 
    <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
 >>
