@@ -176,6 +176,9 @@ functionDecl returns [FunctionBase func]
                                 |
                                     pattern=groupGraphPattern[true]
                                     { svc.addServiceParam(param, pattern); }
+                                |
+                                    
+                                    { svc.setTableParam(param); }
                                 ) 
                             )
                         )*

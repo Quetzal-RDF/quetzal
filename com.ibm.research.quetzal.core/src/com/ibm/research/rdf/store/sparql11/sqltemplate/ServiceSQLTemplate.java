@@ -45,6 +45,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 	@Override
 	Map<String, SQLMapping> populateMappings() {
+
 		Map<String, SQLMapping> mappings = super.populateMappings();
 
 		List<String> names = new ArrayList<String>();
@@ -98,10 +99,16 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
 			String service;
 			
+			ServiceFunction serviceFunction = (ServiceFunction)bfp.getFunction();
 			if (bfp.getFunction() instanceof ServiceFunction) {
 				try {
 					boolean amp = false;
-					Expression svc = ((ServiceFunction)bfp.getFunction()).service();
+					Expression svc = serviceFunction.service();
+			
+					if (serviceFunction.tableParam() != null) {
+						mappings.put("queryText", new SQLMapping("queryText", serviceFunction.tableParam().replaceAll("\"", "") + "=", ""));
+					}
+					
 					FilterContext context = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
 					service = expGenerator.getSQLExpression(svc,context, store);
 
@@ -114,8 +121,13 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 					boolean useConcat = false;
 					boolean concat = false;
-					
-					for(Entry<String,Object> p : ((ServiceFunction)bfp.getFunction()).parameters()) {
+
+					if (store.getStoreBackend()==Store.Backend.shark) {
+						useConcat = true;
+						concat = true;
+					}
+				
+					for(Entry<String,Object> p : serviceFunction.parameters()) {
 						if (p.getValue() instanceof Expression) {
 							concat = true;
 							FilterContext context1 = new FilterContext(varMap,  wrapper.getPropertyValueTypes(), planNode);
@@ -145,7 +157,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			}
 			
 			mappings.put("service", new SQLMapping("service", service, null));
-			ServiceFunction sf = ((ServiceFunction) bfp.getFunction());
+			ServiceFunction sf = serviceFunction;
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", sf.rowXPath(), null));
 			Iterator<String> it = sf.columns().iterator();
 			while (it.hasNext()) {
@@ -154,14 +166,20 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				xPathForColTypes.add(it.next());
 			}
 			List<String> inputCols = new LinkedList<String>();
-			Set<Variable> vs = sf.service().gatherVariables();
+		//	Set<Variable> vs = sf.service().gatherVariables();
+			Set<Variable> vs = bfp.gatherVariables();
+
+			/*
+			System.out.println("KAVITHA: sf" + vs);
+			System.out.println("KAVITHA: bfp" + bfp.gatherVariables());
 			if (! vs.isEmpty()) {
 				for(Variable v : vs) {
 					inputCols.add(v.getName());
 				}
 			} else {
 				inputCols.add("url");
-			}
+			} */
+			inputCols.add("url");
 			addPredecessorVariables(inputCols, true);
 			
 			List<String> outputCols = new LinkedList<String>();
@@ -195,7 +213,6 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 	private void setupPostData(Map<String, SQLMapping> mappings) {
 		@SuppressWarnings("unchecked")
 		List<String> cols = (List<String>) mappings.get("outputColumns").values;
-		cols.add("index");
 		mappings.put("outputColumns", new SQLMapping("outputColumns", cols, null));
 
 		List<String> indexColumns = new LinkedList<String>();
