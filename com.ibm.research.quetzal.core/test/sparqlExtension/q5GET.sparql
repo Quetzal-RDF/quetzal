@@ -7,12 +7,12 @@ function fn:getDrugBankNames GET ( -> ?x )
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
 function fn:getDrugTransporters ( ?x -> ?y ) 
-table fn:postData [ "funcData" -> post data ] -> "/data/row" :: "drug" "xs:string" 
+table fn:postData [ "funcData" -> post data ] -> "//row" :: "./drug" "xs:string" "./sum" "xs:string" 
 
-select ?drug ?transporter where {
+select * where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getDrugTransporters( ?drug ) AS ( ?transporter ) )
+BIND( fn:getDrugTransporters( ?drug ) AS ( ?drug ?sum ) )
 
 }

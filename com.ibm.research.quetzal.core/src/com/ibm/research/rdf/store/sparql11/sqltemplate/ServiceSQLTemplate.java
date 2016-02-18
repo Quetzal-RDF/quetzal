@@ -213,7 +213,6 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 	private void setupPostData(Map<String, SQLMapping> mappings) {
 		@SuppressWarnings("unchecked")
 		List<String> cols = (List<String>) mappings.get("outputColumns").values;
-		cols.add("index");
 		mappings.put("outputColumns", new SQLMapping("outputColumns", cols, null));
 
 		List<String> indexColumns = new LinkedList<String>();

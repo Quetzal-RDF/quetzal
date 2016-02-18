@@ -76,7 +76,8 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		List<String> allColumns = new LinkedList<String>();
 
 		for (Variable v : vars) {
-			firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + v.getName());
+			//firstProjectCols.add((req.contains(v)? "pred": "xml") + "." + v.getName());
+			firstProjectCols.add("xml." + v.getName());
 			allColumns.add(v.getName());
 			allColumns.add(v.getName()+ "_TYP");
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + v.getName());
@@ -90,7 +91,8 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 
 		for (Variable v : literalVars) {
 			String vt = v.getName() + "_TYP";
-			firstProjectCols.add(req.contains(v)? "pred." + vt : "typecode(xml." + vt + ") AS " + vt);
+			//firstProjectCols.add(req.contains(v)? "pred." + vt : "typecode(xml." + vt + ") AS " + vt);
+			firstProjectCols.add("typecode(xml." + vt + ") AS " + vt);
 			secondProjectCols.add(wrapper.getPlanNodeCTE(planNode, false) + "_TMP." + vt);
 			dtCols.add(v.getName());
 			dtConstraints.add("((" + vt + " IS NOT NULL AND " + vt + " = " + "DATATYPE_NAME) OR (" + vt + " IS NULL AND DATATYPE_NAME='SIMPLE_LITERAL_ID'))");
