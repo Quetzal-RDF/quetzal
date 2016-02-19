@@ -552,6 +552,10 @@ public abstract class Pattern implements Planner.Key {
 			}
 		}
 		
+		case BINDFUNC: {
+			return this.gatherVariables();
+		}
+			
 		case SUBSELECT:
 			return Iterator2Collection.toSet(
 				new MapIterator<ProjectedVariable,Variable>(

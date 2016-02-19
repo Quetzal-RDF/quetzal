@@ -518,6 +518,9 @@ public class Planner {
 				
 				PlanNode node = 
 					planFactory.createSTPlanNode(this);
+				
+				node.setFilters(filters);
+				
 				node.cost = getCost(g);
 				assert node.cost.fst > 0.0;
 				Set<Variable> vars = HashSetFactory.make(this.availableVars);

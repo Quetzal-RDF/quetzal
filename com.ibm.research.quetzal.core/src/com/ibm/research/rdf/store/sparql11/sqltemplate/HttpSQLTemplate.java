@@ -10,6 +10,7 @@ import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.planner.PlanNode;
+import com.ibm.research.rdf.store.sparql11.sqlwriter.SQLWriterException;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 
@@ -56,7 +57,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	}
 
 	@Override
-	Map<String, SQLMapping> populateMappings() {	
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {	
 		// wrapper.getQuery().getPrologue().getPrefixes();
 		
 		Map<String, SQLMapping> mappings = HashMapFactory.make();

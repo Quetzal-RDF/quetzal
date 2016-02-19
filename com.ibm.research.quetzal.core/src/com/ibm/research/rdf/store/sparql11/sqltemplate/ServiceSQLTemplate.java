@@ -44,7 +44,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 	}
 
 	@Override
-	Map<String, SQLMapping> populateMappings() {
+	Map<String, SQLMapping> populateMappings() throws SQLWriterException {
 
 		Map<String, SQLMapping> mappings = super.populateMappings();
 
@@ -61,8 +61,9 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		LinkedList<String> xPathForCols = new LinkedList<String>();
 		LinkedList<String> xPathForColTypes = new LinkedList<String>();
 
+		varMap = HashMapFactory.make();
+
 		if (! planNode.getRequiredVariables().isEmpty()) {
-			varMap = HashMapFactory.make();
 			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
 			Iterator<Variable> fps = ((ServiceFunction)bfp.getFunction()).getInVariables().iterator();
 			PlanNode pred = planNode.getPredecessor(wrapper.plan);
@@ -71,6 +72,13 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				String vPredName = wrapper.getPlanNodeVarMapping(pred,v.getName());
 				//projectMapping.add(predCte+"."+vPredName+" AS "+v.getName());
 				varMap.put(fps.next().getName(), Pair.make(predCte+"."+vPredName, null));
+			}
+		}
+		
+
+		{	
+			for(Variable v : planNode.getProducedVariables()){
+				varMap.put(v.getName(), Pair.make(v.getName(), "typecode(" + v.getName() + "_TYP)"));
 			}
 		}
 		
@@ -206,6 +214,10 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			mappings.put("httpMethod",new SQLMapping("httpMethod", "GET", null));
 		}
 
+		List<String> filterConstraint = getFilterSQLConstraint();
+		SQLMapping filterMapping = new SQLMapping("filter_constraint", filterConstraint,null);
+		mappings.put("filter_constraint", filterMapping);
+		
 		return mappings;
 	}
 	
