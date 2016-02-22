@@ -124,7 +124,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 					if (store.getStoreBackend()==Store.Backend.shark) {
 						useConcat = true;
-						concat = true;
+						concat = false;
 					}
 				
 					for(Entry<String,Object> p : serviceFunction.parameters()) {
@@ -169,18 +169,10 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		//	Set<Variable> vs = sf.service().gatherVariables();
 			Set<Variable> vs = bfp.gatherVariables();
 
-			/*
-			System.out.println("KAVITHA: sf" + vs);
-			System.out.println("KAVITHA: bfp" + bfp.gatherVariables());
-			if (! vs.isEmpty()) {
-				for(Variable v : vs) {
-					inputCols.add(v.getName());
-				}
-			} else {
+			if (!sf.tableFunction()) {
 				inputCols.add("url");
-			} */
-			inputCols.add("url");
-			addPredecessorVariables(inputCols, true);
+				addPredecessorVariables(inputCols, true);
+			}
 			
 			List<String> outputCols = new LinkedList<String>();
 			for (Variable v: planNode.getProducedVariables()) {

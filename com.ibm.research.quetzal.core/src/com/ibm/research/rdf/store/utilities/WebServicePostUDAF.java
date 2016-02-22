@@ -1,12 +1,13 @@
 package com.ibm.research.rdf.store.utilities;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -25,7 +26,8 @@ import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantStringObjectInspector;
-import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
+import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.Text;
 
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
@@ -47,7 +49,9 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		private List<Pair<String, Pair<String, String>>> xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
 
 		private Map<String, Integer> outputColumnNames = new HashMap<String, Integer>();
-		private List<String> inputColumnNames = new ArrayList<String>();
+		private Map<String, Integer> inputColumns = new HashMap<String, Integer>();
+		private Map<String, Integer> postedColumns = new HashMap<String, Integer>();
+		private Set<String> joinColumns = new HashSet<String>();
 
 		@SuppressWarnings("deprecation")
 		public static class TableAggregator implements AggregationBuffer {
@@ -69,10 +73,10 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		@Override
 		/**
 		 * Assumption: parameters are passed in the following order:  
-		 * All input parameters which are NOT constants and hence not writableConstantStringParameters,
+		 * all input parameters which are NOT constants and hence not writableConstantStringParameters
 		 * followed by a set of constants to denote:
-		 * urlForService, functionBody, input columnNames separated by
-		 * ',', and output parameters separated by ',', namespace parameters as defined by "key1=val1, key2=val2..",
+		 * urlForService, input columnNames separated by
+		 * ',', posted columns separated by ',', output parameters separated by ',', namespace parameters as defined by "key1=val1, key2=val2..",
 		 * xpath for rows, xpath for columns as specified by col1name, xpathForCol1, xpathForCol1Type etc. All of these parameters will be
 		 * passed in as WritableConstantStringObjectInspectors. 
 		 */
@@ -83,6 +87,9 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 			int i = 0;
 			int k = 0;
+			List<String> inputCols = new LinkedList<String>();
+			LinkedList<String> l =  new LinkedList<String>();
+
 			while (i < parameters.length) {
 				PrimitiveObjectInspector param = (PrimitiveObjectInspector) parameters[i];
 				if (param instanceof WritableConstantStringObjectInspector) {
@@ -93,18 +100,29 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 							break;
 						case 1:
 							StringTokenizer tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
+							int z = 0;
 							while (tokenizer.hasMoreTokens()) {
-								inputColumnNames.add(tokenizer.nextToken());
+								String col = tokenizer.nextToken();
+								inputColumns.put(col, z);
+								inputCols.add(col);
+								z++;
 							}
 							break;
 						case 2:
-							String str = wc.getWritableConstantValue().toString();
-							handleOutputTypeSpecification(foi, str);
+							tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
+							while (tokenizer.hasMoreTokens()) {
+								String col = tokenizer.nextToken();
+								postedColumns.put(col, inputColumns.get(col));
+							}
 							break;
 						case 3:
-							resolver = createNamespaces(wc.getWritableConstantValue().toString());
+							String str = wc.getWritableConstantValue().toString();
+							handleOutputTypeSpecification(foi, str, l);
 							break;
 						case 4:
+							resolver = createNamespaces(wc.getWritableConstantValue().toString());
+							break;
+						case 5:
 							xpathForRows = wc.getWritableConstantValue().toString();
 							break;			
 						default: 
@@ -116,18 +134,25 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 				i++;
 			}
 			
-			// add all input columns to output because that will be returned by this function along with output columns.  
+			// add all input columns to output because that will be returned by this function along with output columns on order of what was passed in.  
 			// all input parameters will be treated as string unless they are type columns, indicated by _TYP
-			for (String inputCol : inputColumnNames) {
+			for (String inputCol : inputCols) {
+				if (outputColumnNames.containsKey(inputCol)) {
+					continue;
+				}
 				if (!inputCol.endsWith("_TYP")) {
 					foi.add(PrimitiveObjectInspectorFactory.writableStringObjectInspector);
 				} else {
 					foi.add(PrimitiveObjectInspectorFactory.writableShortObjectInspector);
 				}
+				l.add(inputCol);
 			}
 			
-			LinkedList<String> l =  new LinkedList<String>(outputColumnNames.keySet());
-			l.addAll(inputColumnNames);
+			for (String s : outputColumnNames.keySet()) {
+				if (inputColumns.containsKey(s)) {
+					joinColumns.add(s);
+				}
+			}
 
 			return ObjectInspectorFactory.getStandardListObjectInspector(ObjectInspectorFactory.getStandardStructObjectInspector(l, foi));
 		}
@@ -153,8 +178,8 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 			TableAggregator agg = (TableAggregator) arg0;
 
-			Object[] s = new Object[inputColumnNames.size()];
-			for (int i = 0; i < inputColumnNames.size(); i++) {
+			Object[] s = new Object[inputColumns.size()];
+			for (int i = 0; i < inputColumns.size(); i++) {
 				if (arg1[i] instanceof String) {
 					s[i] = new Text((String) arg1[i]);	
 				} else {
@@ -164,30 +189,29 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			agg.add(s);
 		}
 		
-		private String inferInputType(Object[] arg, int colIndex, int rowIndex) {
-			String colName = inputColumnNames.get(colIndex);
-			if (inputColumnNames.contains(colName + "_TYP")) {
-				int index = inputColumnNames.indexOf(colName + "_TYP");
+		private String inferInputType(Object[] arg, String colName) {
+			if (inputColumns.containsKey(colName + "_TYP")) {
+				int index = inputColumns.get(colName + "_TYP");
 				short obj = (short) arg[index];
 				if (obj == TypeMap.DECIMAL_ID) {
-					return "decimal";
+					return TypeMap.DECIMAL_IRI;
 				} else if (obj == TypeMap.DATE_ID) {
-					return "date";
+					return TypeMap.DATE_IRI;
 				} else if (obj == TypeMap.DATETIME_ID) {
-					return "timestamp";
+					return TypeMap.DATETIME_IRI;
 				} else if (obj == TypeMap.INT_ID || obj == TypeMap.INTEGER_ID || obj == TypeMap.SHORT_ID) {
-					return "int";
+					return TypeMap.INTEGER_IRI;
 				} else if (obj == TypeMap.FLOAT_ID || obj == TypeMap.LONG_ID) {
-					return "float";
+					return TypeMap.FLOAT_IRI;
 				} else if (obj == TypeMap.DOUBLE_ID) {
-					return "double";
+					return TypeMap.DOUBLE_IRI;
 				} else if (obj == TypeMap.BOOLEAN_ID) {
-					return "boolean";
+					return TypeMap.BOOLEAN_IRI;
 				} else {
-					return "string";
+					return TypeMap.STRING_IRI;
 				}
 			} 
-			return "string";
+			return TypeMap.STRING_IRI;
 		}
 
 		@SuppressWarnings("deprecation")
@@ -207,25 +231,21 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 		}
 
-		private List<Object[]> addRowNumbers(List<Object[]> r) {
-			List<Object[]> result = new LinkedList<Object[]>();
-			for (int i = 0; i < r.size(); i++) {
-				Object[] s = r.get(i);
-				Object[] ss = new Object[s.length + 1];
-				System.arraycopy(s, 0, ss, 0, s.length);
-				ss[ss.length - 1] = i;
-				result.add(ss);
-			}
-			return result;
-		}
 		
 		/** 
 		 * Input rows are in terms of non writable types.  Need a mechanism to copy
-		 * input files out but in the right format expected by hive
+		 * input files out but in the right format expected by hive, making sure not to copy shared variables
 		 */
-		private void copyToWritable(Object[] src, Object[] dest, int startIndex, int endIndex) {
-			assert dest.length == src.length + startIndex;
-			for (int k = 0; k < endIndex; k++) {
+		private void copyToWritable(Object[] src, Object[] dest, int startIndex) {
+			Set<Integer> sharedIndexes = new HashSet<Integer>();
+			for (String s : joinColumns) {
+				sharedIndexes.add(inputColumns.get(s));
+			}
+			
+			for (int k = 0; k < src.length; k++) {
+				if (sharedIndexes.contains(k)) {
+					continue;
+				}
 				Object o = src[k];
 				if (o instanceof Short) {
 					ShortWritable s = new ShortWritable();
@@ -237,48 +257,48 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 			}
 		}
+		
+		private boolean isJoinable(Object[] inputRow, Object[] outputRow) {
+			for (String s : joinColumns) {
+				int inputIndex = inputColumns.get(s);
+				int outputIndex = outputColumnNames.get(s);
+				// KAVITHA: Of course the input and output object types won't match 
+				// So revert to string equals :(
+				if (!inputRow[inputIndex].toString().trim().equals(outputRow[outputIndex].toString().trim())) {
+					return false;
+				}
+			}
+			return true;
+		}
 
 		/**
-		 * Assumption is that the right hand side (input temp table) and left
-		 * hand side (output temp table) share NO columns in common other than
-		 * the index column. Also, assumption is that the index column is the
-		 * very last column in each temp table
+		 * Assumption is that there is a set of shared variables that 
+		 * are common across input and outpul cols.  We need to implement a join
+		 * based on those shared variables
 		 * 
-		 * @param r
-		 * @param l
+		 * @param input
+		 * @param output
 		 * @return
 		 */
 
-		private List<Object[]> join(List<Object[]> r, List<Object[]> l) {
+		private List<Object[]> join(List<Object[]> input, List<Object[]> output) {
 			List<Object[]> ret = new LinkedList<Object[]>();
 
-			// iterate over the two lists and merge them
-			int i = 0;
-			int j = 0;
-
-			while (i < r.size() && j < l.size()) {
-				Object[] rRow = r.get(i);
-				Object[] lRow = l.get(j);
-				int rlast = rRow.length - 1;
-				int llast = lRow.length - 1;
-				int totalInRow = rlast + llast;
-				int rIndex = (int) rRow[rlast];
-				int lIndex = ((IntWritable) lRow[llast]).get();
-
-				if (rIndex == lIndex) {
-					Object[] newRow = new Object[totalInRow];
-					System.arraycopy(lRow, 0, newRow, 0, llast);
-					copyToWritable(rRow, newRow, llast, rlast);
-					//System.arraycopy(rRow, 0, newRow, llast, rlast);
+			// nested loop join  
+			for (int i = 0; i < input.size(); i++) {
+				for (int j = 0; j < output.size(); j++) {
+					Object[] iRow = input.get(i);
+					Object[] oRow = output.get(j);
+					int totalInRow = iRow.length + oRow.length - joinColumns.size();
 					
-					ret.add(newRow);
-					j++;
-				} else if (rIndex < lIndex) {
-					i++;
-				} else {
-					j++;
+					if (isJoinable(iRow, oRow)) {
+						Object[] newRow = new Object[totalInRow];
+						System.arraycopy(oRow, 0, newRow, 0, oRow.length);
+						copyToWritable(iRow, newRow, oRow.length);
+						ret.add(newRow);
+						j++;
+					} 
 				}
-
 			}
 			System.out.println("Returned table:");
 			WebServiceInterface.prettyPrint(ret);
@@ -288,44 +308,32 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		@SuppressWarnings("deprecation")
 		@Override
 		// KAVITHA: we need to join the rows returned by the service call with
-		// the input dataset based on their row numbers.
-		// In DB2 and Postgresql, this is accomplished
-		// as a join between the input dataset with an extra column for row
-		// numbers (created by row_sequence). In Hive this would be
-		// yet another table aggregation function whose sole job would be to add
-		// row numbers. Better to do this join here in Java (UGH)
-		// and return the joined result
+		// the input dataset based on shared variables between the input and output columns
 
 		public Object terminate(AggregationBuffer arg0) throws HiveException {
 			// TODO Auto-generated method stub
-			List<Object[]> r = ((TableAggregator) arg0).data;
+			List<Object[]> input = ((TableAggregator) arg0).data;
 			
 			System.out.println("printing input");
-			WebServiceInterface.prettyPrint(r);
-
-			// add row numbers to table. This step is used to join the table
-			// that is returned to the input table.
-			// Note this step cannot be performed until the reduce step here
-			// (e.g., it CANNOT be done in iterate)
-			List<Object[]> rs = addRowNumbers(r);
+			WebServiceInterface.prettyPrint(input);
 
 			// serialize the data as XML
 			HttpClient client = new HttpClient();
 
 			PostMethod method = new PostMethod(urlForService);
-			method.setParameter("funcData", serialize(rs));
+			method.setParameter("funcData", serialize(input));
 			BufferedReader br = null;
 			List<Object[]> result = null;
 
 			try {
 				int returnCode = client.executeMethod(method);
-
+				
 				if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
 					System.err.println("The Post method is not implemented by this URI");
 					// still consume the response body
 					method.getResponseBodyAsString();
 				} else {
-					result = parseResponse(method.getResponseBodyAsStream(), resolver, xpathForRows, xPathForColumns, true);
+					result = parseResponse(method.getResponseBodyAsStream(), resolver, xpathForRows, xPathForColumns);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -338,7 +346,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 					} catch (Exception fe) {
 					}
 			}
-			result = join(rs, result);
+			result = join(input, result);
 			return result;
 		}
 
@@ -356,13 +364,12 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			for (int j = 0; j < data.size(); j++) {
 				Object[] s = data.get(j);
 				buf.append("<row>");
-				for (int i = 0; i < s.length - 1; i++) {
-					buf.append("<").append(inputColumnNames.get(i)).append(" type=\"xs:")
-							.append(inferInputType(s, i, j)).append("\"> ").append(s[i]).append("</")
-							.append(inputColumnNames.get(i)).append("> ");
+				for (Map.Entry<String, Integer> entry : postedColumns.entrySet()) {
+					buf.append("<").append(entry.getKey()).append(" type=\"")
+							.append(inferInputType(s, entry.getKey())).append("\"> ").append(s[entry.getValue()]).append("</")
+							.append(entry.getKey()).append("> ");
 				}
 
-				buf.append("<index type=\"xs:int\">").append(s[s.length - 1]).append("</index>");
 				buf.append("</row>");
 			}
 			buf.append("</data>");
@@ -383,41 +390,48 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 	}
 	
 	public static void test() throws HiveException {
-		ObjectInspector[] inputParameters = new ObjectInspector[14];
-		/*
 		TestUDFEvaluator eval = new TestUDFEvaluator();
-		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("http://localhost:8083/postData"));
-		inputParameters[0] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name,age"));
-		inputParameters[1] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name,age,sum"));
-		inputParameters[2] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text(""));
-		inputParameters[3] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("//row"));
-		inputParameters[4] = sc;
+		List<ObjectInspector> inputParameters = new LinkedList<ObjectInspector>();
 		
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("name"));
-		inputParameters[5] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./name"));
-		inputParameters[6] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<string>"));
-		inputParameters[7] = sc;
+		// add url
+		ObjectInspector sc =  (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("http://localhost:8083/postData"));
+		inputParameters.add(sc);
+		// add input columns
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("name,age"));
+		inputParameters.add(sc);
+		// add postedColumns
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("age"));
+		inputParameters.add(sc);
+		// add output columns
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("age,sum"));
+		inputParameters.add(sc);
+		// add namespaces
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text(""));
+		inputParameters.add(sc);
+		// add xpath to get rows back
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("//row"));
+		inputParameters.add(sc);
 
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("age"));
-		inputParameters[8] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./age"));
-		inputParameters[9] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<int>"));
-		inputParameters[10] = sc;
+		// add xpath specs for age
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("age"));
+		inputParameters.add(sc);
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("./age"));
+		inputParameters.add(sc);
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text(TypeMap.INTEGER_IRI));
+		inputParameters.add(sc);
+		// add xpath specs for sum
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("sum"));
+		inputParameters.add(sc);
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text("./sum"));
+		inputParameters.add(sc);
+		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(TypeInfoFactory.stringTypeInfo, new Text(TypeMap.INTEGER_IRI));
+		inputParameters.add(sc);
 		
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("sum"));
-		inputParameters[11] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("./sum"));
-		inputParameters[12] = sc;
-		sc = (ObjectInspector) PrimitiveObjectInspectorFactory.getPrimitiveWritableConstantObjectInspector(PrimitiveCategory.STRING, new Text("<int>"));
-		inputParameters[13] = sc;
-		eval.init(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode.COMPLETE, inputParameters);
+		ObjectInspector[] inputParams = new ObjectInspector[inputParameters.size()];
+		inputParams = inputParameters.toArray(inputParams);
+		
+
+		eval.init(org.apache.hadoop.hive.ql.udf.generic.GenericUDAFEvaluator.Mode.COMPLETE, inputParams);
 		
 		Object[][] data = new Object[3][2];
 		for (int i = 0; i < 3; i++) {
@@ -434,74 +448,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			Object[] row = data[i];
 			eval.iterate(buf, row);
 		}
-		eval.terminate(buf); */
-		
+		eval.terminate(buf); 	
 	}
-
-	private static void testJoin(TestUDFEvaluator eval) {
-		List<Object[]> input = new LinkedList<Object[]>();
-		List<Object[]> output = new LinkedList<Object[]>();
-
-		for (int i = 0; i < 5; i++) {
-			Object[] row = new Object[2];
-			row[0] = "foo" + i;
-			row[1] = i;
-			input.add(row);
-		}
-
-		for (int i = 0; i < 10; i++) {
-			Object[] row = new Object[2];
-			row[0] = "foo" + i;
-			row[1] = i / 2;
-			output.add(row);
-		}
-		
-		WebServiceInterface.prettyPrint(eval.join(input, output));
-		output = new LinkedList<Object[]>();
-		for (int i = 3; i < 4; i++) {
-			Object[] row = new Object[2];
-			row[0] = "foo" + i;
-			row[1] = i;
-			output.add(row);
-		}
-		WebServiceInterface.prettyPrint(eval.join(input, output));
-
-		output = new LinkedList<Object[]>();
-		for (int i = 0; i < 5; i += 2) {
-			Object[] row = new Object[2];
-			row[0] = "foo" + i;
-			row[1] = i;
-			output.add(row);
-		}
-		WebServiceInterface.prettyPrint(eval.join(input, output));
-
-	}
-
-	private static void testDeserialize(TestUDFEvaluator eval) throws Exception {
-		FileInputStream fi = new FileInputStream(
-				"/Users/ksrinivs/git/DawgTests/dawg/sparql11-test-suite/exists/exists01.srx");
-		eval.outputColumnNames.put("s", 0);
-		eval.outputColumnNames.put("p", 1);
-		eval.outputColumnNames.put("o", 2);
-
-		// System.out.println(eval.parseResponse(fi));
-	}
-
-	private static void testSerialize(TestUDFEvaluator eval) {
-		List<Object[]> data = new LinkedList<Object[]>();
-		eval.inputColumnNames.add("foo");
-		eval.inputColumnNames.add("bar");
-		eval.inputColumnNames.add("gar");
-
-		for (int i = 0; i < 5; i++) {
-			Object[] row = new Object[3];
-			for (int j = 0; j < 3; j++) {
-				row[j] = "j" + j;
-			}
-			data.add(row);
-		}
-		System.out.println(eval.serialize(data));
-	}
-	
 
 }

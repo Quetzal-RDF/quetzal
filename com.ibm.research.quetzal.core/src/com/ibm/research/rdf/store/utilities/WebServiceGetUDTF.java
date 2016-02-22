@@ -60,6 +60,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 		inputColumns = new LinkedList<String>();
 		xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
 		outputColumnNames = new HashMap<String, Integer>();
+		List<String> l = new LinkedList<String>();
 
 		int i = 0;
 		int k = 0;
@@ -72,7 +73,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 				switch (k) {
 				case 0:
 					String str = wc.getWritableConstantValue().toString();
-					handleOutputTypeSpecification(foi, str);
+					handleOutputTypeSpecification(foi, str, l);
 					break;
 				case 1:
 					str = wc.getWritableConstantValue().toString();
@@ -111,7 +112,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 													// constants end
 
 		return ObjectInspectorFactory
-				.getStandardStructObjectInspector(new LinkedList<String>(outputColumnNames.keySet()), foi);
+				.getStandardStructObjectInspector(l, foi);
 
 	}
 
@@ -123,7 +124,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 
 			List<Object[]> result = null;
 			InputStream stream = getResponseAsStream(url, arg0);
-			result = parseResponse(stream, resolver, xpathForRows, xPathForColumns, false);
+			result = parseResponse(stream, resolver, xpathForRows, xPathForColumns);
 			for (Object[] record : result) {
 				// KAVITHA: This is most annoying but we have a situation where sometimes, data from input needs
 				// to be passed along, but we don't really get it back from the web service.  So search parsed
@@ -299,7 +300,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 		p = Pair.make("./x:action", "xs:string");
 		pk = Pair.make("action", p);
 		xPathForEachColumn.add(pk);
-		udtf.parseResponse(new FileInputStream(new File(args[0])), namespace, "//x:row", xPathForEachColumn, false);
+		udtf.parseResponse(new FileInputStream(new File(args[0])), namespace, "//x:row", xPathForEachColumn);
 	}
 
 	public static ObjectInspector[] createInput() {

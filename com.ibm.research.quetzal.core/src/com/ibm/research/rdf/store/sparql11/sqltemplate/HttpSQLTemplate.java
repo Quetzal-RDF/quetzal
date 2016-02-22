@@ -128,6 +128,9 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		// Need to add all the variables carried so far as input columns as well, if pred is not null
 		if (pred != null) {
 			for (Variable v: pred.getAvailableVariables()) {
+				if (columns.contains(v.getName())) {
+					continue;
+				}
 				columns.add(v.getName());
 				if (addType) {
 					columns.add(v.getName()+ "_TYP");

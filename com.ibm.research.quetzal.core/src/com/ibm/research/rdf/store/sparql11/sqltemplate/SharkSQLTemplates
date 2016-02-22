@@ -79,27 +79,23 @@ QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> EXCEPT
 SELECT <right_project; separator=","> FROM <right_target>)
 >>
 
-xmlPostData(sql_id, target, indexColumns, postColumns, postTypes) ::= <<
+xmlPostData(sql_id, target, indexColumns, service, ns, iris, postedColumns, outputCols, outputColumns, xPathForRows, xPathForCols, xPathForColTypes) ::= <<
 
-QS<sql_id>_POST AS (select processTable('<service>', '<functionBody>', '<indexColumns; separator="|">', <indexColumns; separator=",">, <cols:{c | '<c>'}; separator=",">) as p from <target>), 
-,
+QS<sql_id>_POST AS (select processTable(<indexColumns; separator=",">,<service>,'<indexColumns; separator=",">','<postedColumns:{c | <c>}; separator=",">','<outputCols; separator=",">','<ns, iris:{n, iri | <n>=<iri>}; separator=",">', '<xPathForRows; separator=",">', <outputColumns, xPathForCols, xPathForColTypes:{o, c, t | '<o>', '<c>', '<t>'}; separator=",">) as p from <target>), 
 >>
 
-serviceHttpPost(sql_id, firstProjectCols, queryText, service, cols, dtCols, htmlHeader) ::= <<
-
-QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
+serviceHttpPost(sql_id, firstProjectCols, allColumns) ::= <<
 QS<sql_id>_RAW AS (select inline(p) from QS<sql_id>_POST),
 QS<sql_id>_TMP AS (select <allColumns: {col | `_c<i0>` AS <col>} ; separator=","> from QS<sql_id>_RAW),
-
 >>
 
-serviceMerge(firstProjectCols, secondProjectCols, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
-QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP 
+serviceMerge(sql_id, allColumns) ::= <<
+QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP) 
 >>
 
 
 servicePost(firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
-QS<sql_id>_POST AS (select processTable('<service>', '<functionBody>', '<indexColumns; separator="|">', <indexColumns; separator=",">, <cols:{c | '<c>'}; separator=",">) as p from <target>), 
+QS<sql_id>_POST AS (select processTable(<service>, '<functionBody>', '<indexColumns; separator="|">', <indexColumns; separator=",">, <cols:{c | '<c>'}; separator=",">) as p from <target>), 
 QS<sql_id>_RAW AS (select inline(p) from QS<sql_id>_POST),
 QS<sql_id>_TMP AS (select <allColumns: {col | `_c<i0>` AS <col>} ; separator=","> from QS<sql_id>_RAW),
 QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP 

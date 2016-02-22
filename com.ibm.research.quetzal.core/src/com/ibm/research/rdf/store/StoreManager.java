@@ -228,6 +228,15 @@ public class StoreManager {
 				e.printStackTrace();
 			}
 		}
+		
+		if (store.getStoreBackend() == Backend.shark) {
+			sql = "create temporary function processTable as 'com.ibm.research.rdf.store.utilities.WebServicePostUDAF'";
+			try {
+				conn.createStatement().executeQuery(sql);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 		return store;
 
 		/*

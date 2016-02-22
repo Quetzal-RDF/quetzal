@@ -35,21 +35,23 @@ import com.ibm.wala.util.collections.Pair;
 public interface WebServiceInterface {
 	public Map<String, Integer> getOutputColumnNames();
 	
-	default public void handleOutputTypeSpecification(List<ObjectInspector> foi, String outputColSpec) {
+	default public void handleOutputTypeSpecification(List<ObjectInspector> foi, String outputColSpec, List<String> l) {
 		StringTokenizer tokenizer = new StringTokenizer(outputColSpec, ",");
 		int indexOfCol = 0;
 		while (tokenizer.hasMoreTokens()) {
 			String outName = tokenizer.nextToken();
 			getOutputColumnNames().put(outName, indexOfCol); 
+			l.add(outName);
 			indexOfCol++;
 			getOutputColumnNames().put(outName + "_TYP", indexOfCol);
+			l.add(outName + "_TYP");
 			indexOfCol++;
 			foi.add(PrimitiveObjectInspectorFactory.writableStringObjectInspector);			// output column name
 			foi.add(PrimitiveObjectInspectorFactory.writableShortObjectInspector);			// output column type as a type map
 		}
 	}
 	
-	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<Pair<String, Pair<String, String>>> xPathForEachColumn, boolean indexAdded) throws Exception {
+	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<Pair<String, Pair<String, String>>> xPathForEachColumn) throws Exception {
 		BufferedReader br;
 		br = new BufferedReader(new InputStreamReader(is));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -71,11 +73,8 @@ public interface WebServiceInterface {
 		for (int i = 0; i < rows.getLength(); i++) {
 			Node row = rows.item(i);
 			Object[] k = null;
-			if (indexAdded) {
-				k = new Object[getOutputColumnNames().size() + 1];		// return from function will always return an index column.  So the extra element in the k array reflects that		
-			} else {
-				k = new Object[getOutputColumnNames().size()];
-			}
+			k = new Object[getOutputColumnNames().size()];
+			
 			IntWritable indexValue = null;
 			
 			for (int j = 0; j < xPathForEachColumn.size(); j++) {
@@ -86,11 +85,15 @@ public interface WebServiceInterface {
 						XPathConstants.NODE);
 				String value = column.getTextContent();
 				String type = null;
-				Node t = ((Node) xPath.compile(xPathForColType).evaluate(row,
-						XPathConstants.NODE));
-				if (t != null) {
-					type = ((Node) xPath.compile(xPathForColType).evaluate(row,
-						XPathConstants.NODE)).getTextContent();
+				if (xPathForColType.startsWith(".") || xPathForColType.startsWith("/")) {
+					Node t = ((Node) xPath.compile(xPathForColType).evaluate(row,
+							XPathConstants.NODE));
+					if (t != null) {
+						type = ((Node) xPath.compile(xPathForColType).evaluate(row,
+							XPathConstants.NODE)).getTextContent();
+					} else {
+						type = xPathForColType;
+					}
 				} else {
 					type = xPathForColType;
 				}
@@ -100,15 +103,7 @@ public interface WebServiceInterface {
 				st.set(getTypedValue(value, type));
 				k[(j * 2) +1] =  st;
 			}
-			// add index at very end
-			if (indexAdded) {
-				Node column = (Node) xPath.compile("./index").evaluate(row,
-						XPathConstants.NODE);
-				String value = column.getTextContent();
-				indexValue = new IntWritable();
-				indexValue.set(Integer.parseInt(value));
-				k[k.length - 1] = indexValue;
-			}
+
 			result.add(k);
 		}
 		System.out.println("Parsed response");
@@ -138,23 +133,23 @@ public interface WebServiceInterface {
 	}
 
 	default short getTypedValue(String value, String colType) {
-		if (colType.endsWith("decimal")) {
+		if (colType.endsWith(TypeMap.DECIMAL_IRI)) {
 			return TypeMap.DECIMAL_ID;
-		} else if (colType.endsWith("Date")) {
+		} else if (colType.endsWith(TypeMap.DATE_IRI)) {
 			return TypeMap.DATE_ID;
-		} else if (colType.endsWith("Timestamp")) {
+		} else if (colType.endsWith(TypeMap.DATETIME_IRI)) {
 			return TypeMap.DATETIME_ID;
-		} else if (colType.endsWith("int")) {
+		} else if (colType.endsWith(TypeMap.INT_IRI)) {
 			return TypeMap.INT_ID;
-		} else if (colType.endsWith("integer")) {
+		} else if (colType.endsWith(TypeMap.INTEGER_IRI)) {
 			return TypeMap.INTEGER_ID;
-		} else if (colType.endsWith("short")) {
+		} else if (colType.endsWith(TypeMap.SHORT_IRI)) {
 			return TypeMap.SHORT_ID;
-		} else if (colType.endsWith("float")) {
+		} else if (colType.endsWith(TypeMap.FLOAT_IRI)) {
 			return TypeMap.FLOAT_ID;
-		} else if (colType.endsWith("double")) {
+		} else if (colType.endsWith(TypeMap.DOUBLE_IRI)) {
 			return TypeMap.DOUBLE_ID;
-		} else if (colType.endsWith("boolean")) {
+		} else if (colType.endsWith(TypeMap.BOOLEAN_IRI)) {
 			return TypeMap.BOOLEAN_ID;
 		} else {
 			return TypeMap.SIMPLE_LITERAL_ID;
