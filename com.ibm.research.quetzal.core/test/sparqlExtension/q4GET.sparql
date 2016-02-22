@@ -22,4 +22,5 @@ BIND( fn:getDrugTransporters( ?drug ) AS ( ?transporter ) )
 
 BIND( drug:getProteinGeneFunctions(?transporter) AS (?geneFunction ?type) )
 
+filter (?type = "GO")
 }
