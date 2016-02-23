@@ -89,8 +89,8 @@ QS<sql_id>_RAW AS (select inline(p) from QS<sql_id>_POST),
 QS<sql_id>_TMP AS (select <allColumns: {col | `_c<i0>` AS <col>} ; separator=","> from QS<sql_id>_RAW),
 >>
 
-serviceMerge(sql_id, allColumns) ::= <<
-QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP) 
+serviceMerge(sql_id, allColumns, filter_constraint) ::= <<
+QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP <if(filter_constraint)> WHERE <filter_constraint; separator=" AND "> <endif>) 
 >>
 
 
@@ -102,11 +102,12 @@ QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP
 )
 >>
 
-service(sql_id, urlTable, target, inputCols, service, httpMethod, queryText, ns, iris, postedColumns, outputCols, outputColumns, allColumns, xPathForRows, xPathForCols, xPathForColTypes) ::= <<
+service(sql_id, urlTable, target, inputCols, service, httpMethod, queryText, ns, iris, postedColumns, outputCols, outputColumns, allColumns, xPathForRows, xPathForCols, xPathForColTypes, filter_constraint) ::= <<
 <if(urlTable)>
 	QS<sql_id>_URLS AS (select * from <urlTable> <if(target)> ,<target> <endif>),
 <else>
 	QS<sql_id>_URL AS (select explode(array(<service>)) as url <if(inputCols)>, <inputCols; separator=","> <endif> <if(target)> from <target> <endif>), QS<sql_id>_URLS AS (select * from QS<sql_id>_URL), 
 <endif>
-QS<sql_id> AS (select httpGet('<outputCols; separator=",">', '<inputCols; separator=",">', '<queryText>', '<httpMethod>', '<ns, iris:{n, iri | <n>=<iri>}; separator=",">', '<xPathForRows; separator=",">', <outputColumns, xPathForCols, xPathForColTypes:{o, c, t | '<o>', '<c>', '<t>'}; separator=",">, <inputCols; separator=",">) as (<allColumns; separator=",">) from QS<sql_id>_URLS)
+QS<sql_id>_GET AS (select httpGet('<outputCols; separator=",">', '<inputCols; separator=",">', '<queryText>', '<httpMethod>', '<ns, iris:{n, iri | <n>=<iri>}; separator=",">', '<xPathForRows; separator=",">', <outputColumns, xPathForCols, xPathForColTypes:{o, c, t | '<o>', '<c>', '<t>'}; separator=",">, <inputCols; separator=",">) as (<allColumns; separator=",">) from QS<sql_id>_URLS),
+QS<sql_id> AS (select <allColumns; separator=",">  from QS<sql_id>_GET <if(filter_constraint)> WHERE <filter_constraint; separator=" AND "> <endif>)
 >>

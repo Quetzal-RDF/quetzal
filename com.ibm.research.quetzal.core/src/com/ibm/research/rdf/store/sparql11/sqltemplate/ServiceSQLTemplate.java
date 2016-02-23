@@ -78,7 +78,12 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 		{	
 			for(Variable v : planNode.getProducedVariables()){
-				varMap.put(v.getName(), Pair.make(v.getName(), "typecode(" + v.getName() + "_TYP)"));
+				if (store.getStoreBackend() != Store.Backend.shark) {
+					varMap.put(v.getName(), Pair.make(v.getName(), "typecode(" + v.getName() + "_TYP)"));
+				} else {
+					varMap.put(v.getName(), Pair.make(v.getName(), v.getName() + "_TYP"));
+					
+				}
 			}
 		}
 		
