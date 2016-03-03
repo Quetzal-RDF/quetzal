@@ -67,6 +67,11 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			BindFunctionCall bfp = ((BindFunctionPattern) sp).getFuncCall();
 			Iterator<Variable> fps = ((ServiceFunction)bfp.getFunction()).getInVariables().iterator();
 			PlanNode pred = planNode.getPredecessor(wrapper.plan);
+			
+			if (pred == null) {
+				System.err.println(planNode.getPredecessor(wrapper.plan));
+			}
+			
 			String predCte = wrapper.getPlanNodeCTE(pred, false);
 			for(Variable v : planNode.getRequiredVariables()){
 				String vPredName = wrapper.getPlanNodeVarMapping(pred,v.getName());

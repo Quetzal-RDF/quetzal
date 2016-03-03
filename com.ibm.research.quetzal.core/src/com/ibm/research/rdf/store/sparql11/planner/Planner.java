@@ -523,9 +523,10 @@ public class Planner {
 				
 				node.cost = getCost(g);
 				assert node.cost.fst > 0.0;
-				Set<Variable> vars = HashSetFactory.make(this.availableVars);
-				vars.addAll(producedVariables);
+				// Set<Variable> vars = HashSetFactory.make(this.availableVars);
+				Set<Variable> vars = HashSetFactory.make(availableVars);
 				vars.retainAll(liveVars);
+				vars.addAll(producedVariables);
 				node.setAvailableVariables(vars);
 				g.addNode(node);
 				if (currentHead != null) {
