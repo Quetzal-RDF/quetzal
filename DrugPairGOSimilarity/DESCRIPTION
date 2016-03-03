@@ -1,0 +1,9 @@
+Package: DrugPairGOSimilarity
+Type: Package
+Title: Meant to be a web service that given a drug and its Gene Ontology Annotation, computes all drug pairs, and finds the Gene ontology similarity between them, returns drug1, drug2, similarity value
+Version: 1.0
+Date: 2016-03-02
+Author: Kavitha Srinivas
+Maintainer: Who to complain to <ksrinivs@us.ibm.com>
+Description: More about what it does (maybe more than one line)
+License: Same license as the Quetzal project
