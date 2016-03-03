@@ -1,0 +1,38 @@
+# install opencpu.  This exports ALL the packages installed in R (both global and user packages)
+# as a web service using Apache.  Assuming Ubuntu 14.04 here.
+
+apt-get install python-software-properties 
+AND/OR
+sudo apt-get install software-properties-common
+sudo add-apt-repository -y ppa:opencpu/opencpu-1.5
+sudo apt-get update 
+sudo apt-get upgrade
+
+# Check out the openCPU installation.  Try the following command:  
+curl https://<yourservername>/ocpu/library/stats/R/rnorm/json -d "n=10&mean=5"
+
+# Several cool things happening here.  First notice that 1. we cannot use localhost
+# 2.  If your server is configured badly, we cannot use SSL, so just default to http
+# 3.  Some servers are configured oddly, notice the IP address that opencpu says its guessing,
+# use that as the address. 
+# Note the pattern after library: library/stats/R/rnorm/json.  Its really library/<libraryName>/R/<functionName>/json.  ANY R library can be called in this manner.
+
+# To call your OWN library or R package, build it first using RStudio (build a binary package).
+# Then:
+R CMD INSTALL <pathToRPackage>
+# Pay attention to where the install occurred to (if the base is your home directory because you
+# you installed as non-root, you will need to use a different URL than if its a root install
+# which installs to /usr/local/..)
+
+# So if you have a root install, your package name is DrugPairGOSimilarity and your function is 
+# computeSimilarDrugPairs which computes drugs with similar gene annotations, then: 
+curl -X POST -d @postedData.xml https://<servername>/ocpu/library/DrugPairGOSimilarity/R/computeSimilarDrugPairs/json 
+
+# If you have a non-root install, your package names is DrugPairGOSimilarity and your function is 
+# computeSimilarDrugPairs which computes drugs with similar gene annotations, then:
+curl -X POST -d @postedData.xml https://<servername>/ocpu/library/user/ksrinivs/DrugPairGOSimilarity/R/computeSimilarDrugPairs/json
+
+# Note that if you have output that is like an SVG or a PDF, you just drop the JSON suffix, and 
+# the system returns a locaton on the server where it writes the output file to.  A second GET needs
+# to be done to fetch the file.
+
