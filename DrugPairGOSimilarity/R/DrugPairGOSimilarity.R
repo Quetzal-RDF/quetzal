@@ -1,16 +1,39 @@
 library(GOSemSim)
 library(readr)
 require(XML)
+library(RxnSim)
+library(testit)
 
-computeSimilarDrugPairs <- function(str) {
-  # used to test the function locally
-  # str <- read_file("/tmp/postedData.xml")
-  
+parseInput <- function(str) {
   # parse a dataframe from XML
   data <- xmlParse(str)
   drug_cat = xmlSApply(xmlRoot(data), function(x) xmlSApply(x, xmlValue))
   free(data)
-  drug_df <- data.frame(t(drug_cat),row.names=NULL)
+  d <- data.frame(t(drug_cat),row.names=NULL)
+}
+
+
+# Compute similarity of SMILES fingerprints
+computeFPPerPair <- function(d1, d2, d) {
+  smiles1 <- as.character(d1[, "SMILES"])
+  smiles2 <- as.character(d2[,"SMILES"])
+  
+  assert("length should be 1 for a chemical fp of a drug", length(smiles1) == 1)
+  assert("length should be 1 for a chemical fp of a drug", length(smiles2) == 1) 
+  sim = ms.compute (smiles1, smiles2, fp.depth=8)
+}
+
+# Compute similarity of GO functions
+computeGOSimilarityPerPair <- function(d1, d2, d) {
+  go1 <- as.character(d1[, "GO"])
+  go2 <- as.character(d2[,"GO"])
+  sim = mgoSim(go1, go2, ont="MF", measure="Wang", combine="BMA")
+}
+
+computeOverSimilarDrugPairs <- function(str, f) {
+  # used to test the function locally
+  # str <- read_file("/tmp/postedData.xml")
+  d <- parseInput(str) 
   
   # select just the drug column to compute all drug pairs
   m <- unique(subset(d, select = c("drug")))
@@ -32,9 +55,7 @@ computeSimilarDrugPairs <- function(str) {
     xml$addTag("drug2", drug2)
     d1 = d[d$drug==drug1,]
     d2 = d[d$drug==drug2,]
-    go1 <- as.character(d1[, "GO"])
-    go2 <- as.character(d2[,"GO"])
-    sim = mgoSim(go1, go2, ont="MF", measure="Wang", combine="BMA")
+    sim = f(d1, d2, d)
     xml$addTag("sim", sim)
     xml$closeTag()
   }
@@ -42,3 +63,17 @@ computeSimilarDrugPairs <- function(str) {
   xml$closeTag()
   ret <- saveXML(xml)
 }
+
+computeChemicalFingerprintSimilarity <- function(str) {
+  computeOverSimilarDrugPairs(str, computeFPPerPair)
+}
+
+computeGOSimilarity <- function(str) {
+  computeOverSimilarDrugPairs(str, computeGOSimilarityPerPair)
+}
+
+str <- read_file("/tmp/postedData.xml")
+print(computeGOSimilarity(str))
+str <- read_file("/tmp/postedChem.xml")
+print(computeChemicalFingerprintSimilarity(str))
+
