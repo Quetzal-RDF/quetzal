@@ -32,7 +32,8 @@ def extractSMILES():
  #       print row.xpath('./x:calculated_properties/x:property[./x:kind/text()="SMILES"]/x:value/text()', namespaces={'x': 'http://www.drugbank.ca'})
 
 def extractSMILES(drugName):
-    root = etree.parse("../../drugbank.xml")
+    root = etree.parse("db_small.xml")
+    # root = etree.parse("../../drugbank.xml")
     rows = root.xpath('/x:drugbank/x:drug[./x:name/text()="'+ drugName + '"]', namespaces={'x': 'http://www.drugbank.ca'})
 
     result = '<?xml version="1.0"?>'
@@ -40,7 +41,8 @@ def extractSMILES(drugName):
 
     for row in rows:
         smiles = row.xpath('.//x:property[./x:kind/text()="SMILES"]/x:value/text()', namespaces={'x': 'http://www.drugbank.ca'})
-        result += "<row>" + "<drug>" + drugName+ "</drug> <smiles>" + smiles[0] + "</smiles> </row>"
+        if (len(smiles) > 0):
+            result += "<row>" + "<drug>" + drugName+ "</drug> <smiles>" + smiles[0] + "</smiles> </row>"
     result += '</data>'
     return result
 
