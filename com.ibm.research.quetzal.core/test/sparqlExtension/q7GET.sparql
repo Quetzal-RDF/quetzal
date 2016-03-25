@@ -1,6 +1,7 @@
 
 SELECT ?patient WHERE {
-   SERVICE <http://9.186.100.76:8889/openrdf-sesame/repositories/bjdiag3> { 
-  		?patient a <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT>
+   SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag> { 
+  		?patient a <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT> ;
+  		<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> "000B276045F0EC49E43F4C5AA80DC9BA"
   }
 } 
