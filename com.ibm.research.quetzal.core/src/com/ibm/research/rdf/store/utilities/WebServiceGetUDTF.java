@@ -1,9 +1,11 @@
 package com.ibm.research.rdf.store.utilities;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -12,6 +14,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -27,6 +32,11 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantStringObjectInspector;
 import org.apache.hadoop.io.Text;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.Pair;
@@ -205,14 +215,20 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 
 			if (method == httpMethod.GET) {
 				if (!queryText.isEmpty()) {
-					url = url + "?" + URLEncoder.encode(queryText, "UTF-8");
+					url = url + "?query=" + queryText;
+					System.out.println(url);
 				} else {
 					url = addURLParams(url, arg0);
 				}
 
 				GetMethod getMethod = new GetMethod(url);
+				if (queryText != null && !queryText.isEmpty()) {
+					getMethod.addRequestHeader(HttpHeaders.ACCEPT, "application/sparql-results+xml");
+				}
 				client.executeMethod(getMethod);
 				stream = getMethod.getResponseBodyAsStream();
+
+			    
 			} else {
 				PostMethod postMethod = new PostMethod(url);
 				for (int i = indexOfInput + 1; i < inputColumns.size(); i++) {
@@ -241,24 +257,41 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 	}
 
 	public static void main(String[] args) throws Exception {
-		// test1(args);
-		test2();
+		//test1(args);
+		//test2();
+		test3();
+	}
+	
+	public static void test3() throws Exception {
+		WebServiceGetUDTF g = new WebServiceGetUDTF();
+		g.method = httpMethod.GET;
+		Object[] obj = new Object[1];
+		g.queryText = " select * where { " +
+					" ?patient a <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT> ; " +
+					" <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> \"000B276045F0EC49E43F4C5AA80DC9BA\" }";
+ 		
+		// g.queryText = "SELECT+*+WHERE+%7B+%0A++%09%09%3Fpatient+a+%3Chttp%3A%2F%2Fwww.ibm.com%2Fhealth%2Fbjdiag%2FDIAG_OUTPATIENT%3E+%3B%0A++%09%09%3Chttp%3A%2F%2Fwww.ibm.com%2Fhealth%2Fbjdiag%2FDIAG_OUTPATIENT%23EMPI%3E+%22000B276045F0EC49E43F4C5AA80DC9BA%22%0A++%7D";
+		InputStream is = g.getResponseAsStream("http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag", obj);
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+
+		DocumentBuilder builder = factory.newDocumentBuilder();
+
+		Document doc = builder.parse(new InputSource(br));
+		
+		/*
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		String line = null;
+		StringBuffer buf = new StringBuffer();
+		while ((line = reader.readLine()) != null) {
+			System.out.println(line);
+			buf.append(line);
+		}
+		System.out.println(buf.toString()); */
+		
 	}
 
-	public static void test2() {
-		Object[] argsToProcess = new Object[2];
-		String url = "http://localhost:8083/getDrugTransporters?drugName=\"||QS0.drug||\"";
-		argsToProcess[0] = PrimitiveObjectInspectorFactory.javaStringObjectInspector
-				.create("http://localhost:8083/getDrugTransporters?drugName=\"||QS0.drug||\"");
-		argsToProcess[1] = PrimitiveObjectInspectorFactory.javaStringObjectInspector.create("Vasopressin");
-		WebServiceGetUDTF udtf = new WebServiceGetUDTF();
-		udtf.indexOfInput = 0;
-		udtf.inputColumns = new LinkedList<String>();
-		udtf.inputColumns.add("url");
-		udtf.inputColumns.add("drug");
-
-		udtf.addURLParams(url, argsToProcess);
-	}
 
 	public static void test1(String[] args) throws Exception, FileNotFoundException {
 		Object[] argsToProcess = new Object[1];

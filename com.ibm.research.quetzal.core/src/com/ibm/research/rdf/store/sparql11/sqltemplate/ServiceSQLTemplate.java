@@ -91,26 +91,41 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				}
 			}
 		}
+		List<String> inputCols = new LinkedList<String>();
+		List<String> outputCols = new LinkedList<String>();
+
 		
 		if (sp instanceof ServicePattern) {
 			names.add("sparql");
 			iris.add("http://www.w3.org/2005/sparql-results#");
+			
+			names.add("xs");
+			iris.add("http://www.w3.org/2001/XMLSchema");
 
 			// this supports the regular SPARQL service call right now
 			assert ((ServicePattern) sp).getService().isIRI();
 			String queryText = ((ServicePattern) sp).getQueryText();
 			
-			mappings.put("queryText", new SQLMapping("queryText", "&query=" + queryText, null));
+			mappings.put("queryText", new SQLMapping("queryText", queryText, null));
 			String service = ((ServicePattern) sp).getService().getIRI().toString();
+			if (store.getStoreBackend()==Store.Backend.shark) {
+				service = "'" + service + "'";
+			}
 			mappings.put("service", new SQLMapping("service", service, null));
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", "//sparql:result", null));
+			inputCols.add("url");
 			Set<Variable> producedVars = planNode.getProducedVariables();
+			List<Variable> literals = getAllLiteralVars(producedVars);
+
 			for (Variable v : producedVars) {
-				xPathForCols.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"])");
+				xPathForCols.add("./sparql:binding[./@name=\"" + v.getName() + "\"]");
+				if (literals.contains(v)) {
+					xPathForColTypes.add("./sparql:binding[./@name=\"" + v.getName() + "\"]//@datatype");
+				} else {
+					xPathForColTypes.add(String.valueOf(TypeMap.IRI_ID));
+				}
 			}
-			for (Variable v : getAllLiteralVars(producedVars)) {				
-				xPathForColTypes.add("xs:string(./sparql:binding[./@name=\"" + v.getName() + "\"]//@datatype)");
-			}
+			
 		} else {
 			// this supports extensions to service which allow a GET/POST with parameters from an input table, in which case the GET
 			// or POST work row by row, or a POST ALL which means the contents of the entire table get posted over.
@@ -183,7 +198,6 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 	
 				xPathForColTypes.add(it.next());
 			}
-			List<String> inputCols = new LinkedList<String>();
 		//	Set<Variable> vs = sf.service().gatherVariables();
 			Set<Variable> vs = bfp.gatherVariables();
 
@@ -191,16 +205,15 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				inputCols.add("url");
 				addPredecessorVariables(inputCols, true);
 			}
-			
-			List<String> outputCols = new LinkedList<String>();
-			for (Variable v: planNode.getProducedVariables()) {
-				outputCols.add(v.getName());
-			}
-			addPredecessorVariables(outputCols, false);
-		
-			mappings.put("inputCols", new SQLMapping("inputCols", inputCols, null));
-			mappings.put("outputCols", new SQLMapping("outputCols", outputCols, null));
+					
 		}
+		for (Variable v: planNode.getProducedVariables()) {
+			outputCols.add(v.getName());
+		}
+		addPredecessorVariables(outputCols, false);
+
+		mappings.put("inputCols", new SQLMapping("inputCols", inputCols, null));
+		mappings.put("outputCols", new SQLMapping("outputCols", outputCols, null));
 
 		mappings.put("xPathForCols", new SQLMapping("xPathForCols", xPathForCols, null));
 		mappings.put("xPathForColTypes", new SQLMapping("xPathForColTypes", xPathForColTypes, null));

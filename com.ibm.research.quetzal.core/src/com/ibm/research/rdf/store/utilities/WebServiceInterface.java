@@ -52,14 +52,23 @@ public interface WebServiceInterface {
 	}
 	
 	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<Pair<String, Pair<String, String>>> xPathForEachColumn) throws Exception {
-		BufferedReader br;
+		/* BufferedReader br;
 		br = new BufferedReader(new InputStreamReader(is));
+		
+		StringBuffer buf = new StringBuffer();
+		String line = null;
+		while ((line = br.readLine()) != null) {
+			buf.append(line);
+		}
+		line = buf.toString(); */
+		
+		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 
-		DocumentBuilder builder = factory.newDocumentBuilder();
+		DocumentBuilder builder = factory.newDocumentBuilder(); 
 
-		Document doc = builder.parse(new InputSource(br));
+		Document doc = builder.parse(new InputSource(is));
 		printDocument(doc);
 		    
 		XPath xPath = XPathFactory.newInstance().newXPath();
@@ -85,7 +94,9 @@ public interface WebServiceInterface {
 						XPathConstants.NODE);
 				String value = column.getTextContent();
 				String type = null;
-				if (xPathForColType.startsWith(".") || xPathForColType.startsWith("/")) {
+				if (xPathForColType.equals(String.valueOf(TypeMap.IRI_ID))) {
+					type = TypeMap.IRI_TYPE_IRI;
+				} else if (xPathForColType.startsWith(".") || xPathForColType.startsWith("/")) {
 					Node t = ((Node) xPath.compile(xPathForColType).evaluate(row,
 							XPathConstants.NODE));
 					if (t != null) {
@@ -98,7 +109,7 @@ public interface WebServiceInterface {
 					type = xPathForColType;
 				}
 				
-				k[j * 2] = new Text(value);
+				k[j * 2] = new Text(value.trim());
 				ShortWritable st = new ShortWritable();
 				st.set(getTypedValue(value, type));
 				k[(j * 2) +1] =  st;
@@ -107,7 +118,7 @@ public interface WebServiceInterface {
 			result.add(k);
 		}
 		System.out.println("Parsed response");
-		br.close();
+//		br.close();
 		is.close();
 		
 		prettyPrint(result);
@@ -151,6 +162,8 @@ public interface WebServiceInterface {
 			return TypeMap.DOUBLE_ID;
 		} else if (colType.endsWith(TypeMap.BOOLEAN_IRI)) {
 			return TypeMap.BOOLEAN_ID;
+		} else if (colType.equals(TypeMap.IRI_TYPE_IRI)) {
+			return TypeMap.IRI_ID;
 		} else {
 			return TypeMap.SIMPLE_LITERAL_ID;
 		}

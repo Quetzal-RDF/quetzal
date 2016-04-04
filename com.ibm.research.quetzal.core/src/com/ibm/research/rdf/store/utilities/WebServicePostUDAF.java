@@ -96,11 +96,14 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 					WritableConstantStringObjectInspector wc = (WritableConstantStringObjectInspector) param;
 					switch(k) {
 						case 0:
+							System.out.println("url:" + urlForService);
 							urlForService = wc.getWritableConstantValue().toString();
 							break;
 						case 1:
 							StringTokenizer tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
 							int z = 0;
+							System.out.println("inputCols:" + wc.getWritableConstantValue().toString());
+
 							while (tokenizer.hasMoreTokens()) {
 								String col = tokenizer.nextToken();
 								inputColumns.put(col, z);
@@ -109,6 +112,8 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 							}
 							break;
 						case 2:
+							System.out.println("postedCols:" + wc.getWritableConstantValue().toString());
+
 							tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
 							while (tokenizer.hasMoreTokens()) {
 								String col = tokenizer.nextToken();
@@ -116,10 +121,14 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 							}
 							break;
 						case 3:
+							System.out.println("outputCols:" + wc.getWritableConstantValue().toString());
+
 							String str = wc.getWritableConstantValue().toString();
 							handleOutputTypeSpecification(foi, str, l);
 							break;
 						case 4:
+							System.out.println("namespaces:" + wc.getWritableConstantValue().toString());
+
 							resolver = createNamespaces(wc.getWritableConstantValue().toString());
 							break;
 						case 5:
