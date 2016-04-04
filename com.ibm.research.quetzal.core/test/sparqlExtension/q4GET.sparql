@@ -18,8 +18,8 @@ select distinct * where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getDrugTransporters( ?drug ) AS ( ?transporter ) )
-
+BIND( fn:getDrugTransporters( ?drug ) AS ( ?transporter ) ) 
+ 
 BIND( drug:getProteinGeneFunctions(?transporter) AS (?geneFunction ?type) )
 
 filter (?type = "GO")
