@@ -215,7 +215,6 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 
 			if (method == httpMethod.GET) {
 				if (!queryText.isEmpty()) {
-					url = url + "?query=" + queryText;
 					System.out.println(url);
 				} else {
 					url = addURLParams(url, arg0);

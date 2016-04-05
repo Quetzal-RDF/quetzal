@@ -106,12 +106,11 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			assert ((ServicePattern) sp).getService().isIRI();
 			String queryText = ((ServicePattern) sp).getQueryText();
 			
-			mappings.put("queryText", new SQLMapping("queryText", queryText, null));
-			String service = ((ServicePattern) sp).getService().getIRI().toString();
-			if (store.getStoreBackend()==Store.Backend.shark) {
-				service = "'" + service + "'";
-			}
-			mappings.put("service", new SQLMapping("service", service, null));
+			String queryStr = queryText != null? "?query=" + queryText: "";
+			mappings.put("queryText", new SQLMapping("queryText", queryStr, null));
+			String service = ((ServicePattern) sp).getService().getIRI().toString() + queryStr;
+
+			mappings.put("service", new SQLMapping("service", "'" + service + "'", null));
 			mappings.put("xPathForRows", new SQLMapping("xPathForRows", "//sparql:result", null));
 			inputCols.add("url");
 			Set<Variable> producedVars = planNode.getProducedVariables();
@@ -126,6 +125,11 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 				}
 			}
 			
+			mappings.put(
+				"htmlHeader", 
+				new SQLMapping(
+					"htmlHeader", 
+					"<httpHeader><header name=\"Accept\" value=\"application/sparql-results+xml\"/></httpHeader>", null));
 		} else {
 			// this supports extensions to service which allow a GET/POST with parameters from an input table, in which case the GET
 			// or POST work row by row, or a POST ALL which means the contents of the entire table get posted over.
@@ -223,7 +227,6 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 		if (planNode.isPost()) {
 			setupPostData(mappings);
-			mappings.put("htmlHeader", new SQLMapping("htmlHeader", "", null));
 			mappings.put("httpMethod",new SQLMapping("httpMethod", "POST", null));
 		} else {
 			mappings.put("httpMethod",new SQLMapping("httpMethod", "GET", null));
@@ -232,6 +235,10 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		List<String> filterConstraint = getFilterSQLConstraint();
 		SQLMapping filterMapping = new SQLMapping("filter_constraint", filterConstraint,null);
 		mappings.put("filter_constraint", filterMapping);
+		
+		if (! mappings.containsKey("htmlHeader")) {
+			mappings.put("htmlHeader", new SQLMapping("htmlHeader", "", null));
+		}
 		
 		return mappings;
 	}
