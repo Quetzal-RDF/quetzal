@@ -33,5 +33,9 @@ public class NamespaceResolver implements NamespaceContext {
         // Not needed in this context.
         return null;
     }
+    
+    public String toString() {
+    	return namespaces.toString();
+    }
 
 }

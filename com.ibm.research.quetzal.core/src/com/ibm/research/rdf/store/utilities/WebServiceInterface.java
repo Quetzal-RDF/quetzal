@@ -51,18 +51,9 @@ public interface WebServiceInterface {
 		}
 	}
 	
-	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<Pair<String, Pair<String, String>>> xPathForEachColumn) throws Exception {
-		/* BufferedReader br;
-		br = new BufferedReader(new InputStreamReader(is));
+	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<Pair<String, Pair<String, String>>> xPathForEachColumn) throws Exception {		
 		
-		StringBuffer buf = new StringBuffer();
-		String line = null;
-		while ((line = br.readLine()) != null) {
-			buf.append(line);
-		}
-		line = buf.toString(); */
-		
-		
+		System.out.println("In parse response");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 
@@ -80,6 +71,7 @@ public interface WebServiceInterface {
 
 		List<Object[]> result = new LinkedList<Object[]>();
 		for (int i = 0; i < rows.getLength(); i++) {
+			System.out.println("In rows loop");
 			Node row = rows.item(i);
 			Object[] k = null;
 			k = new Object[getOutputColumnNames().size()];
@@ -90,6 +82,7 @@ public interface WebServiceInterface {
 				Pair<String, Pair<String, String>> p = xPathForEachColumn.get(j);
 				String xPathForColValue = p.snd.fst;
 				String xPathForColType = p.snd.snd;
+				System.out.println("Column pair for:"  + p.fst + " " + xPathForColValue + " " + xPathForColType);
 				Node column = (Node) xPath.compile(xPathForColValue).evaluate(row,
 						XPathConstants.NODE);
 				String value = column.getTextContent();

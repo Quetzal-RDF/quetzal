@@ -27,6 +27,7 @@ public class ServicePattern extends Pattern implements Service {
 	public ServicePattern(QueryTripleTerm service, String queryText, boolean silent, Pattern pattern) {
 		super(EPatternSetType.SERVICE);
 		String x = null;
+		
 		try {
 			String str = "SELECT * WHERE " + queryText.substring(queryText.indexOf('{'));
 			x = URLEncoder.encode(str, "UTF-8");
