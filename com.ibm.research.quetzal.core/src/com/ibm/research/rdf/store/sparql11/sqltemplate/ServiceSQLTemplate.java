@@ -96,7 +96,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 
 		
 		if (sp instanceof ServicePattern) {
-			names.add("sparql");
+			names.add("s");
 			iris.add("http://www.w3.org/2005/sparql-results#");
 			
 			names.add("xs");
@@ -111,15 +111,18 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			String service = ((ServicePattern) sp).getService().getIRI().toString() + queryStr;
 
 			mappings.put("service", new SQLMapping("service", "'" + service + "'", null));
-			mappings.put("xPathForRows", new SQLMapping("xPathForRows", "//sparql:result", null));
+			mappings.put("xPathForRows", new SQLMapping("xPathForRows", "//s:result", null));
 			inputCols.add("url");
 			Set<Variable> producedVars = planNode.getProducedVariables();
 			List<Variable> literals = getAllLiteralVars(producedVars);
 
 			for (Variable v : producedVars) {
-				xPathForCols.add("./sparql:binding[./@name=\"" + v.getName() + "\"]");
+				// KAVITHA: There is a bug in Kryo which Hive depends on which causes the system to arbitrarily fail in 
+				// deserializing xpath for columns if the strings in this data structure are long.  The only awful hack around this
+				// if to assume that we wont pass these in in the service request is in SPARQL because we can reconstruct it.
+				xPathForCols.add("");
 				if (literals.contains(v)) {
-					xPathForColTypes.add("./sparql:binding[./@name=\"" + v.getName() + "\"]//@datatype");
+					xPathForColTypes.add("");
 				} else {
 					xPathForColTypes.add(String.valueOf(TypeMap.IRI_ID));
 				}

@@ -53,7 +53,7 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 
 	private httpMethod method;
 	List<String> inputColumns;
-	private List<Pair<String, Pair<String, String>>> xPathForColumns;
+	private List<List<String>> xPathForColumns;
 
 	private Map<String, Integer> outputColumnNames;
 	private int indexOfInput = -1;
@@ -67,10 +67,12 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 	@Override
 	public StructObjectInspector initialize(ObjectInspector[] parameters) throws UDFArgumentException {
 		List<ObjectInspector> foi = new ArrayList<ObjectInspector>();
-		inputColumns = new LinkedList<String>();
-		xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
-		outputColumnNames = new HashMap<String, Integer>();
 		List<String> l = new LinkedList<String>();
+		
+		inputColumns = new LinkedList<String>();
+		xPathForColumns = new LinkedList<List<String>>();
+		outputColumnNames = new HashMap<String, Integer>();
+
 
 		int i = 0;
 		while (i < parameters.length && parameters[i] instanceof WritableConstantStringObjectInspector) {
@@ -78,11 +80,14 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 			switch (i) {
 			case 0:
 				String str = wc.getWritableConstantValue().toString();
+				System.out.println("handling output:" + str);
 				handleOutputTypeSpecification(foi, str, l);
 				i++;
 				break;
 			case 1:
 				str = wc.getWritableConstantValue().toString();
+				System.out.println("handling input:" + str);
+
 				StringTokenizer tokenizer = new StringTokenizer(str, ",");
 				while (tokenizer.hasMoreTokens()) {
 					inputColumns.add(tokenizer.nextToken());
@@ -91,10 +96,13 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 				break;
 			case 2:
 				queryText = wc.getWritableConstantValue().toString();
+				System.out.println("handling queryText:" + queryText);
 				i++;
 				break;
 			case 3:
 				str = wc.getWritableConstantValue().toString();
+				System.out.println("handling method:" + str);
+
 				if (str.equals("GET")) {
 					method = httpMethod.GET;
 				} else {
@@ -103,10 +111,12 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 				i++;
 				break;
 			case 4:
+				System.out.println("handling namespaces:" + wc.getWritableConstantValue().toString());
 				resolver = createNamespaces(wc.getWritableConstantValue().toString());
 				i++;
 				break;
 			case 5:
+				System.out.println("xpathforRows:" + wc.getWritableConstantValue().toString());
 				xpathForRows = wc.getWritableConstantValue().toString();
 				i++;
 				break;
@@ -116,13 +126,19 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 			}
 		}
 		indexOfInput = i; // Input starts where writable constants end
-
+		System.out.println("xpathForColumns:" + xPathForColumns);
+		System.out.println("Finished processing init");
 		return ObjectInspectorFactory.getStandardStructObjectInspector(l, foi);
 
 	}
 
 	@Override
 	public void process(Object[] arg0) throws HiveException {
+		System.out.println("Processing records");
+		for (int i = 0; i < arg0.length; i++) {
+			System.out.println(PrimitiveObjectInspectorFactory.javaStringObjectInspector
+			.getPrimitiveJavaObject(arg0[i]));
+		}
 		String url = PrimitiveObjectInspectorFactory.javaStringObjectInspector
 				.getPrimitiveJavaObject(arg0[indexOfInput]);
 		System.out.println("url:" + url);
@@ -250,16 +266,16 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 	}
 
 	@Override
-	public List<Pair<String, Pair<String, String>>> getXpathForColumns() {
+	public List<List<String>> getXpathForColumns() {
 		// TODO Auto-generated method stub
 		return xPathForColumns;
 	}
 
 	public static void main(String[] args) throws Exception {
-		test3();
+		test();
 	}
 
-	public static void test3() throws Exception {
+	public static void test() throws Exception {
 		WebServiceGetUDTF udtf = new WebServiceGetUDTF();
 		udtf.method = httpMethod.GET;
 		Object[] obj = new Object[1];
@@ -284,49 +300,26 @@ public class WebServiceGetUDTF extends GenericUDTF implements WebServiceInterfac
 		h.put("sparql", "http://www.w3.org/2005/sparql-results#");
 
 		NamespaceResolver namespace = new NamespaceResolver(h);
-		List<Pair<String, Pair<String, String>>> xPathForEachColumn = new LinkedList<Pair<String, Pair<String, String>>>();
-		Pair<String, String> p = Pair.make("./sparql:binding[./@name=\"date\"]",
-				"./sparql:binding[./@name=\"date\"]//@datatype");
-		Pair<String, Pair<String, String>> pk = Pair.make("date", p);
-		xPathForEachColumn.add(pk);
-		p = Pair.make("./sparql:binding[./@name=\"x\"]", "10002");
-		pk = Pair.make("x", p);
-		xPathForEachColumn.add(pk);
-		p = Pair.make("./sparql:binding[./@name=\"value\"]", "./sparql:binding[./@name=\"value\"]//@datatype");
-		pk = Pair.make("value", p);
-		xPathForEachColumn.add(pk);
+		List<List<String>> xPathForEachColumn = new LinkedList<List<String>>();
+		List l = new LinkedList<String>();
+		l.add("date");
+		l.add("./sparql:binding[./@name=\"date\"]");
+		l.add("./sparql:binding[./@name=\"date\"]//@datatype");
+		
+		xPathForEachColumn.add(l);
+		l = new LinkedList<String>();
+		l.add("x");
+		l.add("./sparql:binding[./@name=\"x\"]");
+		l.add("10002");
+		xPathForEachColumn.add(l);
+		
+		l = new LinkedList<String>();
+		l.add("value");
+		l.add("./sparql:binding[./@name=\"value\"]");
+		l.add("./sparql:binding[./@name=\"value\"]//@datatype");
+		xPathForEachColumn.add(l);
 		udtf.parseResponse(is, namespace, "//sparql:result", xPathForEachColumn);
 
-	}
-
-	public static void test1(String[] args) throws Exception, FileNotFoundException {
-		WebServiceGetUDTF udtf = new WebServiceGetUDTF();
-		udtf.outputColumnNames = new HashMapFactory().make();
-		udtf.outputColumnNames.put("drug", new Integer(0));
-		udtf.outputColumnNames.put("drug_typ", new Integer(1));
-
-		udtf.outputColumnNames.put("id", new Integer(2));
-		udtf.outputColumnNames.put("id_typ", new Integer(3));
-
-		udtf.outputColumnNames.put("action", new Integer(4));
-		udtf.outputColumnNames.put("action_typ", new Integer(5));
-
-		Map h = new HashMap<String, String>();
-		h.put("x", "http://www.drugbank.ca");
-		h.put("xs", "http://www.w3.org/2001/XMLSchema");
-
-		NamespaceResolver namespace = new NamespaceResolver(h);
-		List<Pair<String, Pair<String, String>>> xPathForEachColumn = new LinkedList<Pair<String, Pair<String, String>>>();
-		Pair<String, String> p = Pair.make("./x:drug", "xs:string");
-		Pair<String, Pair<String, String>> pk = Pair.make("drug", p);
-		xPathForEachColumn.add(pk);
-		p = Pair.make("./x:id", "xs:string");
-		pk = Pair.make("id", p);
-		xPathForEachColumn.add(pk);
-		p = Pair.make("./x:action", "xs:string");
-		pk = Pair.make("action", p);
-		xPathForEachColumn.add(pk);
-		udtf.parseResponse(new FileInputStream(new File(args[0])), namespace, "//x:row", xPathForEachColumn);
 	}
 
 }

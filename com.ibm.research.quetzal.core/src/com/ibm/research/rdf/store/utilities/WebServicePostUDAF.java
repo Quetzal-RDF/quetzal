@@ -46,7 +46,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		private String urlForService = null;
 		private String xpathForRows = null;
 		private NamespaceResolver resolver;
-		private List<Pair<String, Pair<String, String>>> xPathForColumns = new LinkedList<Pair<String, Pair<String, String>>>();
+		private List<List<String>> xPathForColumns = new LinkedList<List<String>>();
 
 		private Map<String, Integer> outputColumnNames = new HashMap<String, Integer>();
 		private Map<String, Integer> inputColumns = new HashMap<String, Integer>();
@@ -66,7 +66,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			}
 		}
 		
-		public List<Pair<String, Pair<String, String>>> getXpathForColumns() {
+		public List<List<String>> getXpathForColumns() {
 			return xPathForColumns;
 		}
 

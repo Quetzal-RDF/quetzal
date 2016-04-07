@@ -51,7 +51,7 @@ public interface WebServiceInterface {
 		}
 	}
 	
-	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<Pair<String, Pair<String, String>>> xPathForEachColumn) throws Exception {		
+	default public List<Object[]> parseResponse(InputStream is, NamespaceResolver namespace, String xPathForRows, List<List<String>> xPathForEachColumn) throws Exception {		
 		
 		System.out.println("In parse response");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -79,10 +79,14 @@ public interface WebServiceInterface {
 			IntWritable indexValue = null;
 			
 			for (int j = 0; j < xPathForEachColumn.size(); j++) {
-				Pair<String, Pair<String, String>> p = xPathForEachColumn.get(j);
-				String xPathForColValue = p.snd.fst;
-				String xPathForColType = p.snd.snd;
-				System.out.println("Column pair for:"  + p.fst + " " + xPathForColValue + " " + xPathForColType);
+				List<String> p = xPathForEachColumn.get(j);
+				String xPathForColValue = p.get(1);
+				String xPathForColType = p.get(2);
+				if (xPathForColValue.isEmpty()) {
+					xPathForColValue = "./s:binding[./@name='" + p.get(0) + "']";
+					xPathForColType = "./s:binding[./@name='" + p.get(0) + "']//@datatype";
+				}
+				System.out.println("Column pair for:"  + p.get(0) + " " + xPathForColValue + " " + xPathForColType);
 				Node column = (Node) xPath.compile(xPathForColValue).evaluate(row,
 						XPathConstants.NODE);
 				String value = column.getTextContent();
@@ -180,13 +184,18 @@ public interface WebServiceInterface {
 		return new NamespaceResolver(namespaces);
 	}
 	
-	public List<Pair<String, Pair<String, String>>> getXpathForColumns();
+	public List<List<String>> getXpathForColumns();
 
 	default void addColXpathTuple(ObjectInspector[] parameters, int index) {
 		PrimitiveObjectInspector colName = (PrimitiveObjectInspector) parameters[index];
 		PrimitiveObjectInspector colXpath = (PrimitiveObjectInspector) parameters[index + 1];
 		PrimitiveObjectInspector colTypeXpath = (PrimitiveObjectInspector) parameters[index + 2];
 		assert colName instanceof WritableConstantStringObjectInspector && colXpath instanceof WritableConstantStringObjectInspector && colTypeXpath instanceof WritableConstantStringObjectInspector;
-		getXpathForColumns().add(Pair.make(((WritableConstantStringObjectInspector) colName).getWritableConstantValue().toString(), Pair.make(((WritableConstantStringObjectInspector) colXpath).getWritableConstantValue().toString(), ((WritableConstantStringObjectInspector) colTypeXpath).getWritableConstantValue().toString())));
+		List<String> l = new LinkedList<String>();
+		l.add(((WritableConstantStringObjectInspector) colName).getWritableConstantValue().toString());
+		l.add(((WritableConstantStringObjectInspector) colXpath).getWritableConstantValue().toString());
+		l.add(((WritableConstantStringObjectInspector) colTypeXpath).getWritableConstantValue().toString());
+
+		getXpathForColumns().add(l);
 	}
 }

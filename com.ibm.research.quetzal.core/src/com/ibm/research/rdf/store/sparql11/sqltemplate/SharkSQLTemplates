@@ -27,7 +27,7 @@ top_select(outerProject, project, project_alias_name, project_orderby_vars, targ
 		<if(project_orderby_vars)>SELECT <project_alias_name; separator=","> FROM (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","><if(project_orderby_vars)><if(project)>,<endif> <project_orderby_vars; separator=","><endif>  FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif>) AS <if(sql_id)>QS<sql_id>Nested<else> QSNested<endif>
 		<else>SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif><endif>
 	<if(sql_id)>)<endif>
-<if(outerProject)>)<endif>
+<if(outerProject)>) a <endif>
 >>
 
 triple_all_predicates_both(project,target, entry_constraint, graph_constraint,predicate_constraint, sep, val_constraint,pfilter_constraint, sfilter_constraint, sql_id, columns, project_type,s_project, s_target, is_rph, hasMultipleTargets)  ::= << 
