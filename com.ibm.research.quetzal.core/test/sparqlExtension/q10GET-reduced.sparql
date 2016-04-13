@@ -1,10 +1,11 @@
-
-SELECT ?date (AVG(?value) AS ?avgval) WHERE {
-	SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag2> {
+SELECT * WHERE {
+	SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag-rdf> {
+		SELECT ?date (AVG(?value) AS ?avgval) WHERE {
   		?x <http://www.ibm.com/health/bjdiag/PM25TBL#DATE> ?date;
     	  <http://www.ibm.com/health/bjdiag/PM25TBL#VALUE> ?value;
 		  <http://www.ibm.com/health/bjdiag/PM25TBL#MONTH> 1;
 		  <http://www.ibm.com/health/bjdiag/PM25TBL#YEAR> 2015;
 		  <http://www.ibm.com/health/bjdiag/PM25TBL#DAY> 22
+		  } GROUP BY ?date
     } 
-} GROUP BY ?date
+}

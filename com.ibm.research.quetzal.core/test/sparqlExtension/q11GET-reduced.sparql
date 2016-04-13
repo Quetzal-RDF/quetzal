@@ -1,9 +1,10 @@
-SELECT ?date ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
-	SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag2> {
-        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi ;
-		    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date ;
-			<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_NAME> ?diag_code ;
-		    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> "2015-01-22"
-		FILTER (?empi = "3A743FE03E0679E45889D93A9A05BEAA" && ?diag_code = "K59.801")
-    } 
-} GROUP BY ?date ?diag_code
+SELECT * WHERE {
+ SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag-rdf> 
+ { 
+   SELECT ?date (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
+        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi .
+		?x  <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date ;
+			<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_NAME> "胸闷" 
+    } GROUP BY ?date  
+ }
+}
