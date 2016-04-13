@@ -8,11 +8,12 @@ SELECT ?date ?avgval ?opcnt {
 	} GROUP BY ?date 
 }
 OPTIONAL {
-	SELECT ?date (COUNT(DISTINCT ?value) AS ?opcnt) WHERE {
+	SELECT ?date ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
 			SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag2> {
 		        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi .
-				?x  <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date 
+				?x  <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date ;
+					<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_CODE> ?diag_code 				 
 		    } 
-		} GROUP BY ?date
+		} GROUP BY ?date ?diag_code
 	}
 }
