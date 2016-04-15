@@ -12,12 +12,11 @@ FROM QD<sql_id> LEFT OUTER JOIN <s_target> target_temp_table ON QD<sql_id>.OBJEC
 
 
 sub_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers)  ::= << 
-<if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
-	<if(sql_id)> QS<sql_id> AS (<endif>
-		<if(project_orderby_vars)>SELECT <project_alias_name; separator=","> FROM (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","><if(project_orderby_vars)><if(project)>,<endif> <project_orderby_vars; separator=","><endif>  FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif>) AS <if(sql_id)>QS<sql_id>Nested<else> QSNested<endif>
-		<else>SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> <if(endModifiers)> <endModifiers> <endif><endif>
-	<if(sql_id)>)<endif>
-<if(outerProject)>)<endif>
+<if(outerProject)>QS<sql_id> AS (SELECT <outerProject; separator=" , "> FROM 
+<else> QS<sql_id> AS <endif> (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM <target> 
+<if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif>
+<if(endModifiers)> <endModifiers> <endif>)
+<if(outerProject)> a)<endif>
 >>
 
 
@@ -86,7 +85,7 @@ QS<sql_id>_POST AS (select processTable(<indexColumns; separator=",">,<service>,
 
 serviceHttpPost(sql_id, firstProjectCols, allColumns) ::= <<
 QS<sql_id>_RAW AS (select inline(p) from QS<sql_id>_POST),
-QS<sql_id>_TMP AS (select <allColumns: {col | `_c<i0>` AS <col>} ; separator=","> from QS<sql_id>_RAW),
+QS<sql_id>_TMP AS (select <allColumns; separator=","> from QS<sql_id>_RAW),
 >>
 
 serviceMerge(sql_id, allColumns, filter_constraint) ::= <<
@@ -96,9 +95,8 @@ QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP <if(filter
 
 servicePost(firstProjectCols, secondProjectCols, allColumns, functionBody, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
 QS<sql_id>_POST AS (select processTable(<service>, '<functionBody>', '<indexColumns; separator="|">', <indexColumns; separator=",">, <cols:{c | '<c>'}; separator=",">) as p from <target>), 
-QS<sql_id>_RAW AS (select inline(p) from QS<sql_id>_POST),
-QS<sql_id>_TMP AS (select <allColumns: {col | `_c<i0>` AS <col>} ; separator=","> from QS<sql_id>_RAW),
-QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_TMP 
+QS<sql_id>_RAW AS (select inline(p) from QS<sql_id>_POST)
+QS<sql_id> AS (SELECT <allColumns; separator=","> FROM QS<sql_id>_RAW 
 )
 >>
 

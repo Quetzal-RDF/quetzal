@@ -11,12 +11,13 @@ FROM QD<sql_id> LEFT OUTER JOIN <s_target> ON OBJECT = list_id AND OBJECT LIKE '
 
 
 sub_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers)  ::= <<  
-<if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
-QS<sql_id> AS (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM <target> 
+<if(outerProject)>QS<sql_id> AS (SELECT <outerProject; separator=" , "> FROM 
+<else> QS<sql_id> AS <endif> (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM <target> 
 <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif>
 <if(endModifiers)> <endModifiers> <endif>)
 <if(outerProject)>)<endif>
 >>
+
 
 top_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers, store_name)  ::= << 
 <if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
