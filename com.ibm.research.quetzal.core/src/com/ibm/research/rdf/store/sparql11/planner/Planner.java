@@ -895,7 +895,11 @@ public class Planner {
 				NumberedGraph<PlanNode> g, List<Expression> filters,
 				Set<Variable> availableVars, Set<Variable> liveVars) {
 
-				assert currentHead != null;
+				//assert currentHead != null;
+			if (currentHead == null) {
+				throw new PlannerError("bind with no currentHead");
+			}
+			
 				List<Expression> exp = null;
 				if (currentHead.getType() == PlanNodeType.AND) {
 					Iterator<PlanNode> succs = g.getSuccNodes(currentHead);
@@ -1580,13 +1584,24 @@ public class Planner {
 
 			// final Set<Variable> innerLive= HashSetFactory.make(liveVars);
 			final Set<Variable> innerLive= HashSetFactory.make();
+			boolean expr = sub.getSolutionModifier() != null;
 			for (ProjectedVariable v : sub.gatherRealProjectedVariables()) {
 				if (v.getExpression() == null) {
 					innerLive.add(v.getVariable());
 				} else {
+					expr = true;
 					innerLive.addAll(v.getExpression().gatherVariables());
 				}
 			}
+			
+			System.err.println("pattern: " + p);
+			System.err.println("vars: " + uncomputable(p));
+			
+			if (! availableVars.containsAll(uncomputable(p))) {
+				return;
+			}
+			
+			final boolean noPassThrough = expr;
 			
 			result.add(new AbstractNode(sub) {
 				private final Set<Variable> required;
@@ -1595,7 +1610,7 @@ public class Planner {
 				{
 					required = HashSetFactory.make(availableVars);
 					required.retainAll(vars.keySet());
-
+					
 					produced = HashSetFactory.make(vars.keySet());
 					produced.removeAll(required);
 				}
@@ -1603,28 +1618,58 @@ public class Planner {
 				@Override
 				public PlanNode augmentPlan(Query q, PlanNode top, NumberedGraph<PlanNode> g, List<Expression> filters, Set<Variable> availableVars, Set<Variable> liveVars) {
 					PlanNode ss = walker.plan(this, sub.getPattern(), HashSetFactory.make(availableVars), innerLive, g);
+					
 					Set<Variable> vars = HashSetFactory.make(availableVars);
 					vars.addAll(ss.getProducedVariables());
-
 					vars.retainAll(innerLive);
-
+					if (noPassThrough) {
+						vars.retainAll(sub.getAllPatternVariables());
+					}
+					
 					PlanNode select = planFactory.createSTPlanNode(PlanNodeType.SUBSELECT, vars, sub);
 					select.setFilters(filters);
 					select.cost = ss.cost;
+
+					select.setRequiredVariables(required);
+
+					if (! ss.getAvailableVariables().containsAll(availableVars)) {
+						Set<Variable> operatorVars = HashSetFactory.make(availableVars);
+						operatorVars.retainAll(ss.getAvailableVariables());
+						PlanNode join = planFactory.createSTPlanNode(PlanNodeType.JOIN, operatorVars, p);
+						join.setCost(ss.cost);
+						
+						availableVars = HashSetFactory.make(availableVars);
+						availableVars.addAll(ss.getAvailableVariables());
+						join.setAvailableVariables(availableVars);
+						select.setAvailableVariables(ss.getAvailableVariables());
+						select.setProducedVariables(ss.getProducedVariables());
+
+						g.addNode(ss);
+						g.addNode(select);
+						g.addEdge(select, ss);
+
+						g.addNode(join);
+						g.addEdge(join, top);
+						g.addEdge(join, select);
 					
+						return join;
+
+					} else {
 					Set<Variable> producedVars = HashSetFactory.make(produced);
+					producedVars.addAll(availableVars);
 					producedVars.retainAll(liveVars);
 					select.setProducedVariables(producedVars);
 					vars.addAll(producedVars);
 					vars.retainAll(liveVars);
 					select.setAvailableVariables(vars);
-					select.setRequiredVariables(required);
+					//select.setAvailableVariables(producedVars);
 					
 					g.addNode(ss);
 					g.addNode(select);
 					g.addEdge(select, ss);
 					
 					return join(JoinTypes.AND, q, g, top, select, liveVars);
+					}
 				}
 
 				@Override
@@ -1634,6 +1679,7 @@ public class Planner {
 
 				@Override
 				public Pair<Double, Double> getCost(NumberedGraph<PlanNode> g) {
+					try {
 					PlanNode dp = walker.plan(this,
 							sub.getPattern(), HashSetFactory.make(vars.values()),
 							innerLive, SlowSparseNumberedGraph.<PlanNode> make());
@@ -1644,6 +1690,10 @@ public class Planner {
 						}
 					}
 					return dp.cost;
+					} catch (PlannerError e) {
+						return Pair.make(Double.MAX_VALUE, Double.MAX_VALUE);
+					}
+
 				}
 
 				@Override
@@ -3046,4 +3096,66 @@ public class Planner {
 		}
 	}
 
+	private Set<Variable> uncomputable(Pattern p) {
+		Set<Variable> x = HashSetFactory.make(p.gatherVariables());
+		x.removeAll(computable(p));
+		return x;
+	}
+	
+	private Set<Variable> computable(Pattern p) {
+		Set<Variable> result = HashSetFactory.make();
+		switch (p.getType()) {
+
+		case VALUES:
+		case PRODUCT:
+		case SIMPLE: {
+			result.addAll(p.getVariables());
+			break;
+		}
+
+		case UNION:
+		case AND: {
+			PatternSet ap = (PatternSet)p;
+			for(Pattern sp : ap.getSubPatterns(false)) {
+				result.addAll(computable(sp));
+			}
+		}
+
+		case SERVICE: {
+			result.addAll(p.getVariables());
+			break;
+		}
+
+		case SUBSELECT: {
+			SubSelectPattern sp = (SubSelectPattern)p;
+			result.addAll(sp.gatherProjectedVariables());
+			for(Pattern cp : sp.getSubPatterns(false)) {
+				result.addAll(computable(cp));
+			}
+			break;
+		}
+
+		case BIND: {
+			BindPattern bp = (BindPattern)p;
+			result.add(bp.getVar());
+			break;
+		}
+		
+		case BINDFUNC:{
+			BindFunctionPattern bp = (BindFunctionPattern)p;
+			result.addAll(bp.getVars());
+			break;
+		}
+
+		case GRAPH:
+		case EXISTS:
+		case MINUS:
+		case NOT_EXISTS: 
+		case OPTIONAL: {
+			break; 
+		}
+		}
+		
+		return result;
+	}
 }
