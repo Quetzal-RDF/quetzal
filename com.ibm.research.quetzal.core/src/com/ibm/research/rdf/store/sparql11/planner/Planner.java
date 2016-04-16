@@ -70,6 +70,8 @@ import com.ibm.wala.util.graph.NumberedGraph;
 import com.ibm.wala.util.graph.impl.ExtensionGraph;
 import com.ibm.wala.util.graph.impl.SlowSparseNumberedGraph;
 
+import akka.remote.ContainerFormats.PatternType;
+
 @SuppressWarnings("unused")
 public class Planner {
 
@@ -553,7 +555,19 @@ public class Planner {
 
 		@Override
 		public Set<Variable> getProducedVariables() {
-			return new HashSet<Variable>(p.gatherVariables());
+			Set<Variable> vars = new HashSet<Variable>();
+			Set<Pattern> subPatterns = p.getSubPatterns(false);
+			assert !subPatterns.isEmpty() && subPatterns.size() == 1;
+			Pattern subp = subPatterns.iterator().next();
+		
+			if (subp.getType() == EPatternSetType.SUBSELECT) {
+				for (ProjectedVariable v : ((SubSelectPattern) subp).getSelectClause().getProjectedVariables()) {
+					vars.add(v.getVariable());
+				}
+			} else {
+				vars.addAll(p.gatherVariables());
+			}
+			return vars;
 		}
 		
 	}

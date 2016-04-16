@@ -1,4 +1,4 @@
-FROM sequenceiq/spark:1.4.0
+FROM sequenceiq/spark:1.6.0
 
 MAINTAINER Kavitha Srinivas <ksrinivs@us.ibm.com>
 
