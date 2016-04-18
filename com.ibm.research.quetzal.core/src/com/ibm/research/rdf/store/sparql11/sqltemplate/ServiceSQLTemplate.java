@@ -117,15 +117,10 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 			List<Variable> literals = getAllLiteralVars(producedVars);
 
 			for (Variable v : producedVars) {
-				// KAVITHA: There is a bug in Kryo (Spark 1.4) which Hive depends on which causes the system to arbitrarily fail in 
-				// deserializing xpath for columns if the strings in this data structure are long.  The only awful hack around this
-				// if to assume that we wont pass these in in the service request is in SPARQL because we can reconstruct it.
-				xPathForCols.add("");
-				if (literals.contains(v)) {
-					xPathForColTypes.add("");
-				} else {
-					xPathForColTypes.add(String.valueOf(TypeMap.IRI_ID));
-				}
+				xPathForCols.add("xs:string(./s:binding[./@name=\"" + v.getName() + "\"])");
+			}
+			for (Variable v : getAllLiteralVars(producedVars)) {				
+				xPathForColTypes.add("xs:string(./s:binding[./@name=\"" + v.getName() + "\"]//@datatype)");
 			}
 			
 			mappings.put(

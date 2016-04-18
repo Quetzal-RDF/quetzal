@@ -507,7 +507,9 @@ public abstract class Pattern implements Planner.Key {
 	 }
 	
 	 public Pattern getGroup() {
-		 if (this instanceof PatternSet) {
+		 if (getType() == EPatternSetType.SUBSELECT) {
+			 return getParent().getGroup();
+		 } else if (this instanceof PatternSet) {
 			 if (getParent() != null && getParent().getOptionalPatterns() != null && getParent().getOptionalPatterns().contains(this)) {
 				 return getParent().getGroup();
 			 } else {

@@ -24,6 +24,10 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	}
 
 	public List<String> getProjectedVariablesFromPredecessor() {
+		return getProjectedVariablesFromPredecessor(Collections.emptySet());
+	}
+	
+	public List<String> getProjectedVariablesFromPredecessor(Set<Variable> newVars) {
 		if (pred == null) {
 			return Collections.emptyList();
 		}
@@ -33,7 +37,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 		Set<Variable> joinVars = getJoinVariables();
 		
 		for(Variable v : vars) {
-			if (joinVars.contains(v)) {
+			if (joinVars.contains(v) || newVars.contains(v)) {
 				continue;
 			}
 			String vPredNameLeft = wrapper.getPlanNodeVarMapping(pred,v.getName());
@@ -100,7 +104,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			dtConstraints.add("((" + vt + " IS NOT NULL AND " + vt + " = " + "DATATYPE_NAME) OR (" + vt + " IS NULL AND DATATYPE_NAME='SIMPLE_LITERAL_ID'))");
 		}
 					
-		secondProjectCols.addAll(getProjectedVariablesFromPredecessor());
+		secondProjectCols.addAll(getProjectedVariablesFromPredecessor(vars));
 		mappings.put("firstProjectCols", new SQLMapping("firstProjectCols", firstProjectCols, null));
 		mappings.put("secondProjectCols", new SQLMapping("secondProjectCols", secondProjectCols, null));
 		mappings.put("allColumns", new SQLMapping("allColumns", allColumns, null));

@@ -60,6 +60,9 @@ public class BindFunctionPattern extends Pattern implements Service {
 	public Set<Variable> gatherVariables() {
 		Set<Variable> ret = new HashSet<Variable>();
 		ret.addAll(vars);
+		if (funcCall != null) {
+			ret.addAll(funcCall.vars);
+		}
 		return ret;
 	}
 	

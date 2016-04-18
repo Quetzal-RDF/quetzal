@@ -619,6 +619,8 @@ public void setMaterialzedTable(String materialzedTable) {
    
    public PlanNode getPredecessor(Plan p) {
 	   PlanNode x = getPredecessorUp(p);
+	   System.err.println("*** node: " + x);
+	   System.err.println("*** for: " + this);
 	   return x==null? null: x.getPredecessorDown(p);
    }
    
@@ -659,9 +661,11 @@ public void setMaterialzedTable(String materialzedTable) {
    }
 
    public PlanNode getPredecessorUp(Plan p) {
+	   assert p.getPlanTree().containsNode(this);
 	   Iterator<PlanNode> parents = p.getPlanTree().getPredNodes(this);
 	   if (! parents.hasNext()) {
 		   // root of tree
+		   System.err.println("got here");
 		   return null;
 	   } else {
 		   PlanNode parent = parents.next();
@@ -685,6 +689,7 @@ public void setMaterialzedTable(String materialzedTable) {
 					return pred;
 				}
 			}
+			case SERVICE:
 			case PRODUCT:
 			case JOIN:
 			case SUBSELECT:

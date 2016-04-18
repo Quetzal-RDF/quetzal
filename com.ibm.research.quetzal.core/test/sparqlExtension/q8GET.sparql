@@ -14,17 +14,29 @@ service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "
 function drug:getProteinGeneFunctions GET (?protein -> ?geneFunction ?type) 
 service CONCAT("http://www.uniprot.org/uniprot/", CONCAT(?protein, ".xml")) [ ] -> "/up:uniprot/up:entry/up:dbReference" :: "./@id" "xs:string" "./@type" "xs:string"
 
-select distinct * where {
+select ?d1 ?geneFunction where 
+{  
+  { select distinct ?d1 ?transporter where {
 
-{ select distinct ?transporter where { 
+    BIND( fn:getDrugBankNames() AS ( ?d1 ) )
 
-BIND( fn:getDrugBankNames() AS ( ?drug ) )
+    BIND( fn:getDrugTransporters( ?d1 ) AS ( ?d1 ?transporter ) )
+ 
+  } }
 
- BIND( fn:getDrugTransporters( ?drug ) AS ( ?drug ?transporter ) )
+  { select distinct ?transporter ?geneFunction where {
 
- } }
+    { select distinct ?transporter where 
+      {
+        BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( drug:getProteinGeneFunctions(?transporter) AS (?geneFunction ?type) )
+        BIND( fn:getDrugTransporters( ?drug ) AS ( ?drug ?transporter ) ) 
+      }
+    }
 
-filter (?type = "GO")
+    BIND( drug:getProteinGeneFunctions(?transporter) AS (?geneFunction ?type) )
+    
+    FILTER (?type = "GO")
+  }}
+
 }

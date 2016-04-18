@@ -1646,7 +1646,7 @@ public class Planner {
 
 					select.setRequiredVariables(required);
 
-					if (! ss.getAvailableVariables().containsAll(availableVars)) {
+					if (! ss.getAvailableVariables().containsAll(availableVars) && top != null) {
 						Set<Variable> operatorVars = HashSetFactory.make(availableVars);
 						operatorVars.retainAll(ss.getAvailableVariables());
 						PlanNode join = planFactory.createSTPlanNode(PlanNodeType.JOIN, operatorVars, p);
