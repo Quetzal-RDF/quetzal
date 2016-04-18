@@ -1,34 +1,36 @@
 import cherrypy
 import urllib
 import warnings
-import xpathTest
+import xpathTest as x
 
 class PythonEval(object):
+    xPathTest = x.xPathTest("../../drugbank.xml")
+
     @cherrypy.expose
     def getDrugBank(self):
-        return xpathTest.extractDrugBank()
+        return self.xPathTest.extractDrugBank()
     
     @cherrypy.expose
     def getDrugBankNames(self):
-        return xpathTest.extractDrugNames()
+        return self.xPathTest.extractDrugNames()
 
     @cherrypy.expose
     def getDrugTransporters(self, drugName):
         cherrypy.log("transporter request for:" + drugName)
-        return xpathTest.extractTransporters(drugName)
+        return self.xPathTest.extractTransporters(drugName)
 
     @cherrypy.expose
     def getSMILES(self, drugName):
-        return xpathTest.extractSMILES(drugName)
+        return self.xPathTest.extractSMILES(drugName)
 
     @cherrypy.expose
     def getDrugTargets(self, drugName):
-        return xpathTest.extractTargets(drugName)
+        return self.xPathTest.extractTargets(drugName)
 
     @cherrypy.expose
     def postData(self, funcData):
         cherrypy.log("function data:" + funcData)
-        return xpathTest.extractPost(funcData)
+        return self.xPathTest.extractPost(funcData)
 
     @cherrypy.expose
     def evalPython(self, funcBody):
