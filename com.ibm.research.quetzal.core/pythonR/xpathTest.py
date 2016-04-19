@@ -6,7 +6,11 @@ class xPathTest(object):
     def __init__(self, input):
         self.root = etree.parse(input)
 
-    def extractPost(self, funcData):
+    def sumFunc(self, text):
+        return "<sum>%d</sum>" % random.randint(0,100)
+
+    def extractPost(self, funcData, func):
+        print funcData
         root = etree.fromstring(funcData)
         rows = root.xpath('//row')
         row = next(iter(rows), None)
@@ -22,11 +26,20 @@ class xPathTest(object):
             k = 0;
             for col in row:
                 result += "<" + colNames[k] + ">" + col.text + "</" + colNames[k] + ">"
+                result += func(col.text)
                 k+=1
-            result += "<sum>%d</sum>" % random.randint(0,100)
             result += "</row>"
         result += "</data>"
         return result
+
+    def transportersFunc(self, text):
+        return "<transporter>%s</transporter>" % self.extractTransporters(text)
+
+    def SMILESFunc(self, text):
+        return "<smiles>%s</smiles>" % self.extractSMILES(text)
+
+    def targetsFunc(self, text):
+        return "<target>%s</target>" % self.extractTargets(text)
 
     def extractSMILES(self):
         rows = self.root.xpath('/x:drugbank/x:drug', namespaces={'x': 'http://www.drugbank.ca'})
@@ -55,6 +68,20 @@ class xPathTest(object):
         for row in rows:
             drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
             result += "<row>" + "<drug>" + drug[0] + "</drug>  </row>"
+        result += '</data>'
+
+        return result
+
+    def extractDrugNamesAndGroups(self):
+        rows = self.root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
+
+        result = '<?xml version="1.0"?>'
+        result += '<data xmlns="http://www.drugbank.ca">'
+        for row in rows:
+            drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            group = row.xpath('./x:groups/x:group/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            for g in group:
+                result += "<row>" + "<drug>" + drug[0] + "</drug> <group>" + g + "</group> </row>"
         result += '</data>'
 
         return result

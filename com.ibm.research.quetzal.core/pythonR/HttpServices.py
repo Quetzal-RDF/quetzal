@@ -7,12 +7,12 @@ class PythonEval(object):
     xPathTest = x.xPathTest("../../drugbank.xml")
 
     @cherrypy.expose
-    def getDrugBank(self):
-        return self.xPathTest.extractDrugBank()
-    
-    @cherrypy.expose
     def getDrugBankNames(self):
         return self.xPathTest.extractDrugNames()
+
+    @cherrypy.expose
+    def getDrugBankNamesAndGroups(self):
+        return self.xPathTest.extractDrugNamesAndGroups()
 
     @cherrypy.expose
     def getDrugTransporters(self, drugName):
@@ -30,7 +30,20 @@ class PythonEval(object):
     @cherrypy.expose
     def postData(self, funcData):
         cherrypy.log("function data:" + funcData)
-        return self.xPathTest.extractPost(funcData)
+        return self.xPathTest.extractPost(funcData, self.xPathTest.sumFunc)
+
+    @cherrypy.expose
+    def getSMILES(self, funcData):
+        cherrypy.log("function data:" + funcData)
+        return self.xPathTest.extractPost(funcData, self.xPathTest.SMILESFunc)
+
+    @cherrypy.expose
+    def getTransporters(self, funcData):
+        return self.xPathTest.extractPost(funcData, self.xPathTest.transportersFunc)
+
+    @cherrypy.expose
+    def getTargets(self, funcData):
+        return self.xPathTest.extractPost(funcData, self.xPathTest.targetsFunc)
 
     @cherrypy.expose
     def evalPython(self, funcBody):
