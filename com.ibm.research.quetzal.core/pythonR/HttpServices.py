@@ -16,7 +16,6 @@ class PythonEval(object):
 
     @cherrypy.expose
     def getDrugTransporters(self, drugName):
-        cherrypy.log("transporter request for:" + drugName)
         return self.xPathTest.extractTransporters(drugName)
 
     @cherrypy.expose
@@ -29,12 +28,10 @@ class PythonEval(object):
 
     @cherrypy.expose
     def postData(self, funcData):
-        cherrypy.log("function data:" + funcData)
         return self.xPathTest.extractPost(funcData, self.xPathTest.sumFunc)
 
     @cherrypy.expose
     def getSMILES(self, funcData):
-        cherrypy.log("function data:" + funcData)
         return self.xPathTest.extractPost(funcData, self.xPathTest.SMILESFunc)
 
     @cherrypy.expose
