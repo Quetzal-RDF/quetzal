@@ -77,7 +77,7 @@ class xPathTest(object):
         return result
 
     def extractDrugNames(self):
-        rows = self.drugsToSMILES.keys()
+        rows = self.drugsToTargets.keys()
 
         result = '<?xml version="1.0"?>'
         result += '<data xmlns="http://www.drugbank.ca">'
