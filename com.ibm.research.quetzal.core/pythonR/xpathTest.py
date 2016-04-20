@@ -77,13 +77,12 @@ class xPathTest(object):
         return result
 
     def extractDrugNames(self):
-        rows = self.root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
+        rows = self.drugsToSMILES.keys()
 
         result = '<?xml version="1.0"?>'
         result += '<data xmlns="http://www.drugbank.ca">'
         for row in rows:
-            drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
-            result += "<row>" + "<drug>" + drug[0] + "</drug>  </row>"
+            result += "<row>" + "<drug>" + row + "</drug>  </row>"
         result += '</data>'
 
         return result
