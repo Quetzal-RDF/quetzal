@@ -1,5 +1,5 @@
 
-prefix fn: <http://rdfstore.sl.cloud9.ibm.com:8083/>
+prefix fn: <http://9.12.235.45:8083/>
 prefix x: <http://www.drugbank.ca>
 prefix xs: <http://www.w3.org/2001/XMLSchema>
 
@@ -7,15 +7,15 @@ function fn:getDrugBankNames GET ( -> ?x )
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
 function fn:getTransportersGet GET ( ?x -> ?y ) 
-service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:id" "xs:string" 
+service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
-function fn:getTransportersPost ( ?drug -> ?transporter ) 
-table fn:getTransporters [ "funcData" -> post data ] -> "//row" :: "./x:drug" "xs:string" "./x:id" "xs:string" 
+function fn:getTransportersPost ( ?drug -> ?targets ) 
+table fn:getTransporters [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
-select ?drug ?transporter where {
+select ?drug ?targets where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getTransportersPost( ?drug ) AS ( ?drug ?transporter ) )
+BIND( fn:getTransportersPost( ?drug ) AS ( ?drug ?targets ) )
 
 }
