@@ -23,21 +23,23 @@ class xPathTest(object):
         rows = root.xpath('//row')
         row = next(iter(rows), None)
         assert len(row) == 1
-
         result = '<?xml version="1.0"?>'
-        result += '<data>'
+        result +='<data xmlns="http://www.drugbank.ca">'
 
         for row in rows:
-            for val in func(row[0].text):
+            for val in func(row[0].text.strip()):
+                print val
                 if val == "":
                     continue
                 result += "<row>"
                 result += "<" + row[0].tag + ">" + row[0].text + "</" + row[0].tag + ">" + val
                 result += "</row>"
+                print result
         result += "</data>"
         return result
 
     def transportersFunc(self, text):
+        print "searching for#" + text + "#"
         if text not in self.drugsToTransporters:
             yield "" 
         else:
@@ -204,7 +206,7 @@ class xPathTest(object):
             ids = []
             ids.extend(targets)
             if len(ids) > 0:
-                dict[escape(drug[0])] = ids
+                dict[drug[0]] = ids
         print dict
 
 #print extractSMILES('Ibuprofen')
