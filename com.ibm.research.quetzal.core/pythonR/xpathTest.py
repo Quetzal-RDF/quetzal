@@ -1,4 +1,5 @@
 from lxml import etree
+from xml.sax.saxutils import escape
 import random
 
 class xPathTest(object):
@@ -17,6 +18,7 @@ class xPathTest(object):
         return "<sum>%d</sum>" % random.randint(0,100)
 
     def extractPost(self, funcData, func):
+        print funcData
         root = etree.fromstring(funcData)
         rows = root.xpath('//row')
         row = next(iter(rows), None)
@@ -77,7 +79,7 @@ class xPathTest(object):
         return result
 
     def extractDrugNames(self):
-        rows = self.drugsToTargets.keys()
+        rows = self.drugsToTransporters.keys()
 
         result = '<?xml version="1.0"?>'
         result += '<data xmlns="http://www.drugbank.ca">'
@@ -196,12 +198,13 @@ class xPathTest(object):
 
         for row in rows:
             drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            # drug[0] = drug[0].replace(">", "")
             assert len(drug) == 1
             targets = row.xpath(tXpathExpr, namespaces={'x': 'http://www.drugbank.ca'})
             ids = []
             ids.extend(targets)
             if len(ids) > 0:
-                dict[drug[0]] = ids
+                dict[escape(drug[0])] = ids
         print dict
 
 #print extractSMILES('Ibuprofen')
