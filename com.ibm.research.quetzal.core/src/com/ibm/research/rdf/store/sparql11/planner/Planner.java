@@ -555,7 +555,7 @@ public class Planner {
 
 		@Override
 		public Set<Variable> getProducedVariables() {
-			Set<Variable> vars = new HashSet<Variable>();
+			Set<Variable> vars = HashSetFactory.make();
 			Set<Pattern> subPatterns = p.getSubPatterns(false);
 			assert !subPatterns.isEmpty() && subPatterns.size() == 1;
 			Pattern subp = subPatterns.iterator().next();

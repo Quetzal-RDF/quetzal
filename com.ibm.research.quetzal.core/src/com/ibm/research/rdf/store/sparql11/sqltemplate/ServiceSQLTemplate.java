@@ -174,7 +174,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 								service += (useConcat? ",": "||") + "'&";
 							}
 							service += p.getKey().replaceAll("\"", "");
-							service += "='" + (useConcat? ",": "||") + eSql;
+							service += "='" + (useConcat? ",": "||") + "DB2XML.URLENCODE(" + eSql + ", NULL)";
 						}
 					}
 					

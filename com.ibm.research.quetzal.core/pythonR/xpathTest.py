@@ -1,10 +1,18 @@
 from lxml import etree
+from xml.sax.saxutils import escape
 import random
 
 class xPathTest(object):
 
     def __init__(self, input):
-        self.root = etree.parse(input)
+        root = etree.parse(input)
+        self.drugsToTargets = {}
+        self.drugsToTransporters = {}
+        self.drugsToSMILES = {}
+        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', './x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', self.drugsToTargets)
+        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', './x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', self.drugsToTransporters)
+        self.extractDrugsToDict(root, '/x:drugbank/x:drug', './/x:property[./x:kind/text()="SMILES"]/x:value/text()', self.drugsToSMILES)
+ 
 
     def sumFunc(self, text):
         return "<sum>%d</sum>" % random.randint(0,100)
@@ -14,32 +22,44 @@ class xPathTest(object):
         root = etree.fromstring(funcData)
         rows = root.xpath('//row')
         row = next(iter(rows), None)
-        colNames = []
-        for col in row:
-            colNames.append(col.tag)
-
+        assert len(row) == 1
         result = '<?xml version="1.0"?>'
-        result += '<data>'
+        result +='<data xmlns="http://www.drugbank.ca">'
 
         for row in rows:
-            result += "<row>"
-            k = 0;
-            for col in row:
-                result += "<" + colNames[k] + ">" + col.text + "</" + colNames[k] + ">"
-                result += func(col.text)
-                k+=1
-            result += "</row>"
+            for val in func(row[0].text.strip()):
+                print val
+                if val == "":
+                    continue
+                result += "<row>"
+                result += "<" + row[0].tag + ">" + row[0].text + "</" + row[0].tag + ">" + val
+                result += "</row>"
+                print result
         result += "</data>"
         return result
 
     def transportersFunc(self, text):
-        return "<transporter>%s</transporter>" % self.extractTransporters(text)
+        print "searching for#" + text + "#"
+        if text not in self.drugsToTransporters:
+            yield "" 
+        else:
+            for id in self.drugsToTransporters[text]:
+                yield "<transporter>%s</transporter>" % id
 
     def SMILESFunc(self, text):
-        return "<smiles>%s</smiles>" % self.extractSMILES(text)
+        if text not in self.drugsToSMILES:
+            yield "" 
+        else:
+            for id in self.drugsToSMILES[text]:
+                yield "<smiles>%s</smiles>" % id
 
     def targetsFunc(self, text):
-        return "<target>%s</target>" % self.extractTargets(text)
+        if text not in self.drugsToTargets:
+            yield "" 
+        else:
+            for id in self.drugsToTargets[text]:
+                yield "<target>%s</target>" % id
+
 
     def extractSMILES(self):
         rows = self.root.xpath('/x:drugbank/x:drug', namespaces={'x': 'http://www.drugbank.ca'})
@@ -61,13 +81,12 @@ class xPathTest(object):
         return result
 
     def extractDrugNames(self):
-        rows = self.root.xpath('/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', namespaces={'x': 'http://www.drugbank.ca'})
+        rows = self.drugsToTransporters.keys()
 
         result = '<?xml version="1.0"?>'
         result += '<data xmlns="http://www.drugbank.ca">'
         for row in rows:
-            drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
-            result += "<row>" + "<drug>" + drug[0] + "</drug>  </row>"
+            result += "<row>" + "<drug>" + row + "</drug>  </row>"
         result += '</data>'
 
         return result
@@ -175,6 +194,20 @@ class xPathTest(object):
         result += '</data>'
 
         return result
+
+    def extractDrugsToDict(self, root, drugXpathExpr, tXpathExpr, dict):
+        rows = root.xpath(drugXpathExpr, namespaces={'x': 'http://www.drugbank.ca'})
+
+        for row in rows:
+            drug = row.xpath('./x:name/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            # drug[0] = drug[0].replace(">", "")
+            assert len(drug) == 1
+            targets = row.xpath(tXpathExpr, namespaces={'x': 'http://www.drugbank.ca'})
+            ids = []
+            ids.extend(targets)
+            if len(ids) > 0:
+                dict[drug[0]] = ids
+        print dict
 
 #print extractSMILES('Ibuprofen')
 # print extractTransporters('Vasopressin')

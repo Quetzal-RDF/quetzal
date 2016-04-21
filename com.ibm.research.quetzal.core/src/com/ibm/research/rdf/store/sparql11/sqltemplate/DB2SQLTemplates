@@ -58,14 +58,20 @@ SELECT <right_project; separator=","> FROM <right_target>)
 
 xmlPostData(sql_id, target, indexColumns, postedColumns, postTypes) ::= <<
 
-QS<sql_id>_INDEX AS (select ROW_NUMBER() OVER () AS index, <indexColumns; separator=","> FROM <target>),
 QS<sql_id>_POST AS 
   (select xmlserialize( 
      xmlelement( name "data", 
-        xmlagg(xmltext(db2xml.urlencode(xmlserialize( 
-           xmlelement( name "row", xmlelement( name "index", xmlattributes( 'xs:int' AS "type" ), QS<sql_id>_INDEX.index ), 
-               <postedColumns,postTypes:{c,t |xmlelement( name "<c>", xmlattributes( <t> AS "type" ), QS<sql_id>_INDEX.<c>)
-}; separator=",">     ) AS CLOB), null)))) AS BLOB) AS doc from QS<sql_id>_INDEX),
+        xmlagg(
+           xmlelement( name "row", 
+               <postedColumns,postTypes:{c,t |xmlelement( name "<c>", xmlattributes( <t> AS "type" ), <target>.<c>)
+}; separator=",">     ))) AS BLOB) AS doc from <target>),
+>>
+
+textPostData(sql_id, target, indexColumns, postedColumns, postTypes) ::= <<
+
+QS<sql_id>_POST AS 
+  (select CAST(<postedColumns,postTypes:{c,t |'--xYzZY'||X'0A'||'Content-Disposition: form-data; name="<c>"'||X'0A'||listagg(<c>, X'0A')
+}; separator="||"> AS BLOB) AS doc from <target>),
 >>
 
 serviceHttpPost(ns, iris, xPathForRows, xPathForCols, xPathForColTypes, sql_id, firstProjectCols, queryText, service, outputColumns, dtCols, htmlHeader) ::= <<
@@ -75,7 +81,7 @@ QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
       PASSING XMLPARSE(
          DOCUMENT 
            DB2XML.HTTPPOSTBLOB(<service>, CAST ('<htmlHeader>' AS CLOB(1K)), CAST('<queryText>' AS BLOB) || (select doc from QS<sql_id>_POST))) as "results"
-           COLUMNS 
+           COLUMNS
              <outputColumns,xPathForCols:{c,x|<c> VARCHAR(1024) PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
 }; separator=","> <if(dtCols)>           ,<dtCols,xPathForColTypes:{c,x|<c>_TYP VARCHAR(128) WITH DEFAULT 'SIMPLE_LITERAL_ID' PATH '<ns,iris:{n,iri|declare namespace <n>="<iri>";}; separator=" "> <x>'
             }; separator=","><endif>) AS xml),

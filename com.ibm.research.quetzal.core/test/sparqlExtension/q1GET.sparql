@@ -10,4 +10,6 @@ select * where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
+filter ( ! contains(?drug, ">") )
+
 }
