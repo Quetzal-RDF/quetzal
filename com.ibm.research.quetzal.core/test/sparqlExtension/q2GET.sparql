@@ -7,14 +7,16 @@ function fn:getDrugBankNames GET ( -> ?x )
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
 function fn:getTransportersGet GET ( ?x -> ?y ) 
-service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:id" "xs:string" 
+service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
 function fn:getTransportersPost ( ?drug -> ?transporter ) 
-table fn:getTransporters [ "funcData" -> post data ] -> "//row" :: "./x:drug" "xs:string" "./x:id" "xs:string" 
+table fn:getTransporters [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
 select ?drug ?transporter where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
+
+filter ( ! contains(?drug, ">") )
 
 BIND( fn:getTransportersPost( ?drug ) AS ( ?drug ?transporter ) )
 
