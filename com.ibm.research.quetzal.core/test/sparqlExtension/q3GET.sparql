@@ -6,18 +6,18 @@ prefix xs: <http://www.w3.org/2001/XMLSchema>
 function fn:getDrugBankNames GET ( -> ?x ) 
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
-function fn:getDrugTransporters GET ( ?x -> ?y ) 
-service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:id" "xs:string" 
+function fn:getTransporters ( ?drug -> ?transporter ) 
+table fn:getTransporters [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
-function fn:getDrugSMILES GET ( ?x -> ?y ) 
-service fn:getSMILES [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:smiles" "xs:string" 
+function fn:getSMILES ( ?x -> ?y ) 
+table fn:getSMILES [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:smiles" "xs:string" 
 
 select distinct * where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getDrugTransporters( ?drug ) AS ( ?drug ?transporter ) )
+BIND( fn:getTransporters( ?drug ) AS ( ?drug ?transporter ) )
 
-BIND( fn:getDrugSMILES( ?drug ) AS ( ?drug ?smiles ) )
+BIND( fn:getSMILES( ?drug ) AS ( ?drug ?smiles ) )
 
 }
