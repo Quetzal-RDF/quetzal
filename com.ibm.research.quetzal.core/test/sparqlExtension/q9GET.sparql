@@ -1,4 +1,3 @@
-
 prefix fn: <http://localhost:8083/>
 prefix fn2: <http://localhost:8888/>
 prefix x: <http://www.drugbank.ca>
@@ -7,18 +6,18 @@ prefix xs: <http://www.w3.org/2001/XMLSchema>
 function fn:getDrugBankNames GET ( -> ?x ) 
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
-function fn:getDrugSMILES GET ( ?x -> ?y ) 
-service fn:getSMILES [ "drugName" -> ?x ] -> "//x:row" :: "./x:smiles" "xs:string" 
+function fn:getSMILES ( ?x -> ?y ) 
+table fn:getSMILES [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:smiles" "xs:string" 
 
 function fn2:computeChemSimilarity ( ?drug ?SMILES -> ?a ?b ?c ) 
-table fn2:computeChemicalFingerprint [ "str" -> post data ] -> "//row" :: "./drug1" "xs:string" "./drug2" "xs:string" "./sim" "xs:number"
+table fn2:computeChemicalFingerprint [ "funcData" -> post data ] -> "//row" :: "./drug1" "xs:string" "./drug2" "xs:string" "./sim" "xs:number"
 
-select distinct * where {
+select distinct ?drug ?drug1 ?similarity where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getDrugSMILES( ?drug ) AS ( ?SMILES ) )
+BIND( fn:getSMILES( ?drug ) AS ( ?drug ?SMILES ) )
 
-BIND( fn2:computeChemSimilarity(?drug ?SMILES) AS (?drug1 ?drug2 ?similarity) )
+BIND( fn2:computeChemSimilarity(?drug ?SMILES) AS (?drug ?drug1 ?similarity) )
 
 }

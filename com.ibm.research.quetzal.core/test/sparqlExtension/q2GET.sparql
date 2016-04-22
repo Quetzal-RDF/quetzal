@@ -9,13 +9,15 @@ service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 function fn:getTransportersGet GET ( ?x -> ?y ) 
 service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
-function fn:getTransportersPost ( ?drug -> ?targets ) 
+function fn:getTransportersPost ( ?drug -> ?transporter ) 
 table fn:getTransporters [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
-select ?drug ?targets where {
+select ?drug ?transporter where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getTransportersPost( ?drug ) AS ( ?drug ?targets ) )
+filter ( ! contains(?drug, ">") )
+
+BIND( fn:getTransportersPost( ?drug ) AS ( ?drug ?transporter ) )
 
 }
