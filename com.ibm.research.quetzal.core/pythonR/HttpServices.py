@@ -5,7 +5,7 @@ import xpathTest as x
 import TestCDK as CDK
 
 class PythonEval(object):
-    xPathTest = x.xPathTest("../../drugbank.xml")
+    xPathTest = x.xPathTest("drugbank.xml")
     cdk = CDK.TestCDK()
 
     @cherrypy.expose

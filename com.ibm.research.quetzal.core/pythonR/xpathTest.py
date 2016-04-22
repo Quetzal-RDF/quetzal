@@ -211,5 +211,5 @@ class xPathTest(object):
 
 #print extractSMILES('Ibuprofen')
 # print extractTransporters('Vasopressin')
-#print extractDrugNames()
+# print(extractDrugNames())
 # extractDrugBankTargetsInNT()

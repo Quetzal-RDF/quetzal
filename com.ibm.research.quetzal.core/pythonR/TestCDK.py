@@ -9,14 +9,14 @@ class TestCDK(object):
 
     def computeChemSimilarity(self, funcData):
         root = etree.fromstring(funcData)
-        rows = root.xpath('//x:row', namespaces={'x': 'http://www.drugbank.ca'})
+        rows = root.xpath('//row')
 
         l = []
         drugs=[]
         for row in rows:
-            s = row.xpath('./x:smiles/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            s = row.xpath('./smiles/text()')
             l.extend(s)
-            d = row.xpath('./x:drug/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            d = row.xpath('./drug/text()')
             drugs.extend(d)
 
         result = '<?xml version="1.0"?>'
@@ -28,11 +28,13 @@ class TestCDK(object):
 
         for i in range(len(l)):
             for j in range(len(l)):
+                if i==j:
+                    continue
                 index = (i * len(l)) + j
                 result += "<row>"
                 result += "<drug1>" + drugs[i] + "</drug1>"
-                result += "<drug2>" + drugs[j] + "<drug2>"
+                result += "<drug2>" + drugs[j] + "</drug2>"
                 result += "<sim>" + str(m[index]) + "</sim>"
-                result += "/row>"
+                result += "</row>"
         result += "</data>"
         return result
