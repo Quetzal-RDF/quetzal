@@ -2,9 +2,11 @@ import cherrypy
 import urllib
 import warnings
 import xpathTest as x
+import TestCDK as CDK
 
 class PythonEval(object):
-    xPathTest = x.xPathTest("../../drugbank.xml")
+    xPathTest = x.xPathTest("drugbank.xml")
+    cdk = CDK.TestCDK()
 
     @cherrypy.expose
     def getDrugBankNames(self):
@@ -43,12 +45,8 @@ class PythonEval(object):
         return self.xPathTest.extractPost(funcData, self.xPathTest.targetsFunc)
 
     @cherrypy.expose
-    def evalPython(self, funcBody):
-        cherrypy.log("function body:" + funcBody)
-        ns = {}
-        code = compile(funcBody, '<string>', 'exec')
-        exec code in ns
-        return ns['result']
+    def computeChemSimilarity(self, funcData):
+        return self.cdk.computeChemSimilarity(funcData)
 
 if __name__ == '__main__':
     cherrypy.config.update({'server.socket_host': '0.0.0.0'})
