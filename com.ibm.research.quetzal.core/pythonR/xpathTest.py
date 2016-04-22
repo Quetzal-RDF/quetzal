@@ -9,16 +9,16 @@ class xPathTest(object):
         self.drugsToTargets = {}
         self.drugsToTransporters = {}
         self.drugsToSMILES = {}
-        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', './x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', self.drugsToTargets)
-        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"]', './x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', self.drugsToTransporters)
-        self.extractDrugsToDict(root, '/x:drugbank/x:drug', './/x:property[./x:kind/text()="SMILES"]/x:value/text()', self.drugsToSMILES)
+        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"][./x:groups/x:group/text()="approved"]', './x:targets/x:target/x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', self.drugsToTargets)
+        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier/x:resource/text()="UniProtKB"][./x:groups/x:group/text()="approved"]', './x:transporters/x:transporter/x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', self.drugsToTransporters)
+        self.extractDrugsToDict(root, '/x:drugbank/x:drug[./x:groups/x:group/text()="approved"]', './/x:property[./x:kind/text()="SMILES"]/x:value/text()', self.drugsToSMILES)
  
 
     def sumFunc(self, text):
         return "<sum>%d</sum>" % random.randint(0,100)
 
     def extractPost(self, funcData, func):
-        print funcData
+        print(funcData)
         root = etree.fromstring(funcData)
         rows = root.xpath('//row')
         row = next(iter(rows), None)
@@ -28,18 +28,18 @@ class xPathTest(object):
 
         for row in rows:
             for val in func(row[0].text.strip()):
-                print val
+                print(val)
                 if val == "":
                     continue
                 result += "<row>"
                 result += "<" + row[0].tag + ">" + row[0].text + "</" + row[0].tag + ">" + val
                 result += "</row>"
-                print result
+                print(result)
         result += "</data>"
         return result
 
     def transportersFunc(self, text):
-        print "searching for#" + text + "#"
+        print("searching for#" + text + "#")
         if text not in self.drugsToTransporters:
             yield "" 
         else:
@@ -64,7 +64,7 @@ class xPathTest(object):
     def extractSMILES(self):
         rows = self.root.xpath('/x:drugbank/x:drug', namespaces={'x': 'http://www.drugbank.ca'})
         for row in rows:
-            print row.xpath('.//x:property[./x:kind/text()="SMILES"]/x:value/text()', namespaces={'x': 'http://www.drugbank.ca'})
+            print(row.xpath('.//x:property[./x:kind/text()="SMILES"]/x:value/text()', namespaces={'x': 'http://www.drugbank.ca'}))
      #       print row.xpath('./x:calculated_properties/x:property[./x:kind/text()="SMILES"]/x:value/text()', namespaces={'x': 'http://www.drugbank.ca'})
 
     def extractSMILES(self, drugName):
@@ -155,7 +155,7 @@ class xPathTest(object):
                     act = action.xpath('./text()', namespaces={'x': 'http://www.drugbank.ca'})
                     id = target.xpath('./x:polypeptide/x:external-identifiers/x:external-identifier[./x:resource/text()="UniProtKB"]/x:identifier/text()', namespaces={'x': 'http://www.drugbank.ca'})
                     if len(id) > 0 and len(act) > 0:
-                        print "<http://www.research.ibm.com/Tiresias/entity/bio/DRUG/" + drug[0] + "> <http://www.research.ibm.com/Tiresias/prop/target> <http://purl.uniprot.org/uniprot/" + id[0] + "> ."
+                        print("<http://www.research.ibm.com/Tiresias/entity/bio/DRUG/" + drug[0] + "> <http://www.research.ibm.com/Tiresias/prop/target> <http://purl.uniprot.org/uniprot/" + id[0] + "> .")
 
 
     def extractDrugBankTargets(self):
@@ -207,7 +207,7 @@ class xPathTest(object):
             ids.extend(targets)
             if len(ids) > 0:
                 dict[drug[0]] = ids
-        print dict
+        print(dict)
 
 #print extractSMILES('Ibuprofen')
 # print extractTransporters('Vasopressin')
