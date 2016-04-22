@@ -11,16 +11,35 @@ service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 function fn:getTransporters ( ?drug -> ?transporter ) 
 table fn:getTransporters [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:transporter" "xs:string" 
 
-function drug:getProteinGeneFunctions GET (?protein -> ?geneFunction ?type) 
-table "http://www.uniprot.org/uniprot/batch" [ ] -> "/up:uniprot/up:entry/up:dbReference" :: "./@id" "xs:string" "./@type" "xs:string"
+function drug:getProteinGeneFunctions GET ( ?ids -> ?geneFunction ?id ?type) 
+service CONCAT("http://www.ebi.ac.uk/Tools/dbfetch/dbfetch?db=uniprot&format=xml&id=", ?ids) [ ] -> "/up:uniprot/up:entry/up:dbReference" ::  "./@id" "xs:string" "../up:accession[1]" "xs:string" "./@type" "xs:string" 
 
-select distinct * where {
+select ?t2 ?geneFunction where 
+{
+  {select ?geneFunction ?t2 ?type where 
+  {
+    { select (group_concat(?transporter; separator = '+') AS ?ids) where 
+      {
+        { select distinct ?transporter where 
+          {
+            BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getDrugBankNames() AS ( ?drug ) )
+            BIND( fn:getTransporters( ?drug ) AS ( ?drug ?transporter ) )
+           } 
+        limit 10 }
+      }
+    }
+  
+    BIND( drug:getProteinGeneFunctions( ?ids ) AS ( ?geneFunction ?t2 ?type ) )
+  
+    FILTER (?type = "GO")
+  }}
 
-BIND( fn:getTransporters( ?drug ) AS ( ?drug ?transporter ) )
- 
-BIND( drug:getProteinGeneFunctions(?transporter) AS (?geneFunction ?type) )
+        { select distinct ?transporter where 
+          {
+            BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-filter (?type = "GO")
+            BIND( fn:getTransporters( ?drug ) AS ( ?drug ?transporter ) )
+           } 
+        }
 }
