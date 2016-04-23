@@ -339,7 +339,8 @@ public class AggregateExpression extends Expression {
 		} else if (getAggregationType() == EType.GROUP_CONCAT) {
 			t = store.getInstanceOf(GROUP_CONCAT);
 			t.setAttribute("var", vars.iterator().next().getName());
-
+			t.setAttribute("s", getSeparator().substring(1, 2));
+			
 			return t.toString();
 		} else {
 			if (context.doesConstantNeedTypeCheck(this)) {
