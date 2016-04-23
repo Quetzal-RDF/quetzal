@@ -491,13 +491,13 @@ public class Planner {
 		@Override
 		public Set<Variable> getRequiredVariables() {
 			assert p instanceof BindFunctionPattern;
-			return new HashSet<Variable>(((BindFunctionPattern)p).getFuncCall().getVariables());
+			return HashSetFactory.make(((BindFunctionPattern)p).getFuncCall().getVariables());
 		}
 
 		@Override
 		public Set<Variable> getProducedVariables() {
 			assert p instanceof BindFunctionPattern;
-			return new HashSet<Variable>(((BindFunctionPattern)p).getVariables());
+			return HashSetFactory.make(((BindFunctionPattern)p).getVariables());
 		}
 	}
 	
@@ -530,6 +530,7 @@ public class Planner {
 				vars.retainAll(liveVars);
 				vars.addAll(producedVariables);
 				node.setAvailableVariables(vars);
+				node.setProducedVariables(producedVariables);
 				g.addNode(node);
 				if (currentHead != null) {
 					return join(JoinTypes.AND, q, g, currentHead, node, liveVars);		

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.wala.util.collections.HashSetFactory;
 
 public class BindFunctionPattern extends Pattern implements Service {
 
@@ -76,7 +76,7 @@ public class BindFunctionPattern extends Pattern implements Service {
 	}
 
 	public Set<Variable> getVariables() {
-		Set<Variable> ret = new HashSet<Variable>();
+		Set<Variable> ret = HashSetFactory.make();
 		ret.addAll(vars);
 		return ret;
 	}
