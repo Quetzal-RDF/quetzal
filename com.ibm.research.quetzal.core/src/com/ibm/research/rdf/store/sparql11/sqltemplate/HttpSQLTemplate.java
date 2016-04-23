@@ -139,6 +139,9 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 				if (columns.contains(v.getName())) {
 					continue;
 				}
+				if (this.planNode.getProducedVariables().contains(v)) {
+					continue;
+				}
 				columns.add(v.getName());
 				if (addType) {
 					columns.add(v.getName()+ "_TYP");
