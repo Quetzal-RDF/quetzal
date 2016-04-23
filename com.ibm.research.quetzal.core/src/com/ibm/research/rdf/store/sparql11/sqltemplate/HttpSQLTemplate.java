@@ -1,6 +1,7 @@
 package com.ibm.research.rdf.store.sparql11.sqltemplate;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 	}
 	
 	public List<String> getProjectedVariablesFromPredecessor(Set<Variable> newVars) {
+		
 		if (pred == null) {
 			return Collections.emptyList();
 		}
@@ -47,7 +49,7 @@ public abstract class HttpSQLTemplate extends JoinNonSchemaTablesSQLTemplate {
 			}
 	
 		}
-		return projected;
+		return projected; 
 	}
 
 	protected List<Variable> getAllLiteralVars(Set<Variable> vars) {

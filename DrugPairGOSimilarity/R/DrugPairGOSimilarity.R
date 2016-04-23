@@ -1,26 +1,57 @@
 library(GOSemSim)
 library(readr)
-require(XML)
-library(RxnSim)
+library(XML)
 library(testit)
+library(RxnSim)
 
 parseInput <- function(str) {
   # parse a dataframe from XML
-  data <- xmlParse(str)
+  data <- xmlParse(str, asText=TRUE)
   drug_cat = xmlSApply(xmlRoot(data), function(x) xmlSApply(x, xmlValue))
   free(data)
   d <- data.frame(t(drug_cat),row.names=NULL)
+  smiles <- as.character(d[, "smiles"])
+  sim = ms.compute.sim.matrix (smiles, format='smiles', standardize = T, explicitH = F,
+                         sim.method = 'tanimoto',fp.mode ='bit', fp.depth = 6, fp.size = 1024)
+  
+  rows = nrow(sim)
+  cols = ncol(sim)
+  cat('<?xml version="1.0" encoding="UTF-8"?>')
+  cat("<data>")
+  
+  for(i in 1:rows)  
+  {
+    drug1 <- as.character(d[i,1])
+    for (j in 1:cols)
+    { 
+      cat("<row>")
+      drug2 <- as.character(d[j,1])
+      print("<drug1>")
+      print(drug1)
+      print("</drug1>")
+      print("<drug2>")
+      print(drug2)
+      print("</drug2>")
+      similarity = sim[i,j]
+      print("<sim>")
+      print(similarity)
+      print("</sim>")
+      print("</row>")    
+    }
+  }
+  print("</data>")
+  
 }
 
 
 # Compute similarity of SMILES fingerprints
 computeFPPerPair <- function(d1, d2, d) {
-  smiles1 <- as.character(d1[, "SMILES"])
-  smiles2 <- as.character(d2[,"SMILES"])
+  smiles1 <- as.character(d1[, "smiles"])
+  smiles2 <- as.character(d2[,"smiles"])
   
   assert("length should be 1 for a chemical fp of a drug", length(smiles1) == 1)
   assert("length should be 1 for a chemical fp of a drug", length(smiles2) == 1) 
-  sim = ms.compute (smiles1, smiles2, fp.depth=8)
+  sim = RxnSim::ms.compute (smiles1, smiles2, fp.depth=6, fpCached=T, sim.method =  tanimoto)
 }
 
 # Compute similarity of GO functions
@@ -69,11 +100,13 @@ computeChemicalFingerprintSimilarity <- function(str) {
 }
 
 computeGOSimilarity <- function(str) {
+  # str
   computeOverSimilarDrugPairs(str, computeGOSimilarityPerPair)
 }
 
-str <- read_file("/tmp/postedData.xml")
-print(computeGOSimilarity(str))
-str <- read_file("/tmp/postedChem.xml")
-print(computeChemicalFingerprintSimilarity(str))
+#str <- read_file("/tmp/postedData.xml")
+#print(computeGOSimilarity(str))
+str <- read_file("/tmp/SMILES")
+#print(computeChemicalFingerprintSimilarity(str))
+print(parseInput(str))
 

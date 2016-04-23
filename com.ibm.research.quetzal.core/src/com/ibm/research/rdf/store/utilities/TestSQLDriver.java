@@ -21,10 +21,13 @@ public class TestSQLDriver {
 		stmt.executeQuery(sql);
 
 		
-		sql = "WITH 	QS0_URL AS (select explode(array('http://localhost:8083/getDrugBankNames')) as url , url  ), QS0_URLS AS (select * from QS0_URL), QS0_GET AS (select httpGet('drug', 'url', '', 'GET', 'fn=http://localhost:8083/,x=http://www.drugbank.ca,xs=http://www.w3.org/2001/XMLSchema', '//x:row', 'drug', './x:drug', 'xs:string', url) as (drug,drug_TYP) from QS0_URLS)," +
-				" QS0 AS (select drug,drug_TYP  from QS0_GET )," +
-				" QS1_POST AS (select processTable(drug,drug_TYP,'http://localhost:8083/postData','drug,drug_TYP','drug','drug,sum','fn=http://localhost:8083/,x=http://www.drugbank.ca,xs=http://www.w3.org/2001/XMLSchema', '//row', 'drug', './drug', 'xs:string','sum', './sum', 'xs:string') as p from QS0), QS1_RAW AS (select inline(p) from QS1_POST) " +
-				" select drug, drug_typ, sum, sum_typ from QS1_RAW";
+		sql = "WITH QS5_URL AS (select explode(array('http://localhost:8083/getDrugBankNames')) as url , url  ), " + 
+		" QS5_URLS AS (select * from QS5_URL), QS5_GET AS (select httpGet('d1', 'url', '', 'GET', 'fn=http://localhost:8083/,x=http://www.drugbank.ca,xs=http://www.w3.org/2001/XMLSchema,up=http://uniprot.org/uniprot,drug=http://www.drugbank.ca', '//x:row', 'd1', './x:drug', 'xs:string', url) as (d1,d1_TYP) from QS5_URLS)," 
+		+ " QS5 AS (select d1,d1_TYP  from QS5_GET ),"
+		+ " QS6_URL AS (select explode(array(concat('http://localhost:8083/getDrugTransporters','?drugName=',QS5.d1))) as url , url,transporter,transporter_TYP,d1,d1_TYP   from QS5 ), QS6_URLS AS (select * from QS6_URL), QS6_GET AS (select " +
+		" httpGet('transporter,d1', 'url,transporter,transporter_TYP,d1,d1_TYP', '', 'GET', 'fn=http://localhost:8083/,x=http://www.drugbank.ca,xs=http://www.w3.org/2001/XMLSchema,up=http://uniprot.org/uniprot,drug=http://www.drugbank.ca', '//x:row', 'transporter', './x:drug', 'xs:string','d1', './x:id', 'xs:string', url,transporter,transporter_TYP,d1,d1_TYP) as (transporter,transporter_TYP,d1,d1_TYP) from QS6_URLS)," +
+		" QS6 AS (select transporter,transporter_TYP,d1,d1_TYP  from QS6_GET ) "
+		+ " select * from QS6";
 		
 		ResultSet res = stmt.executeQuery(sql);
 

@@ -71,10 +71,9 @@ public interface WebServiceInterface {
 
 		List<Object[]> result = new LinkedList<Object[]>();
 		for (int i = 0; i < rows.getLength(); i++) {
-			System.out.println("In rows loop");
 			Node row = rows.item(i);
 			Object[] k = null;
-			k = new Object[getOutputColumnNames().size()];
+			k = new Object[xPathForEachColumn.size() * 2];
 			
 			IntWritable indexValue = null;
 			
@@ -86,7 +85,6 @@ public interface WebServiceInterface {
 					xPathForColValue = "./s:binding[./@name='" + p.get(0) + "']";
 					xPathForColType = "./s:binding[./@name='" + p.get(0) + "']//@datatype";
 				}
-				System.out.println("Column pair for:"  + p.get(0) + " " + xPathForColValue + " " + xPathForColType);
 				Node column = (Node) xPath.compile(xPathForColValue).evaluate(row,
 						XPathConstants.NODE);
 				String value = column.getTextContent();
@@ -118,7 +116,7 @@ public interface WebServiceInterface {
 //		br.close();
 		is.close();
 		
-		prettyPrint(result);
+//		prettyPrint(result);
 		return result;
 	}
 	

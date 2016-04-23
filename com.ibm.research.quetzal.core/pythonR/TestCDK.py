@@ -19,11 +19,15 @@ class TestCDK(object):
             d = row.xpath('./drug/text()')
             drugs.extend(d)
 
+        for i in range(len(l)):
+            l[i] = l[i].strip()
+            
         result = '<?xml version="1.0"?>'
         result += '<data>'
 
         smiles = robjects.StrVector(l)
         rcompute = robjects.r['ms.compute.sim.matrix']
+        print(l)
         m = rcompute(smiles, format='smiles', standardize='T',fp_depth=6)
 
         for i in range(len(l)):

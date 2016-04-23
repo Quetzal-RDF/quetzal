@@ -263,6 +263,7 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 						+ TypeMap.DATATYPE_NUMERICS_IDS_END + " then 'xs:integer' " + "else 'xs:string' end)");
 			}
 		}
+		addPredecessorVariables(indexColumns, true);
 		mappings.put("indexColumns", new SQLMapping("indexColumns", indexColumns, null));
 		mappings.put("postedColumns", new SQLMapping("postedColumns", postedColumns, null));
 		mappings.put("postTypes", new SQLMapping("postTypes", postedTypes, null));

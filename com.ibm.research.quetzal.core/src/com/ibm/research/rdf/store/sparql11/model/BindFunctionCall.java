@@ -75,7 +75,7 @@ public class BindFunctionCall {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(name)
+		sb.append(iri)
 		  	.append("(");
 		for(Variable v: vars)
 		{

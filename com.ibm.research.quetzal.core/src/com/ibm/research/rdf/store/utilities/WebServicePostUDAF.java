@@ -52,6 +52,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		private Map<String, Integer> inputColumns = new HashMap<String, Integer>();
 		private Map<String, Integer> postedColumns = new HashMap<String, Integer>();
 		private Set<String> joinColumns = new HashSet<String>();
+		private String inputFormat = "XML";
 
 		@SuppressWarnings("deprecation")
 		public static class TableAggregator implements AggregationBuffer {
@@ -96,8 +97,9 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 					WritableConstantStringObjectInspector wc = (WritableConstantStringObjectInspector) param;
 					switch(k) {
 						case 0:
-							System.out.println("url:" + urlForService);
 							urlForService = wc.getWritableConstantValue().toString();
+							System.out.println("url:" + urlForService);
+
 							break;
 						case 1:
 							StringTokenizer tokenizer = new StringTokenizer(wc.getWritableConstantValue().toString(), ", ");
@@ -131,6 +133,12 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 							resolver = createNamespaces(wc.getWritableConstantValue().toString());
 							break;
+						/*
+						case 5:
+							inputFormat = wc.getWritableConstantValue().toString();
+							break;
+							
+						case 6: */
 						case 5:
 							xpathForRows = wc.getWritableConstantValue().toString();
 							break;			
@@ -157,9 +165,15 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 				l.add(inputCol);
 			}
 			
-			for (String s : outputColumnNames.keySet()) {
+			Set<String> realOutput = new HashSet<String>();
+			for (int j = 0; j < xPathForColumns.size(); j++) {
+				realOutput.add(xPathForColumns.get(j).get(0));
+			}
+			
+			for (String s : realOutput) {
 				if (inputColumns.containsKey(s)) {
 					joinColumns.add(s);
+					joinColumns.add(s + "_TYP");
 				}
 			}
 
@@ -250,7 +264,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			for (String s : joinColumns) {
 				sharedIndexes.add(inputColumns.get(s));
 			}
-			
+			int z = 0;
 			for (int k = 0; k < src.length; k++) {
 				if (sharedIndexes.contains(k)) {
 					continue;
@@ -259,11 +273,11 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 				if (o instanceof Short) {
 					ShortWritable s = new ShortWritable();
 					s.set((short) o);
-					dest[k + startIndex] = s;
+					dest[z + startIndex] = s;
 				} else {
-					dest[k + startIndex] = o;
+					dest[z + startIndex] = o;
 				}
-
+				z++;
 			}
 		}
 		
@@ -292,25 +306,34 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
 		private List<Object[]> join(List<Object[]> input, List<Object[]> output) {
 			List<Object[]> ret = new LinkedList<Object[]>();
+			System.out.println("joinColumns:" + joinColumns);
 
 			// nested loop join  
 			for (int i = 0; i < input.size(); i++) {
 				for (int j = 0; j < output.size(); j++) {
 					Object[] iRow = input.get(i);
 					Object[] oRow = output.get(j);
-					int totalInRow = iRow.length + oRow.length - joinColumns.size();
-					
-					if (isJoinable(iRow, oRow)) {
+					int totalInRow = iRow.length + oRow.length - joinColumns.size();	
+					if (!joinColumns.isEmpty() && isJoinable(iRow, oRow)) {
 						Object[] newRow = new Object[totalInRow];
 						System.arraycopy(oRow, 0, newRow, 0, oRow.length);
 						copyToWritable(iRow, newRow, oRow.length);
 						ret.add(newRow);
 						j++;
+					} else if (joinColumns.isEmpty()) {
+						System.out.println("cross product:");
+						Object[] newRow = new Object[oRow.length];
+						System.arraycopy(oRow, 0, newRow, 0, oRow.length);
+						copyToWritable(iRow, newRow, oRow.length);
+						ret.add(newRow);
+					//	WebServiceInterface.prettyPrint(ret);
+						j++;
 					} 
 				}
 			}
-			System.out.println("Returned table:");
-			WebServiceInterface.prettyPrint(ret);
+			
+		//	System.out.println("Returned table:");
+		//	WebServiceInterface.prettyPrint(ret);
 			return ret;
 		}
 
@@ -323,8 +346,8 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			// TODO Auto-generated method stub
 			List<Object[]> input = ((TableAggregator) arg0).data;
 			
-			System.out.println("printing input");
-			WebServiceInterface.prettyPrint(input);
+		//	System.out.println("printing input");
+		//	WebServiceInterface.prettyPrint(input);
 
 			// serialize the data as XML
 			HttpClient client = new HttpClient();
@@ -365,8 +388,16 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			// TODO Auto-generated method stub
 			return null;
 		}
-
+		
 		private String serialize(List<Object[]> data) {
+			if (inputFormat.equals("XML")) {
+				return serializeXML(data);
+			} else {
+				return serializePost(data);
+			}
+		}
+
+		private String serializeXML(List<Object[]> data) {
 			StringBuffer buf = new StringBuffer();
 	//		prettyPrint(data);
 			buf.append("<data>");
@@ -382,6 +413,19 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 				buf.append("</row>");
 			}
 			buf.append("</data>");
+			return buf.toString();
+		}
+		
+		private String serializePost(List<Object[]> data) {
+			StringBuffer buf = new StringBuffer();
+			for (int j = 0; j < data.size(); j++) {
+				Object[] s = data.get(j);
+				for (Map.Entry<String, Integer> entry : postedColumns.entrySet()) {
+					buf.append(s[entry.getValue()] + " ");
+				}
+
+				buf.append("\n");
+			}
 			return buf.toString();
 		}
 
