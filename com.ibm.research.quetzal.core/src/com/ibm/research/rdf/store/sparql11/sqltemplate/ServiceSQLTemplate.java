@@ -267,5 +267,11 @@ public class ServiceSQLTemplate extends HttpSQLTemplate {
 		mappings.put("indexColumns", new SQLMapping("indexColumns", indexColumns, null));
 		mappings.put("postedColumns", new SQLMapping("postedColumns", postedColumns, null));
 		mappings.put("postTypes", new SQLMapping("postTypes", postedTypes, null));
+		
+		List<String> paramNames = new ArrayList<String>();
+		for(Variable p : ((ServiceFunction)((BindFunctionPattern)planNode.getPattern()).getFuncCall().getFunction()).getInVariables()) {
+			paramNames.add(p.getName());
+		}
+		mappings.put("paramNames",  new SQLMapping("paramNames", paramNames, null));
 	}
 }

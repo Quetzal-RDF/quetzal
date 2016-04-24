@@ -4,7 +4,7 @@ prefix xs: <http://www.w3.org/2001/XMLSchema>
 function fn:getDrugBankNames GET ( -> ?x ) 
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
-function fn:getSMILES ( ?x -> ?y ) 
+function fn:getSMILES ( ?drug -> ?smiles ) 
 table fn:getSMILES [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:smiles" "xs:string" 
 
 function fn:computeChemSimilarity ( ?drug ?smiles -> ?a ?b ?c ) 
