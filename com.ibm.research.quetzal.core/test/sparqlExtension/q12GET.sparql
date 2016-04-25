@@ -13,12 +13,9 @@ OPTIONAL {
 		        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi ;
 				    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date2 ;
 					<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_NAME> ?diag_code
-		    FILTER (?diag_code = "胸闷" 
-			 || ?diag_code = "胸痛"
-			 || ?diag_code = "肺部感染" )
+		    FILTER (?diag_code = "胸闷" )
 			} GROUP BY ?date2 ?diag_code
 	    } 
 	} 
   bind(if(!bound(?opcnt), 0, ?opcnt) as ?opcnt)
 } order by ?date limit 100
-

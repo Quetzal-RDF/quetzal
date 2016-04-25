@@ -1,19 +1,21 @@
 SELECT * WHERE {
  {
 	SERVICE <http://9.12.235.45:9999/blazegraph/namespace/bjdiag/sparql> {
-		SELECT ?date (AVG(?value) AS ?avgval) WHERE {
-	  		?x <http://www.ibm.com/health/bjdiag/PM25TBL#DATE> ?date;
-	    	  <http://www.ibm.com/health/bjdiag/PM25TBL#VALUE> ?value
-	    } GROUP BY ?date
+		{
+			SELECT ?date (AVG(?value) AS ?avgval) WHERE {
+			
+		  		?x <http://www.ibm.com/health/bjdiag/PM25TBL#DATE> ?date;
+		    	  <http://www.ibm.com/health/bjdiag/PM25TBL#VALUE> ?value
+		    } GROUP BY ?date
 
-}
-OPTIONAL {
-		SELECT (?date2 AS ?date) ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
-		        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi ;
-				    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date2 ;
-					<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_NAME> ?diag_code
-		    FILTER (?diag_code = "胸闷" )
-			} GROUP BY ?date2 ?diag_code
+		}
+		OPTIONAL {
+			SELECT (?date2 AS ?date) ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
+			        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi ;
+					    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date2 ;
+						<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_NAME> ?diag_code
+			    FILTER (?diag_code = "胸闷" )
+				} GROUP BY ?date2 ?diag_code
 	    } 
 	} 
     bind(if(!bound(?opcnt), 0, ?opcnt) as ?opcnt)
