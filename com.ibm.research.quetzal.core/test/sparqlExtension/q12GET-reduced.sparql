@@ -5,11 +5,9 @@ SELECT * WHERE {
 	  		?x <http://www.ibm.com/health/bjdiag/PM25TBL#DATE> ?date;
 	    	  <http://www.ibm.com/health/bjdiag/PM25TBL#VALUE> ?value
 	    } GROUP BY ?date
-	} 
 
 }
 OPTIONAL {
-	SERVICE <http://9.12.235.45:9999/blazegraph/namespace/bjdiag/sparql> {
 		SELECT (?date2 AS ?date) ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
 		        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi ;
 				    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date2 ;
