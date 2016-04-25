@@ -1,6 +1,6 @@
 SELECT * WHERE {
  {
-	SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag-rdf> {
+	SERVICE <http://9.12.235.45:9999/blazegraph/namespace/bjdiag/sparql> {
 		SELECT ?date (AVG(?value) AS ?avgval) WHERE {
 	  		?x <http://www.ibm.com/health/bjdiag/PM25TBL#DATE> ?date;
 	    	  <http://www.ibm.com/health/bjdiag/PM25TBL#VALUE> ?value
@@ -8,8 +8,8 @@ SELECT * WHERE {
 	} 
 }
 OPTIONAL {
-	SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag-rdf> {
-		SELECT ?date2 ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
+	SERVICE <http://9.12.235.45:9999/blazegraph/namespace/bjdiag/sparql> {
+		SELECT (?date2 as ?date) ?diag_code (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
 		        ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi ;
 				    <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DATE> ?date2 ;
 					<http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#DIAG_NAME> ?diag_code
@@ -18,5 +18,7 @@ OPTIONAL {
 			 || ?diag_code = "肺部感染" )
 			} GROUP BY ?date2 ?diag_code
 	    } 
-	} FILTER (?date = ?date2)
-} limit 6
+	} 
+  bind(if(!bound(?opcnt), 0, ?opcnt) as ?opcnt)
+} order by ?date limit 100
+
