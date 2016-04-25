@@ -1,5 +1,5 @@
 SELECT * WHERE {
- SERVICE <http://9.12.235.45:9091/openrdf-sesame/repositories/bjdiag-rdf> 
+ SERVICE <http://9.12.235.45:9999/blazegraph/namespace/bjdiag/sparql> 
  { 
    SELECT ?date (COUNT(DISTINCT ?empi) AS ?opcnt) WHERE {
         ?x <http://www.ibm.com/health/bjdiag/DIAG_OUTPATIENT#EMPI> ?empi .
