@@ -1,4 +1,4 @@
-SELECT * WHERE {
+SELECT * WHERE 
  {
 	SERVICE <http://9.12.235.45:9999/blazegraph/namespace/bjdiag/sparql> {
 		{
