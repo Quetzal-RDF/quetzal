@@ -32,7 +32,7 @@ class TestCDK(object):
 
         for i in range(len(l)):
             for j in range(len(l)):
-                if i==j:
+                if i==j or drugs[i] > drugs[j]:
                     continue
                 index = (i * len(l)) + j
                 result += "<row>"
