@@ -38,6 +38,7 @@ class TestCDK(object):
                 result += "<row>"
                 result += "<drug1>" + drugs[i] + "</drug1>"
                 result += "<drug2>" + drugs[j] + "</drug2>"
+                print("<sim>" + str(m[index]) + "</sim>")
                 result += "<sim>" + str(m[index]) + "</sim>"
                 result += "</row>"
         result += "</data>"
