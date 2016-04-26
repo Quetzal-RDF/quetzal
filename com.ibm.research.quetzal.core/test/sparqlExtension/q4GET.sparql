@@ -26,7 +26,7 @@ select ?d1 ?geneFunction where
 
             BIND( fn:getTransporters( ?drug ) AS ( ?drug ?transporter ) )
            } 
-        limit 15 }
+        limit 50 }
       }
     }
   

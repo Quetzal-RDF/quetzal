@@ -1,0 +1,26 @@
+
+prefix fn: <http://localhost:8083/>
+prefix x: <http://www.drugbank.ca>
+prefix xs: <http://www.w3.org/2001/XMLSchema>
+prefix drug: <http://www.drugbank.ca>
+prefix up: <http://uniprot.org/uniprot>
+
+function fn:getDrugBankNames GET ( -> ?x ) 
+service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
+
+function fn:getDrugTransporters GET ( ?x -> ?y ) 
+service fn:getDrugTransporters [ "drugName" -> ?x ] -> "//x:row" :: "./x:id" "xs:string" 
+
+function drug:getProteinGeneFunctions GET (?transporter -> ?geneFunction ?type) 
+service CONCAT("http://www.uniprot.org/uniprot/", CONCAT(?transporter, ".xml")) [ ] -> "/up:uniprot/up:entry/up:dbReference" :: "./@id" "xs:string" "./@type" "xs:string"
+
+select ?drug ?geneFunction where 
+{
+  BIND( fn:getDrugBankNames() AS ( ?drug ) )
+
+  BIND( fn:getDrugTransporters( ?drug ) AS ( ?transporter ) ) 
+
+  BIND( drug:getProteinGeneFunctions(?transporter) AS (?geneFunction ?type) )
+
+  filter (?type = "GO") 
+}

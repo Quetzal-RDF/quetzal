@@ -1,19 +1,15 @@
 
 prefix fn: <http://localhost:8083/>
-prefix fn2: <http://localhost:8888/>
 prefix x: <http://www.drugbank.ca>
 prefix xs: <http://www.w3.org/2001/XMLSchema>
 
 function fn:getDrugBankNames GET ( -> ?x ) 
 service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
 
-function fn:getSMILES ( ?drug -> ?smiles ) 
-table fn:getSMILES [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:smiles" "xs:string" 
-
-select distinct * where {
+select ?drug ?drug1 where {
 
 BIND( fn:getDrugBankNames() AS ( ?drug ) )
 
-BIND( fn:getSMILES( ?drug ) AS ( ?drug ?smiles ) )
+BIND( fn:getDrugBankNames() AS ( ?drug1 ) )
 
 }
