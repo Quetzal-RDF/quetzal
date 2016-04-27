@@ -14,7 +14,7 @@ select distinct ?drug ?drug1 ?similarity where {
 
   { select ?drug where {
     BIND( fn:getDrugBankNames() AS ( ?drug ) )
-  } limit 400 }
+  } limit 250 }
   
 BIND( fn:getSMILES( ?drug ) AS ( ?drug ?smiles ) )
 
