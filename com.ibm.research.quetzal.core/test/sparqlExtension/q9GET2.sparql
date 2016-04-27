@@ -1,0 +1,24 @@
+prefix fn: <http://10.0.2.2:8083/>prefix x: <http://www.drugbank.ca>
+prefix xs: <http://www.w3.org/2001/XMLSchema>
+
+function fn:getDrugBankNames GET ( -> ?x ) 
+service fn:getDrugBankNames [ ] -> "//x:row" :: "./x:drug" "xs:string"
+
+function fn:getSMILES ( ?x -> ?y ) 
+table fn:getSMILES [ "funcData" -> post data ] -> "//x:row" :: "./x:drug" "xs:string" "./x:smiles" "xs:string" 
+
+function fn:computeChemSimilarity ( ?drug ?smiles -> ?a ?b ?c ) 
+table fn:computeChemSimilarity [ "funcData" -> post data ] -> "//row" :: "./drug1" "xs:string" "./drug2" "xs:string" "./sim" "xs:number"
+
+select distinct ?drug ?drug1 ?similarity where {
+
+ { select ?drug where {
+
+   BIND( fn:getDrugBankNames() AS ( ?drug ) )
+ } limit 300 }
+  
+BIND( fn:getSMILES( ?drug ) AS ( ?drug ?smiles ) )
+
+BIND( fn:computeChemSimilarity(?drug ?smiles) AS (?drug ?drug1 ?similarity) )
+
+}
