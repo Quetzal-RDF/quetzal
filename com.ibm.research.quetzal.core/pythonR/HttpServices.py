@@ -48,6 +48,10 @@ class PythonEval(object):
     def computeChemSimilarity(self, funcData):
         return self.cdk.computeChemSimilarity(funcData)
 
+    @cherrypy.expose
+    def computeGOSimilarity(self, funcData):
+        return self.cdk.computeGOSimilarity(funcData)
+
 if __name__ == '__main__':
     cherrypy.config.update({'server.socket_host': '0.0.0.0'})
     cherrypy.config.update({'server.socket_port': 8083})
