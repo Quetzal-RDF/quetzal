@@ -1,46 +1,12 @@
 library(GOSemSim)
-library(readr)
 library(XML)
-library(testit)
-library(RxnSim)
 
 parseInput <- function(str) {
   # parse a dataframe from XML
   data <- xmlParse(str, asText=TRUE)
   drug_cat = xmlSApply(xmlRoot(data), function(x) xmlSApply(x, xmlValue))
   free(data)
-  d <- data.frame(t(drug_cat),row.names=NULL)
-  smiles <- as.character(d[, "smiles"])
-  sim = ms.compute.sim.matrix (smiles, format='smiles', standardize = T, explicitH = F,
-                         sim.method = 'tanimoto',fp.mode ='bit', fp.depth = 6, fp.size = 1024)
-  
-  rows = nrow(sim)
-  cols = ncol(sim)
-  cat('<?xml version="1.0" encoding="UTF-8"?>')
-  cat("<data>")
-  
-  for(i in 1:rows)  
-  {
-    drug1 <- as.character(d[i,1])
-    for (j in 1:cols)
-    { 
-      cat("<row>")
-      drug2 <- as.character(d[j,1])
-      print("<drug1>")
-      print(drug1)
-      print("</drug1>")
-      print("<drug2>")
-      print(drug2)
-      print("</drug2>")
-      similarity = sim[i,j]
-      print("<sim>")
-      print(similarity)
-      print("</sim>")
-      print("</row>")    
-    }
-  }
-  print("</data>")
-  
+  d <- data.frame(t(drug_cat),row.names=NULL)  
 }
 
 
@@ -99,14 +65,16 @@ computeChemicalFingerprintSimilarity <- function(str) {
   computeOverSimilarDrugPairs(str, computeFPPerPair)
 }
 
-computeGOSimilarity <- function(str) {
+computeGOSimilarity <- function(funcData) {
   # str
-  computeOverSimilarDrugPairs(str, computeGOSimilarityPerPair)
+  library(GOSemSim)
+  library(XML)
+  computeOverSimilarDrugPairs(funcData, computeGOSimilarityPerPair)
 }
 
 #str <- read_file("/tmp/postedData.xml")
 #print(computeGOSimilarity(str))
-str <- read_file("/tmp/SMILES")
+#str <- read_file("/tmp/SMILES")
 #print(computeChemicalFingerprintSimilarity(str))
-print(parseInput(str))
+#print(parseInput(str))
 

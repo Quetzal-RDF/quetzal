@@ -25,6 +25,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -60,8 +61,7 @@ public interface WebServiceInterface {
 		DocumentBuilder builder = factory.newDocumentBuilder(); 
 
 		Document doc = builder.parse(new InputSource(is));
-		printDocument(doc);
-		    
+	//	printDocument(doc);
 		XPath xPath = XPathFactory.newInstance().newXPath();
 
 	    xPath.setNamespaceContext(namespace);
@@ -87,6 +87,7 @@ public interface WebServiceInterface {
 				}
 				Node column = (Node) xPath.compile(xPathForColValue).evaluate(row,
 						XPathConstants.NODE);
+		//		System.out.println("GOT HERE:" + xPathForColValue + " " + column);
 				String value = column.getTextContent();
 				String type = null;
 				if (xPathForColType.equals(String.valueOf(TypeMap.IRI_ID))) {
@@ -110,7 +111,9 @@ public interface WebServiceInterface {
 				k[(j * 2) +1] =  st;
 			}
 
+			row.getParentNode().removeChild(row);
 			result.add(k);
+			
 		}
 		System.out.println("Parsed response");
 //		br.close();

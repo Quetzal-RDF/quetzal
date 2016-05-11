@@ -2,6 +2,7 @@ package com.ibm.research.rdf.store.utilities;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,15 +24,12 @@ import org.apache.hadoop.hive.serde2.io.ShortWritable;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
-import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector.PrimitiveCategory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.WritableConstantStringObjectInspector;
-import org.apache.hadoop.hive.serde2.typeinfo.PrimitiveTypeInfo;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.io.Text;
 
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.wala.util.collections.Pair;
 
 public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 
@@ -53,6 +51,7 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		private Map<String, Integer> postedColumns = new HashMap<String, Integer>();
 		private Set<String> joinColumns = new HashSet<String>();
 		private String inputFormat = "XML";
+		private boolean mergeJoin = true;
 
 		@SuppressWarnings("deprecation")
 		public static class TableAggregator implements AggregationBuffer {
@@ -293,6 +292,99 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 			}
 			return true;
 		}
+		
+		private int compareOnJoin(Object[] inputRow, Object[] outputRow) {
+			int ret = 0;
+			for (String s : joinColumns) {
+				int inputIndex = inputColumns.get(s);
+				int outputIndex = outputColumnNames.get(s);
+				// KAVITHA: Of course the input and output object types won't match 
+				// So revert to string equals :(
+				ret = inputRow[inputIndex].toString().trim().compareTo(outputRow[outputIndex].toString().trim());
+				if (ret != 0) {
+					break;
+				}
+			}
+			return ret;
+		}
+		
+		private List<Object[]> mergeJoin(List<Object[]> r, List<Object[]> l) {
+			// using merge-join
+			int i = 0;
+			int j = 0;
+			List<Object[]> ret = new LinkedList<Object[]>();
+			
+			r.sort(new Comparator<Object[]>() {
+				@Override
+				public int compare(Object[] o1, Object[] o2) {
+					// TODO Auto-generated method stub
+					return compareOnJoin(o1, o2);
+				}
+			});
+			
+			l.sort(new Comparator<Object[]>() {
+				@Override
+				public int compare(Object[] o1, Object[] o2) {
+					// TODO Auto-generated method stub
+					return compareOnJoin(o1, o2);
+				}
+			});
+
+			assert !joinColumns.isEmpty();
+			assert r.size() > 0;
+			assert l.size() > 0;
+			
+			Object[] rRow = r.get(0);
+			Object[] lRow = l.get(0);
+						
+			
+			while (rRow != null && lRow != null) {
+				int totalInRow = rRow.length + lRow.length - joinColumns.size();
+				
+				if (compareOnJoin(rRow, lRow) > 0) {
+					j++;
+					lRow = j < l.size() ? l.get(j) : null;
+				} else if (compareOnJoin(rRow, lRow) < 0) {
+					i++;
+					rRow = i < r.size() ? r.get(i) : null;
+				} else {
+					// they are equal so join
+					addNewRow(ret, rRow, lRow, totalInRow);
+					// keep i fixed, iterate over all output rows that are equal to input[i]
+					int k = j + 1;
+					lRow = k < l.size() ? l.get(k) : null;
+					while (rRow != null && lRow != null && compareOnJoin(rRow, lRow) == 0) {
+						addNewRow(ret, rRow, lRow, totalInRow);
+						k++;
+						lRow = k < l.size() ? l.get(k) : null;
+					}
+					// keep j fixed, iterate over all input rows that are equal to output[j]
+
+					int z = i + 1;
+					rRow = z < r.size() ? r.get(z) : null;
+					lRow = j < l.size() ? l.get(j) : null;
+
+					while (rRow != null && lRow != null && compareOnJoin(rRow, lRow) == 0) {
+						addNewRow(ret, rRow, lRow, totalInRow);	
+						z++;
+						rRow = z < r.size() ? r.get(z) : null;
+					}
+					
+					i++;
+					j++;
+					rRow = i < r.size() ? r.get(i) : null;
+					lRow = j < l.size() ? l.get(j) : null;
+				}
+			}
+			return ret;
+		}
+
+		public void addNewRow(List<Object[]> ret, Object[] rRow, Object[] lRow, int totalInRow) {
+			Object[] newRow = new Object[totalInRow];
+			System.arraycopy(lRow, 0, newRow, 0, lRow.length);
+			copyToWritable(rRow, newRow, lRow.length);
+			ret.add(newRow);
+		}
 
 		/**
 		 * Assumption is that there is a set of shared variables that 
@@ -307,6 +399,10 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 		private List<Object[]> join(List<Object[]> input, List<Object[]> output) {
 			List<Object[]> ret = new LinkedList<Object[]>();
 			System.out.println("joinColumns:" + joinColumns);
+			
+			if (!joinColumns.isEmpty() && mergeJoin) {
+				return mergeJoin(input,  output);
+			} 
 
 			// nested loop join  
 			for (int i = 0; i < input.size(); i++) {
@@ -315,23 +411,15 @@ public class WebServicePostUDAF extends AbstractGenericUDAFResolver {
 					Object[] oRow = output.get(j);
 					int totalInRow = iRow.length + oRow.length - joinColumns.size();	
 					if (!joinColumns.isEmpty() && isJoinable(iRow, oRow)) {
-						Object[] newRow = new Object[totalInRow];
-						System.arraycopy(oRow, 0, newRow, 0, oRow.length);
-						copyToWritable(iRow, newRow, oRow.length);
-						ret.add(newRow);
-						j++;
+						addNewRow(ret, iRow, oRow, totalInRow);
 					} else if (joinColumns.isEmpty()) {
 						System.out.println("cross product:");
-						Object[] newRow = new Object[oRow.length];
-						System.arraycopy(oRow, 0, newRow, 0, oRow.length);
-						copyToWritable(iRow, newRow, oRow.length);
-						ret.add(newRow);
+						addNewRow(ret, iRow, oRow, totalInRow);
 					//	WebServiceInterface.prettyPrint(ret);
-						j++;
 					} 
 				}
 			}
-			
+
 		//	System.out.println("Returned table:");
 		//	WebServiceInterface.prettyPrint(ret);
 			return ret;
