@@ -1,0 +1,11 @@
+	
+getDataset = SELECT * from %s WHERE storeName = ? and status = 0
+	
+insertBasicStats = INSERT INTO %s(TYPE, AVG) VALUES(?,?)
+
+distinctCountQuery = SELECT COUNT(DISTINCT %type) AS COUNT FROM %table
+	
+insertTopK = INSERT INTO %s(%c , CNT)
+ 
+getBasicStats = SELECT TYPE, AVG, STDDEV, MIN, MAX FROM %s order by type
+getTopKStats = SELECT TYPE, GRAPH, SUBJECT, PREDICATE, OBJECT, CNT FROM %s order by type

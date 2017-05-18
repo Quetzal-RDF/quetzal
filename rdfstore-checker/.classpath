@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="source"/>
+	<classpathentry kind="lib" path="lib/kodkod-2.0.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DawgTests"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rdfstore-base"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

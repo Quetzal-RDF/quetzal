@@ -94,6 +94,11 @@ public class StoreManager {
 		private final Map<String, int[]> hashes = HashMapFactory.make();
 
 		@Override
+		public Iterable<String> predicates() {
+			return hashes.keySet();
+		}
+		
+		@Override
 		public boolean hasSpills(String predicate) {
 			return hasSpills.contains(predicate);
 		}
@@ -177,24 +182,26 @@ public class StoreManager {
 			}
 		}
 
-		String sql = "select distinct gid from "
+		if (store.getStoreBackend() != Backend.bigquery) {
+			String sql = "select distinct gid from "
 				+ store.getDirectPrimary() + " limit 2";
-		try {
-			stmt = conn.prepareStatement(sql);
-			rs = stmt.executeQuery();
-			while (rs.next()) {
-				String graphId = rs.getString(1);
-				if (!graphId.equals("DEF")) {
-					store.setHasGraphs(true);
+			try {
+				stmt = conn.prepareStatement(sql);
+				rs = stmt.executeQuery();
+				while (rs.next()) {
+					String graphId = rs.getString(1);
+					if (!graphId.equals("DEF")) {
+						store.setHasGraphs(true);
+					}
 				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			} finally {
+				DB2CloseObjects.close(rs, stmt);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} finally {
-			DB2CloseObjects.close(rs, stmt);
 		}
-
+		
 		// load the stats
 		Statistics[] stats = new DbBasedStatisticsMgr(conn, backend, store)
 				.loadStatsFromSchema();
@@ -205,14 +212,21 @@ public class StoreManager {
 		try {
 			Statement s = conn.createStatement();
 
-			PredicateTableImpl dt = readPredicateInfo(storeName, s,
-					"_DIRECT_PREDS");
+			String directPredsName;
+			if (store.getStoreBackend() == Backend.bigquery) {
+				directPredsName = store.getSchemaName() + "." + storeName + "_PREDICATES";
+			} else {
+				directPredsName = storeName + "_DIRECT_PREDS";
+			}
+				
+			PredicateTableImpl dt = readPredicateInfo(directPredsName, s);
 			store.setDirectPredicates(dt);
 
-			PredicateTableImpl rt = readPredicateInfo(storeName, s,
-					"_REVERSE_PREDS");
-			store.setReversePredicates(rt);
-
+			if (store.getStoreBackend() != Backend.bigquery) {
+				PredicateTableImpl rt = readPredicateInfo(storeName + "_REVERSE_PREDS", s);
+				store.setReversePredicates(rt);
+			}
+			
 			s.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -221,7 +235,7 @@ public class StoreManager {
 		store.getStoreBackend();
 		
 		if (store.getStoreBackend() == Backend.shark) {
-			sql = "create temporary function httpGet as 'com.ibm.research.rdf.store.utilities.WebServiceGetUDTF'";
+			String sql = "create temporary function httpGet as 'com.ibm.research.rdf.store.utilities.WebServiceGetUDTF'";
 			try {
 				conn.createStatement().executeQuery(sql);
 			} catch (SQLException e) {
@@ -230,7 +244,7 @@ public class StoreManager {
 		}
 		
 		if (store.getStoreBackend() == Backend.shark) {
-			sql = "create temporary function processTable as 'com.ibm.research.rdf.store.utilities.WebServicePostUDAF'";
+			String sql = "create temporary function processTable as 'com.ibm.research.rdf.store.utilities.WebServicePostUDAF'";
 			try {
 				conn.createStatement().executeQuery(sql);
 			} catch (SQLException e) {
@@ -245,10 +259,9 @@ public class StoreManager {
 		 */
 	}
 
-	private static PredicateTableImpl readPredicateInfo(String storeName,
-			Statement s, String table) throws SQLException {
+	private static PredicateTableImpl readPredicateInfo(String tableName, Statement s) throws SQLException {
 		PredicateTableImpl dt = new PredicateTableImpl();
-		ResultSet dp_rs = s.executeQuery("select * from " + storeName + table);
+		ResultSet dp_rs = s.executeQuery("select * from " + tableName);
 		while (dp_rs.next()) {
 			int[] hashes = new int[dp_rs.getInt("num_hashes")];
 			for (int i = 0; i < hashes.length; i++) {
@@ -275,7 +288,7 @@ public class StoreManager {
 		// update the internal statistics maintained as well as run
 		// distribution stats on the required columns in the DB
 
-		Store store = initialConnect(conn, backend, schemaName, storeName,
+		Store store = connectStore(conn, backend, schemaName, storeName,
 				context);
 
 		// probably want to avoid thread race issues here

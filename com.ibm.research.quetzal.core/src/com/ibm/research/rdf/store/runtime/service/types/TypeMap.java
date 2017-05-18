@@ -118,7 +118,7 @@ public class TypeMap {
 		NUMERIC, STRING, NONE, IRI, DATETIME, DATE
 	}
 
-	protected static short idForIRI(String iri) {
+	public static short idForIRI(String iri) {
 		for (short i = 0; i < typediriArray.length; i++) {
 			if (typediriArray[i].equals(iri)) {
 				return (short) (i + DATATYPE_IDS_START);

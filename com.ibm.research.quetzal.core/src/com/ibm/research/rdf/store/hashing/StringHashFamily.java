@@ -8,21 +8,12 @@
  * Contributors:
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
- package com.ibm.research.rdf.store.hashing;
-
-import java.util.Vector;
-
-import com.ibm.research.helix.hash.IHashFunction;
-import com.ibm.research.helix.rabinfingerprints.RabinFingerprintsFamily;
+package com.ibm.research.rdf.store.hashing;
 
 public class StringHashFamily implements IHashingFamily {
 	int targetRange;
 
 	int fSize;
-
-	RabinFingerprintsFamily<String> setOfHash;
-
-	Vector<IHashFunction<String>> hashes;
 
 	public StringHashFamily(int domain, int familySize) {
 		targetRange = domain;

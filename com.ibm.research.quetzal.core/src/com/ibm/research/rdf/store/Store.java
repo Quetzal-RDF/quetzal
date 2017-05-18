@@ -10,21 +10,26 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store;
 
+import java.io.Serializable;
+
 import org.antlr.stringtemplate.StringTemplate;
 
 import com.ibm.research.rdf.store.config.Statistics;
+import com.ibm.wala.util.intset.IntSet;
 
 public interface Store {
 	public static final int SHARK_REDUCERS = 200;
 	public enum Backend {
-		db2, postgresql, shark
+		db2, postgresql, shark, bigquery
 	}
-	public enum Db2Type {
+	public enum Db2Type implements Serializable {
 		DECFLOAT, TIMESTAMP, VARCHAR, MIXED
 	};
 	
 	public interface PredicateTable {
 	
+		Iterable<String> predicates();
+		
 		boolean hasSpills(String predicate);
 		
 		boolean hasSpills();
@@ -97,4 +102,5 @@ public interface Store {
 	
 	public void setUserTablespace(String name);
 	
+	public IntSet getAccessMethods();
 }

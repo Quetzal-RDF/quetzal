@@ -103,7 +103,7 @@ public class CodeGenerator {
 	public CodeGenerator( Store store, SPARQLOptimizerStatistics stats, Context context, Query query, PlanNode materializedTableStartingPoint,
 			TemporaryTableMgr tmptableMgr, StoreProcedureManager procMgr,  NewVariableGenerator newvargen, Set<Variable> explicitIRIBoundVariables, 
 			Map<Variable, Variable> variable2RenamedVariable, int cteCount) {
-		this( store,  stats, context, query, new PlannerWithMaterializedTableStartingPoint(materializedTableStartingPoint).plan(query, store, stats),
+		this( store,  stats, context, query, new PlannerWithMaterializedTableStartingPoint(store.getAccessMethods(), materializedTableStartingPoint).plan(query, store, stats),
 				tmptableMgr, procMgr, newvargen, explicitIRIBoundVariables, variable2RenamedVariable, cteCount);
 		
 	}

@@ -651,7 +651,7 @@ public class StoreHelper
       String getter = Sqls.getSqls(backend).getSql("getDataset");
 
       store = new SQLExecutor().getStore(conn, context, getter.replaceFirst("%s", schemaName + "." + datasetName),
-           datasetName.toUpperCase());
+           backend==Backend.bigquery? datasetName: datasetName.toUpperCase());
 
       if (store != null)
          {

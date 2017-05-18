@@ -165,7 +165,7 @@ public class QueryProcessorImpl implements QueryProcessor
       catch (SQLException e)
          {
          e.printStackTrace();
-         throw new IllegalArgumentException("execask failed");
+         throw new IllegalArgumentException("execAsk failed");
          }
       }
 
@@ -239,9 +239,9 @@ public class QueryProcessorImpl implements QueryProcessor
                long time = System.currentTimeMillis();
                 Plan greedyPlan;
                try {
-            	   greedyPlan = (new Planner()).plan(query, store, stats);
+            	   greedyPlan = (new Planner(store.getAccessMethods())).plan(query, store, stats);
                } catch (PlannerError e) {
-            	   greedyPlan = (new Planner(false)).plan(query, store, stats);            	   
+            	   greedyPlan = (new Planner(false, store.getAccessMethods())).plan(query, store, stats);            	   
                }
                plan = greedyPlan;
                if (plan.getPlanRoot() == null)

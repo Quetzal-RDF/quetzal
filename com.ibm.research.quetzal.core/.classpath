@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" kind="src" output="target/classes" path="src">
+	<classpathentry kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="generated"/>
-	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="test">
+	<classpathentry kind="src" output="target/test-classes" path="test">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry including="src/**/*.java|test/**/*.java|generated/**/*.java" kind="src" output="target/classes" path="Users/dolby/git/quetzal/com.ibm.research.quetzal.core">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
@@ -18,7 +24,16 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/rdfstore-data/lib/db2jcc4.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/google-api-client-1.22.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-api-services-bigquery-v2-rev320-1.22.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-http-client-1.22.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-http-client-jackson2-1.22.0.jar"/>
+	<classpathentry kind="lib" path="lib/google-oauth-client-1.22.0.jar"/>
+	<classpathentry kind="lib" path="lib/GoogleBigQueryJDBC42.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

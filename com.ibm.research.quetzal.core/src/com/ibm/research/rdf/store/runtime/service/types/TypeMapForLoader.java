@@ -13,6 +13,8 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -21,6 +23,10 @@ import com.ibm.wala.util.collections.Pair;
 
 public class TypeMapForLoader extends TypeMap {
 
+	public interface Writer {
+		void write(String type, short value);
+	}
+	
 	private static final Map<String,Short> typeTable = HashMapFactory.make();
 	static {
 		for(String typeIRI : TypeMap.typediriArray) { 
@@ -106,10 +112,15 @@ public class TypeMapForLoader extends TypeMap {
 			}
 		}
 		
-		dump();
+		dump(new Writer() {
+			@Override
+			public void write(String type, short value) {
+				System.out.println(type + " " + value);
+			}
+		});
 	}
 	
-	public static void dump() {
+	public static void dump(Writer writer) {
 		for (Field f : TypeMap.class.getDeclaredFields()) {
 			if (f.getName().endsWith("_ID")) {
 				try {
@@ -120,7 +131,7 @@ public class TypeMapForLoader extends TypeMap {
 				} catch (NoSuchFieldException e) {
 					try {
 						//...no, so print it
-						System.out.println(f.getName() + " " + f.getShort(null));
+						writer.write(f.getName(), f.getShort(null));
 					} catch (IllegalArgumentException e1) {
 						continue;
 					} catch (IllegalAccessException e1) {
@@ -134,13 +145,12 @@ public class TypeMapForLoader extends TypeMap {
 
 		// now print the table
 		for(String typeIRI : typeTable.keySet()) {
-			System.out.println(typeIRI + " " + typeTable.get(typeIRI));
+			writer.write(typeIRI, typeTable.get(typeIRI));
 		}
 
 		for (Map.Entry<String,Pair<Short,Map<String,Short>>> elt : langTable.entrySet()) {
-			System.out.println(elt.getKey() + " " + elt.getValue().fst);
 			for(Map.Entry<String, Short> subElt : elt.getValue().snd.entrySet()) {
-				System.out.println(elt.getKey() + "-" + subElt.getKey() + " " + subElt.getValue());
+				writer.write(elt.getKey() + "-" + subElt.getKey(), subElt.getValue());
 			}
 		}	
 	}

@@ -9,7 +9,7 @@
 
        http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
+    Unless required by appsjalicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
@@ -27,7 +27,7 @@
   <packaging>jar</packaging>
 
   <properties>
-    <beam.version>0.7.0-SNAPSHOT</beam.version>
+    <beam.version>0.6.0</beam.version>
   </properties>
 
   <repositories>
@@ -166,37 +166,6 @@
     </profile>
 
     <profile>
-      <id>apex-runner</id>
-      <!-- Makes the ApexRunner available when running a pipeline. -->
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.beam</groupId>
-          <artifactId>beam-runners-apex</artifactId>
-          <version>${beam.version}</version>
-          <scope>runtime</scope>
-        </dependency>
-
-        <!--
-          Apex depends on httpclient version 4.3.5, project has a transitive dependency to httpclient 4.0.1 from
-          google-http-client. Apex dependency version being specified explicitly so that it gets picked up. This
-          can be removed when the project no longer has a dependency on a different httpclient version.
-        -->
-        <dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-          <version>4.3.5</version>
-          <scope>runtime</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>commons-codec</groupId>
-              <artifactId>commons-codec</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <profile>
       <id>dataflow-runner</id>
       <!-- Makes the DataflowRunner available when running a pipeline. -->
       <dependencies>
@@ -204,51 +173,6 @@
           <groupId>org.apache.beam</groupId>
           <artifactId>beam-runners-google-cloud-dataflow-java</artifactId>
           <version>${beam.version}</version>
-          <scope>runtime</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <profile>
-      <id>flink-runner</id>
-      <!-- Makes the FlinkRunner available when running a pipeline. -->
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.beam</groupId>
-          <artifactId>beam-runners-flink_2.10</artifactId>
-          <version>${beam.version}</version>
-          <scope>runtime</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <profile>
-      <id>spark-runner</id>
-      <!-- Makes the SparkRunner available when running a pipeline. Additionally,
-           overrides some Spark dependencies to Beam-compatible versions. -->
-      <dependencies>
-        <dependency>
-          <groupId>org.apache.beam</groupId>
-          <artifactId>beam-runners-spark</artifactId>
-          <version>${beam.version}</version>
-          <scope>runtime</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.spark</groupId>
-          <artifactId>spark-streaming_2.10</artifactId>
-          <version>1.6.2</version>
-          <scope>runtime</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>org.slf4j</groupId>
-              <artifactId>jul-to-slf4j</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.jackson.module</groupId>
-          <artifactId>jackson-module-scala_2.10</artifactId>
-          <version>2.7.2</version>
           <scope>runtime</scope>
         </dependency>
       </dependencies>
@@ -368,6 +292,12 @@
       <version>4.12</version>
     </dependency>
     
+    <dependency>
+  		<groupId>com.ibm.wala</groupId>
+  		<artifactId>com.ibm.wala.util</artifactId>
+  		<version>1.3.7</version>
+  	</dependency>
+    
     <!-- https://mvnrepository.com/artifact/org.openrdf.sesame/sesame-rio-rdfxml -->
 
     <!-- The DirectRunner is needed for unit tests. -->
@@ -377,5 +307,49 @@
       <version>${beam.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>quetzal-RDF</groupId>
+    	<artifactId>quetzal-RDF</artifactId>
+    	<version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+    	<groupId>com.google.apis</groupId>
+    	<artifactId>google-api-services-storage</artifactId>
+    	<version>v1-rev105-1.22.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.beam</groupId>
+    	<artifactId>beam-runners-core-java</artifactId>
+    	<version>${beam.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.beam</groupId>
+      <artifactId>beam-runners-google-cloud-dataflow-java</artifactId>
+      <version>${beam.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>simba</groupId>
+      <artifactId>simbajdbc</artifactId>
+      <scope>system</scope>
+      <version>1.0</version>
+      <systemPath>${basedir}/lib/GoogleBigQueryJDBC42.jar</systemPath>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-bigquery</artifactId>
+      <version>0.17.1-beta</version>
+    </dependency>
+    
   </dependencies>
+  <dependencyManagement>
+  	<dependencies>
+  		<dependency>
+  			<groupId>com.google.protobuf</groupId>
+  			<artifactId>protobuf-java</artifactId>
+  			<version>3.2.0</version>
+  		</dependency>
+  	</dependencies>
+  </dependencyManagement>
 </project>

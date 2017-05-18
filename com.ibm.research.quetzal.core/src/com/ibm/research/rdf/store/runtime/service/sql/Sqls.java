@@ -51,6 +51,14 @@ public class Sqls extends Properties
                   .getResourceAsStream(
                         "com/ibm/research/rdf/store/runtime/service/sql/DB2RdfStoreSqls");
             }
+         else if (backend == Store.Backend.bigquery)
+         {
+         in = props
+               .getClass()
+               .getClassLoader()
+               .getResourceAsStream(
+                     "com/ibm/research/rdf/store/runtime/service/sql/BigQueryRdfStoreSqls");
+         }
          else
          { 
         	 assert backend == Store.Backend.shark : "Unsupported backend: "+backend;

@@ -55,7 +55,7 @@ public class AssignHashesToPredicates {
 		RabinHashFamily family = null;
 		if (numFns != 0) {
 			family = new RabinHashFamily(maxHashBuckets, numFns);
-			numFns = family.hashes.size();							// HACK ALERT.  If num fns is large, and max buckets is small, then we may fail to get the																	// the required num of funns
+			numFns = family.hashes.length;							// HACK ALERT.  If num fns is large, and max buckets is small, then we may fail to get the																	// the required num of funns
 		}
 
 		return new Functions(colorsPair, family);
@@ -111,7 +111,7 @@ public class AssignHashesToPredicates {
 				}
 			}
 			if (f.hashes != null) {
-				for (int i = 0; i < f.hashes.hashes.size(); i++) {
+				for (int i = 0; i < f.hashes.hashes.length; i++) {
 					f.hashes.computeHash(s);
 					int value = f.hashes.hash(s, i);
 					bf.append(value).append(" ");

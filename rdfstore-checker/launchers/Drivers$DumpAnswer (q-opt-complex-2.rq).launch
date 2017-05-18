@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/rdfstore-checker/source/com/ibm/research/rdf/store/sparql11/Drivers.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="/tmp/q-opt-complex-2.out"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.research.rdf.store.sparql11.Drivers$DumpAnswer"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="file://${project_loc:DawgTests}/data/queryTests/d_o1_d_ocomplex_data_2_nq/data.nq file://${project_loc:DawgTests}/dawg/data-r2/optional/q-opt-complex-2.rq file://${project_loc:DawgTests}/dawg/data-r2/optional/result-opt-complex-2.ttl"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-checker"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=/Users/dolby/RdfStoreWorkspace/rdfstore-checker/jni/x86-mac -ea -Xmx6000M"/>
+</launchConfiguration>

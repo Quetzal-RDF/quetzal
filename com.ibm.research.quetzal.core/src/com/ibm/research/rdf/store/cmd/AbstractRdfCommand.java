@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
+import com.simba.googlebigquery.core.BQConnectionOptions.QueryDialect;
+import com.simba.googlebigquery.jdbc42.DataSource;
 
 public abstract class AbstractRdfCommand
    {
@@ -97,71 +99,93 @@ public abstract class AbstractRdfCommand
       }
 
    private Connection getConnection()
-      {
+   {
 
-      String backend = params.get("-backend");
-      String db = params.get("-db");
-      String port = params.get("-port");
-      String host = params.get("-host");
-      String user = params.get("-user");
-      String password = params.get("-password");
-      if (backend == null)
-         backend = Store.Backend.db2.name();
-      if (host == null)
-         host = "localhost";
-      if (port == null)
-         port = "50000";
+	   String backend = params.get("-backend");
+	   String db = params.get("-db");
+	   String port = params.get("-port");
+	   String host = params.get("-host");
+	   String user = params.get("-user");
+	   String password = params.get("-password");
 
-      String JDBC_URL;
-      String classNameString;
-      if (backend.equalsIgnoreCase(Store.Backend.postgresql.name()))
-         {
-         JDBC_URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + db);
-         classNameString = new String("org.postgresql.Driver");
-         }
-      else if  (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
-    	  JDBC_URL = new String("jdbc:hive2://" + host + ":" + port + "/" + db);
-          classNameString = new String("org.apache.hive.jdbc.HiveDriver");
-      }
-      else
-         {
-         JDBC_URL = new String("jdbc:db2://" + host + ":" + port + "/" + db);
-         classNameString = new String("com.ibm.db2.jcc.DB2Driver");
-         }
+	   if (Store.Backend.bigquery.name().equalsIgnoreCase(backend)) {
 
-      try
-         {
-    	 Class.forName(classNameString); 
-         Connection conn = DriverManager.getConnection(JDBC_URL, user, password);
-         if (conn != null )
-            {
-        	 if (!backend.equalsIgnoreCase(Store.Backend.shark.name()))
-        	 {
-	            // this will cause StoreManager to start a txn
-	            // and commit on success, which is good for us
-	            conn.setAutoCommit(true);
-        	 }
-            }
-         else
-            {
-            System.err.println("Failed to establish connection to the database");
-            }
-         return conn;
-         }
-      catch (ClassNotFoundException e)
-         {
-         System.err.println(e.getLocalizedMessage());
-         return null;
-         }
-      catch (SQLException e)
-         {
-         System.err.println(e.getLocalizedMessage());
-         return null;
-         }
+		   String jdbcUrl = "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=" 
+				   + db 
+				   + ";OAuthType=0;OAuthServiceAcctEmail=" 
+				   + user
+				   + ";OAuthPvtKeyPath="
+				   + password;
 
-      // + ":traceFile=c:/jcc.log;traceLevel=-1;traceFileAppend=false;" ;
+		   DataSource ds = new DataSource();
+		   ds.setSQLDialect(QueryDialect.SQL);
+		   ds.setURL(jdbcUrl);
+		   ds.setTimeout(120);
+		   try {
+			   return ds.getConnection();
+		   } catch (SQLException e) {
+			   System.err.println(e.getLocalizedMessage());
+			   return null;
+		   }
+	   } else {
+		   
+		   if (backend == null)
+			   backend = Store.Backend.db2.name();
+		   if (host == null)
+			   host = "localhost";
+		   if (port == null)
+			   port = "50000";
 
-      }
+		   String JDBC_URL;
+		   String classNameString;
+		   if (backend.equalsIgnoreCase(Store.Backend.postgresql.name()))
+		   {
+			   JDBC_URL = new String("jdbc:postgresql://" + host + ":" + port + "/" + db);
+			   classNameString = new String("org.postgresql.Driver");
+		   }
+		   else if  (backend.equalsIgnoreCase(Store.Backend.shark.name())) {
+			   JDBC_URL = new String("jdbc:hive2://" + host + ":" + port + "/" + db);
+			   classNameString = new String("org.apache.hive.jdbc.HiveDriver");
+		   }
+		   else
+		   {
+			   JDBC_URL = new String("jdbc:db2://" + host + ":" + port + "/" + db);
+			   classNameString = new String("com.ibm.db2.jcc.DB2Driver");
+		   }
+
+		   try
+		   {
+			   Class.forName(classNameString); 
+			   Connection conn = DriverManager.getConnection(JDBC_URL, user, password);
+			   if (conn != null )
+			   {
+				   if (!backend.equalsIgnoreCase(Store.Backend.shark.name()))
+				   {
+					   // this will cause StoreManager to start a txn
+					   // and commit on success, which is good for us
+					   conn.setAutoCommit(true);
+				   }
+			   }
+			   else
+			   {
+				   System.err.println("Failed to establish connection to the database");
+			   }
+			   return conn;
+		   }
+		   catch (ClassNotFoundException e)
+		   {
+			   System.err.println(e.getLocalizedMessage());
+			   return null;
+		   }
+		   catch (SQLException e)
+		   {
+			   System.err.println(e.getLocalizedMessage());
+			   return null;
+		   }
+	   }
+	   // + ":traceFile=c:/jcc.log;traceLevel=-1;traceFileAppend=false;" ;
+
+   }
 
    private void closeConnection(Connection conn)
       {

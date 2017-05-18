@@ -119,6 +119,7 @@ public class SQLExecutor {
 
 			return p.processRow(conn, rs);
 		} catch (SQLException e) {
+			System.err.println(sql);
 			e.printStackTrace();
 			throw new SQLExceptionWrapper(e);
 		} finally {
@@ -127,7 +128,8 @@ public class SQLExecutor {
 	}
 
 	public StoreImpl getStore(Connection conn, final Context context, String sql, Object... params) {
-	   StoreImpl store= executeQuery(conn, sql,
+	   System.err.println(sql);
+		StoreImpl store= executeQuery(conn, sql,
 				new SingleRowResultSetProcessor<StoreImpl>() {
 					public StoreImpl processRow(Connection conn, ResultSet rs)
 							throws SQLException {

@@ -10,7 +10,6 @@
  *****************************************************************************/
 package com.ibm.research.owlql.ruleref;
 
-import com.ibm.iodt.sor.db.sql.CreatableTable;
 import com.ibm.research.owlql.rule.Predicate;
 import com.ibm.research.owlql.rule.RuleSystem;
 

@@ -69,6 +69,8 @@ import com.ibm.wala.util.graph.Graph;
 import com.ibm.wala.util.graph.NumberedGraph;
 import com.ibm.wala.util.graph.impl.ExtensionGraph;
 import com.ibm.wala.util.graph.impl.SlowSparseNumberedGraph;
+import com.ibm.wala.util.intset.IntSet;
+import com.ibm.wala.util.intset.IntSetUtil;
 
 import akka.remote.ContainerFormats.PatternType;
 
@@ -97,12 +99,23 @@ public class Planner {
 	
 	private PredicateTable forwardPreds;
 
-	public Planner(PlanNodeCreator planFactory, boolean checkMinus) {
+	private IntSet accessMethodMask;
+	
+	public Planner(PlanNodeCreator planFactory, boolean checkMinus, IntSet accessMethodMask) {
 		this.planFactory = planFactory;
 		this.CHECK_MINUS = checkMinus;
+		this.accessMethodMask = accessMethodMask;
 	}
 
-	public Planner(boolean checkMinus) {
+	public Planner(PlanNodeCreator planFactory, boolean checkMinus) {
+		this(planFactory, checkMinus, fullMask());
+	}
+
+	public Planner(IntSet accessMethodMask) {
+		this(true, fullMask());
+	}
+
+	public Planner(boolean checkMinus, IntSet accessMethodMask) {
 		this(new PlanNodeCreator() {
 
 			public PlanNode createSTPlanNode(QueryTriple triple,
@@ -145,7 +158,15 @@ public class Planner {
 			}
 			
 			
-		}, checkMinus);
+		}, checkMinus, accessMethodMask);
+	}
+	
+	public static IntSet fullMask() {
+		return IntSetUtil.make(new int[]{1,2,3,4,5,6});
+	}
+	
+	public Planner(boolean checkMinus) {
+		this(checkMinus, fullMask());
 	}
 	
 	public Planner() {
@@ -1238,11 +1259,13 @@ public class Planner {
 				Set<Variable> availableVars, Set<Variable> liveVars, Walker walker, List<Pattern> region, Set<Node> result) {
 			for (QueryTriple q : ((SimplePattern) p).getQueryTriples()) {
 				for (int accessMethod = 1; accessMethod <= 6; accessMethod++) {
-					if ( (p.getGraphRestriction() != null && !q.getPredicate().isComplexPath()) || accessMethod != QueryTripleNode.GDPH) {
-						// graph access  not allow for complex property paths
-						Node n = new SimpleNode(accessMethod, q, liveVars, p, stats, ++graphCounterId);
-						if (availableVars.containsAll(n.getRequiredVariables())) {
-							result.add(n);
+					if (accessMethodMask.contains(accessMethod)) {
+						if ( (p.getGraphRestriction() != null && !q.getPredicate().isComplexPath()) || accessMethod != QueryTripleNode.GDPH) {
+							// graph access  not allow for complex property paths
+							Node n = new SimpleNode(accessMethod, q, liveVars, p, stats, ++graphCounterId);
+							if (availableVars.containsAll(n.getRequiredVariables())) {
+								result.add(n);
+							}
 						}
 					}
 				}

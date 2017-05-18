@@ -235,7 +235,7 @@ public class QueryProcessorImpl implements QueryProcessor
                PropertyPathRewrite rewrite = new PropertyPathRewrite();
                boolean hasNoPropertyPath = rewrite.rewrite(query, true, null, null);
                logger.debug("Rewritten query (after property path rewrite): {}", query);
-               Plan greedyPlan = (new Planner()).plan(query, store, stats);
+               Plan greedyPlan = (new Planner(store.getAccessMethods())).plan(query, store, stats);
                plan = greedyPlan;
                if (plan.getPlanRoot() == null)
                   {

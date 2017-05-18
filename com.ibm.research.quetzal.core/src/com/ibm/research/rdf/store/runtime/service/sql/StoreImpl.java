@@ -30,7 +30,12 @@ import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.config.Statistics;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
+import com.ibm.research.rdf.store.sparql11.planner.Planner;
+import com.ibm.research.rdf.store.sparql11.planner.QueryTripleNode;
 import com.ibm.research.rdf.store.sparql11.sqlwriter.SPARQLToSQLExpression;
+import com.ibm.wala.util.intset.IntSet;
+import com.ibm.wala.util.intset.IntSetUtil;
+import com.ibm.wala.util.intset.MutableIntSet;
 
 public class StoreImpl implements Store {
 
@@ -67,13 +72,17 @@ public class StoreImpl implements Store {
 	
 	private Properties dataTypes;
 	
+	private IntSet accessMask;
+	
 	public static final String DB2templatesFile = "com/ibm/research/rdf/store/sparql11/sqlwriter/DB2SQLTemplates.stg";
 	public static final String PSQLtemplatesFile = "com/ibm/research/rdf/store/sparql11/sqlwriter/PSQLSQLTemplates.stg";
 	public static final String SharktemplatesFile = "com/ibm/research/rdf/store/sparql11/sqlwriter/SharkSQLTemplates.stg";
+	public static final String BigQuerytemplatesFile = "com/ibm/research/rdf/store/sparql11/sqlwriter/BigQuerySQLTemplates.stg";
 	
 	public static final String DB2DatatypesFile = "com/ibm/research/rdf/store/runtime/service/sql/DB2.datatypes";
 	public static final String PostgresqlDatatypesFile = "com/ibm/research/rdf/store/runtime/service/sql/Postgresql.datatypes";
 	public static final String SharkDatatypesFile = "com/ibm/research/rdf/store/runtime/service/sql/Shark.datatypes";
+	public static final String BigQueryDatatypesFile = "com/ibm/research/rdf/store/runtime/service/sql/BigQuery.datatypes";
 	
 	public StoreImpl(Context context) {
 		super();
@@ -173,16 +182,26 @@ public class StoreImpl implements Store {
 			{
 				templatesFile = PSQLtemplatesFile;
 				dataTypesFile = PostgresqlDatatypesFile;
+				accessMask = Planner.fullMask();
 			
 			}
 			else if (storeBackend==Store.Backend.shark)
 			{
 				templatesFile = SharktemplatesFile;
 				dataTypesFile = SharkDatatypesFile;
+				accessMask = Planner.fullMask();
+			}
+			else if (storeBackend==Store.Backend.bigquery)
+			{
+				templatesFile = BigQuerytemplatesFile;
+				dataTypesFile = BigQueryDatatypesFile;
+				accessMask = IntSetUtil.make();
+				((MutableIntSet)accessMask).add(QueryTripleNode.DPH);
 			}
 			else {
 				templatesFile = DB2templatesFile;
 				dataTypesFile = DB2DatatypesFile;
+				accessMask = Planner.fullMask();
 			}
 			
 			InputStream istream = SPARQLToSQLExpression.class.getClassLoader().getResourceAsStream(templatesFile);
@@ -249,7 +268,11 @@ public class StoreImpl implements Store {
 	}
 
 	public String getBasicStatsTable() {
-		return basicStatsTable;
+		if (storeBackend == Backend.bigquery) {
+			return schemaName + "." + basicStatsTable;
+		} else {
+			return basicStatsTable;
+		}
 	}
 
 	public void setBasicStatsTable(String basicStatsTable) {
@@ -257,7 +280,11 @@ public class StoreImpl implements Store {
 	}
 
 	public String getTopKStatsTable() {
-		return topKStatsTable;
+		if (storeBackend == Backend.bigquery) {
+			return schemaName + "." + topKStatsTable;
+		} else {
+			return topKStatsTable;
+		}
 	}
 
 	public void setTopKStatsTable(String topKStatsTable) {
@@ -297,7 +324,11 @@ public class StoreImpl implements Store {
 	}
 
 	public String getDataTypeTable() {
-		return datatype;
+		if (storeBackend == Backend.bigquery) {
+			return schemaName + "." + datatype;
+		} else {
+			return datatype;
+		}
 	}
 
 	public void setDatatypeTable(String datatype) {
@@ -372,6 +403,11 @@ public class StoreImpl implements Store {
 
 	public void setHasGraphs(boolean hasGraphs) {
 		this.hasGraphs = hasGraphs;
+	}
+
+	@Override
+	public IntSet getAccessMethods() {
+		return accessMask;
 	}
 
 }

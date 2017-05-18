@@ -37,14 +37,14 @@ public class UpdateRdfStoreStats extends AbstractRdfCommand {
 			StoreManager.runStats(conn, Backend.valueOf(params.get("-backend")), params.get("-schema"), storeName, Context.defaultContext);
 		}
 		catch(RdfStoreException e) {
-			log.error(e);
 			e.printStackTrace();
 			System.out.println(e.getLocalizedMessage());
+			log.error(e);
 		}
 		catch(Exception e) {
-			log.error(e);
 			e.printStackTrace();
 			System.out.println(e.getLocalizedMessage());
+			log.error(e);
 		}
 	}
 		

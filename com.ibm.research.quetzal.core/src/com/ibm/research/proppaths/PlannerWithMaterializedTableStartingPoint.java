@@ -25,6 +25,7 @@ import com.ibm.research.rdf.store.sparql11.planner.Planner;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.graph.NumberedGraph;
+import com.ibm.wala.util.intset.IntSet;
 
 public class PlannerWithMaterializedTableStartingPoint extends Planner {
 
@@ -146,13 +147,13 @@ public class PlannerWithMaterializedTableStartingPoint extends Planner {
 	
 	protected MaterializedTableKey materializedTableKey;
 	
-	public PlannerWithMaterializedTableStartingPoint(PlanNode materializedTable) {
-		super();
+	public PlannerWithMaterializedTableStartingPoint(IntSet accessMask, PlanNode materializedTable) {
+		super(accessMask);
 		materializedTableKey = materializedTable!=null? new MaterializedTableKey(materializedTable): null;
 	}
 
-	public PlannerWithMaterializedTableStartingPoint(PlanNodeCreator planFactory, PlanNode materializedTable) {
-		super(planFactory, true);
+	public PlannerWithMaterializedTableStartingPoint(IntSet accessMask, PlanNodeCreator planFactory, PlanNode materializedTable) {
+		super(planFactory, true, accessMask);
 		materializedTableKey =  materializedTable!=null? new MaterializedTableKey(materializedTable): null;
 	}
 

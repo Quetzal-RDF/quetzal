@@ -19,10 +19,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.ibm.research.proppaths.CTEToNestedQueryConverter;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.Store.Backend;
+import com.ibm.research.rdf.store.Store.PredicateTable;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.config.Statistics;
 import com.ibm.research.rdf.store.config.StatisticsImpl;
@@ -101,13 +104,18 @@ public class DbBasedStatisticsMgr
    private boolean isDB2Engine() {
 	   return  this.backend == Store.Backend.db2;
    }
+   private boolean isBigQueryEngine() {
+	   return this.backend == Store.Backend.bigquery;
+   }
+   
    private void populateTopKStats()
       {
 	  boolean sharkEngine = isSharkEngine();
+	  boolean bigQueryEngine = isBigQueryEngine();
 	  
       // Delete topk stats
       if (!sharkEngine) {
-    	  SQLExecutor.executeUpdate(con, "delete from " + store.getTopKStatsTable());
+    	  SQLExecutor.executeUpdate(con, "delete from " + store.getTopKStatsTable() + " where 1=1");
       } else {
     	  //delete is only supported starting at hive 0.14
     	  
@@ -179,31 +187,33 @@ public class DbBasedStatisticsMgr
       }
 
       // Top Graphs
-      query = new StringBuffer();
-      if (!sharkEngine) {
-    	  query.append(topKInsert.replaceFirst("%c", "TYPE, GRAPH"));
-      } else {
-    	  query.append(topKInsert);
-      }
-      query.append(sharkEngine?"select 'graph', GID, 'null', 'null', 'null', count(*) as COUNT ": "select 'graph',gid,count(*) as COUNT ")
-      	   .append(" from " + store.getDirectSecondary() + " group by GID having count(*) > "
-            + String.valueOf(Constants.LID_COUNT_THRESHOLD / store.getDPrimarySize())
-            + " order by "
-            +(sharkEngine? " count ": " count(*) ")
-            +(sharkEngine? " limit 5000": "fetch first 5000 rows only"));
-      try {
-    	  SQLExecutor.executeUpdate(con, query.toString());
-      } catch (RuntimeException e) {
-    	  if (isSharkEngine()
-				   && (e.getCause() instanceof SQLException)
-					&& ((SQLException) e.getCause()).getErrorCode() == -101) {
-					e.printStackTrace();
-					
-			} else {
-				throw e;
-			}
-      }
+      if (! bigQueryEngine) {
+    	  query = new StringBuffer();
+    	  if (!sharkEngine) {
+    		  query.append(topKInsert.replaceFirst("%c", "TYPE, GRAPH"));
+    	  } else {
+    		  query.append(topKInsert);
+    	  }
+    	  query.append(sharkEngine?"select 'graph', GID, 'null', 'null', 'null', count(*) as COUNT ": "select 'graph',gid,count(*) as COUNT ")
+    	  .append(" from " + store.getDirectSecondary() + " group by GID having count(*) > "
+    			  + String.valueOf(Constants.LID_COUNT_THRESHOLD / store.getDPrimarySize())
+    			  + " order by "
+    			  +(sharkEngine? " count ": " count(*) ")
+    			  +(sharkEngine? " limit 5000": "fetch first 5000 rows only"));
+    	  try {
+    		  SQLExecutor.executeUpdate(con, query.toString());
+    	  } catch (RuntimeException e) {
+    		  if (isSharkEngine()
+    				  && (e.getCause() instanceof SQLException)
+    				  && ((SQLException) e.getCause()).getErrorCode() == -101) {
+    			  e.printStackTrace();
 
+    		  } else {
+    			  throw e;
+    		  }
+    	  }
+      }
+      
       // Number of triples
       query = new StringBuffer();
       if (sharkEngine) {
@@ -219,8 +229,11 @@ public class DbBasedStatisticsMgr
 
    private String getTopEntities(boolean direct)
       {
+	   String type = (direct ? "'subj'" : "'obj'");
+	   if (isBigQueryEngine()) {
+		   return flipPrimaryComponent(direct, "SELECT " + type + " as type, entry AS entity, count(*) as count ", false) + " group by entry";
+	   }
 	  boolean sharkEngine = isSharkEngine();
-      String type = (direct ? "'subj'" : "'obj'");
       String secondary = direct ? store.getDirectSecondary() : store.getReverseSecondary();
       String preds = store.getSchemaName() + "." + store.getStoreName() + "_" + (direct ? "direct" : "reverse") + "_preds";
       String ret= "WITH Q0 AS (select entity, count(*) as count from " + secondary + " group by entity)," + "Q1 AS ("
@@ -252,6 +265,10 @@ public class DbBasedStatisticsMgr
 
    private String getQueryForTopPredicates()
       {
+	   if (isBigQueryEngine()) {
+		   return flipPrimaryComponent(true, "SELECT 'pred' as type, prop AS predicate, count(*) as count ", false) + " group by prop";
+	   }
+
 	   boolean sharkEngine = isSharkEngine();
       StringBuffer query = new StringBuffer();
       query.append("WITH Q0 AS (");
@@ -289,7 +306,10 @@ public class DbBasedStatisticsMgr
          {
          SQLExecutor.executeUpdate(con, "delete from " + store.getSchemaName() + "." + store.getBasicStatsTable());
          }
-      else if (!isSharkEngine())
+      else if (isBigQueryEngine()) {
+          SQLExecutor.executeUpdate(con, "delete from " + store.getBasicStatsTable() + " where 1=1");    	  
+      
+      } else if (!isSharkEngine())
          {
     	  
     	  SQLExecutor.executeUpdate(con, "delete from " + store.getBasicStatsTable());
@@ -312,37 +332,39 @@ public class DbBasedStatisticsMgr
 
       System.err.println("Total number of values in DPH " + nrTriples);
 
-      // Total number of triples = Total number of values in DPH
-      // + ( Total records in DS - Unique lids in DS)
-      nrTriples += new SQLExecutor().executeQuery(con,
-            "SELECT (-COUNT(DISTINCT list_id) + COUNT(*) ) AS COUNT FROM " + store.getDirectSecondary(),
-            new SingleRowResultSetProcessor<Integer>()
-               {
-                  public Integer processRow(Connection conn, ResultSet rs) throws SQLException
-                     {
-                     return rs.getInt("COUNT");
-                     }
-               });
-
-      System.err.println("Total number of values in DPH + ( Total records in DS - Unique lids in DS) " + nrTriples);
-
       // Distinct Graphs
       String distinctCountQuery = Sqls.getSqls(this.backend).getSql("distinctCountQuery");
 
-      distinctGraphs = new SQLExecutor().executeQuery(con, distinctCountQuery.replaceFirst("%table", store.getDirectPrimary())
-            .replaceFirst("%type", Constants.NAME_COLUMN_GRAPH_ID), new SingleRowResultSetProcessor<Integer>()
-         {
-            public Integer processRow(Connection conn, ResultSet rs) throws SQLException
-               {
-               return rs.getInt("COUNT");
-               }
-         });
+      if (store.getStoreBackend() != Backend.bigquery) {
+    	  // Total number of triples = Total number of values in DPH
+    	  // + ( Total records in DS - Unique lids in DS)
+    	  nrTriples += new SQLExecutor().executeQuery(con,
+    			  "SELECT (-COUNT(DISTINCT list_id) + COUNT(*) ) AS COUNT FROM " + store.getDirectSecondary(),
+    			  new SingleRowResultSetProcessor<Integer>()
+    	  {
+    		  public Integer processRow(Connection conn, ResultSet rs) throws SQLException
+    		  {
+    			  return rs.getInt("COUNT");
+    		  }
+    	  });
 
-      System.err.println("Distinct Graphs " + distinctGraphs);
+    	  System.err.println("Total number of values in DPH + ( Total records in DS - Unique lids in DS) " + nrTriples);
 
+    	  distinctGraphs = new SQLExecutor().executeQuery(con, distinctCountQuery.replaceFirst("%table", store.getDirectPrimary())
+    			  .replaceFirst("%type", Constants.NAME_COLUMN_GRAPH_ID), new SingleRowResultSetProcessor<Integer>()
+    	  {
+    		  public Integer processRow(Connection conn, ResultSet rs) throws SQLException
+    		  {
+    			  return rs.getInt("COUNT");
+    		  }
+    	  });
+
+    	  System.err.println("Distinct Graphs " + distinctGraphs);
+      }
+      
       // Distinct Subjects
       distinctSubjects = new SQLExecutor().executeQuery(con, distinctCountQuery.replaceFirst("%table", store.getDirectPrimary())
-            .replaceFirst("%type", Constants.NAME_COLUMN_ENTRY), new SingleRowResultSetProcessor<Integer>()
+            .replaceFirst("%type", store.getStoreBackend()==Backend.bigquery? "subject": Constants.NAME_COLUMN_ENTRY), new SingleRowResultSetProcessor<Integer>()
          {
             public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                {
@@ -352,18 +374,22 @@ public class DbBasedStatisticsMgr
 
       System.err.println("Distinct Subjects " + distinctSubjects);
 
-      // Distinct Objects
-      distinctObjects = new SQLExecutor().executeQuery(con, distinctCountQuery.replaceFirst("%table", store.getReversePrimary())
-            .replaceFirst("%type", Constants.NAME_COLUMN_ENTRY), new SingleRowResultSetProcessor<Integer>()
-         {
-            public Integer processRow(Connection conn, ResultSet rs) throws SQLException
-               {
-               return rs.getInt("COUNT");
-               }
-         });
+      if (store.getStoreBackend() != Backend.bigquery) {
+    	  // Distinct Objects
+    	  distinctObjects = 
+    		new SQLExecutor()
+    			.executeQuery(con, distinctCountQuery.replaceFirst("%table", store.getReversePrimary())
+    			.replaceFirst("%type", Constants.NAME_COLUMN_ENTRY), new SingleRowResultSetProcessor<Integer>()
+    	  {
+    		  public Integer processRow(Connection conn, ResultSet rs) throws SQLException
+    		  {
+    			  return rs.getInt("COUNT");
+    		  }
+    	  });
 
-      System.err.println("Distinct Objects " + distinctObjects);
-
+    	  System.err.println("Distinct Objects " + distinctObjects);
+      }
+      
       // Insert into basic stats table
       String insertBasics = Sqls.getSqls(this.backend).getSql("insertBasicStats").replaceFirst("%s", store.getBasicStatsTable());
 
@@ -602,8 +628,56 @@ public class DbBasedStatisticsMgr
       int maxPreds = (direct) ? store.getDPrimarySize() : store.getRPrimarySize();
       query.append(" FROM \n");
 
-      if (isPostgresqlEngine())
-         {
+      if (isBigQueryEngine()) {
+    	  List<String> onePreds = new LinkedList<String>();    	  
+    	  List<String> multiPreds = new LinkedList<String>();
+    	  PredicateTable preds = store.getDirectPredicates();
+    	  preds.predicates().forEach((String p) -> {
+    		if (preds.isOneToOne(p)) {
+    			onePreds.add(p);
+    		} else {
+    			multiPreds.add(p);
+    		}
+    	  });
+    	      
+    	  query.append("(");
+    	  boolean first = true;
+    	  for(String p : multiPreds) {
+    		  if (! first) {
+    			  query.append(" UNION ALL ");
+    		  }
+    		  query.append("SELECT subject as " + (direct? "entry": "val") + ", \"" + p + "\" AS prop, " + 
+    				       (direct? "val": "val as entry") + " " +
+    		               "FROM " + store.getDirectPrimary() +  " " + 		
+    				  	   "cross join unnest(col_" + preds.getHashes(p)[0] + ") as val " +
+     		               "WHERE col_" + preds.getHashes(p)[0] + " is not null ");
+    	   	    		  first = false;
+    	  }
+    	  if (onePreds.size() > 0) {
+       		  if (! first) {
+    			  query.append(" UNION ALL ");
+    		  }
+       		  
+       		  query.append("SELECT subject as " + (direct? "entry": "val") + 
+       				       ", s.prop as prop, s.val as " + (direct? "val": "entry") + 
+       				       " from (select subject, [");
+       		  
+      		  first = true;
+      		  for(String p : onePreds) {
+      			  if (! first) {
+      				  query.append(",");
+      			  }
+      			  first = false;
+      			  query.append("struct(").append('"').append(p).append('"').append(" as prop, ");
+      			  query.append("col_").append(preds.getHashes(p)[0]).append(" as val)");
+      		  }
+ 
+      		  query.append("] as data from " + store.getDirectPrimary());
+      		  query.append(") t cross join unnest(t.data) as s where s.val is not null");
+    	  }
+    	  query.append(")");
+    	  
+      } else if (isPostgresqlEngine()) {
          query.append(" (SELECT ENTRY, GID, UNNEST(ARRAY_REMOVE(ARRAY[");
          int nrPreds = 0;
          for (; nrPreds < maxPreds; nrPreds++)

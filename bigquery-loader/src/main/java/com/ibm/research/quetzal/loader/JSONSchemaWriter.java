@@ -1,7 +1,6 @@
 package com.ibm.research.quetzal.loader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.Enumeration;
 import java.util.Properties;

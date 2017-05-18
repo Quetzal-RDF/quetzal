@@ -22,9 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.ibm.iodt.sor.db.sql.CreatableTable;
-import com.ibm.iodt.sor.db.sql.DatatypeFactory;
-import com.ibm.iodt.sor.db.sql.Table;
 import com.ibm.research.owlql.rule.AtomicFormula;
 import com.ibm.research.owlql.rule.ConstantExpr;
 import com.ibm.research.owlql.rule.Expr;
