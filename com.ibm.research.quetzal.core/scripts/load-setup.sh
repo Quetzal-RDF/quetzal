@@ -34,7 +34,7 @@ else
 	ClassPath=$CLASSPATH
 fi
 
-while [[ $# > 0 && "--" = `expr substr $1 1 2` ]]; do
+while [[ $# > 0 && 2 = `expr $1 : '[-][-]'` ]]; do
     if [[ $1 == "--hashing" ]]; then
 	shift
 	COLOR="false"

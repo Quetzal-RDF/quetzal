@@ -19,11 +19,11 @@ j=0
 (while expr $i '>' 0 > /dev/null; do
   i=`expr $i - $CHUNK`
   if expr $i '<' 0 > /dev/null; then
-      echo cat $FILE "|" gawk -v splitFor=$SPLIT -v pawk=yes -v last=yes -v part=$j -v chunk=`expr $i + $CHUNK` -f $DIR/strings.awk -f $DIR/parse.awk -f $DIR/$AWK_FILE "$@"
+      echo -n cat $FILE "|" gawk -v splitFor=$SPLIT -v pawk=yes -v last=yes -v part=$j -v chunk=`expr $i + $CHUNK` -f $DIR/strings.awk -f $DIR/parse.awk -f $DIR/$AWK_FILE "$@" "\0"
   else
-      echo tail --bytes=$i $FILE "|" gawk -v splitFor=$SPLIT -v pawk=yes -v part=$j -v chunk=$CHUNK -f $DIR/strings.awk -f $DIR/parse.awk -f $DIR/$AWK_FILE "$@" 
+      echo -n tail --bytes=$i $FILE "|" gawk -v splitFor=$SPLIT -v pawk=yes -v part=$j -v chunk=$CHUNK -f $DIR/strings.awk -f $DIR/parse.awk -f $DIR/$AWK_FILE "$@" "\0"
   fi
   j=`expr $j + 1`
-done) | xargs -d '\n' -n 1 -P $DEGREE sh -c
+done) | xargs -0 -n 1 -P $DEGREE sh -c
 
 
