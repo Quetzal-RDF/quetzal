@@ -2198,7 +2198,9 @@ public class Planner {
 		
 			if (GATHER_STARS) {
 				result.addAll(gatherStars(region, availableVars, neededKeys, true, walker));
-				result.addAll(gatherStars(region, availableVars, neededKeys, false, walker));
+				if (reversePreds != null) {
+					result.addAll(gatherStars(region, availableVars, neededKeys, false, walker));
+				}
 			}
 			
 			return result;
@@ -3103,7 +3105,7 @@ public class Planner {
 			for(QueryTriple t : ((SimplePattern)p).getQueryTriples()) {
 				if (t.getPredicate().isIRI() &&
 					(forwardPreds.getHashes(t.getPredicate().getIRI().getValue()) == null ||
-					reversePreds.getHashes(t.getPredicate().getIRI().getValue()) == null)) {
+					(reversePreds != null && reversePreds.getHashes(t.getPredicate().getIRI().getValue()) == null))) {
 					System.out.println("WARNING: " + t.getPredicate().getIRI().getValue() + " does not appear in the database");
 					return true;
 				}

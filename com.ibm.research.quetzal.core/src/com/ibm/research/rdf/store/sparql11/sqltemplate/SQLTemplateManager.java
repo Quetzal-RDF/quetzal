@@ -39,8 +39,12 @@ public class SQLTemplateManager
             {
             configStream = SQLTemplateManager.class.getResourceAsStream("PSQLSQLTemplates");
             }
-         else if (store.getStoreBackend() == Store.Backend.shark) {
+         else if (store.getStoreBackend() == Store.Backend.bigquery) {
+        	 configStream = SQLTemplateManager.class.getResourceAsStream("BigQuerySQLTemplates");
+         } else if (store.getStoreBackend() == Store.Backend.shark) {
         	 configStream = SQLTemplateManager.class.getResourceAsStream("SharkSQLTemplates");
+         } else {
+        	 assert false : "need template file";
          }
          
          SequenceInputStream s = new SequenceInputStream(SQLTemplateManager.class.getResourceAsStream("common.stg"), configStream);

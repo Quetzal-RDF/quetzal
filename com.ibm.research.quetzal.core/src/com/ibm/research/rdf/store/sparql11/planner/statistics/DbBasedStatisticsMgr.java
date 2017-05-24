@@ -231,7 +231,7 @@ public class DbBasedStatisticsMgr
       {
 	   String type = (direct ? "'subj'" : "'obj'");
 	   if (isBigQueryEngine()) {
-		   return flipPrimaryComponent(direct, "SELECT " + type + " as type, entry AS entity, count(*) as count ", false) + " group by entry";
+		   return flipPrimaryComponent(direct, "SELECT " + type + " as type, entry AS entity, count(*) as count ", false) + " group by entry having count > 100";
 	   }
 	  boolean sharkEngine = isSharkEngine();
       String secondary = direct ? store.getDirectSecondary() : store.getReverseSecondary();
@@ -386,9 +386,21 @@ public class DbBasedStatisticsMgr
     			  return rs.getInt("COUNT");
     		  }
     	  });
-
-    	  System.err.println("Distinct Objects " + distinctObjects);
+      } else {
+    	  StringBuffer toq = new StringBuffer();
+    	  toq.append(flipPrimaryComponent(true, "SELECT COUNT(distinct val) AS COUNT ", true));
+    	  System.err.println(query);
+    	  distinctObjects = new SQLExecutor().executeQuery(con, toq.toString(), new SingleRowResultSetProcessor<Integer>()
+    	  {
+    		  public Integer processRow(Connection conn, ResultSet rs) throws SQLException
+    		  {
+    			  return rs.getInt("COUNT");
+    		  }
+    	  });
       }
+
+      System.err.println("Distinct Objects " + distinctObjects);
+      
       
       // Insert into basic stats table
       String insertBasics = Sqls.getSqls(this.backend).getSql("insertBasicStats").replaceFirst("%s", store.getBasicStatsTable());
