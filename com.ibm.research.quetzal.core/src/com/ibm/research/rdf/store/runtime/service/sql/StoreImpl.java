@@ -197,6 +197,9 @@ public class StoreImpl implements Store {
 				dataTypesFile = BigQueryDatatypesFile;
 				accessMask = IntSetUtil.make();
 				((MutableIntSet)accessMask).add(QueryTripleNode.DPH);
+				((MutableIntSet)accessMask).add(QueryTripleNode.FILTER_DPH);
+				((MutableIntSet)accessMask).add(QueryTripleNode.SCAN);
+
 			}
 			else {
 				templatesFile = DB2templatesFile;

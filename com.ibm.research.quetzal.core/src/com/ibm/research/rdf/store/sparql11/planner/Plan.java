@@ -475,7 +475,7 @@ public static AccessMethod getSTAccessMethod(QueryTriple triple,
 			}
 		}
 		
-		boolean revOneToOne =n.getQueryTriple().getPredicate().isIRI()? revPreds.isOneToOne(n.getQueryTriple().getPredicate().getIRI().getValue()): false;
+		boolean revOneToOne = revPreds != null && n.getQueryTriple().getPredicate().isIRI()? revPreds.isOneToOne(n.getQueryTriple().getPredicate().getIRI().getValue()): false;
 		
 		am = new AccessMethod(revOneToOne || (needObject&&!needSubject)? AccessMethodType.RPH_SCAN: AccessMethodType.DPH_SCAN,
 				new com.ibm.research.rdf.store.schema.Pair<Double>(Double.MAX_VALUE,

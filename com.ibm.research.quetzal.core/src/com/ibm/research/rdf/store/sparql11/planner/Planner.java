@@ -112,7 +112,7 @@ public class Planner {
 	}
 
 	public Planner(IntSet accessMethodMask) {
-		this(true, fullMask());
+		this(true, accessMethodMask);
 	}
 
 	public Planner(boolean checkMinus, IntSet accessMethodMask) {
