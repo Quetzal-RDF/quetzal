@@ -54,6 +54,14 @@ public class DphSchemaJDBC {
 			if (! rs.getBoolean("onetoone")) {
 				x.setMode("REPEATED");
 			}
+
+			x = new TableFieldSchema();
+			fields.add(x);
+			x.setName("typ_" + rs.getInt("hash0"));
+			x.setType("INTEGER");
+			if (! rs.getBoolean("onetoone")) {
+				x.setMode("REPEATED");
+			}
 		}
 		connection.close();
 

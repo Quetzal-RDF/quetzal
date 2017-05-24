@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -69,6 +68,7 @@ import com.ibm.research.rdf.store.Store.Db2Type;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap.TypeCategory;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMapForLoader;
+import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 
 /**
@@ -124,7 +124,7 @@ public class BigQueryLoader {
 		private static final long serialVersionUID = -3923823265301357082L;		
 	};
 	
-	private static final TupleTag<KV<String, KV<String, String>>> entities = new TupleTag<KV<String, KV<String, String>>>() {
+	private static final TupleTag<KV<String, KV<String, KV<String, Short>>>> entities = new TupleTag<KV<String, KV<String, KV<String, Short>>>>() {
 		private static final long serialVersionUID = 8665879349850405191L;
 	};
 
@@ -170,10 +170,10 @@ public class BigQueryLoader {
 	/**
 	 * Concept #2: You can make your pipeline assembly code less verbose by
 	 * defining your DoFns statically out-of-line. This DoFn tokenizes RDF
-	 * triples into subject -> (predicate, value) pairs we pass it to a ParDo in
+	 * triples into subject -> (predicate, value) KVs we pass it to a ParDo in
 	 * the pipeline.
 	 */
-	static class ExtractSubjectTriplesFn extends DoFn<String, KV<String, KV<String, String>>> {
+	static class ExtractSubjectTriplesFn extends DoFn<String, KV<String, KV<String, KV<String, Short>>>> {
 
 		/**
 		 * 
@@ -198,21 +198,29 @@ public class BigQueryLoader {
 			} catch (RDFHandlerException e) {
 				System.err.println("skipping " + words + ":" + e);
 			}
-			// Output each subject, with a set of pairs of predicate values per
+			// Output each subject, with a set of KVs of predicate values per
 			// subject encountered into the output PCollection.
 			for (Statement s : myList) {
-				c.output(
-						KV.of(s.getSubject().toString(), KV.of(s.getPredicate().toString(), s.getObject().toString())));
+				short code = TypeMap.IRI_ID;
+				
 				if (s.getObject() instanceof Literal) {
 					Literal l = (Literal) s.getObject();
+		
 					if (l.getLanguage() != null) {
-						c.sideOutput(languages, l.getLanguage().toString());
+						String langStr = l.getLanguage().toString();
+						TypeMapForLoader.ensureLanguage(langStr);
+						code = TypeMap.getLanguageType(langStr);
+						
+						c.sideOutput(languages, langStr);
 						c.sideOutput(predicateType, KV.of(s.getPredicate().toString(), Db2Type.VARCHAR));
 					}
+					
 					if (l.getDatatype() != null) {
-						c.sideOutput(datatypes, l.getDatatype().toString());
+						String typeStr = l.getDatatype().toString();
+						c.sideOutput(datatypes, typeStr);
 						
-						short code = TypeMap.idForIRI(l.getDatatype().toString());
+						TypeMapForLoader.ensureType(typeStr);
+						code = TypeMap.idForIRI(typeStr);
 						TypeCategory category = TypeMap.getTypeCategory(code);
 		
 						switch (category) {
@@ -228,6 +236,13 @@ public class BigQueryLoader {
 							break;
 						}
 					}
+				
+					c.output(
+						KV.of(s.getSubject().toString(), KV.of(s.getPredicate().toString(), KV.of(l.stringValue(), code))));
+				
+				} else {
+					c.output(
+						KV.of(s.getSubject().toString(), KV.of(s.getPredicate().toString(), KV.of(s.getObject().toString(), code))));					
 				}
 			}
 		}
@@ -237,7 +252,7 @@ public class BigQueryLoader {
 	 * Create JSON representation per subject based on keys
 	 */
 
-	public static class CreateJSONPerSubject extends DoFn<KV<String, Iterable<KV<String, String>>>, JSONObject> {
+	public static class CreateJSONPerSubject extends DoFn<KV<String, Iterable<KV<String, KV<String, Short>>>>, JSONObject> {
 
 		private final PCollectionView<JSONObject> predicateMapping;
 
@@ -265,33 +280,39 @@ public class BigQueryLoader {
 		@SuppressWarnings("unchecked")
 		@ProcessElement
 		public void processElement(ProcessContext c) {
-			KV<String, Iterable<KV<String, String>>> input = c.element();
+			KV<String, Iterable<KV<String, KV<String, Short>>>> input = c.element();
 			String subject = input.getKey();
 
 			JSONObject predTable = c.sideInput(predicateMapping);
 
 			JSONObject all = new JSONObject();
-			HashMap<String, HashSet<String>> map = new HashMap<String, HashSet<String>>();
+			HashMap<String, Set<KV<String,Short>>> map = HashMapFactory.make();
 
-			for (KV<String, String> item: input.getValue()) {
+			for (KV<String, KV<String, Short>> item: input.getValue()) {
 				if (!map.containsKey(item.getKey())) {
-					map.put(item.getKey(), new HashSet<String>());
+					map.put(item.getKey(), HashSetFactory.make());
 				}
-				Set<String> l = map.get(item.getKey());
-				l.add(item.getValue().replaceAll("\"", "\\\\\""));
+				Set<KV<String, Short>> l = map.get(item.getKey());
+				l.add(KV.of(item.getValue().getKey().replaceAll("\"", "\\\\\""), item.getValue().getValue()));
 			}
 
-			for (Map.Entry<String, HashSet<String>> e: map.entrySet()) {
+			for (Map.Entry<String, Set<KV<String,Short>>> e: map.entrySet()) {
 				boolean multiple = (boolean) predTable.get(e.getKey());
 				String colName = "col_" + index(e.getKey(), predTable);
-				Set<String> l = e.getValue(); 
+				String typeName = "typ_" + index(e.getKey(), predTable);
+				Set<KV<String, Short>> l = e.getValue(); 
 				assert !l.isEmpty();
 				if (! multiple) {
-					all.put(colName, l.iterator().next());
+					all.put(colName, l.iterator().next().getKey());
+					all.put(typeName, l.iterator().next().getValue());
 				} else {
 					JSONArray a = new JSONArray();
-					l.forEach((String p) -> { a.add(p); });
+					l.forEach((KV<String,Short> p) -> { a.add(p.getKey()); });
 					all.put(colName, a);
+
+					JSONArray b = new JSONArray();
+					l.forEach((KV<String,Short> p) -> { b.add(p.getValue()); });
+					all.put(typeName, b);	
 				}
 			}
 			all.put("subject", subject);
@@ -499,9 +520,9 @@ public class BigQueryLoader {
 		PCollectionTuple triples = p.apply("ReadLines", reader)
 				.apply(ParDo.of(new ExtractSubjectTriplesFn())
 						.withOutputTags(entities, TupleTagList.of(Arrays.asList(datatypes, languages, predicateType))));
-		PCollection<KV<String, Iterable<KV<String, String>>>> subjectGroups = triples
+		PCollection<KV<String, Iterable<KV<String, KV<String,Short>>>>> subjectGroups = triples
 				.get(entities)
-				.apply("Group by Key", GroupByKey.<String, KV<String, String>>create());
+				.apply("Group by Key", GroupByKey.<String, KV<String, KV<String,Short>>>create());
 
 		// build mapping of types for predicates
 		PCollectionView<JSONObject> predicateTypes = triples.get(predicateType)
@@ -529,15 +550,15 @@ public class BigQueryLoader {
 		
 		// 2. collect set of predicates as JSON object, mapping predicates to column numbers
 		@SuppressWarnings("unchecked")
-		PCollection<JSONObject> predCollection = subjectGroups.apply("get pred JSON", ParDo.of(new DoFn<KV<String, Iterable<KV<String, String>>>, JSONObject>() {
+		PCollection<JSONObject> predCollection = subjectGroups.apply("get pred JSON", ParDo.of(new DoFn<KV<String, Iterable<KV<String, KV<String, Short>>>>, JSONObject>() {
 			private static final long serialVersionUID = -6915154158686774192L;
 			@ProcessElement
 			public void processElement(ProcessContext c) {
-				KV<String, Iterable<KV<String, String>>> input = c.element();
+				KV<String, Iterable<KV<String, KV<String, Short>>>> input = c.element();
 
 				Set<String> once = HashSetFactory.make();
 				Set<String> twice = HashSetFactory.make();
-				for(KV<String,String> y : input.getValue()) {
+				for(KV<String, KV<String, Short>> y : input.getValue()) {
 					if (once.contains(y.getKey())) {
 						twice.add(y.getKey());
 					} else {
