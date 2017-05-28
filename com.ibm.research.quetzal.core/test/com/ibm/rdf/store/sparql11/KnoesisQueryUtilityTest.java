@@ -37,7 +37,7 @@ public class KnoesisQueryUtilityTest<D> extends TestRunner<D> {
 		private static final BigQueryEngine engine = new BigQueryEngine();
 		
 		public BigQueryKnoesisTests() {
-			super(data, engine, new int[]{ -1 });
+			super(data, engine, new int[]{ 9757 });
 		}
 	}
 
