@@ -65,6 +65,7 @@ import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.ibm.research.rdf.store.Store.Db2Type;
+import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap.TypeCategory;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMapForLoader;
@@ -298,8 +299,8 @@ public class BigQueryLoader {
 
 			for (Map.Entry<String, Set<KV<String,Short>>> e: map.entrySet()) {
 				boolean multiple = (boolean) predTable.get(e.getKey());
-				String colName = "col_" + index(e.getKey(), predTable);
-				String typeName = "typ_" + index(e.getKey(), predTable);
+				String colName = Constants.NAME_COLUMN_PREFIX_VALUE + index(e.getKey(), predTable);
+				String typeName = Constants.NAME_COLUMN_PREFIX_TYPE + index(e.getKey(), predTable);
 				Set<KV<String, Short>> l = e.getValue(); 
 				assert !l.isEmpty();
 				if (! multiple) {
@@ -315,7 +316,7 @@ public class BigQueryLoader {
 					all.put(typeName, b);	
 				}
 			}
-			all.put("subject", subject);
+			all.put(Constants.NAME_COLUMN_ENTRY, subject);
 			c.output(all);
 		}
 	}

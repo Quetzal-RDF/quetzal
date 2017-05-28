@@ -364,7 +364,7 @@ public class DbBasedStatisticsMgr
       
       // Distinct Subjects
       distinctSubjects = new SQLExecutor().executeQuery(con, distinctCountQuery.replaceFirst("%table", store.getDirectPrimary())
-            .replaceFirst("%type", store.getStoreBackend()==Backend.bigquery? "subject": Constants.NAME_COLUMN_ENTRY), new SingleRowResultSetProcessor<Integer>()
+            .replaceFirst("%type", Constants.NAME_COLUMN_ENTRY), new SingleRowResultSetProcessor<Integer>()
          {
             public Integer processRow(Connection conn, ResultSet rs) throws SQLException
                {
@@ -658,21 +658,21 @@ public class DbBasedStatisticsMgr
     		  if (! first) {
     			  query.append(" UNION ALL ");
     		  }
-    		  query.append("SELECT subject as " + (direct? "entry": "val") + ", \"" + p + "\" AS prop, " + 
+    		  query.append("SELECT " + (direct? "entry": "entry as val") + ", \"" + p + "\" AS prop, " + 
     				       (direct? "val": "val as entry") + " " +
     		               "FROM " + store.getDirectPrimary() +  " " + 		
-    				  	   "cross join unnest(col_" + preds.getHashes(p)[0] + ") as val " +
-     		               "WHERE col_" + preds.getHashes(p)[0] + " is not null ");
-    	   	    		  first = false;
+    				  	   "cross join unnest(val" + preds.getHashes(p)[0] + ") as val " +
+     		               "WHERE val" + preds.getHashes(p)[0] + " is not null ");
+    		  first = false;
     	  }
     	  if (onePreds.size() > 0) {
        		  if (! first) {
     			  query.append(" UNION ALL ");
     		  }
        		  
-       		  query.append("SELECT subject as " + (direct? "entry": "val") + 
+       		  query.append("SELECT entry as " + (direct? "entry": "val") + 
        				       ", s.prop as prop, s.val as " + (direct? "val": "entry") + 
-       				       " from (select subject, [");
+       				       " from (select entry, [");
        		  
       		  first = true;
       		  for(String p : onePreds) {
@@ -681,7 +681,7 @@ public class DbBasedStatisticsMgr
       			  }
       			  first = false;
       			  query.append("struct(").append('"').append(p).append('"').append(" as prop, ");
-      			  query.append("col_").append(preds.getHashes(p)[0]).append(" as val)");
+      			  query.append("val").append(preds.getHashes(p)[0]).append(" as val)");
       		  }
  
       		  query.append("] as data from " + store.getDirectPrimary());

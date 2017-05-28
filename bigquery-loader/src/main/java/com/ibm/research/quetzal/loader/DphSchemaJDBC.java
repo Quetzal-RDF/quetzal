@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableSchema;
+import com.ibm.research.rdf.store.config.Constants;
 import com.simba.googlebigquery.core.BQConnectionOptions.QueryDialect;
 import com.simba.googlebigquery.jdbc42.DataSource;
 
@@ -40,7 +41,7 @@ public class DphSchemaJDBC {
 		List<TableFieldSchema> fields = new LinkedList<TableFieldSchema>();
 		
 		TableFieldSchema subject = new TableFieldSchema();
-		subject.setName("subject");
+		subject.setName(Constants.NAME_COLUMN_ENTRY);
 		subject.setType("STRING");
 		fields.add(subject);
 		
@@ -49,7 +50,7 @@ public class DphSchemaJDBC {
 		while (rs.next()) {
 			TableFieldSchema x = new TableFieldSchema();
 			fields.add(x);
-			x.setName("col_" + rs.getInt("hash0"));
+			x.setName(Constants.NAME_COLUMN_PREFIX_VALUE + rs.getInt("hash0"));
 			x.setType("STRING");
 			if (! rs.getBoolean("onetoone")) {
 				x.setMode("REPEATED");
@@ -57,7 +58,7 @@ public class DphSchemaJDBC {
 
 			x = new TableFieldSchema();
 			fields.add(x);
-			x.setName("typ_" + rs.getInt("hash0"));
+			x.setName(Constants.NAME_COLUMN_PREFIX_TYPE + rs.getInt("hash0"));
 			x.setType("INTEGER");
 			if (! rs.getBoolean("onetoone")) {
 				x.setMode("REPEATED");

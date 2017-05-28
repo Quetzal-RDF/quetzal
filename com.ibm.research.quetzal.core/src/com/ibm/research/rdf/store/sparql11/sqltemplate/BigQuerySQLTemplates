@@ -1,0 +1,70 @@
+dummy(store_name) ::= << select null where 0 = 1>>
+
+describe(target, entry_constraint, sql_id, columns,s_target)  ::= << 
+ QD<sql_id> AS (SELECT ENTRY AS DESCRIBED_RESOURCE, UNNEST(ARRAY_REMOVE(ARRAY[<columns:{c | prop<c>} ; separator=",">], NULL)) AS PROPERTY, UNNEST(ARRAY_REMOVE(ARRAY[<columns:{c | val<c>} ; separator=",">], NULL)) AS OBJECT, UNNEST(ARRAY_REMOVE(ARRAY[<columns:{c | typ<c>} ; separator=",">], NULL)) AS O_TYP
+ FROM <first(target)>) AS LT <if(rest(target))>, <rest(target)> <endif> 
+ <if(entry_constraint)> WHERE <entry_constraint; separator=" AND "> <endif>),
+QR<sql_id> AS ( SELECT DESCRIBED_RESOURCE, PROPERTY, COALESCE(ELEM, OBJECT) AS OBJECT, COALESCE(TYP, O_TYP) AS TYP
+FROM QD<sql_id> LEFT OUTER JOIN <s_target> ON OBJECT = list_id AND OBJECT LIKE 'lid:%' ORDER BY DESCRIBED_RESOURCE)	   
+>>
+
+sub_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers)  ::= <<  
+<if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
+QS<sql_id> AS (SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM <target> 
+<if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif>
+<if(endModifiers)> <endModifiers> <endif>)
+<if(outerProject)>)<endif>
+>>
+
+
+top_select(outerProject, project, project_alias_name, project_orderby_vars, target,sql_id,distinct,const_filter, endModifiers, store_name)  ::= << 
+<if(outerProject)> SELECT <outerProject; separator=" , "> FROM ( <endif>
+<if(sql_id)> QS<sql_id> AS (<endif>SELECT <if(distinct)> DISTINCT <endif> <project; separator=","> FROM<if(target)> <target> <else> <store_name> <endif> <if(const_filter)> WHERE  <const_filter; separator=" AND "> <endif> 
+<if(endModifiers)> <endModifiers> <endif>
+<if(sql_id)>)<endif>
+<if(outerProject)>) AS outer_<sql_id><endif>
+>>
+
+triple_all_predicates_both(project,target, entry_constraint, graph_constraint,predicate_constraint, sep, val_constraint,pfilter_constraint, sfilter_constraint, sql_id, columns, project_type,s_project, s_target, is_rph,  hasMultipleTargets)  ::= << 
+ Q<sql_id> AS (SELECT <project; separator=",">
+ FROM (SELECT ENTRY, GID, <if(is_rph)> TYP, <endif> UNNEST(ARRAY_REMOVE(ARRAY[<columns:{c | prop<c>} ; separator=",">], NULL)) AS prop, UNNEST(ARRAY_REMOVE(ARRAY[<columns:{c | val<c>} ; separator=",">], NULL)) AS val <if(project_type)>, UNNEST(ARRAY_REMOVE(ARRAY[<columns:{c | typ<c>} ; separator=",">], NULL)) AS typ<endif> 
+      FROM <first(target)>) AS LT <if(rest(target))>, <rest(target)> <endif>
+       WHERE LT.prop IS NOT NULL
+ 	   <if(entry_constraint)> AND <entry_constraint; separator=" AND "> <endif>
+ 	   <if(predicate_constraint)> AND (<predicate_constraint; separator=sep>)<endif>
+ 	   <if(graph_constraint)> AND <graph_constraint; separator=" AND "> <endif>
+ 	   <if(pfilter_constraint)> AND <pfilter_constraint; separator=" AND "> <endif>),
+QS<sql_id> AS ( SELECT <s_project; separator=",">
+FROM Q<sql_id> LEFT OUTER JOIN <s_target> ON ltval = list_id AND ltval LIKE 'lid:%'
+	   <if(sfilter_constraint)> WHERE <sfilter_constraint; separator=" AND "> <endif>
+	   <if(val_constraint)> <if(sfilter_constraint)> AND <else> WHERE <endif> <val_constraint; separator=" AND "> <endif> )	   
+>>
+
+ask(target)  ::= << 
+ SELECT * FROM <target> LIMIT 1
+>>
+
+values(values_project, project, values, sql_id, target, join_constraint, store_name)  ::= << 
+QS<sql_id> AS ( SELECT <project; separator=","> FROM (VALUES <values:{(<it; separator=",">)};separator=",">) AS TEMP(<values_project; separator=",">)
+<if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif> <endif>
+)
+>>
+
+minus(left_project,left_target,right_project,right_target,sql_id)  ::= << 
+QS<sql_id> AS ( SELECT <left_project; separator=","> FROM <left_target> EXCEPT
+SELECT <right_project; separator=","> FROM <right_target>)
+>>
+
+servicePost(firstProjectCols, secondProjectCols, queryText, service, cols, sql_id, join_constraint, target, dtCols, dtConstraints, dtTable, postColumns, postTypes, htmlHeader, indexColumns) ::= <<
+
+QS<sql_id>_INDEX AS (select ROW_NUMBER() OVER () AS index, <indexColumns; separator=","> FROM <target>),
+QS<sql_id>_POST AS (select xmlelement( name "data", xmlagg(xmlelement( name "row" , <postColumns,postTypes:{c,t |xmlelement( name "<c>", xmlattributes( <t> AS "type" ), QS<sql_id>_INDEX.<c>)}; separator=" , "> )))::text AS doc from QS<sql_id>_INDEX),
+QS<sql_id>_RAW AS (select UNNEST( xpath('//s:result', xmlparse( DOCUMENT ( select content from dawg.http_post('<service>', '<queryText>' || (select dawg.urlencode(doc) from QS<sql_id>_POST), 'application/x-www-form-urlencoded'))), ARRAY[ARRAY['s', 'http://www.w3.org/2005/sparql-results#']])) as row), 
+QS<sql_id>_XML AS (select <cols:{c| (xpath('//s:binding[@name="<c>"]//text()', row, ARRAY[ARRAY['s', 'http://www.w3.org/2005/sparql-results#']]))[1]::varchar AS <c>}; separator=",">
+  <if(dtCols)>, <dtCols:{c| (xpath('//s:binding[name="<c>"]//@datatype', row, ARRAY[ARRAY['s', 'http://www.w3.org/2005/sparql-results#']]))[1]::varchar AS <c>_TYP}; separator=","> <endif>
+  FROM QS<sql_id>_RAW),
+QS<sql_id>_TMP AS (SELECT <firstProjectCols; separator=",">
+   FROM QS<sql_id>_XML AS xml, QS<sql_id>_INDEX AS pred WHERE xml.index::int = pred.index),
+QS<sql_id> AS (SELECT <secondProjectCols; separator=","> FROM QS<sql_id>_TMP 
+   <if(target)>,<target> <if(join_constraint)>WHERE <join_constraint; separator=" AND "><endif><endif>)
+>>

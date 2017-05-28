@@ -1,0 +1,12 @@
+prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+prefix obs: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+
+select ?s ?lat ?long
+{
+  ?p geo:lat ?lat .
+  ?p geo:long ?long .
+  ?p a geo:Point .
+  ?s a obs:System .
+  ?s obs:processLocation ?p .
+}
+

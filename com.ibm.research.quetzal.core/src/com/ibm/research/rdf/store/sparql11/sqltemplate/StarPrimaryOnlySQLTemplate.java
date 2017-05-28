@@ -283,9 +283,17 @@ public class StarPrimaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		for(QueryTriple qt : planNode.starTriples){
 			// TODO [Property Path]: Double check with Mihaela that it is fine for propTerm.toSqlDataString() to return null for complex path (ie., same behavior as variable)
 			PropertyTerm  propTerm = qt.getPredicate();
-			propSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_PREDICATE,propTerm.toString())+" = '"+propTerm.toSqlDataString()+"'");
+			propSQLConstraint.add(makePredicateTest(propTerm));
 		}
 		return propSQLConstraint;
+	}
+
+	protected String makePredicateTest(PropertyTerm propTerm) {
+		if (store.getStoreBackend() == Store.Backend.bigquery) {
+			return hashColumnExpression(Constants.NAME_COLUMN_PREFIX_VALUE,propTerm.toString()) + " is not null";
+		} else  {
+			return hashColumnExpression(Constants.NAME_COLUMN_PREFIX_PREDICATE,propTerm.toString())+" = '"+propTerm.toSqlDataString()+"'";
+		}
 	}
 
 	/**
