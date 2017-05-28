@@ -117,7 +117,11 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			if(projectedInSecondary.contains(entryVariable))return null;
 			projectedInSecondary.add(entryVariable);
 			List<String> entrySqlToSparql =  new LinkedList<String>();
-			entrySqlToSparql.add( Constants.NAME_COLUMN_ENTITY+" AS "+entryVariable.getName());
+			if (store.getStoreBackend() == Store.Backend.bigquery) {
+				entrySqlToSparql.add( Constants.NAME_COLUMN_ENTRY+" AS "+entryVariable.getName());				
+			} else {
+				entrySqlToSparql.add( Constants.NAME_COLUMN_ENTITY+" AS "+entryVariable.getName());
+			}
 			String entryType = null;
 			Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 			if(!iriBoundVariables.contains(entryVariable)){
@@ -180,9 +184,13 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			String valType = null;
 			Set<Variable> iriBoundVariables = wrapper.getIRIBoundVariables();
 			if(!iriBoundVariables.contains(valueVariable)){
-				valType = (valueHasSqlType)?Constants.NAME_COLUMN_PREFIX_TYPE:new Short(TypeMap.IRI_ID).toString();
-				valSqlToSparql.add(valType+" AS "+valueVariable.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
+				if (store.getStoreBackend() != Store.Backend.bigquery) {
+					valType = (valueHasSqlType)?Constants.NAME_COLUMN_PREFIX_TYPE:new Short(TypeMap.IRI_ID).toString();
+				} else {
+					valType = "T.typ" + getColumnIndex() + "[offset(type_offset)]";
+				}
 				
+				valSqlToSparql.add(valType+" AS "+valueVariable.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 			}
 			return valSqlToSparql;
 		}
@@ -220,7 +228,11 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 		
 	private List<String> getTargetSQLClause(){
 		List<String> targetSQLClause = new LinkedList<String>();
-		if(AccessMethodType.isDirectAccess(planNode.getMethod().getType())){
+		if (store.getStoreBackend() == Store.Backend.bigquery) {
+			targetSQLClause.add(store.getDirectPrimary()+" AS T");				
+			targetSQLClause.add("unnest(T.val" + getColumnIndex() + ") as elem with offset type_offset");
+		} 
+		else if(AccessMethodType.isDirectAccess(planNode.getMethod().getType())){
 			targetSQLClause.add(store.getDirectSecondary()+" AS T");
 		}
 		else{
@@ -231,6 +243,13 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			targetSQLClause.add( wrapper.getPlanNodeCTE(predecessor, true));
 		}
 		return targetSQLClause;		
+	}
+
+	private int getColumnIndex() {
+		String predicateString = planNode.getTriple().getPredicate().toString();
+		PredicateTable hashingFamily = store.getDirectPredicates();
+		int col = hashingFamily.getHashes(predicateString)[0];
+		return col;
 	}
 	
 	
@@ -270,7 +289,7 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			varMap.put(entryVariable.getName(), Pair.make(tTableColumnPrefix+Constants.NAME_COLUMN_ENTITY, typeSQL));
 		}
 		else{
-			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, tTableColumnPrefix+Constants.NAME_COLUMN_ENTITY);
+			super.addConstantEntrySQLConstraint(entryTerm, entrySQLConstraint, hasSqlType, tTableColumnPrefix+((store.getStoreBackend()==Store.Backend.bigquery)? Constants.NAME_COLUMN_ENTRY: Constants.NAME_COLUMN_ENTITY));
 		}
 		return entrySQLConstraint;
 	}
@@ -352,7 +371,9 @@ public class TripleSecondaryOnlySQLTemplate extends SimplePatternSQLTemplate {
 			
 		}
 		else{
-			propSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_PREDICATE+ " = '"+propTerm.toSqlDataString()+"'");
+			if (store.getStoreBackend() != Store.Backend.bigquery) {
+				propSQLConstraint.add(tTableColumnPrefix+Constants.NAME_COLUMN_PREFIX_PREDICATE+ " = '"+propTerm.toSqlDataString()+"'");
+			}
 		}
 		
 		return propSQLConstraint;

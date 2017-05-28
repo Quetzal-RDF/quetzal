@@ -1,0 +1,7 @@
+prefix obs: <http://knoesis.wright.edu/ssw/ont/sensor-observation.owl#>
+
+select ?s ?o
+{
+  ?s obs:parameter ?o .
+}
+
