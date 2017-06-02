@@ -9,7 +9,7 @@ import com.ibm.wala.util.io.Streams;
 
 public class KnoesisQueryUtilityTest<D> extends TestRunner<D> {
 
-	private static final int[] answers = new int[]{ 9757, 59109 };
+	private static final int[] answers = new int[]{ 9757, 59109, 59109 };
 	
 	public KnoesisQueryUtilityTest(D data, DatabaseEngine<D> engine, int[] answers) {
 		super(data, engine, answers);
@@ -58,5 +58,11 @@ public class KnoesisQueryUtilityTest<D> extends TestRunner<D> {
 	public void testQuery2() throws IllegalArgumentException, IOException {
 		String sparql = getQuery("queries/knoesis/q2.sparql");
 		executeSparql(sparql, answers[1]);
+	}
+
+	@Test
+	public void testQuery3() throws IllegalArgumentException, IOException {
+		String sparql = getQuery("queries/knoesis/q3.sparql");
+		executeSparql(sparql, answers[2]);
 	}
 }

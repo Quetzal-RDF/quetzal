@@ -372,11 +372,19 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 		for(QueryTriple qt : planNode.starTriples){
 			// TODO [Property Path]: Double check with Mihaela that it is fine for propTerm.toSqlDataString() to return null for complex path (ie., same behavior as variable)
 			PropertyTerm propTerm = qt.getPredicate();
-			propSQLConstraint.add(hashColumnExpression(Constants.NAME_COLUMN_PREFIX_PREDICATE,propTerm.toString())+" = '"+propTerm.toSqlDataString()+"'");
+			propSQLConstraint.add(makePredicateTest(propTerm));
 		}
 		return propSQLConstraint;
 	}
 	
+	protected String makePredicateTest(PropertyTerm propTerm) {
+		if (store.getStoreBackend() == Store.Backend.bigquery) {
+			return hashColumnExpression(Constants.NAME_COLUMN_PREFIX_VALUE,propTerm.toString()) + " is not null";
+		} else  {
+			return hashColumnExpression(Constants.NAME_COLUMN_PREFIX_PREDICATE,propTerm.toString())+" = '"+propTerm.toSqlDataString()+"'";
+		}
+	}
+
 	protected boolean isApplicableInSecondaryOnly(Variable v) {
 		Set<Variable> multivaluedVariables = getMultivaluedVariables();
 
@@ -470,13 +478,18 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 					Variable valueVariable = valTerm.getVariable();
 					Db2Type pType=predicateTable.getType(qt.getPredicate().getIRI().getValue());
 					wrapper.addProperyValueType(valueVariable.getName(), pType);
-					if(projectedInSecondary.contains(valueVariable))continue;
+					if(projectedInSecondary.contains(valueVariable)) continue;
 					projectedInSecondary.add(valueVariable);
-					String valSqlName = coalesceColumnExpression(tripleToIdMap.get(qt), Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT,Constants.NAME_COLUMN_PREFIX_VALUE);
+					String valSqlName = 
+							!store.getStoreBackend().equals(Store.Backend.bigquery)?
+							coalesceColumnExpression(tripleToIdMap.get(qt), Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT,Constants.NAME_COLUMN_PREFIX_VALUE):
+							"S" +  tripleToIdMap.get(qt);
 					String valTypeSqlName = null;
 					valSqlToSparql.add(valSqlName+" AS "+valueVariable.getName());
 					if(!iriBoundVariables.contains(valueVariable)){
-						valTypeSqlName = (valHasSqlType)?
+						valTypeSqlName = store.getStoreBackend().equals(Store.Backend.bigquery)?
+								"TYP" + tripleToIdMap.get(qt) + "[offset(O" + tripleToIdMap.get(qt) + ")]":
+                                (valHasSqlType)?
 								coalesceColumnExpression(tripleToIdMap.get(qt), Constants.NAME_COLUMN_PREFIX_TYPE, Constants.NAME_COLUMN_PREFIX_TYPE)
 								: new Short(TypeMap.IRI_ID).toString();
 						valSqlToSparql.add(valTypeSqlName+" AS "+valueVariable.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
