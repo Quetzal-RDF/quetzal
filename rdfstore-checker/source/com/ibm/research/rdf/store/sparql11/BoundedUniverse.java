@@ -10,18 +10,13 @@ import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.xsdStringType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Set;
+
+import com.ibm.wala.util.collections.Pair;
 
 import kodkod.ast.Relation;
 import kodkod.instance.Bounds;
 import kodkod.instance.TupleFactory;
-import kodkod.instance.TupleSet;
-
-import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RDFDataMgr;
-
-import com.ibm.wala.util.collections.Pair;
 
 public class BoundedUniverse extends BasicUniverse {
 
@@ -61,32 +56,10 @@ public class BoundedUniverse extends BasicUniverse {
 	@Override
 	protected void boundDataSet(Set<Relation> liveRelations, final TupleFactory f,
 			Bounds b, Set<Object> liveAtoms) throws URISyntaxException {
-		LazyTupleSet s = new LazyTupleSet() {
-			@Override
-			public TupleSet tuples() throws URISyntaxException {
-				final TupleSet x = f.noneOf(1);
-				for(URI iri : iris) {
-					x.add(f.tuple(iri));
-				}
-				
-				final TupleSet y = x.clone();
-				for(String blank : blankNodes) {
-					y.add(f.tuple(blank));
-				}
-
-				final TupleSet z = y.clone();
-				for(Pair<String, ?> lit : literals) {
-					z.add(f.tuple(lit));
-				}
-
-				final TupleSet g = f.setOf(f.tuple(QuadTableRelations.defaultGraph));
-				return g.product(y).product(x).product(z);
-			}	
-		};
-		
+		LazyTupleSet s = dataSetCrossProduct(f);		
 		bound(liveRelations, liveAtoms, b, QuadTableRelations.quads, s);
 	}
-	
+
 	@Override
 	protected void boundLiteralTypes(Set<Relation> liveRelations,
 			TupleFactory tf, Bounds b, Set<Object> liveAtoms)

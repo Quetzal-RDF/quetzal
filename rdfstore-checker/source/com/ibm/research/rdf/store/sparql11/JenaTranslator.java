@@ -182,6 +182,7 @@ import com.hp.hpl.jena.sparql.path.PathVisitor;
 import com.ibm.rdf.store.dawg.queries.QueryTests.QueryTest;
 import com.ibm.rdf.store.dawg.queries.SparqlSelectResult;
 import com.ibm.research.rdf.store.sparql11.DawgUtil.DawgVerification;
+import com.ibm.research.rdf.store.sparql11.JenaTranslator.Continuation;
 import com.ibm.research.sparql.rewriter.OpVariableVistor;
 import com.ibm.wala.util.Predicate;
 import com.ibm.wala.util.collections.HashMapFactory;
@@ -193,8 +194,6 @@ import com.ibm.wala.util.functions.Function;
 @SuppressWarnings("unused")
 public class JenaTranslator implements OpVisitor {
 	
-
-
 	private interface Domain {		
 		Expression bound();
 	}
@@ -321,6 +320,18 @@ public class JenaTranslator implements OpVisitor {
 		public abstract Op top();
 		
 		public abstract Op scope();
+		
+		public boolean explicitChoices();
+		
+		public Continuation getCurrentContinuation();
+
+		public void setCurrentContinuation(Continuation currentContinuation);
+
+	}
+
+	@FunctionalInterface
+	interface Continuation {
+		void next(TranslatorContext context, Formula ret);
 	}
 	
 	private abstract static class DelegatingContext implements TranslatorContext {
@@ -328,6 +339,11 @@ public class JenaTranslator implements OpVisitor {
 
 		public DelegatingContext(TranslatorContext parent) {
 			this.parent = parent;
+		}
+
+		@Override
+		public boolean explicitChoices() {
+			return parent.explicitChoices();
 		}
 
 		public Map<String, Variable> getVars() {
@@ -348,6 +364,16 @@ public class JenaTranslator implements OpVisitor {
 
 		public void setCurrentQuery(Formula currentQuery) {
 			parent.setCurrentQuery(currentQuery);
+		}
+
+		@Override
+		public Continuation getCurrentContinuation() {
+			return parent.getCurrentContinuation();
+		}
+
+		@Override
+		public void setCurrentContinuation(Continuation currentContinuation) {
+			parent.setCurrentContinuation(currentContinuation);
 		}
 
 		public Expression getDynamicBinding() {
@@ -393,20 +419,23 @@ public class JenaTranslator implements OpVisitor {
 		private final Expression activeGraph;
 		private final Map<Variable,Domain> domain = HashMapFactory.make();
 		private final Op top;
+		private final boolean choices;
 		
 		private Formula currentQuery;
+		private Continuation currentContinuation;
 		private Expression dynamicBinding;
 		private Set<Variable> staticBinding;
 		
-		public BaseTranslatorContext(Map<String, Variable> vars, Map<String, Object> bindings, Expression activeGraph, Op top) {
+		public BaseTranslatorContext(Map<String, Variable> vars, Map<String, Object> bindings, Expression activeGraph, Op top, boolean choices) {
 			this.vars = vars;
 			this.activeGraph = activeGraph;
 			this.top = top;
 			this.constants = bindings;
+			this.choices = choices;
 		}
 
-		public BaseTranslatorContext(Map<String, Variable> vars, Expression activeGraph, Op top) {
-			this(vars, HashMapFactory.<String, Object>make(), activeGraph, top);
+		public BaseTranslatorContext(Map<String, Variable> vars, Expression activeGraph, Op top, boolean choices) {
+			this(vars, HashMapFactory.<String, Object>make(), activeGraph, top, choices);
 		}
 		
 		/* (non-Javadoc)
@@ -444,6 +473,14 @@ public class JenaTranslator implements OpVisitor {
 		@Override
 		public void setCurrentQuery(Formula currentQuery) {
 			this.currentQuery = currentQuery;
+		}
+
+		public Continuation getCurrentContinuation() {
+			return currentContinuation;
+		}
+
+		public void setCurrentContinuation(Continuation currentContinuation) {
+			this.currentContinuation = currentContinuation;
 		}
 
 		/* (non-Javadoc)
@@ -500,6 +537,11 @@ public class JenaTranslator implements OpVisitor {
 		@Override
 		public Op scope() {
 			return top;
+		}
+
+		@Override
+		public boolean explicitChoices() {
+			return choices;
 		}
 }
 
@@ -611,31 +653,30 @@ public class JenaTranslator implements OpVisitor {
 
 	private final List<Variable> projectedVars;
 
-	private SolutionRelation solution;
+	private final SolutionRelation solution;
 	
 	private final Collection<Op> queries;
 	
 	private JenaTranslator(Map<String,Variable> allVars, List<Variable> projectedVars, 
-			Collection<Op> queries, UniverseFactory universe) {
+			Collection<Op> queries, UniverseFactory universe, SolutionRelation solution) {
 		this.queries = queries;
 		this.universe = universe;
 		this.allVars = allVars; 
 		this.projectedVars = projectedVars;
+		this.solution = solution;
 	}
 	
 	public static JenaTranslator make(List<Var> projectedVars, Op query, UniverseFactory universe, SolutionRelation solution) {
-		JenaTranslator xlator = make(projectedVars, Collections.singleton(query), universe);
-		xlator.solution = solution;
-		return xlator;
+		return make(projectedVars, Collections.singleton(query), universe, solution);
 	}
 
-	public static JenaTranslator make(List<Var> projectedVars, Collection<Op> queries, UniverseFactory universe) {
+	public static JenaTranslator make(List<Var> projectedVars, Collection<Op> queries, UniverseFactory universe, SolutionRelation solution) {
 		Map<String,Variable> allVars = makeAllVars(queries);
-		return new JenaTranslator(allVars, makeProjectedVars(projectedVars, allVars), queries, universe);
+		return new JenaTranslator(allVars, makeProjectedVars(projectedVars, allVars), queries, universe, solution);
 	}
 
 	public static JenaTranslator make(List<Var> projectedVars, Op query, UniverseFactory universe) {
-		return make(projectedVars, Collections.singleton(query), universe);
+		return make(projectedVars, Collections.singleton(query), universe, null);
 	}
 	
 	private static Map<String,Variable> makeAllVars(Collection<Op> queries) {
@@ -810,172 +851,179 @@ public class JenaTranslator implements OpVisitor {
 		return orderedVars;
 	}
 
-	public Pair<Formula,Pair<Formula,Formula>> translateMulti(boolean leftNonEmpty, boolean rightNonEmpty) {		
+	public Pair<Formula,Pair<Formula,Formula>> translateMulti(boolean leftNonEmpty, boolean rightNonEmpty) {	
+		Set<Pair<Formula,Pair<Formula,Formula>>> stuff = HashSetFactory.make();
 		assert queries.size() == 2;
 
 		Iterator<Op> qs = queries.iterator();
-		
+
 		Op left = qs.next();
-		this.context = new BaseTranslatorContext(allVars, universe.atomRelation(QuadTableRelations.defaultGraph), left);
-		Formula lq = visit(left);
-		Expression ls = scope(lq, context.getDynamicBinding(), projectedVars);
-		
-		Op right = qs.next();
-		this.context = new BaseTranslatorContext(allVars, universe.atomRelation(QuadTableRelations.defaultGraph), right);
-		Formula rq = visit(right);
-		Expression rs = scope(rq, context.getDynamicBinding(), projectedVars);
+		this.context = new BaseTranslatorContext(allVars, universe.atomRelation(QuadTableRelations.defaultGraph), left, false);
+		visit(left, (TranslatorContext context1, Formula lq) -> {
+			Expression ls = scope(lq, context.getDynamicBinding(), projectedVars);
 
-		Relation leftSolution = Relation.nary("left_solution", ls.arity());
-		universe.nodesRelation(leftSolution);
+			Op right = qs.next();
+			this.context = new BaseTranslatorContext(allVars, universe.atomRelation(QuadTableRelations.defaultGraph), right, false);
+			visit(right, (TranslatorContext context2, Formula rq) -> {
+				Expression rs = scope(rq, context.getDynamicBinding(), projectedVars);
 
-		Relation rightSolution = Relation.nary("right_solution", rs.arity());
-		universe.nodesRelation(rightSolution);
+				Relation leftSolution = Relation.nary("left_solution", ls.arity());
+				universe.nodesRelation(leftSolution);
 
-		Formula q = rs.eq(ls).not().and(ls.eq(leftSolution)).and(rs.eq(rightSolution));
-		
-		if (leftNonEmpty) {
-			q = q.and(ls.some());
-		}
+				Relation rightSolution = Relation.nary("right_solution", rs.arity());
+				universe.nodesRelation(rightSolution);
 
-		if (rightNonEmpty) {
-			q = q.and(rs.some());
-		}
+				Formula q = rs.eq(ls).not().and(ls.eq(leftSolution)).and(rs.eq(rightSolution));
 
-		for(Formula f : relationBindings) {
-			q = q.and(f);
-		}
+				if (leftNonEmpty) {
+					q = q.and(ls.some());
+				}
 
-		Relation leftExtra = Relation.nary("left_extra", ls.arity());
-		universe.nodesRelation(leftExtra);
-		Formula getLeftExtra = leftExtra.eq(ls.difference(rs));
-		
-		Relation rightExtra = Relation.nary("right_extra", ls.arity());
-		universe.nodesRelation(rightExtra);
-		Formula getRightExtra = rightExtra.eq(rs.difference(ls));
-		
-		return Pair.make(Formula.TRUE, Pair.make(q, getLeftExtra.and(getRightExtra)));
+				if (rightNonEmpty) {
+					q = q.and(rs.some());
+				}
+
+				for(Formula f : relationBindings) {
+					q = q.and(f);
+				}
+
+				Relation leftExtra = Relation.nary("left_extra", ls.arity());
+				universe.nodesRelation(leftExtra);
+				Formula getLeftExtra = leftExtra.eq(ls.difference(rs));
+
+				Relation rightExtra = Relation.nary("right_extra", ls.arity());
+				universe.nodesRelation(rightExtra);
+				Formula getRightExtra = rightExtra.eq(rs.difference(ls));
+
+				stuff.add(Pair.make(Formula.TRUE, Pair.make(q, getLeftExtra.and(getRightExtra))));
+			});
+		});
+
+		return stuff.iterator().next();
 	}
-	
-	public Pair<Formula,Pair<Formula,Formula>> translateSingle(Map<String, Object> bindings) {	
-		Expression actualSolution;
+
+	public Set<Pair<Formula,Pair<Formula,Formula>>> translateSingle(Map<String, Object> bindings, boolean expand) {	
+		Set<Pair<Formula,Pair<Formula,Formula>>> stuff = HashSetFactory.make();
 		assert queries.size() == 1;
 		Op query = queries.iterator().next();
-		
-		Formula correctness = null;
-		Formula differences = null;
-		
-		Formula s = Formula.TRUE;	
-		this.context = new BaseTranslatorContext(allVars, bindings, universe.atomRelation(QuadTableRelations.defaultGraph), query);
-		Formula q = visit(query);
-		
-		if (solution != null && solution.variables().isEmpty()) {
-			actualSolution = null;
-			
-			q = existentialScope(context.getVars().values(), q, context.getDynamicBinding());
-			if (solution.hasSolutions()) {
-				s = q; 
-			} else {
-				s = q.not();
-			} 
-			
-		} else if (solution != null) {
-			Set<Variable> projectedVars = HashSetFactory.make();
-			for(Variable name : sortVars(context.getVars().values())) {
-				com.ibm.research.rdf.store.sparql11.model.Variable key = new com.ibm.research.rdf.store.sparql11.model.Variable(name.name());
-				if (solution.variables().contains(key)) {
-					projectedVars.add(name);
-				}
-			}
-			
-			actualSolution = scope(q, context.getDynamicBinding(), projectedVars);
-			
-			Expression x;
-			Set<Variable> liveVars = ASTUtils.gatherVariables(actualSolution);
-			
-			Expression sol = solution.mappedSolution(universe);
-			Expression expectedSolution = sol;
-			if (expectedSolution == null) {
-				Relation r = solution.solutionRelation();
-				expectedSolution = r;
-				universe.nodesRelation(r);
-			}
-			
-			Domain[] domain = new Domain[expectedSolution.arity()];
-			if (expectedSolution.arity() != actualSolution.arity()) {
-				int i = 0, index = 0;
-				List<IntConstant> cols = new LinkedList<IntConstant>();
+
+		this.context = new BaseTranslatorContext(allVars, bindings, universe.atomRelation(QuadTableRelations.defaultGraph), query, expand);
+		visit(query, (TranslatorContext context1, Formula q) -> {
+			Expression actualSolution;
+			Formula correctness = null;
+			Formula differences = null;
+			Formula s = Formula.TRUE;	
+
+			if (solution != null && solution.variables().isEmpty()) {
+				actualSolution = null;
+
+				q = existentialScope(context.getVars().values(), q, context.getDynamicBinding());
+				if (solution.hasSolutions()) {
+					s = q; 
+				} else {
+					s = q.not();
+				} 
+
+			} else if (solution != null) {
+				Set<Variable> projectedVars = HashSetFactory.make();
 				for(Variable name : sortVars(context.getVars().values())) {
-					if (liveVars.contains(name)) {
-						com.ibm.research.rdf.store.sparql11.model.Variable key = new com.ibm.research.rdf.store.sparql11.model.Variable(name.name());
-						if (solution.variables().contains(key)) {
-							domain[i] = context.getDomain(name);
-							cols.add(IntConstant.constant(index));
-						}
-						index++;
-					}	
-				}	
-				x = actualSolution.project(cols.toArray(new IntConstant[cols.size()]));
-			} else {
-				int i = 0;
-				for(Variable name : sortVars(projectedVars)) {
-					if (liveVars.contains(name)) {
-						domain[i++] = context.getDomain(name);
+					com.ibm.research.rdf.store.sparql11.model.Variable key = new com.ibm.research.rdf.store.sparql11.model.Variable(name.name());
+					if (solution.variables().contains(key)) {
+						projectedVars.add(name);
 					}
 				}
-				
-				x = actualSolution;
-			}
 
-			if (solution.hasBlankNodes()) {
-				Variable m1 = Variable.unary("x");
-				Variable m2 = Variable.unary("y");
-				Variable m3 = Variable.unary("a");
-				Variable m4 = Variable.unary("b");
-				Decls md = m4.oneOf(QuadTableRelations.blankNodes)
-						.and(m3.oneOf(QuadTableRelations.blankNodes))
-						.and(m2.oneOf(QuadTableRelations.blankNodes))
-						.and(m1.oneOf(QuadTableRelations.blankNodes));
-				Formula map = 
-						m1.product(m2).in(QuadTableRelations.blankNodeRenaming)
-						.and(m3.product(m4).in(QuadTableRelations.blankNodeRenaming))
-						.implies(m1.eq(m3).iff(m2.eq(m4))).forAll(md);
-				s = s.and(map);
+				actualSolution = scope(q, context.getDynamicBinding(), projectedVars);
 
-				if (sol != null) {
-					correctness = x.eq(sol);
-				} else {
-					correctness = x.no();
+				Expression x;
+				Set<Variable> liveVars = ASTUtils.gatherVariables(actualSolution);
+
+				Expression sol = solution.mappedSolution(universe);
+				Expression expectedSolution = sol;
+				if (expectedSolution == null) {
+					Relation r = solution.solutionRelation();
+					expectedSolution = r;
+					universe.nodesRelation(r);
 				}
-				System.err.println("adding verification constraint\n");
+
+				Domain[] domain = new Domain[expectedSolution.arity()];
+				if (expectedSolution.arity() != actualSolution.arity()) {
+					int i = 0, index = 0;
+					List<IntConstant> cols = new LinkedList<IntConstant>();
+					for(Variable name : sortVars(context.getVars().values())) {
+						if (liveVars.contains(name)) {
+							com.ibm.research.rdf.store.sparql11.model.Variable key = new com.ibm.research.rdf.store.sparql11.model.Variable(name.name());
+							if (solution.variables().contains(key)) {
+								domain[i] = context.getDomain(name);
+								cols.add(IntConstant.constant(index));
+							}
+							index++;
+						}	
+					}	
+					x = actualSolution.project(cols.toArray(new IntConstant[cols.size()]));
+				} else {
+					int i = 0;
+					for(Variable name : sortVars(projectedVars)) {
+						if (liveVars.contains(name)) {
+							domain[i++] = context.getDomain(name);
+						}
+					}
+
+					x = actualSolution;
+				}
+
+				if (solution.hasBlankNodes()) {
+					Variable m1 = Variable.unary("x");
+					Variable m2 = Variable.unary("y");
+					Variable m3 = Variable.unary("a");
+					Variable m4 = Variable.unary("b");
+					Decls md = m4.oneOf(QuadTableRelations.blankNodes)
+							.and(m3.oneOf(QuadTableRelations.blankNodes))
+							.and(m2.oneOf(QuadTableRelations.blankNodes))
+							.and(m1.oneOf(QuadTableRelations.blankNodes));
+					Formula map = 
+							m1.product(m2).in(QuadTableRelations.blankNodeRenaming)
+							.and(m3.product(m4).in(QuadTableRelations.blankNodeRenaming))
+							.implies(m1.eq(m3).iff(m2.eq(m4))).forAll(md);
+					s = s.and(map);
+
+					if (sol != null) {
+						correctness = x.eq(sol);
+					} else {
+						correctness = x.no();
+					}
+					System.err.println("adding verification constraint\n");
+				} else {
+					correctness = x.eq(expectedSolution);				
+					System.err.println("adding verification constraint for \n" + expectedSolution);
+				}
+
+				Relation extraSolutions = Relation.nary("extra_solutions", actualSolution.arity());
+				universe.nodesRelation(extraSolutions);
+				differences = extraSolutions.eq(x.difference(expectedSolution)); 
+
+				Relation missingSolutions = Relation.nary("missing_solutions", actualSolution.arity());
+				universe.nodesRelation(missingSolutions);
+				differences = differences.and(missingSolutions.eq(expectedSolution.difference(x))); 
+
 			} else {
-				correctness = x.eq(expectedSolution);				
-				System.err.println("adding verification constraint for \n" + expectedSolution);
+				actualSolution = scope(q, context.getDynamicBinding(), context.getVars().values());
+				System.err.println(actualSolution);
 			}
-			
-			Relation extraSolutions = Relation.nary("extra_solutions", actualSolution.arity());
-			universe.nodesRelation(extraSolutions);
-			differences = extraSolutions.eq(x.difference(expectedSolution)); 
 
-			Relation missingSolutions = Relation.nary("missing_solutions", actualSolution.arity());
-			universe.nodesRelation(missingSolutions);
-			differences = differences.and(missingSolutions.eq(expectedSolution.difference(x))); 
-			
-		} else {
-			actualSolution = scope(q, context.getDynamicBinding(), context.getVars().values());
-			System.err.println(actualSolution);
-		}
-		
-		for(Formula f : relationBindings) {
-			s = s.and(f);
-		}
+			for(Formula f : relationBindings) {
+				s = s.and(f);
+			}
 
-		if (actualSolution != null) {
-			Relation solutionRelation = Relation.nary("solution", actualSolution.arity());
-			universe.nodesRelation(solutionRelation);
-			s = s.and(actualSolution.eq(solutionRelation));
-		}
-		
-		return Pair.make(s, Pair.make(correctness,  differences));
+			if (actualSolution != null) {
+				Relation solutionRelation = Relation.nary("solution", actualSolution.arity());
+				universe.nodesRelation(solutionRelation);
+				s = s.and(actualSolution.eq(solutionRelation));
+			}
+
+			stuff.add(Pair.make(s, Pair.make(correctness,  differences)));
+		});
+		return stuff;
 	}
 
 	private TranslatorContext context;
@@ -1516,19 +1564,25 @@ public class JenaTranslator implements OpVisitor {
 								existsQuery = currentQuery;
 							}
 						};
-						rf = JenaTranslator.this.visit(arg0.getGraphPattern());
-						if (isNegated) {
-							rf = rf.not();
-						}
-						context = save;
+						JenaTranslator.this.visit(arg0.getGraphPattern(), (TranslatorContext context1, Formula rf1) -> {
+							if (isNegated) {
+								rf1 = rf1.not();
+							}
+							context = save;
+							ret(rf1, Formula.TRUE);
+							
+							context.setStaticBinding(leftStaticBinding);
+							context.setDynamicBinding(leftDynamicBinding);
+							context.getCurrentContinuation().next(context, rf1);
+						});
 					} else {
 						rf = checkExists(ASTUtils.gatherVariables(context.getCurrentQuery()), leftStaticBinding, leftDynamicBinding, rightRelation, isNegated, false, null);
-					}
 					
-					ret(rf, Formula.TRUE);
+						ret(rf, Formula.TRUE);
 			
-					context.setStaticBinding(leftStaticBinding);
-					context.setDynamicBinding(leftDynamicBinding);
+						context.setStaticBinding(leftStaticBinding);
+						context.setDynamicBinding(leftDynamicBinding);
+					}
 				} else {
 					assert false : arg0.getFunctionIRI();
 				}
@@ -1554,8 +1608,11 @@ public class JenaTranslator implements OpVisitor {
 		}.visit(e);
 	}
 
-	private Formula visit(Op op) {
+	private void visit(Op op, Continuation next) {
 		assert context.getCurrentQuery() == null;
+		if (context.getCurrentContinuation() == null) {
+			context.setCurrentContinuation(next);
+		}
 		
 		if (op != context.top()) {
 			Set<String> privateVars = privateVariableNames(op, context.top());
@@ -1565,10 +1622,6 @@ public class JenaTranslator implements OpVisitor {
 		}	
 		
 		op.visit(this);
-		Formula ret = context.getCurrentQuery();
-		assert ret != null : op;
-		context.setCurrentQuery(null);
-		return ret;
 	}
 
 	@Override
@@ -1577,6 +1630,7 @@ public class JenaTranslator implements OpVisitor {
 			conj(handleTriple(t));
 		}
 		doStandardBindings(context.getCurrentQuery(), arg0);
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
 	@Override
@@ -1585,6 +1639,7 @@ public class JenaTranslator implements OpVisitor {
 			conj(handleQuad(q));
 		}
 		doStandardBindings(context.getCurrentQuery(), arg0);
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
 	@Override
@@ -1593,16 +1648,19 @@ public class JenaTranslator implements OpVisitor {
 			conj(handleQuad(q));
 		}
 		doStandardBindings(context.getCurrentQuery(), arg0);
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 	
 	@Override
 	public void visit(OpTriple arg0) {
 		context.setCurrentQuery(doStandardBindings(handleTriple(arg0.getTriple()), arg0));
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
 	@Override
 	public void visit(OpQuad arg0) {
 		context.setCurrentQuery(doStandardBindings(handleQuad(arg0.getQuad()), arg0));
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
 	@Override
@@ -1743,18 +1801,22 @@ public class JenaTranslator implements OpVisitor {
 		Expression s = constrainDomain(toTerm(arg0.getTriplePath().getSubject()), new Or(Leaf.OBJECT, Leaf.SUBJECT));
 		Expression o = constrainDomain(toTerm(arg0.getTriplePath().getObject()), new Or(Leaf.OBJECT, Leaf.SUBJECT));
 		context.setCurrentQuery(doStandardBindings(s.product(o).in(relation), arg0));
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
 	@Override
 	public void visit(OpFilter arg0) {
-		Formula f = visit(arg0.getSubOp());
-		context.setCurrentQuery(f);
+		Continuation next = context.getCurrentContinuation();
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+			context.setCurrentQuery(f);
 
-		for(Expr e : arg0.getExprs()) {
-			ExpressionContext val = handleExpression(e);
-			f = f.and(val.guard()).and(ebv(val));
-		}
-		context.setCurrentQuery(f);
+			for(Expr e : arg0.getExprs()) {
+				ExpressionContext val = handleExpression(e);
+				f = f.and(val.guard()).and(ebv(val));
+			}
+			context.setCurrentQuery(f);
+			next.next(context, f);			
+		});
 	}
 
 
@@ -1771,19 +1833,36 @@ public class JenaTranslator implements OpVisitor {
 				return g;
 			}
 		};
-		Formula f = visit(arg0.getSubOp());
 		
-		context = save;
-		context.setCurrentQuery(f.and(g.eq(universe.atomRelation(QuadTableRelations.defaultGraph)).not()));
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+
+			context = save;
+			context.setCurrentQuery(f.and(g.eq(universe.atomRelation(QuadTableRelations.defaultGraph)).not()));
+		});
 	}
 
-	private final Map<Op, Variable> unionChoices = HashMapFactory.make();
+	private final Map<Pair<Op,String>, Variable> choiceVariables = HashMapFactory.make();
+	
+	private Formula choose(Variable choice) {
+		return universe.atomRelation(0).eq(choice);
+	}
+	
+	private Variable choice(Op arg0, String name) {
+		Pair<Op, String> key = Pair.make(arg0, name);
+		if (! choiceVariables.containsKey(key)) {
+			Variable x = Variable.unary(name + choiceVariables.size());
+			choiceVariables.put(key, x);
+		}
+		Variable choice = choiceVariables.get(key);
+		return choice;
+	}
 	
 	@Override
 	public void visit(OpUnion arg0) {
 		class UnionContext extends DomainContext {
 			private final Set<Variable> staticBinding;
 			private Expression dynamicBinding;
+			private Formula query;
 			private UnionContext(TranslatorContext parent) {
 				super(parent);
 				staticBinding = parent.getStaticBinding()==null? HashSetFactory.<Variable>make(): HashSetFactory.make(parent.getStaticBinding());
@@ -1809,50 +1888,77 @@ public class JenaTranslator implements OpVisitor {
 			public void setStaticBinding(Set<Variable> staticBinding) {
 				this.staticBinding.addAll(staticBinding);
 			}
-		};
-		
-		TranslatorContext save = context;
-		TranslatorContext scope = new ScopeContext(save, arg0);
-		
-		TranslatorContext left = context = new UnionContext(scope);
-		Formula l = visit(arg0.getLeft());
-		
-		TranslatorContext right = context = new UnionContext(scope);
-		Formula r = visit(arg0.getRight());
-		
-		context = save;
-		
-		if (! unionChoices.containsKey(arg0)) {
-			Variable x = Variable.unary("choice" + unionChoices.size());
-			unionChoices.put(arg0, x);
-		}
-		Variable choice = unionChoices.get(arg0);
-		context.setDomain(choice, Leaf.CHOICE);
 
-		Set<Variable> newBindings = HashSetFactory.make(left.getStaticBinding());
-		newBindings.retainAll(right.getStaticBinding());
-		newBindings.add(choice);
-		context.setStaticBinding(newBindings);
-			
-		Expression nb = 
-			l.thenElse(
-				r.thenElse(
-					universe.atomRelation(0).eq(choice).thenElse(left.getDynamicBinding(), right.getDynamicBinding()), 
-					left.getDynamicBinding()), 
-				right.getDynamicBinding());
-		context.setDynamicBinding(nb);
-		
-		context.setCurrentQuery(l.or(r));
-		
-		for(Variable v : context.getVars().values()) {
-			Domain n = union(left.getDomain(v), right.getDomain(v));
-			if (n != null) {
-				if (context.getDomain(v) != null) {
-					context.setDomain(v, new And(n, context.getDomain(v)));
-				} else {
-					context.setDomain(v, n);
-				}
-			} 
+			@Override
+			public Formula getCurrentQuery() {
+				return query;
+			}
+
+			@Override
+			public void setCurrentQuery(Formula currentQuery) {
+				query = currentQuery;
+			}
+		};
+
+		TranslatorContext save = context;
+		Continuation c = save.getCurrentContinuation();
+		TranslatorContext scope = new ScopeContext(save, arg0);
+
+		TranslatorContext left = context = new UnionContext(scope);
+
+		if (context.explicitChoices()) {
+			visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
+				context1.setCurrentQuery(l);
+				c.next(context1, l);
+			});
+
+			TranslatorContext right = context = new UnionContext(scope);
+			visit(arg0.getRight(), (TranslatorContext context1, Formula r) -> {
+				context1.setCurrentQuery(r);
+				c.next(context1, r);
+			});
+
+		} else {
+			visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
+
+				TranslatorContext right = context = new UnionContext(scope);
+				visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
+
+					context = save;
+
+					Variable choice = choice(arg0, "union");
+					context.setDomain(choice, Leaf.CHOICE);
+
+					Set<Variable> newBindings = HashSetFactory.make(left.getStaticBinding());
+					newBindings.retainAll(right.getStaticBinding());
+					newBindings.add(choice);
+					context.setStaticBinding(newBindings);
+
+					Expression nb = 
+							l.thenElse(
+									r.thenElse(
+											choose(choice).thenElse(left.getDynamicBinding(), right.getDynamicBinding()), 
+											left.getDynamicBinding()), 
+									right.getDynamicBinding());
+					context.setDynamicBinding(nb);
+
+					context.setCurrentQuery(l.or(r));
+
+
+					for(Variable v : context.getVars().values()) {
+						Domain n = union(left.getDomain(v), right.getDomain(v));
+						if (n != null) {
+							if (context.getDomain(v) != null) {
+								context.setDomain(v, new And(n, context.getDomain(v)));
+							} else {
+								context.setDomain(v, n);
+							}
+						}	 
+					}
+
+					//				context.getCurrentContinuation().next(context, context.getCurrentQuery());
+				});
+			});
 		}
 	}
 
@@ -1876,11 +1982,17 @@ public class JenaTranslator implements OpVisitor {
 	public void visit(OpJoin arg0) {
 		TranslatorContext save = context;
 		context = new ScopeContext(save, arg0);
-		Formula l = visit(arg0.getLeft());		
-		Formula r = visit(arg0.getRight());
-		context = save;
 		
-		context.setCurrentQuery(l.and(r));
+		visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {	
+			
+			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
+				
+				context = save;
+				context.setCurrentQuery(l.and(r));
+				
+				context.getCurrentContinuation().next(save, context.getCurrentQuery());
+			});
+		});
 	}
 
 	private final Set<Formula> relationBindings = HashSetFactory.make();
@@ -1927,30 +2039,31 @@ public class JenaTranslator implements OpVisitor {
 		
 			TranslatorContext save = context;
 			
-			context = new BaseTranslatorContext(newVars, context.constants(), context.getActiveGraph(), context.top());
-			Formula nr = visit(rhs);
-			Set<Variable> rhsVars = ASTUtils.gatherVariables(nr);
-			neededVars.retainAll(rhsVars);
-			if (rhsVars.isEmpty() || neededVars.isEmpty()) {
+			context = new BaseTranslatorContext(newVars, context.constants(), context.getActiveGraph(), context.top(), context.explicitChoices());
+			visit(rhs, (TranslatorContext context, Formula nr) -> {
+				Set<Variable> rhsVars = ASTUtils.gatherVariables(nr);
+				neededVars.retainAll(rhsVars);
+				if (rhsVars.isEmpty() || neededVars.isEmpty()) {
+					context = save;
+					return;
+				}
+				Relation opRelation = Relation.nary("rel" + relationBindings.size(), neededVars.size());
+				Expression rel = scope(nr, context.getDynamicBinding(), neededVars);
+				// System.err.println(rel);
+				relationBindings.add(opRelation.eq(rel));
+				universe.nodesRelation(opRelation);
+			
+				List<Pair<Variable,Domain>> vars = new LinkedList<Pair<Variable,Domain>>();
+				for(Variable v : neededVars) {
+					vars.add(Pair.make(v, context.getDomain(v)));
+				}
+			
+				relations.put(rhs, Pair.make(opRelation, vars));
+			
+				System.err.println(relations.get(rhs));
+			
 				context = save;
-				return null;
-			}
-			Relation opRelation = Relation.nary("rel" + relationBindings.size(), neededVars.size());
-			Expression rel = scope(nr, context.getDynamicBinding(), neededVars);
-			// System.err.println(rel);
-			relationBindings.add(opRelation.eq(rel));
-			universe.nodesRelation(opRelation);
-			
-			List<Pair<Variable,Domain>> vars = new LinkedList<Pair<Variable,Domain>>();
-			for(Variable v : neededVars) {
-				vars.add(Pair.make(v, context.getDomain(v)));
-			}
-			
-			relations.put(rhs, Pair.make(opRelation, vars));
-			
-			System.err.println(relations.get(rhs));
-			
-			context = save;
+			});
 		}
 		
 		return relations.get(rhs);
@@ -2000,131 +2113,114 @@ public class JenaTranslator implements OpVisitor {
 		TranslatorContext outerSave = context;
 		context = new ScopeContext(outerSave, arg0);
 
-		Formula l = visit(arg0.getLeft());
-		Set<Variable> lhsVars = ASTUtils.gatherVariables(l);
+		visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
+			Set<Variable> lhsVars = ASTUtils.gatherVariables(l);
 
-		Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
-		Expression leftDynamicBinding = context.getDynamicBinding();
-		System.err.println(context.getDynamicBinding());
+			Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
+			Expression leftDynamicBinding = context.getDynamicBinding();
+			System.err.println(context.getDynamicBinding());
 		
-		final TranslatorContext save = context;
-		context = new DomainContext(context);
-		Formula r = visit(arg0.getRight());
-		Expression rightDynamicBinding = context.getDynamicBinding();
+			final TranslatorContext save = context;
+			context = new DomainContext(context);
+			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
+				Expression rightDynamicBinding = context.getDynamicBinding();
 
-		Formula filters = null;
-		if (arg0.getExprs() != null) {
-			for(Expr e : arg0.getExprs()) {
-				ExpressionContext ec = handleExpression(e);
-				Formula x = ec.booleanValue().and(ec.guard());
-				filters = filters==null? x: filters.and(x);
-			}
-			assert filters != null;
-		}
+				Formula filters = null;
+				if (arg0.getExprs() != null) {
+					for(Expr e : arg0.getExprs()) {
+						ExpressionContext ec = handleExpression(e);
+						Formula x = ec.booleanValue().and(ec.guard());
+						filters = filters==null? x: filters.and(x);
+					}
+					assert filters != null;
+				}
 
-		Set<Variable> neededVars = HashSetFactory.make(lhsVars);
-		if (filters != null) {
-			neededVars.addAll(ASTUtils.gatherVariables(filters));
-		}
-		neededVars.retainAll(ASTUtils.gatherVariables(r));
+				Set<Variable> neededVars = HashSetFactory.make(lhsVars);
+				if (filters != null) {
+					neededVars.addAll(ASTUtils.gatherVariables(filters));
+				}
+				neededVars.retainAll(ASTUtils.gatherVariables(r));
 
-		Pair<Relation, List<Pair<Variable, Domain>>> rhs = reifyOpAsRelation(arg0.getRight(), context);
+				Pair<Relation, List<Pair<Variable, Domain>>> rhs = reifyOpAsRelation(arg0.getRight(), context);
 				
-		context = save;
+				context = save;
 				
-		Formula both = r;
-		if (filters != null) {
-			both = both.and(filters);
-		}
+				Formula both = r;
+				if (filters != null) {
+					both = both.and(filters);
+				}
 
-		/*
-		Op bothOp = OpJoin.create(arg0.getLeft(), arg0.getRight());
-		if (arg0.getExprs() != null) {
-			bothOp = OpFilter.filter(arg0.getExprs(), bothOp);
-		}
-		Set<String> lhsVarNames = HashSetFactory.make();
-		for(Variable lv : lhsVars) {
-			lhsVarNames.add(lv.name());
-		}
-		Pair<Relation, List<Pair<Variable, Domain>>> bothRel = reifyOpAsRelation(bothOp, lhsVars);
+				Formula leftOnly;
+				if (rhs != null) {
+					leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
+				} else {
+					Set<Variable> rvs = ASTUtils.gatherVariables(r);
+					if (rvs.isEmpty()) {
+						leftOnly = r.not();
+					} else {
+						leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
+					}
+					if (filters != null) {
+						leftOnly = leftOnly.or(filters.not());
+					}
+				}
+				
+				context = outerSave;
 		
-		Expression tuple = null;
-		for(int i = 0, j = 0; i < bothRel.snd.size(); i++) {
-			Variable var = bothRel.snd.get(i).fst;
-			if (lhsVarNames.contains(var.name())) {
-				tuple = (tuple==null)? var: tuple.product(var);
-			}
-		}
-		
-		Formula leftOnly = tuple.in(bothRel.fst).not();
-		*/
-
-		Formula leftOnly;
-		if (rhs != null) {
-			leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
-		} else {
-			Set<Variable> rvs = ASTUtils.gatherVariables(r);
-			if (rvs.isEmpty()) {
-				leftOnly = r.not();
-			} else {
-				leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
-			}
-			if (filters != null) {
-				leftOnly = leftOnly.or(filters.not());
-			}
-		}
-		
-		//System.err.println(leftOnly);
-		
-		//Formula leftOnly = scope(r, rightDynamicBinding, lhsVars).no();
-		
-		context = outerSave;
-		
-		context.setStaticBinding(leftStaticBinding);
-		context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
-		context.setCurrentQuery(l.and(both.or(leftOnly)));
+				context.setStaticBinding(leftStaticBinding);
+				context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
+				context.setCurrentQuery(l.and(both.or(leftOnly)));
+				
+				context.getCurrentContinuation().next(context, context.getCurrentQuery());
+			});
+		});
 	}
-
-	@Override
-	public void visit(OpMinus arg0) {
 	
-		Formula l = visit(arg0.getLeft());
-		Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
-		Expression leftDynamicBinding = context.getDynamicBinding();
-		System.err.println(context.getDynamicBinding());
+	@Override
+	public void visit(OpMinus arg0) {	
+		visit(arg0.getLeft(), (TranslatorContext context, Formula l) -> {
+			Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
+			Expression leftDynamicBinding = context.getDynamicBinding();
+			System.err.println(context.getDynamicBinding());
 		
-		Pair<Relation, List<Pair<Variable, Domain>>> r = reifyOpAsRelation(arg0.getRight(), new ScopeContext(context, arg0.getRight()));
+			Pair<Relation, List<Pair<Variable, Domain>>> r = reifyOpAsRelation(arg0.getRight(), new ScopeContext(context, arg0.getRight()));
 		
-		context.setStaticBinding(leftStaticBinding);
-		context.setDynamicBinding(leftDynamicBinding);
-		context.setCurrentQuery(l.and(checkExists(ASTUtils.gatherVariables(l), leftStaticBinding, leftDynamicBinding, r, true, true, null)));
+			context.setStaticBinding(leftStaticBinding);
+			context.setDynamicBinding(leftDynamicBinding);
+			context.setCurrentQuery(l.and(checkExists(ASTUtils.gatherVariables(l), leftStaticBinding, leftDynamicBinding, r, true, true, null)));
+			
+			context.getCurrentContinuation().next(context, context.getCurrentQuery());
+		});
 	}
 
 	@Override
 	public void visit(OpExtend arg0) {
-		Formula f = visit(arg0.getSubOp());
-		for(Map.Entry<Var,Expr> ve : arg0.getVarExprList().getExprs().entrySet()) {
-			Variable v = context.getVars().get(ve.getKey().getName());
-			ExpressionContext expr = handleExpression(ve.getValue());
-			
-			Formula bound = 
-					expr.guard().and( (isSomeFloatType(expr.type()).and(intValue(v).eq(expr.floatValue())))
-						 .or(isIntegerType(expr.type()).and(intValue(v).eq(expr.intValue())))
-						 .or(v.eq(expr.value())));
-			
-			Formula notBound = expr.guard().not().and(v.eq(NULL));
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+			for(Map.Entry<Var,Expr> ve : arg0.getVarExprList().getExprs().entrySet()) {
+				Variable v = context.getVars().get(ve.getKey().getName());
+				ExpressionContext expr = handleExpression(ve.getValue());
 
-			f = f.and(bound.or(notBound));
-			
-			Expression bind = context.getDynamicBinding();
-			if (bind == null) {
-				bind = Expression.NONE;
+				Formula bound = 
+						expr.guard().and( (isSomeFloatType(expr.type()).and(intValue(v).eq(expr.floatValue())))
+								.or(isIntegerType(expr.type()).and(intValue(v).eq(expr.intValue())))
+								.or(v.eq(expr.value())));
+
+				Formula notBound = expr.guard().not().and(v.eq(NULL));
+
+				f = f.and(bound.or(notBound));
+
+				Expression bind = context.getDynamicBinding();
+				if (bind == null) {
+					bind = Expression.NONE;
+				}
+				context.setDynamicBinding(expr.guard().thenElse(bind.union(varExpr(v)), bind));
+
+				context.setDomain(v, Leaf.ANY);
 			}
-			context.setDynamicBinding(expr.guard().thenElse(bind.union(varExpr(v)), bind));
-			
-			context.setDomain(v, Leaf.ANY);
-		}
-		context.setCurrentQuery(f);
+			context.setCurrentQuery(f);
+
+			context.getCurrentContinuation().next(context, context.getCurrentQuery());
+		});
 	}
 
 	@Override
@@ -2165,6 +2261,8 @@ public class JenaTranslator implements OpVisitor {
 				context.setDynamicBinding(bound);
 			}
 		}
+		
+		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
 	@Override
@@ -2254,84 +2352,87 @@ public class JenaTranslator implements OpVisitor {
 	public void visit(OpGroup arg0) {
 		final TranslatorContext save = context;
 		context = new DomainContext(context);
-		Formula r = visit(arg0.getSubOp());
-		Set<Variable> subStaticBinding = HashSetFactory.make(context.getStaticBinding());
-		Expression subDynamicBinding = context.getDynamicBinding();
-		context = save;
-		
-		Pair<Relation, List<Pair<Variable, Domain>>> subRel = reifyOpAsRelation(arg0.getSubOp(), context);
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula r) -> {
+			Set<Variable> subStaticBinding = HashSetFactory.make(context.getStaticBinding());
+			Expression subDynamicBinding = context.getDynamicBinding();
+			context = save;
 
-		Expression tuple = null;
-		for(Pair<Variable, Domain> x : subRel.snd) {
-			tuple = tuple==null? x.fst: tuple.product(x.fst);
-			context.setDomain(x.fst, x.snd);
-		}
-		
-		Formula outer = Formula.TRUE;
-		Formula inner = tuple.in(subRel.fst);
-		
-		Decls dd = null;
-		for(Entry<Var, Expr> e : arg0.getGroupVars().getExprs().entrySet()) {
-			Variable pv = (Variable) toTerm(e.getKey());
-			if (e.getValue() != null) {
-				ExpressionContext ec = handleExpression(e.getValue());
-//				Decl d = pv.oneOf(ec.value());
-//				dd = dd==null? d: dd.and(d);
-				outer = outer.and(ec.guard()).and(pv.eq(ec.value()));
-				context.setDomain(pv, Leaf.ANY);
-				subStaticBinding.add(pv);
+			Pair<Relation, List<Pair<Variable, Domain>>> subRel = reifyOpAsRelation(arg0.getSubOp(), context);
+
+			Expression tuple = null;
+			for(Pair<Variable, Domain> x : subRel.snd) {
+				tuple = tuple==null? x.fst: tuple.product(x.fst);
+				context.setDomain(x.fst, x.snd);
 			}
-		}
 
-		grouped_vars: for(Pair<Variable, Domain> x : subRel.snd) {
-			for(Var v : arg0.getGroupVars().getVars()) {
-				Variable pv = (Variable) toTerm(v);
-				if (x.fst.equals(pv)) {
-					continue grouped_vars;
+			Formula outer = Formula.TRUE;
+			Formula inner = tuple.in(subRel.fst);
+
+			Decls dd = null;
+			for(Entry<Var, Expr> e : arg0.getGroupVars().getExprs().entrySet()) {
+				Variable pv = (Variable) toTerm(e.getKey());
+				if (e.getValue() != null) {
+					ExpressionContext ec = handleExpression(e.getValue());
+					//				Decl d = pv.oneOf(ec.value());
+					//				dd = dd==null? d: dd.and(d);
+					outer = outer.and(ec.guard()).and(pv.eq(ec.value()));
+					context.setDomain(pv, Leaf.ANY);
+					subStaticBinding.add(pv);
 				}
 			}
-			for(Expr e : arg0.getGroupVars().getExprs().values()) {
-				for(Var ev : e.getVarsMentioned()) {
-					Variable pev = (Variable) toTerm(ev);
-					if (x.fst.equals(pev)) {
+
+			grouped_vars: for(Pair<Variable, Domain> x : subRel.snd) {
+				for(Var v : arg0.getGroupVars().getVars()) {
+					Variable pv = (Variable) toTerm(v);
+					if (x.fst.equals(pv)) {
 						continue grouped_vars;
 					}
 				}
+				for(Expr e : arg0.getGroupVars().getExprs().values()) {
+					for(Var ev : e.getVarsMentioned()) {
+						Variable pev = (Variable) toTerm(ev);
+						if (x.fst.equals(pev)) {
+							continue grouped_vars;
+						}
+					}
+				}
+
+				Decl d = x.fst.oneOf(nodes.union(NULL));
+				dd = dd==null? d: dd.and(d);
 			}
-			
-			Decl d = x.fst.oneOf(nodes.union(NULL));
-			dd = dd==null? d: dd.and(d);
-		}
-		
-		Formula query = outer.and(dd != null? inner.forSome(dd): inner);
-		
-		for(ExprAggregator e : arg0.getAggregators()) {
-			Variable agg = (Variable) toTerm(e.getAggVar().asVar());
-			context.setDomain(agg, Leaf.ANY);
-			subStaticBinding.add(agg);
-			
-			Expression table;
-			if (e.getExpr() != null) {
-				ExpressionContext ec = handleExpression(e.getExpr());
-				
-				Decls ad = agg.oneOf(nodes.union(NULL)).and(dd);
-			
-				table = inner.and(ec.guard()).and(ec.value().eq(agg)).comprehension(ad);
-			} else {
-				table = inner.comprehension(dd);
+
+			Formula query = outer.and(dd != null? inner.forSome(dd): inner);
+
+			for(ExprAggregator e : arg0.getAggregators()) {
+				Variable agg = (Variable) toTerm(e.getAggVar().asVar());
+				context.setDomain(agg, Leaf.ANY);
+				subStaticBinding.add(agg);
+
+				Expression table;
+				if (e.getExpr() != null) {
+					ExpressionContext ec = handleExpression(e.getExpr());
+
+					Decls ad = agg.oneOf(nodes.union(NULL)).and(dd);
+
+					table = inner.and(ec.guard()).and(ec.value().eq(agg)).comprehension(ad);
+				} else {
+					table = inner.comprehension(dd);
+				}
+
+				System.err.println("group=" + table);
+
+				query = query.and(handleAggregator(e, table.project(IntConstant.constant(0))));
 			}
-			
-			System.err.println("group=" + table);
-			
-			query = query.and(handleAggregator(e, table.project(IntConstant.constant(0))));
-		}
-		
-		System.err.println("group query: " + query);
-		
-		context.setStaticBinding(subStaticBinding);
-		context.setDynamicBinding(subDynamicBinding);
-		//doStandardBindings(query, ASTUtils.gatherVariables(query));
-		context.setCurrentQuery(query);
+
+			System.err.println("group query: " + query);
+
+			context.setStaticBinding(subStaticBinding);
+			context.setDynamicBinding(subDynamicBinding);
+			//doStandardBindings(query, ASTUtils.gatherVariables(query));
+			context.setCurrentQuery(query);
+
+			context.getCurrentContinuation().next(context, context.getCurrentQuery());
+		});
 	}
 
 	private Formula handleAggregator(ExprAggregator e, Expression table) {
@@ -2361,21 +2462,34 @@ public class JenaTranslator implements OpVisitor {
 
 	@Override
 	public void visit(OpProject arg0) {
-		context.setCurrentQuery(visit(arg0.getSubOp()));
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+			context.setCurrentQuery(f);
+			context.getCurrentContinuation().next(context, f);
+		});
 	}
 
 	@Override
 	public void visit(OpReduced arg0) {
-		context.setCurrentQuery(visit(arg0.getSubOp()));
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+			context.setCurrentQuery(f);
+			context.getCurrentContinuation().next(context, f);
+		});
 	}
 
 	@Override
 	public void visit(OpDistinct arg0) {
-		context.setCurrentQuery(visit(arg0.getSubOp()));
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+			context.setCurrentQuery(f);
+			context.getCurrentContinuation().next(context, f);
+		});
 	}
+
 	@Override
 	public void visit(OpOrder arg0) {
-		context.setCurrentQuery(visit(arg0.getSubOp()));
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+			context.setCurrentQuery(f);
+			context.getCurrentContinuation().next(context, f);
+		});
 	}
 
 	public static abstract class TranslatorTest {
@@ -2396,7 +2510,7 @@ public class JenaTranslator implements OpVisitor {
 			this.universe = universe;
 			Map<String, Variable> varMap = makeVars(variables);
 			this.variables = varMap;
-			this.xlator = new JenaTranslator(varMap, variables, Collections.<Op>emptySet(), universe);
+			this.xlator = new JenaTranslator(varMap, variables, Collections.<Op>emptySet(), universe, null);
 		}
 		
 		public static UniverseFactory getUniverse(final String path) throws SQLException, IOException, URISyntaxException {

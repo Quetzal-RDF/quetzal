@@ -62,7 +62,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 
 	private void addLanguage(String language) {
 		languages.add(language);
-		ensureLiteral(Pair.make(language, null));
+		//ensureLiteral(Pair.make(language, null));
 	}
 	
 	@Override
@@ -139,6 +139,16 @@ public abstract class BasicUniverse implements UniverseFactory {
 			TupleSet ts = bound.tuples();
 			b.bound(r, ts);
 			collectAtoms(liveAtoms, ts);
+		}
+	}
+
+	protected void bound(Set<Relation> liveRelations, Set<Object> liveAtoms, Bounds b, Relation r, LazyTupleSet lower, LazyTupleSet upper) throws URISyntaxException {
+		if (liveRelations == null || liveRelations.contains(r)) {
+			TupleSet ls = lower.tuples();
+			TupleSet us = upper.tuples();
+			b.bound(r, ls, us);
+			collectAtoms(liveAtoms, ls);
+			collectAtoms(liveAtoms, us);
 		}
 	}
 
@@ -671,5 +681,31 @@ public abstract class BasicUniverse implements UniverseFactory {
 					}
 				};
 			}
+
+	protected LazyTupleSet dataSetCrossProduct(final TupleFactory f) {
+		LazyTupleSet s = new LazyTupleSet() {
+			@Override
+			public TupleSet tuples() throws URISyntaxException {
+				final TupleSet x = f.noneOf(1);
+				for(URI iri : iris) {
+					x.add(f.tuple(iri));
+				}
+				
+				final TupleSet y = x.clone();
+				for(String blank : blankNodes) {
+					y.add(f.tuple(blank));
+				}
+	
+				final TupleSet z = y.clone();
+				for(Pair<String, ?> lit : literals) {
+					z.add(f.tuple(lit));
+				}
+	
+				final TupleSet g = f.setOf(f.tuple(QuadTableRelations.defaultGraph));
+				return g.product(y).product(x).product(z);
+			}	
+		};
+		return s;
+	}
 
 }

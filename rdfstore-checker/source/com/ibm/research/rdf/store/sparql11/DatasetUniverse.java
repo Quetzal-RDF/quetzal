@@ -16,7 +16,7 @@ import com.hp.hpl.jena.query.Dataset;
 public class DatasetUniverse extends BasicUniverse {
 
 	private final URL datasetURL;
-	private final Dataset datasetModel;
+	protected final Dataset datasetModel;
 
 	public DatasetUniverse(URL datasetURL) throws URISyntaxException {
 		this.datasetURL = datasetURL;
