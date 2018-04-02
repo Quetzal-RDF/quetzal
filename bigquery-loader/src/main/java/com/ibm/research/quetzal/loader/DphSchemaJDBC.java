@@ -10,7 +10,7 @@ import java.util.List;
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableSchema;
 import com.ibm.research.rdf.store.config.Constants;
-import com.simba.googlebigquery.core.BQConnectionOptions.QueryDialect;
+import com.simba.googlebigquery.googlebigquery.core.BQConnectionOptions.QueryDialect;
 import com.simba.googlebigquery.jdbc42.DataSource;
 
 public class DphSchemaJDBC {

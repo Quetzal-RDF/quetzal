@@ -333,7 +333,7 @@
       <artifactId>simbajdbc</artifactId>
       <scope>system</scope>
       <version>1.0</version>
-      <systemPath>${basedir}/lib/GoogleBigQueryJDBC42.jar</systemPath>
+      <systemPath>${basedir}/../com.ibm.research.quetzal.core/lib/GoogleBigQueryJDBC42.jar</systemPath>
     </dependency>
 
     <dependency>
