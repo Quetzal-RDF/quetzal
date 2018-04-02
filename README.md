@@ -15,3 +15,12 @@ The goal of Quetzal is to provide researchers with a framework to experiment wit
 * SQL generator:  In the current implementation, the plan serves as input to a number of SQL templates, which get created for every type of node in the plan tree.  The ``com.ibm.research.rdf.store.sparql11.sqltemplate`` package contains the templates, which generate SQL modularly per node in the plan tree using common table expressions (CTEs).  The template code is general purpose and keeps track of things such as the specific CTE to node mappings, what external variables need to be projected, which variables should be joined together etc.  The actual job of generating SQL for different backends is accomplished using specialized String Templates from the [String Template](http://www.stringtemplate.org) library.  Example files are ``com.ibm.research.rdf.store.sparql11.sqltemplate.common.stg`` which has the templates that are common to all backends.
 
 For more information on how to get started, click on the Wiki to this repository
+
+* Install and build issues
+If you are building from source, get the following:
+``git clone https://github.com/themadcreator/rabinfingerprint`` and build using maven.
+* Also install the latest JDBC driver from: https://cloud.google.com/bigquery/partners/simba-drivers/#current_jdbc_driver_releases_1151005 and drop it into lib to compile.
+Then clone this repository and build using maven.
+
+
+
