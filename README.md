@@ -17,10 +17,10 @@ The goal of Quetzal is to provide researchers with a framework to experiment wit
 For more information on how to get started, click on the Wiki to this repository
 
 * Install and build issues
-If building from source, get the following:
+If you are building from source, get the following:
 ``git clone https://github.com/themadcreator/rabinfingerprint`` and build using maven.
+* Also install the latest JDBC driver from: https://cloud.google.com/bigquery/partners/simba-drivers/#current_jdbc_driver_releases_1151005 and drop it into lib to compile.
 Then clone this repository and build using maven.
-
 
 
 
