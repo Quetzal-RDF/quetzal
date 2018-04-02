@@ -30,7 +30,6 @@ import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
-import com.ibm.research.rdf.store.Store.Backend;
 import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.jena.RdfStoreFactory;
 import com.ibm.research.rdf.store.jena.RdfStoreQueryExecutionFactory;
@@ -40,8 +39,6 @@ import com.ibm.research.rdf.store.query.QueryProcessorFactory;
 import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.rdf.store.sparql11.model.Query;
-import com.simba.googlebigquery.core.BQConnectionOptions.QueryDialect;
-import com.simba.googlebigquery.jdbc42.DataSource;
 
 public class TestRunner<D> {
 
@@ -211,70 +208,6 @@ public class TestRunner<D> {
 		}
 	}
 
-	public static class BigQueryEngine extends AbstractEngine<BigQueryTestData> {
-
-		public BigQueryEngine() {
-			super();
-		}
-
-		public BigQueryEngine(OWLQLSPARQLCompiler compiler) {
-			super(compiler);
-		}
-
-		protected QueryProcessor createQueryProcessor(BigQueryTestData data, Query q) {
-			return QueryProcessorFactory.create(q, data.conn, data.store,
-					data.ctx, compiler);
-		}
-
-	}
-	
-	public static class BigQueryTestData extends TestData {
-
-		public BigQueryTestData(String db, String dataset, String username,
-				String password, String schemaName, boolean defUnionGraph) {
-			super(db, dataset, username, password, schemaName,
-					defUnionGraph);
-		}
-		
-		private BigQueryTestData(BigQueryTestData toCopy, String dataset) {
-			super(toCopy, dataset);
-			setStore();
-		}
-
-		@Override
-		protected void setConnectionDetails() {
-			String jdbcUrl = "jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=" 
-					+ jdbcurl 
-					+ ";OAuthType=0;OAuthServiceAcctEmail=" 
-					+ username
-					+ ";OAuthPvtKeyPath="
-					+ password;
-
-			   DataSource ds = new DataSource();
-			   ds.setSQLDialect(QueryDialect.SQL);
-			   ds.setURL(jdbcUrl);
-			   ds.setTimeout(120);
-			   try {
-				   conn = ds.getConnection();
-			   } catch (SQLException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);				   
-			   }
-			   ctx = new Context();
-			   setStore();
-		}
-
-		@Override
-		protected Backend getBackend() {
-			return Backend.bigquery;
-		}
-
-		@Override
-		public TestData cloneAndResetStore(String dataset) {
-			return new BigQueryTestData(this, dataset);
-		}
-	}
-	
 	//
 	// Shark Test Data
 	//

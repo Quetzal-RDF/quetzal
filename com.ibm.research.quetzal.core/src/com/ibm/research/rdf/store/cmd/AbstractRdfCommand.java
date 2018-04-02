@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
-import com.simba.googlebigquery.core.BQConnectionOptions.QueryDialect;
+import com.simba.googlebigquery.googlebigquery.core.BQConnectionOptions.QueryDialect;
 import com.simba.googlebigquery.jdbc42.DataSource;
 
 public abstract class AbstractRdfCommand
