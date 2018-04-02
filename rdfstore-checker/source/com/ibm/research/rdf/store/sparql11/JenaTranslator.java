@@ -1612,6 +1612,12 @@ public class JenaTranslator implements OpVisitor {
 		assert context.getCurrentQuery() == null;
 		if (context.getCurrentContinuation() == null) {
 			context.setCurrentContinuation(next);
+		} else {
+			Continuation c = context.getCurrentContinuation();
+			context.setCurrentContinuation((TranslatorContext cc, Formula ff) -> {
+				context.setCurrentContinuation(c);
+				next.next(cc, ff);
+			});
 		}
 		
 		if (op != context.top()) {
