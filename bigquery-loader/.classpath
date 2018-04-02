@@ -23,6 +23,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/rdfstore-base"/>
-	<classpathentry kind="lib" path="lib/GoogleBigQueryJDBC42.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
