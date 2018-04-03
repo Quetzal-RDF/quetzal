@@ -1863,54 +1863,54 @@ public class JenaTranslator implements OpVisitor {
 		return choice;
 	}
 	
+	class SplitContext extends DomainContext {
+		private final Set<Variable> staticBinding;
+		private Expression dynamicBinding;
+		private Formula query;
+		private SplitContext(TranslatorContext parent) {
+			super(parent);
+			staticBinding = parent.getStaticBinding()==null? HashSetFactory.<Variable>make(): HashSetFactory.make(parent.getStaticBinding());
+			dynamicBinding = parent.getDynamicBinding();
+		}
+
+		@Override
+		public Expression getDynamicBinding() {
+			return dynamicBinding;
+		}
+
+		@Override
+		public void setDynamicBinding(Expression dynamicBinding) {
+			this.dynamicBinding = dynamicBinding;
+		}
+
+		@Override
+		public Set<Variable> getStaticBinding() {
+			return staticBinding;
+		}
+
+		@Override
+		public void setStaticBinding(Set<Variable> staticBinding) {
+			this.staticBinding.addAll(staticBinding);
+		}
+
+		@Override
+		public Formula getCurrentQuery() {
+			return query;
+		}
+
+		@Override
+		public void setCurrentQuery(Formula currentQuery) {
+			query = currentQuery;
+		}
+	};
+
 	@Override
 	public void visit(OpUnion arg0) {
-		class UnionContext extends DomainContext {
-			private final Set<Variable> staticBinding;
-			private Expression dynamicBinding;
-			private Formula query;
-			private UnionContext(TranslatorContext parent) {
-				super(parent);
-				staticBinding = parent.getStaticBinding()==null? HashSetFactory.<Variable>make(): HashSetFactory.make(parent.getStaticBinding());
-				dynamicBinding = parent.getDynamicBinding();
-			}
-
-			@Override
-			public Expression getDynamicBinding() {
-				return dynamicBinding;
-			}
-
-			@Override
-			public void setDynamicBinding(Expression dynamicBinding) {
-				this.dynamicBinding = dynamicBinding;
-			}
-
-			@Override
-			public Set<Variable> getStaticBinding() {
-				return staticBinding;
-			}
-
-			@Override
-			public void setStaticBinding(Set<Variable> staticBinding) {
-				this.staticBinding.addAll(staticBinding);
-			}
-
-			@Override
-			public Formula getCurrentQuery() {
-				return query;
-			}
-
-			@Override
-			public void setCurrentQuery(Formula currentQuery) {
-				query = currentQuery;
-			}
-		};
-
 		TranslatorContext save = context;
 		Continuation c = save.getCurrentContinuation();
 		TranslatorContext scope = new ScopeContext(save, arg0);
 
-		TranslatorContext left = context = new UnionContext(scope);
+		TranslatorContext left = context = new SplitContext(scope);
 
 		if (context.explicitChoices()) {
 			visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
@@ -1918,7 +1918,7 @@ public class JenaTranslator implements OpVisitor {
 				c.next(context1, l);
 			});
 
-			TranslatorContext right = context = new UnionContext(scope);
+			TranslatorContext right = context = new SplitContext(scope);
 			visit(arg0.getRight(), (TranslatorContext context1, Formula r) -> {
 				context1.setCurrentQuery(r);
 				c.next(context1, r);
@@ -1927,7 +1927,7 @@ public class JenaTranslator implements OpVisitor {
 		} else {
 			visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
 
-				TranslatorContext right = context = new UnionContext(scope);
+				TranslatorContext right = context = new SplitContext(scope);
 				visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
 
 					context = save;
@@ -2174,10 +2174,26 @@ public class JenaTranslator implements OpVisitor {
 				context = outerSave;
 		
 				context.setStaticBinding(leftStaticBinding);
-				context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
-				context.setCurrentQuery(l.and(both.or(leftOnly)));
 				
-				context.getCurrentContinuation().next(context, context.getCurrentQuery());
+				if (context.explicitChoices()) {
+					SplitContext leftContext = new SplitContext(context);
+					context = leftContext;
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setCurrentQuery(l.and(leftOnly));				
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+
+					SplitContext rightContext = new SplitContext(context);
+					context = rightContext;
+					context.setDynamicBinding(rightDynamicBinding);
+					context.setCurrentQuery(l.and(both));				
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+
+				} else {
+					context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
+					context.setCurrentQuery(l.and(both.or(leftOnly)));
+				
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+				}
 			});
 		});
 	}

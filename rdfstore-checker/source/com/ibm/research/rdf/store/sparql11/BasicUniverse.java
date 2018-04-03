@@ -416,41 +416,53 @@ public abstract class BasicUniverse implements UniverseFactory {
 		};
 	}
 
+	public TupleSet subjectsTableTuples(TupleFactory tf) {
+		TupleSet tuples = tf.noneOf(1);
+		for(Object bn : subjects) {
+			tuples.add(tf.tuple(bn));
+		}
+
+		return tuples;
+	}
+
 	public LazyTupleSet subjectsTableBound(final TupleFactory tf, Set<Object> liveAtoms) {
 		return new LazyTupleSet() {
 			public TupleSet tuples() {
-				TupleSet tuples = tf.noneOf(1);
-				for(Object bn : subjects) {
-					tuples.add(tf.tuple(bn));
-				}
-
-				return tuples;
+				return subjectsTableTuples(tf);
 			}
 		};
+	}
+
+	public TupleSet predicatesTableTuples(final TupleFactory tf) {
+		TupleSet tuples = tf.noneOf(1);
+		for(URI bn : predicates) {
+			tuples.add(tf.tuple(bn));
+		}
+
+		return tuples;
 	}
 
 	public LazyTupleSet predicatesTableBound(final TupleFactory tf, Set<Object> liveAtoms) {
 		return new LazyTupleSet() {
 			public TupleSet tuples() {
-				TupleSet tuples = tf.noneOf(1);
-				for(URI bn : predicates) {
-					tuples.add(tf.tuple(bn));
-				}
-
-				return tuples;
+				return predicatesTableTuples(tf);
 			}
 		};
+	}
+
+	public TupleSet objectsTableTuples(TupleFactory tf) {
+		TupleSet tuples = tf.noneOf(1);
+		for(Object bn : objects) {
+			tuples.add(tf.tuple(bn));
+		}
+
+		return tuples;
 	}
 
 	public LazyTupleSet objectsTableBound(final TupleFactory tf, Set<Object> liveAtoms) {
 		return new LazyTupleSet() {
 			public TupleSet tuples() {
-				TupleSet tuples = tf.noneOf(1);
-				for(Object bn : objects) {
-					tuples.add(tf.tuple(bn));
-				}
-
-				return tuples;
+				return objectsTableTuples(tf);
 			}
 		};
 	}

@@ -2,24 +2,22 @@ package com.ibm.research.rdf.store.sparql11;
 
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Set;
 
-import kodkod.ast.Relation;
-import kodkod.instance.Bounds;
-import kodkod.instance.TupleFactory;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 
-public class OpenDatasetUniverse extends DatasetUniverse {
+import com.hp.hpl.jena.query.Dataset;
 
+public class OpenDatasetUniverse extends BoundedUniverse {
+	
 	public OpenDatasetUniverse(URL datasetURL) throws URISyntaxException {
-		super(datasetURL);
+		super();
+		Dataset datasetModel = 
+				RDFDataMgr.loadDataset(
+						datasetURL.toExternalForm(),
+						datasetURL.getPath().endsWith(".nq")? Lang.NQUADS: Lang.NTRIPLES);
+		initDataset(datasetModel);
 	}
-
-	@Override
-	protected void boundDataSet(Set<Relation> liveRelations, TupleFactory tf, Bounds b, Set<Object> liveAtoms)
-			throws URISyntaxException {
-		LazyTupleSet s = dataSetCrossProduct(tf);		
-		bound(liveRelations, liveAtoms, b, QuadTableRelations.quads, relationTableBound(tf, datasetModel.asDatasetGraph().find(), liveAtoms), s);
-	}
-
+	
 	
 }

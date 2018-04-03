@@ -37,24 +37,29 @@ public class LSDDriver {
 		JenaTranslator xlator = JenaTranslator.make(ast.getProjectVars(), Collections.singleton(query), U, null);
 
 		if (args.length > 2 && "expand".equals(args[2])) {
+			Formula f = Formula.TRUE;
+			Formula s1 = null;
+			Formula s2 = null;
 			Dataset dataset = DatasetFactory.createMem();
 			Graph G = dataset.asDatasetGraph().getDefaultGraph();
 			Set<Pair<Formula, Pair<Formula, Formula>>> fs = xlator.translateSingle(Collections.<String,Object>emptyMap(), true);
-			for(Pair<Formula, Pair<Formula, Formula>> f : fs) {
-				System.err.println(f);
-				
-				for(Relation r : ASTUtils.gatherRelations(f.fst)) {
+			for(Pair<Formula, Pair<Formula, Formula>> p : fs) {
+				for(Relation r : ASTUtils.gatherRelations(p.fst)) {
 					if (r.name().equals("solution")) {
-						f = Pair.make(f.fst.and(r.some()), f.snd);
+						f = f.and(p.fst.and(r.some()));
+						s1 = s1==null? p.snd.fst: p.snd.fst==null? s1: p.snd.fst.and(s1);
+						s2 = s2==null? p.snd.snd: p.snd.snd==null? s2: p.snd.snd.and(s2);
 						break;
 					}
 				}
-				
-				TupleSet t = Drivers.check(U, f, "quads");
-				if (t != null) {
-					JenaUtil.addTupleSet(G, t);
-				}
 			}
+			
+			System.err.println(f);
+			TupleSet t = Drivers.check(U, Pair.make(f,  Pair.make(s1, s2)), "quads");
+			if (t != null) {
+				JenaUtil.addTupleSet(G, t);
+			}
+
 			RDFDataMgr.write(System.out, dataset, Lang.NQ);
 
 		} else {
