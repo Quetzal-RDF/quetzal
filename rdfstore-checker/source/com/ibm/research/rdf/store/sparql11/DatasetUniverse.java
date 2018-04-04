@@ -15,21 +15,23 @@ import com.hp.hpl.jena.query.Dataset;
 
 public class DatasetUniverse extends BasicUniverse {
 
-	private final URL datasetURL;
 	protected final Dataset datasetModel;
 
 	public DatasetUniverse(URL datasetURL) throws URISyntaxException {
-		this.datasetURL = datasetURL;
-		this.datasetModel = 
-				RDFDataMgr.loadDataset(
-						datasetURL.toExternalForm(),
-						datasetURL.getPath().endsWith(".nq")? Lang.NQUADS: Lang.NTRIPLES);
+		this(RDFDataMgr.loadDataset(
+				datasetURL.toExternalForm(),
+						datasetURL.getPath().endsWith(".nq")? Lang.NQUADS: Lang.NTRIPLES));
+
+	}
+	
+	public DatasetUniverse(Dataset dataset) throws URISyntaxException {
+		this.datasetModel = dataset;
 		initDataset(datasetModel);
 	}
 
 	@Override
 	public String toString() {
-		return datasetURL.getPath();
+		return datasetModel.toString();
 	}
 	
 	@Override

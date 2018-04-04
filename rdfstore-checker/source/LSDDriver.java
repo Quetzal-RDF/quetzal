@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.riot.Lang;
@@ -11,6 +12,15 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.RDFVisitor;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.ibm.rdf.store.dawg.queries.SparqlRdfResultReader;
 import com.ibm.rdf.store.dawg.queries.SparqlSelectResult;
@@ -22,6 +32,13 @@ import com.ibm.research.rdf.store.sparql11.Drivers;
 import com.ibm.research.rdf.store.sparql11.JenaTranslator;
 import com.ibm.research.rdf.store.sparql11.JenaUtil;
 import com.ibm.research.rdf.store.sparql11.SolutionRelation;
+import com.ibm.research.rdf.store.sparql11.model.BlankNodeVariable;
+import com.ibm.research.rdf.store.sparql11.model.Constant;
+import com.ibm.research.rdf.store.sparql11.model.IRI;
+import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
+import com.ibm.research.rdf.store.sparql11.model.StringLiteral;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.wala.util.collections.MapIterator;
 import com.ibm.wala.util.collections.Pair;
 
 import kodkod.ast.Formula;
@@ -71,5 +88,76 @@ public class LSDDriver {
 		}
 
 		RDFDataMgr.write(System.out, dataset, Lang.NQ);
+		
+		QueryExecution exec = QueryExecutionFactory.create(ast, dataset);
+		SparqlSelectResult rr = new SparqlSelectResult() {
+			private final ResultSet results = exec.execSelect();
+
+			@Override
+			public Iterator<Row> rows() {
+				return new Iterator<Row>() {
+					@Override
+					public boolean hasNext() {
+						return results.hasNext();
+					}
+
+					@Override
+					public Row next() {
+						return new Row() {
+							private final QuerySolution row = results.next();
+							
+							@Override
+							public QueryTripleTerm get(Variable v) {
+								RDFNode val = row.get(v.getName());
+								return (QueryTripleTerm) val.visitWith(new RDFVisitor() {
+									@Override
+									public Object visitBlank(Resource r, AnonId id) {
+										return new QueryTripleTerm(new BlankNodeVariable(id.getLabelString()));
+									}
+									@Override
+									public Object visitURI(Resource r, String uri) {
+										return new QueryTripleTerm(new IRI(uri));									}
+									@Override
+									public Object visitLiteral(Literal l) {
+										StringLiteral s = new StringLiteral(l.getLexicalForm());
+										if (l.getLanguage() != null) {
+											s.setLanguage(l.getLanguage());
+										}
+										if (l.getDatatypeURI() != null) {
+											s.setType(new IRI(l.getDatatypeURI()));
+										}
+										return new QueryTripleTerm(new Constant(s));
+									}
+								});
+							}
+
+							@Override
+							public Iterator<Variable> variables() {
+								return new MapIterator<String,Variable>(row.varNames(), (String name) -> {
+									return new Variable(name);
+								});
+							}
+						};
+					}
+				};
+			}
+
+			@Override
+			public Iterator<Variable> variables() {
+				Iterator<String> vars = results.getResultVars().iterator();
+				return new MapIterator<String,Variable>(vars, (String name) -> {
+					return new Variable(name);
+				});
+			}
+		};
+		
+		U = new DatasetUniverse(dataset);
+		s = new SolutionRelation(rr, ast.getProjectVars(), Collections.<String,Object>emptyMap());
+		s.init(U);
+		xlator = JenaTranslator.make(ast.getProjectVars(), Collections.singleton(query), U, s);
+		xlation = xlator.translateSingle(Collections.<String,Object>emptyMap(), false).iterator().next();
+		System.err.println(xlation.fst);
+		Drivers.check(U, xlation, "solution");
+
 	}
 }
