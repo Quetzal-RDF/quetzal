@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.core.Var;
-import com.ibm.rdf.store.dawg.queries.DawgRdfResultReader;
+import com.ibm.rdf.store.dawg.queries.SparqlRdfResultReader;
 import com.ibm.rdf.store.dawg.queries.QueryTests.QueryTest;
 import com.ibm.rdf.store.dawg.queries.SparqlSelectResult;
 import com.ibm.rdf.store.dawg.queries.SparqlSelectResult.Row;
@@ -105,7 +105,7 @@ public class Drivers {
 		if (arg.endsWith("srx")) {
 			r = new SparqlXmlResultReader(new URL(arg).openStream());
 		} else if (arg.endsWith("ttl")) {
-			r = new DawgRdfResultReader(arg);
+			r = new SparqlRdfResultReader(arg);
 		} else {
 			assert false : "support " + arg;
 		}

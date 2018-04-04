@@ -1962,7 +1962,7 @@ public class JenaTranslator implements OpVisitor {
 						}	 
 					}
 
-					//				context.getCurrentContinuation().next(context, context.getCurrentQuery());
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
 				});
 			});
 		}
