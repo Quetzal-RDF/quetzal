@@ -8,7 +8,7 @@ import java.net.URL;
 import java.util.Set;
 
 import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.hp.hpl.jena.datatypes.xsd.impl.XMLLiteralType;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
@@ -91,7 +91,7 @@ public class JenaUtil {
 		if (o.snd instanceof String) {
 			return NodeFactory.createLiteral(o.fst, (String)o.snd, false);
 		} else if (o.snd instanceof URI) {
-			RDFDatatype dtype = new XSDDatatype(((URI)o.snd).toString());
+			RDFDatatype dtype = XMLLiteralType.theXMLLiteralType;
 			return NodeFactory.createLiteral(o.fst, dtype);
 		} else {
 			assert o.snd == null;
@@ -99,11 +99,18 @@ public class JenaUtil {
 		}
 	}
 
+	public static Node fromAtom(Object o) {
+		if (o instanceof Pair<?,?>) {
+			return fromLiteral((Pair<String,Object>) o);
+		} else {
+			return fromURI(o.toString());
+		}
+	}
 	public static Triple fromTuple(Tuple t) {
-		String s = t.atom(1).toString();
-		String p = t.atom(2).toString();
-		String o = t.atom(3).toString();
-		return Triple.create(fromURI(s), fromURI(p), fromURI(o));
+		Node s = fromAtom(t.atom(1));
+		Node p = fromAtom(t.atom(2));
+		Node o = fromAtom(t.atom(3));
+		return Triple.create(s, p, o);
 	}
 	
 	public static void addTupleSet(Graph G, TupleSet tt) {

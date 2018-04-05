@@ -38,6 +38,7 @@ import com.ibm.research.rdf.store.sparql11.model.IRI;
 import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
 import com.ibm.research.rdf.store.sparql11.model.StringLiteral;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.MapIterator;
 import com.ibm.wala.util.collections.Pair;
 
@@ -68,12 +69,22 @@ public class LSDDriver {
 		Formula s1 = null;
 		Formula s2 = null;
 		Set<Pair<Formula, Pair<Formula, Formula>>> fs = xlator.translateSingle(Collections.<String,Object>emptyMap(), true);
+		Set<Relation> prs = HashSetFactory.make();
 		formulae: for(Pair<Formula, Pair<Formula, Formula>> p : fs) {
 			for(Relation r : ASTUtils.gatherRelations(p.fst)) {
 				if (r.name().equals("solution")) {
 					
 					Formula thisf = p.fst.and(r.some());
+					for(Relation pr : prs) {
+						if (r.arity() == pr.arity()) {
+							thisf = thisf.and(pr.eq(r).not());
+						}
+					}
+
+					prs.add(r);
+					
 					if (Drivers.check(U, Pair.make(thisf, p.snd), "solution") == null) {
+						prs.clear();
 						continue formulae;
 					}
 					
@@ -114,6 +125,7 @@ public class LSDDriver {
 			JenaUtil.addTupleSet(G, t);
 		}
 
+		System.out.println("the dataset:");
 		RDFDataMgr.write(System.out, dataset, Lang.NQ);
 		
 		QueryExecution exec = QueryExecutionFactory.create(ast, dataset);
