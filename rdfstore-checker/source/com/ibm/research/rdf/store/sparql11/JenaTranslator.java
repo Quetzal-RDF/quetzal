@@ -1008,7 +1008,6 @@ public class JenaTranslator implements OpVisitor {
 
 			} else {
 				actualSolution = scope(q, context.getDynamicBinding(), context.getVars().values());
-				System.err.println(actualSolution);
 			}
 
 			for(Formula f : relationBindings) {

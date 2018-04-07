@@ -33,6 +33,8 @@ public class BoundedUniverse extends BasicUniverse {
 			ensureIRI(new URI("http://synthetic/" + i));
 		}
 	
+		ensureLiteral(Pair.<String, Object>make(ANY_LANGUAGE, null));
+		
 		for(int i = 0; i < literalLimit; i++) {
 			ensureLiteral(
 				Pair.<String, Object>make(

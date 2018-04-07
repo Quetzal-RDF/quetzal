@@ -322,17 +322,14 @@ public class Drivers {
 		Formula f = Nodes.simplify(qf, b);
 
 		Solution s = solver.solve(f, b);
-		System.err.print(s);
 		
 		if (s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE) {
 			Instance instance = s.instance();
-			System.err.println(instance);
 			Evaluator eval = new Evaluator(instance, solver.options());
 				
 			for(Relation rl : instance.relations()) {
 				if (rl.name().equals(relation)) {
 					TupleSet tuples = eval.evaluate(rl);
-					System.err.println(rl.name() + ":\n" + tuples);
 					return tuples;
 				}
 			}
@@ -342,7 +339,6 @@ public class Drivers {
 			if (answer.snd.snd != null) {				
 				Solution diff = solver.solve(Nodes.simplify(cf, b), b);
 
-				System.err.println(diff.instance());
 				Evaluator eval = new Evaluator(diff.instance());
 
 				for(Relation rl : diff.instance().relations()) {

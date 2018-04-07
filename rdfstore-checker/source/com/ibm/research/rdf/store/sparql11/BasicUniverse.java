@@ -62,7 +62,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 
 	private void addLanguage(String language) {
 		languages.add(language);
-		//ensureLiteral(Pair.make(language, null));
+		ensureLiteral(Pair.make(language, null));
 	}
 	
 	@Override
