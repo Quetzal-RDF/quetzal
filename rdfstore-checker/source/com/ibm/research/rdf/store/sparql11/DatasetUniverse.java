@@ -4,14 +4,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
-import kodkod.ast.Relation;
-import kodkod.instance.Bounds;
-import kodkod.instance.TupleFactory;
-
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 import com.hp.hpl.jena.query.Dataset;
+
+import kodkod.ast.Relation;
+import kodkod.instance.Bounds;
+import kodkod.instance.TupleFactory;
 
 public class DatasetUniverse extends BasicUniverse {
 

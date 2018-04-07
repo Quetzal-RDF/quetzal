@@ -4,11 +4,12 @@ import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.fullUnsignedInt
 import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.maxSetBit;
 import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.one;
 import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.zero;
+
+import com.ibm.wala.util.collections.Pair;
+
 import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
 import kodkod.ast.IntExpression;
-
-import com.ibm.wala.util.collections.Pair;
 
 public class FloatingPoint {
 	

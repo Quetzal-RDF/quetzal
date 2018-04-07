@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,15 +22,12 @@ import org.xml.sax.SAXException;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.core.Var;
-import com.ibm.rdf.store.dawg.queries.SparqlRdfResultReader;
-import com.ibm.rdf.store.dawg.queries.QueryTests.QueryTest;
-import com.ibm.rdf.store.dawg.queries.SparqlSelectResult;
-import com.ibm.rdf.store.dawg.queries.SparqlSelectResult.Row;
-import com.ibm.rdf.store.dawg.queries.SparqlXmlResultReader;
 import com.ibm.research.kodkod.util.Nodes;
-import com.ibm.research.rdf.store.sparql11.DawgUtil.DawgVerification;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
-import com.ibm.wala.util.Predicate;
+import com.ibm.research.rdf.store.utilities.io.SparqlRdfResultReader;
+import com.ibm.research.rdf.store.utilities.io.SparqlSelectResult;
+import com.ibm.research.rdf.store.utilities.io.SparqlSelectResult.Row;
+import com.ibm.research.rdf.store.utilities.io.SparqlXmlResultReader;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
@@ -53,35 +49,6 @@ import kodkod.instance.TupleSet;
 
 public class Drivers {
 
-	public static class DumpDawgTests {
-		public static void main(final String[] args) throws SQLException, IOException, URISyntaxException, ParserConfigurationException, SAXException {
-			for(DawgVerification v : 
-				DawgUtil.dawgTests(
-						new Predicate<QueryTest>() {
-							@Override
-							public boolean test(QueryTest arg0) {
-								for(int i = 0; i < args.length; i++) {
-									if (arg0.getQuery().contains(args[i])) {
-										return true;
-									}
-								}
-								return false;
-							}
-						})
-			   ) 
-			{
-				v.verify();
-			}
-		}
-	}
-	
-	public static class DumpDawgSolution {
-		public static void main(String[] args) throws MalformedURLException, ParserConfigurationException, SAXException, IOException, URISyntaxException {
-			String testFileName = args[0];
-			SparqlSelectResult r = DawgUtil.getDawgSolution(testFileName);
-			showSolution(r);
-		}
-	}
 
 	public static class DumpSolution {
 		public static void main(String[] args) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {

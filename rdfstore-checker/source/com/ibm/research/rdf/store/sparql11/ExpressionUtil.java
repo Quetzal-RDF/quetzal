@@ -5,14 +5,14 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import com.ibm.wala.util.collections.Pair;
+
 import kodkod.ast.Expression;
 import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
 import kodkod.ast.IntExpression;
 import kodkod.ast.operator.ExprCastOperator;
 import kodkod.ast.operator.IntCompOperator;
-
-import com.ibm.wala.util.collections.Pair;
 
 public class ExpressionUtil {
 

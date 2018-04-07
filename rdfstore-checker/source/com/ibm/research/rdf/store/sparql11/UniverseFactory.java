@@ -4,10 +4,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
 
+import com.ibm.wala.util.collections.Pair;
+
 import kodkod.ast.Relation;
 import kodkod.instance.Bounds;
-
-import com.ibm.wala.util.collections.Pair;
 
 public interface UniverseFactory {
 
