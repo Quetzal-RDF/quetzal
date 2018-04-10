@@ -4,13 +4,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import com.ibm.wala.util.collections.HashMapFactory;
+import com.ibm.wala.util.collections.HashSetFactory;
+
 import kodkod.ast.Node;
 import kodkod.ast.Relation;
 import kodkod.ast.Variable;
 import kodkod.ast.visitor.AbstractCollector;
-
-import com.ibm.wala.util.collections.HashMapFactory;
-import com.ibm.wala.util.collections.HashSetFactory;
 
 public class ASTUtils {
 

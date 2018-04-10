@@ -9,19 +9,19 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import com.hp.hpl.jena.sparql.core.Var;
+import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.utilities.io.SparqlSelectResult;
+import com.ibm.research.rdf.store.utilities.io.SparqlSelectResult.Row;
+import com.ibm.wala.util.collections.HashSetFactory;
+import com.ibm.wala.util.collections.Iterator2Set;
+
 import kodkod.ast.Expression;
 import kodkod.ast.Relation;
 import kodkod.instance.Bounds;
 import kodkod.instance.TupleFactory;
 import kodkod.instance.TupleSet;
-
-import com.hp.hpl.jena.sparql.core.Var;
-import com.ibm.rdf.store.dawg.queries.SparqlSelectResult;
-import com.ibm.rdf.store.dawg.queries.SparqlSelectResult.Row;
-import com.ibm.research.rdf.store.sparql11.model.QueryTripleTerm;
-import com.ibm.research.rdf.store.sparql11.model.Variable;
-import com.ibm.wala.util.collections.HashSetFactory;
-import com.ibm.wala.util.collections.Iterator2Set;
 
 public class SolutionRelation {
 	private final SparqlSelectResult solution;

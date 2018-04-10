@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,10 +17,25 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.SAXException;
+
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.sparql.algebra.Op;
+import com.hp.hpl.jena.sparql.core.Var;
+import com.ibm.research.kodkod.util.Nodes;
+import com.ibm.research.rdf.store.sparql11.model.Variable;
+import com.ibm.research.rdf.store.utilities.io.SparqlRdfResultReader;
+import com.ibm.research.rdf.store.utilities.io.SparqlSelectResult;
+import com.ibm.research.rdf.store.utilities.io.SparqlSelectResult.Row;
+import com.ibm.research.rdf.store.utilities.io.SparqlXmlResultReader;
+import com.ibm.wala.util.collections.HashMapFactory;
+import com.ibm.wala.util.collections.HashSetFactory;
+import com.ibm.wala.util.collections.Pair;
+import com.ibm.wala.util.functions.Function;
+
 import kodkod.ast.Formula;
 import kodkod.ast.IntConstant;
 import kodkod.ast.Relation;
-import kodkod.engine.CapacityExceededException;
 import kodkod.engine.Evaluator;
 import kodkod.engine.Solution;
 import kodkod.engine.Solution.Outcome;
@@ -33,56 +47,8 @@ import kodkod.instance.Instance;
 import kodkod.instance.Tuple;
 import kodkod.instance.TupleSet;
 
-import org.xml.sax.SAXException;
-
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.ibm.rdf.store.dawg.queries.DawgRdfResultReader;
-import com.ibm.rdf.store.dawg.queries.QueryTests.QueryTest;
-import com.ibm.rdf.store.dawg.queries.SparqlSelectResult;
-import com.ibm.rdf.store.dawg.queries.SparqlSelectResult.Row;
-import com.ibm.rdf.store.dawg.queries.SparqlXmlResultReader;
-import com.ibm.research.kodkod.util.Nodes;
-import com.ibm.research.rdf.store.sparql11.DawgUtil.DawgVerification;
-import com.ibm.research.rdf.store.sparql11.model.Variable;
-import com.ibm.wala.util.Predicate;
-import com.ibm.wala.util.collections.HashMapFactory;
-import com.ibm.wala.util.collections.HashSetFactory;
-import com.ibm.wala.util.collections.Pair;
-import com.ibm.wala.util.functions.Function;
-
 public class Drivers {
 
-	public static class DumpDawgTests {
-		public static void main(final String[] args) throws SQLException, IOException, URISyntaxException, ParserConfigurationException, SAXException {
-			for(DawgVerification v : 
-				DawgUtil.dawgTests(
-						new Predicate<QueryTest>() {
-							@Override
-							public boolean test(QueryTest arg0) {
-								for(int i = 0; i < args.length; i++) {
-									if (arg0.getQuery().contains(args[i])) {
-										return true;
-									}
-								}
-								return false;
-							}
-						})
-			   ) 
-			{
-				v.verify();
-			}
-		}
-	}
-	
-	public static class DumpDawgSolution {
-		public static void main(String[] args) throws MalformedURLException, ParserConfigurationException, SAXException, IOException, URISyntaxException {
-			String testFileName = args[0];
-			SparqlSelectResult r = DawgUtil.getDawgSolution(testFileName);
-			showSolution(r);
-		}
-	}
 
 	public static class DumpSolution {
 		public static void main(String[] args) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {
@@ -106,7 +72,7 @@ public class Drivers {
 		if (arg.endsWith("srx")) {
 			r = new SparqlXmlResultReader(new URL(arg).openStream());
 		} else if (arg.endsWith("ttl")) {
-			r = new DawgRdfResultReader(arg);
+			r = new SparqlRdfResultReader(arg);
 		} else {
 			assert false : "support " + arg;
 		}
@@ -133,7 +99,7 @@ public class Drivers {
 		Query q2 = JenaUtil.parse(queryFile2);
 		Op query2 = JenaUtil.compile(q2);
 
-		JenaTranslator jt = JenaTranslator.make(q1.getProjectVars(), Arrays.asList(query1, query2), uf);
+		JenaTranslator jt = JenaTranslator.make(q1.getProjectVars(), Arrays.asList(query1, query2), uf, null);
 		Pair<Formula, Pair<Formula, Formula>> answer = jt.translateMulti(leftNonEmpty, rightNonEmpty);
 		
 		if (bound > 0) {
@@ -142,7 +108,7 @@ public class Drivers {
 		
 		System.err.println(answer.fst);
 		
-		check(uf, answer);
+		check(uf, answer, "solution");
 	}
 	
 	public static void runVerify(URL dataSet, String queryFile, SparqlSelectResult result) throws URISyntaxException,
@@ -152,7 +118,7 @@ public class Drivers {
 		Query q = JenaUtil.parse(queryFile);
 		List<Var> vars = q.getProjectVars();
 
-		tryToCheck(dataSet, result, q, vars, Collections.<String,Object>emptyMap());
+		tryToCheck(dataSet, result, q, vars, Collections.<String,Object>emptyMap(), "solution", false);
 	}
 
 	private static Map<String, Object> tupleBindings(List<Var> vars, List<Object> t) {
@@ -175,7 +141,7 @@ public class Drivers {
 	}
 	
 	private static Set<List<Object>> tryToCheck(URL dataSet, SparqlSelectResult result,
-			Query q, List<Var> vars, Map<String, Object> bindings) throws URISyntaxException,
+			Query q, List<Var> vars, Map<String, Object> bindings, String relation, boolean expand) throws URISyntaxException,
 			MalformedURLException, IOException {
 
 		if (vars.size() <= 3) {
@@ -186,26 +152,29 @@ public class Drivers {
 			Op query = JenaUtil.compile(q);
 			System.err.println(query);
 			JenaTranslator jt = JenaTranslator.make(vars, query, uf, solutionRelation);
-			Pair<Formula, Pair<Formula, Formula>> answer = jt.translateSingle(bindings);
+			Set<Pair<Formula, Pair<Formula, Formula>>> answer = jt.translateSingle(bindings, expand);
 
 			Set<List<Object>> r = HashSetFactory.make();
-			TupleSet tuples = check(uf, answer);
-			if (q.isAskType()) {
-				return null;
-			} else {
-				if (tuples == null) {
+			
+			for(Pair<Formula, Pair<Formula, Formula>> a : answer) {
+				TupleSet tuples = check(uf, a, relation);
+				if (q.isAskType()) {
 					return null;
 				} else {
-					for(Tuple t : tuples) {
-						List<Object> bt = new ArrayList<Object>(vars.size());
-						for (int i = 0; i < t.arity(); i++) {
-							bt.add(t.atom (i));
+					if (tuples == null) {
+						continue;
+					} else {
+						for(Tuple t : tuples) {
+							List<Object> bt = new ArrayList<Object>(vars.size());
+							for (int i = 0; i < t.arity(); i++) {
+								bt.add(t.atom (i));
+							}
+							r.add(bt);
 						}
-						r.add(bt);
 					}
-					return r;
 				}
 			}
+			return r;
 		} else {
 			List<Var> split = new LinkedList<Var>();
 			Iterator<Var> vs = vars.iterator();
@@ -223,12 +192,12 @@ public class Drivers {
 			
 			assert newVars.size() < vars.size();
 			
-			Set<List<Object>> subset = tryToCheck(dataSet, result, q, newVars, bindings);
+			Set<List<Object>> subset = tryToCheck(dataSet, result, q, newVars, bindings, relation, expand);
 			Set<List<Object>> fullset = HashSetFactory.make();
 			for(List<Object> t : subset) {
 				Map<String, Object> newBindings = tupleBindings(newVars, t);
 				newBindings.putAll(bindings);
-				for (List<Object> ext : tryToCheck(dataSet, result, q, split, newBindings)) {
+				for (List<Object> ext : tryToCheck(dataSet, result, q, split, newBindings, relation, expand)) {
 					List<Object> bt = new ArrayList<Object>(vars.size());
 					for (int i = 0; i < ext.size(); i++) {
 						bt.add(ext.get(i));
@@ -260,9 +229,9 @@ public class Drivers {
 
 		Op query = JenaUtil.compile(q);
 		JenaTranslator jt = r==null? JenaTranslator.make(vars, query, uf): JenaTranslator.make(vars, query, uf, r);
-		Pair<Formula, Pair<Formula, Formula>> answer = jt.translateSingle(Collections.<String,Object>emptyMap());
+		Pair<Formula, Pair<Formula, Formula>> answer = jt.translateSingle(Collections.<String,Object>emptyMap(), false).iterator().next();
 
-		check(uf, answer);
+		check(uf, answer, "solution");
 	}
 
 	public static void runRepair(URL datasetURL, String queryFile, SparqlSelectResult result) throws URISyntaxException,
@@ -281,7 +250,7 @@ public class Drivers {
 
 		Op query = JenaUtil.compile(q);
 		JenaTranslator jt = r==null? JenaTranslator.make(vars, query, uf): JenaTranslator.make(vars, query, uf, r);
-		Pair<Formula, Pair<Formula, Formula>> answer = jt.translateSingle(Collections.<String,Object>emptyMap());
+		Pair<Formula, Pair<Formula, Formula>> answer = jt.translateSingle(Collections.<String,Object>emptyMap(), false).iterator().next();
 
 		Formula minDiff =
 			QuadTableRelations.quads.union(QuadTableRelations.desiredQuads).count().minus(
@@ -289,11 +258,12 @@ public class Drivers {
 		
 		answer = Pair.make(answer.fst.and(minDiff), Pair.make(answer.snd.fst.and(minDiff), answer.snd.snd.and(minDiff)));
 
-		check(uf, answer);
+		check(uf, answer, "solution");
 	}
 
-	private static TupleSet check(UniverseFactory uf,
-			Pair<Formula, Pair<Formula, Formula>> answer)
+	public static TupleSet check(UniverseFactory uf,
+			Pair<Formula, Pair<Formula, Formula>> answer,
+			String relation)
 			throws URISyntaxException {
 		Formula qf = answer.fst;		
 		if (answer.snd.fst != null) {
@@ -319,17 +289,14 @@ public class Drivers {
 		Formula f = Nodes.simplify(qf, b);
 
 		Solution s = solver.solve(f, b);
-		System.err.print(s);
 		
 		if (s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE) {
 			Instance instance = s.instance();
-			System.err.println(instance);
 			Evaluator eval = new Evaluator(instance, solver.options());
 				
 			for(Relation rl : instance.relations()) {
-				if (rl.name().equals("solution")) {
+				if (rl.name().equals(relation)) {
 					TupleSet tuples = eval.evaluate(rl);
-					System.err.println(rl.name() + ":\n" + tuples);
 					return tuples;
 				}
 			}
@@ -339,7 +306,6 @@ public class Drivers {
 			if (answer.snd.snd != null) {				
 				Solution diff = solver.solve(Nodes.simplify(cf, b), b);
 
-				System.err.println(diff.instance());
 				Evaluator eval = new Evaluator(diff.instance());
 
 				for(Relation rl : diff.instance().relations()) {

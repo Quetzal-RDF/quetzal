@@ -1,6 +1,11 @@
 package com.ibm.research.rdf.store.sparql11;
 
-import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.*;
+import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.bitWidth;
+import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.typeURI;
+import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.xsdDecimalType;
+import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.xsdDoubleType;
+import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.xsdFloatType;
+import static com.ibm.research.rdf.store.sparql11.ExpressionUtil.xsdIntegerType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,19 +19,19 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import kodkod.ast.Relation;
-import kodkod.instance.Bounds;
-import kodkod.instance.Tuple;
-import kodkod.instance.TupleFactory;
-import kodkod.instance.TupleSet;
-import kodkod.instance.Universe;
-
 import com.hp.hpl.jena.graph.impl.LiteralLabel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.sparql.core.Quad;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
+
+import kodkod.ast.Relation;
+import kodkod.instance.Bounds;
+import kodkod.instance.Tuple;
+import kodkod.instance.TupleFactory;
+import kodkod.instance.TupleSet;
+import kodkod.instance.Universe;
 
 public abstract class BasicUniverse implements UniverseFactory {
 	
@@ -139,6 +144,16 @@ public abstract class BasicUniverse implements UniverseFactory {
 			TupleSet ts = bound.tuples();
 			b.bound(r, ts);
 			collectAtoms(liveAtoms, ts);
+		}
+	}
+
+	protected void bound(Set<Relation> liveRelations, Set<Object> liveAtoms, Bounds b, Relation r, LazyTupleSet lower, LazyTupleSet upper) throws URISyntaxException {
+		if (liveRelations == null || liveRelations.contains(r)) {
+			TupleSet ls = lower.tuples();
+			TupleSet us = upper.tuples();
+			b.bound(r, ls, us);
+			collectAtoms(liveAtoms, ls);
+			collectAtoms(liveAtoms, us);
 		}
 	}
 
@@ -406,41 +421,53 @@ public abstract class BasicUniverse implements UniverseFactory {
 		};
 	}
 
+	public TupleSet subjectsTableTuples(TupleFactory tf) {
+		TupleSet tuples = tf.noneOf(1);
+		for(Object bn : subjects) {
+			tuples.add(tf.tuple(bn));
+		}
+
+		return tuples;
+	}
+
 	public LazyTupleSet subjectsTableBound(final TupleFactory tf, Set<Object> liveAtoms) {
 		return new LazyTupleSet() {
 			public TupleSet tuples() {
-				TupleSet tuples = tf.noneOf(1);
-				for(Object bn : subjects) {
-					tuples.add(tf.tuple(bn));
-				}
-
-				return tuples;
+				return subjectsTableTuples(tf);
 			}
 		};
+	}
+
+	public TupleSet predicatesTableTuples(final TupleFactory tf) {
+		TupleSet tuples = tf.noneOf(1);
+		for(URI bn : predicates) {
+			tuples.add(tf.tuple(bn));
+		}
+
+		return tuples;
 	}
 
 	public LazyTupleSet predicatesTableBound(final TupleFactory tf, Set<Object> liveAtoms) {
 		return new LazyTupleSet() {
 			public TupleSet tuples() {
-				TupleSet tuples = tf.noneOf(1);
-				for(URI bn : predicates) {
-					tuples.add(tf.tuple(bn));
-				}
-
-				return tuples;
+				return predicatesTableTuples(tf);
 			}
 		};
+	}
+
+	public TupleSet objectsTableTuples(TupleFactory tf) {
+		TupleSet tuples = tf.noneOf(1);
+		for(Object bn : objects) {
+			tuples.add(tf.tuple(bn));
+		}
+
+		return tuples;
 	}
 
 	public LazyTupleSet objectsTableBound(final TupleFactory tf, Set<Object> liveAtoms) {
 		return new LazyTupleSet() {
 			public TupleSet tuples() {
-				TupleSet tuples = tf.noneOf(1);
-				for(Object bn : objects) {
-					tuples.add(tf.tuple(bn));
-				}
-
-				return tuples;
+				return objectsTableTuples(tf);
 			}
 		};
 	}
@@ -671,5 +698,31 @@ public abstract class BasicUniverse implements UniverseFactory {
 					}
 				};
 			}
+
+	protected LazyTupleSet dataSetCrossProduct(final TupleFactory f) {
+		LazyTupleSet s = new LazyTupleSet() {
+			@Override
+			public TupleSet tuples() throws URISyntaxException {
+				final TupleSet x = f.noneOf(1);
+				for(URI iri : iris) {
+					x.add(f.tuple(iri));
+				}
+				
+				final TupleSet y = x.clone();
+				for(String blank : blankNodes) {
+					y.add(f.tuple(blank));
+				}
+	
+				final TupleSet z = y.clone();
+				for(Pair<String, ?> lit : literals) {
+					z.add(f.tuple(lit));
+				}
+	
+				final TupleSet g = f.setOf(f.tuple(QuadTableRelations.defaultGraph));
+				return g.product(y).product(x).product(z);
+			}	
+		};
+		return s;
+	}
 
 }

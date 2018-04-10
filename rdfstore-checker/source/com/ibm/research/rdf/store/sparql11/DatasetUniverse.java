@@ -4,32 +4,34 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
-import kodkod.ast.Relation;
-import kodkod.instance.Bounds;
-import kodkod.instance.TupleFactory;
-
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
 import com.hp.hpl.jena.query.Dataset;
 
+import kodkod.ast.Relation;
+import kodkod.instance.Bounds;
+import kodkod.instance.TupleFactory;
+
 public class DatasetUniverse extends BasicUniverse {
 
-	private final URL datasetURL;
-	private final Dataset datasetModel;
+	protected final Dataset datasetModel;
 
 	public DatasetUniverse(URL datasetURL) throws URISyntaxException {
-		this.datasetURL = datasetURL;
-		this.datasetModel = 
-				RDFDataMgr.loadDataset(
-						datasetURL.toExternalForm(),
-						datasetURL.getPath().endsWith(".nq")? Lang.NQUADS: Lang.NTRIPLES);
+		this(RDFDataMgr.loadDataset(
+				datasetURL.toExternalForm(),
+						datasetURL.getPath().endsWith(".nq")? Lang.NQUADS: Lang.NTRIPLES));
+
+	}
+	
+	public DatasetUniverse(Dataset dataset) throws URISyntaxException {
+		this.datasetModel = dataset;
 		initDataset(datasetModel);
 	}
 
 	@Override
 	public String toString() {
-		return datasetURL.getPath();
+		return datasetModel.toString();
 	}
 	
 	@Override

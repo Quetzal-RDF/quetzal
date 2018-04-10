@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import com.ibm.wala.util.collections.HashSetFactory;
+
 import kodkod.ast.Formula;
 import kodkod.ast.IntExpression;
 import kodkod.ast.Relation;
@@ -23,8 +25,6 @@ import kodkod.instance.Instance;
 import kodkod.instance.Tuple;
 import kodkod.instance.TupleFactory;
 import kodkod.instance.Universe;
-
-import com.ibm.wala.util.collections.HashSetFactory;
 
 public abstract class FloatTestBase {
 

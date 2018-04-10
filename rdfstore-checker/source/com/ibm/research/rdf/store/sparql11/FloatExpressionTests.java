@@ -13,13 +13,14 @@ import static com.ibm.research.rdf.store.sparql11.FloatingPoint.intToFloat;
 import static com.ibm.research.rdf.store.sparql11.FloatingPoint.mantissa;
 import static com.ibm.research.rdf.store.sparql11.FloatingPoint.mantissaBits;
 import static com.ibm.research.rdf.store.sparql11.FloatingPoint.minusOne;
-import junit.framework.Assert;
-import kodkod.ast.IntConstant;
-import kodkod.ast.IntExpression;
 
 import org.junit.Test;
 
 import com.ibm.wala.util.collections.Pair;
+
+import junit.framework.Assert;
+import kodkod.ast.IntConstant;
+import kodkod.ast.IntExpression;
 
 public class FloatExpressionTests extends FloatTestBase {
 	

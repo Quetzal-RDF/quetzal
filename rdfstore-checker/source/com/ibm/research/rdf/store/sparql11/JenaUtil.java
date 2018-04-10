@@ -7,11 +7,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
+import com.hp.hpl.jena.datatypes.xsd.impl.XMLLiteralType;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.impl.LiteralLabel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.sparql.algebra.Algebra;
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.OpVisitorBase;
@@ -34,16 +39,27 @@ import com.hp.hpl.jena.sparql.expr.ExprAggregator;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
+import kodkod.instance.Tuple;
+import kodkod.instance.TupleSet;
+
 public class JenaUtil {
 
 	static URI toURI(Node n) throws URISyntaxException {
 		return new URI(n.getURI());
 	}
 
+	static Node fromURI(String uri) {
+		return NodeFactory.createURI(uri);
+	}
+	
 	static String toBlank(Node n) {
 		return n.getBlankNodeLabel();
 	}
 
+	static Node fromBlank(String s) {
+		return NodeFactory.createAnon(new AnonId(s));
+	}
+		
 	public static Object toAtom(Node n) throws URISyntaxException {
 		if (n.isURI()) {
 			return toURI(n);
@@ -71,6 +87,38 @@ public class JenaUtil {
 		return Algebra.compile(query);
 	}
 
+	static Node fromLiteral(Pair<String,Object> o) {
+		if (o.snd instanceof String) {
+			return NodeFactory.createLiteral(o.fst, (String)o.snd, false);
+		} else if (o.snd instanceof URI) {
+			RDFDatatype dtype = XMLLiteralType.theXMLLiteralType;
+			return NodeFactory.createLiteral(o.fst, dtype);
+		} else {
+			assert o.snd == null;
+			return NodeFactory.createLiteral(o.fst);
+		}
+	}
+
+	public static Node fromAtom(Object o) {
+		if (o instanceof Pair<?,?>) {
+			return fromLiteral((Pair<String,Object>) o);
+		} else {
+			return fromURI(o.toString());
+		}
+	}
+	public static Triple fromTuple(Tuple t) {
+		Node s = fromAtom(t.atom(1));
+		Node p = fromAtom(t.atom(2));
+		Node o = fromAtom(t.atom(3));
+		return Triple.create(s, p, o);
+	}
+	
+	public static void addTupleSet(Graph G, TupleSet tt) {
+		for(Tuple t : tt) {
+			G.add(fromTuple(t));
+		}
+	}
+	
 	public static Pair<String, Object> toAtom(LiteralLabel l) {
 		Object snd = null;
 		if (l.getDatatypeURI() != null) {
