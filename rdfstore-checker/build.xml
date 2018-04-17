@@ -1,0 +1,75 @@
+<project name="quetzal-sparql-semantics" default="download" basedir=".">
+  <description>
+    Relational logic implementation of SPARQL semantics from the WISE paper
+  </description>
+
+  <target name="kodkod-present">
+    <available file="lib/kodkod-2.1.jar" property="kodkod.present"/>
+  </target>
+
+  <target name="download-kodkod"
+	  depends="kodkod-present"
+	  unless="kodkod.present">
+    <mkdir dir="${basedir}/lib"/>
+    <get src="https://github.com/emina/kodkod/releases/download/v2.1/kodkod.jar"
+	 dest="${basedir}/lib/kodkod-2.1.jar"/>
+    <exec executable="mvn">
+      <arg value="install:install-file"/>
+      <arg value="-Dfile=${basedir}/lib/kodkod-2.1.jar"/>
+      <arg value="-DgroupId=kodkod"/>
+      <arg value="-DartifactId=kodkod"/>
+      <arg value="-Dversion=2.1"/>
+      <arg value="-Dpackaging=jar"/>
+    </exec>
+  </target>
+
+  <target name="checkos">
+    <condition property="isMac">
+      <os family="mac" />
+    </condition>
+  </target>
+
+  <target name="checkos.linux" unless="isMac" depends="checkos">
+    <condition property="isLinux">
+      <os family="unix" />
+    </condition>
+  </target>
+
+  <target name="kodkod-mac-present">
+    <available file="jni/darwin_x86_64/libminisat.dylib"
+	       property="kodkod.mac.present"/>
+  </target>
+
+  <target name="download-kodkod-mac"
+	  depends="kodkod-mac-present"
+	  if="isMac"
+	  unless="kodkod.mac.present">
+    <get      src="https://github.com/emina/kodkod/releases/download/v2.1/darwin_x86_64.zip"
+	      dest="/tmp/darwin_x86_64.zip"/>
+    
+    <mkdir dir="${basedir}/jni"/>
+    
+    <unzip src="/tmp/darwin_x86_64.zip" dest="${basedir}/jni"/>
+  </target>
+  
+  <target name="kodkod-linux-present">
+    <available file="jni/linux_x86_64/libminisat.so"
+	       property="kodkod.linux.present"/>
+  </target>
+
+  <target name="download-kodkod-linux"
+	  depends="kodkod-linux-present"
+	  if="isLinux"
+	  unless="kodkod.linux.present">
+    <get      src="https://github.com/emina/kodkod/releases/download/v2.1/linux_x86_64.zip"
+	      dest="/tmp/linux_x86_64.zip"/>
+    
+    <mkdir dir="${basedir}/jni"/>
+    
+    <unzip src="/tmp/linux_x86_64.zip" dest="${basedir}/jni"/>
+  </target>
+
+  <target name="download"
+	  depends="checkos.linux,download-kodkod,download-kodkod-mac,download-kodkod-linux"/>
+
+</project>

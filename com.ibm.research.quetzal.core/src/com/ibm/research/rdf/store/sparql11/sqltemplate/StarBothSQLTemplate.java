@@ -480,17 +480,18 @@ public class StarBothSQLTemplate extends SimplePatternBothSQLTemplate {
 					wrapper.addProperyValueType(valueVariable.getName(), pType);
 					if(projectedInSecondary.contains(valueVariable)) continue;
 					projectedInSecondary.add(valueVariable);
+					Integer id = tripleToIdMap.get(qt);
 					String valSqlName = 
 							!store.getStoreBackend().equals(Store.Backend.bigquery)?
-							coalesceColumnExpression(tripleToIdMap.get(qt), Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT,Constants.NAME_COLUMN_PREFIX_VALUE):
-							"S" +  tripleToIdMap.get(qt);
+							coalesceColumnExpression(id, Constants.NAME_COLUMN_PREFIX_LIST_ELEMENT,Constants.NAME_COLUMN_PREFIX_VALUE):
+							"S" +  id;
 					String valTypeSqlName = null;
 					valSqlToSparql.add(valSqlName+" AS "+valueVariable.getName());
 					if(!iriBoundVariables.contains(valueVariable)){
-						valTypeSqlName = store.getStoreBackend().equals(Store.Backend.bigquery)?
-								"TYP" + tripleToIdMap.get(qt) + "[offset(O" + tripleToIdMap.get(qt) + ")]":
-                                (valHasSqlType)?
-								coalesceColumnExpression(tripleToIdMap.get(qt), Constants.NAME_COLUMN_PREFIX_TYPE, Constants.NAME_COLUMN_PREFIX_TYPE)
+						valTypeSqlName = (valHasSqlType)?
+								(store.getStoreBackend().equals(Store.Backend.bigquery)?
+								 "TYP" + id + "[offset(O" + id + ")]":
+								 coalesceColumnExpression(id, Constants.NAME_COLUMN_PREFIX_TYPE, Constants.NAME_COLUMN_PREFIX_TYPE))
 								: new Short(TypeMap.IRI_ID).toString();
 						valSqlToSparql.add(valTypeSqlName+" AS "+valueVariable.getName()+Constants.TYP_COLUMN_SUFFIX_IN_SPARQL_RS);
 					}

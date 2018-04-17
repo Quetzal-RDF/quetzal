@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
-<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/rdfstore-checker/source/com/ibm/research/rdf/store/sparql11/Drivers.java"/>
-</listAttribute>
-<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-<listEntry value="1"/>
-</listAttribute>
-<stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="/tmp/bind01.out"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.research.rdf.store.sparql11.Drivers$DumpAnswer"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="file:///Users/dolby/RdfStoreWorkspace/DawgTests/data/queryTests/s_entailment_bind_data_nt/data.nt file:///Users/dolby/RdfStoreWorkspace/rdfstore-checker/data/tests/bind01.rq"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-checker"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=/Users/dolby/RdfStoreWorkspace/rdfstore-checker/jni/x86-mac -ea"/>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+        <listEntry value="/rdfstore-checker"/>
+    </listAttribute>
+    <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+        <listEntry value="4"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.debug.ui.ATTR_CAPTURE_IN_FILE" value="/tmp/bind01.out"/>
+    <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
+    <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.ibm.research.rdf.store.sparql11.semantics.Drivers$DumpAnswer"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="file:///Users/dolby/RdfStoreWorkspace/DawgTests/data/queryTests/s_entailment_bind_data_nt/data.nt file:///Users/dolby/RdfStoreWorkspace/rdfstore-checker/data/tests/bind01.rq"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="rdfstore-checker"/>
+    <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=/Users/dolby/RdfStoreWorkspace/rdfstore-checker/jni/x86-mac -ea"/>
 </launchConfiguration>
