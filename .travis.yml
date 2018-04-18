@@ -1,5 +1,9 @@
 language: java
 jdk: oraclejdk8
+install:
+ - pushd com.ibm.research.quetzal.core
+ - ant download
+ - popd
 script:
  - mvn clean install -B -q
 sudo: false
