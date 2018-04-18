@@ -4,6 +4,9 @@ install:
  - pushd com.ibm.research.quetzal.core
  - ant download
  - popd
+ - pushd rdfstore-checker
+ - ant download
+ - popd
 script:
  - mvn clean install -B -q
 sudo: false
