@@ -315,7 +315,6 @@ public class Drivers {
 				}
 
 			}
-			assert s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE;
 			return null;
 		}
 	}
