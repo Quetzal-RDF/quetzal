@@ -251,9 +251,19 @@
   </dependencies>
     
   <repositories>
-           <repository>
-        <id>org.topbraid</id>
-        <url>http://topquadrant.com/repository/spin</url>
+    <repository>
+      <id>org.topbraid</id>
+      <url>http://topquadrant.com/repository/spin</url>
+    </repository>
+    <repository>
+      <id>sonatype-public-repository</id>
+      <url>https://oss.sonatype.org/content/groups/public</url>
+      <snapshots>
+	<enabled>true</enabled>
+      </snapshots>
+      <releases>
+	<enabled>true</enabled>
+      </releases>
     </repository>
   </repositories>
 
