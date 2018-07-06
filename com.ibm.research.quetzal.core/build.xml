@@ -7,7 +7,7 @@
 <project basedir="." default="download" name="sparqltosqlbase">
 
   <target name="simba-present">
-    <available file="lib/GoogleBigQueryJDBC42.jar" property="simba.present"/>
+    <available file="src/lib/GoogleBigQueryJDBC42.jar" property="simba.present"/>
   </target>
 
     <target name="download"
@@ -16,7 +16,7 @@
       <delete dir="${temp.folder}"/>
       <mkdir dir="${temp.folder}"/>
       <get src="https://storage.googleapis.com/simba-bq-release/jdbc/SimbaJDBCDriverforGoogleBigQuery42_1.1.5.1005.zip" dest="${temp.folder}/simba.zip"/>
-      <unzip src="${temp.folder}/simba.zip" dest="lib"/>
+      <unzip src="${temp.folder}/simba.zip" dest="src/lib"/>
      <delete dir="${temp.folder}"/>
     </target>
     

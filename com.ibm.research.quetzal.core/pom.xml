@@ -5,51 +5,60 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>Quetzal</name>
   <description>RDF store for multiple backends</description>
+  <packaging>jar</packaging>
   <build>
-    <sourceDirectory>.</sourceDirectory>
-    <resources>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
+    <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9.1</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>generated</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+ <plugin>
+  <artifactId>maven-antrun-plugin</artifactId>
+  <version>1.7</version>
+  <executions>
+    <execution>
+      <id>define-classpath</id>
+      <phase>process-sources</phase>
+      <goals>
+        <goal>run</goal>
+      </goals>
+      <configuration>
+        <exportAntProperties>true</exportAntProperties>
+        <target>
+          <property name="maven.classpath" refid="maven.compile.classpath"/>
+        </target>
+      </configuration>
+    </execution>
+  </executions>
+ </plugin>
+ <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
+	  <compilerArgs>
+	    <arg>-classpath</arg>
+	    <arg>${maven.classpath}:${basedir}/src/lib/GoogleBigQueryJDBC42.jar</arg>
+	  </compilerArgs>
           <source>1.8</source>
           <target>1.8</target>
-	  <includes>
-            <include>src/**/*.java</include>
-            <include>test/**/*.java</include>
-            <include>generated/**/*.java</include>
-          </includes>
         </configuration>
       </plugin>
-      <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <version>2.3.2</version>
-            <configuration>
-                <archive>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                        <mainClass>com.ibm.rdf.store.sparql11.CommandLineDriver</mainClass>
-                    </manifest>
-                </archive>
-            </configuration>
-        </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -244,22 +253,10 @@
 	<version>1.2.1</version>
 	</dependency>
 	<dependency>
-		<groupId>org.topbraid</groupId>
-		<artifactId>spin</artifactId>
-		<version>1.4.0</version>
-	</dependency>
-	<dependency>
 	  	<groupId>org.rabinfingerprint</groupId>
 		<artifactId>rabinfingerprint</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</dependency>
-<dependency>
-      <groupId>simba</groupId>
-      <artifactId>simbajdbc</artifactId>
-      <scope>system</scope>
-      <version>1.0</version>
-      <systemPath>${basedir}/lib/GoogleBigQueryJDBC42.jar</systemPath>
-    </dependency>
   </dependencies>
     
   <repositories>
