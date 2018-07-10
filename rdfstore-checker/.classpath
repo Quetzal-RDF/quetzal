@@ -7,7 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="/rdfstore-base/target/classes" sourcepath="/rdfstore-base/src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/rdfstore-base"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
