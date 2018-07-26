@@ -1796,12 +1796,31 @@ public class JenaTranslator implements OpVisitor {
 		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
 			context.setCurrentQuery(f);
 
+			Formula filter = Formula.TRUE;
 			for(Expr e : arg0.getExprs()) {
 				ExpressionContext val = handleExpression(e);
-				f = f.and(val.guard()).and(ebv(val));
+				filter = filter.and(val.guard()).and(ebv(val));
 			}
-			context.setCurrentQuery(f);
-			next.next(context, f);			
+			
+			Formula pass = f.and(filter);
+			if (context.explicitChoices()) {	
+				TranslatorContext splitSave = context;
+				
+				SplitContext leftContext = new SplitContext(splitSave);
+				context = leftContext;
+				context.setCurrentQuery(pass);
+				next.next(context, pass);	
+				
+				SplitContext rightContext = new SplitContext(splitSave);
+				context = rightContext;
+				Formula fail = f.and(filter.not());
+				context.setCurrentQuery(fail);
+				next.next(context, fail);	
+				
+			} else {
+				context.setCurrentQuery(pass);
+				next.next(context, pass);	
+			}
 		});
 	}
 
@@ -2155,14 +2174,16 @@ public class JenaTranslator implements OpVisitor {
 		
 				context.setStaticBinding(leftStaticBinding);
 				
-				if (context.explicitChoices()) {					
-					SplitContext leftContext = new SplitContext(context);
+				if (context.explicitChoices()) {	
+					TranslatorContext splitSave = context;
+					
+					SplitContext leftContext = new SplitContext(splitSave);
 					context = leftContext;
 					context.setDynamicBinding(leftDynamicBinding);
 					context.setCurrentQuery(l.and(leftOnly));				
 					context.getCurrentContinuation().next(context, context.getCurrentQuery());
 
-					SplitContext rightContext = new SplitContext(context);
+					SplitContext rightContext = new SplitContext(splitSave);
 					context = rightContext;
 					context.setDynamicBinding(rightDynamicBinding);
 					context.setCurrentQuery(l.and(both));				
