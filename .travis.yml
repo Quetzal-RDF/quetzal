@@ -1,6 +1,9 @@
 language: java
 jdk: oraclejdk8
 install:
+ - pushd com.ibm.research.quetzal.core
+ - ant
+ - popd
  - pushd rdfstore-checker
  - ant
  - popd
