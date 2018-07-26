@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Set;
 
 import com.hp.hpl.jena.datatypes.RDFDatatype;
@@ -88,9 +89,9 @@ public class JenaUtil {
 		return Algebra.compile(query);
 	}
 
-	static Node fromLiteral(Pair<String,Object> o) {
+	static Node fromLiteral(Pair<String,Object> o, Map<Object, String> langs) {
 		if (o.snd instanceof String) {
-			return NodeFactory.createLiteral(o.fst, (String)o.snd, false);
+			return NodeFactory.createLiteral(o.fst, langs.containsKey(o)? langs.get(o): (String)o.snd, false);
 		} else if (o.snd instanceof URI) {
 			RDFDatatype dtype = XMLLiteralType.theXMLLiteralType;
 			return NodeFactory.createLiteral(o.fst, dtype);
@@ -101,23 +102,23 @@ public class JenaUtil {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Node fromAtom(Object o) {
+	public static Node fromAtom(Object o, Map<Object, String> langs) {
 		if (o instanceof Pair<?,?>) {
-			return fromLiteral((Pair<String,Object>) o);
+			return fromLiteral((Pair<String,Object>) o, langs);
 		} else {
 			return fromURI(o.toString());
 		}
 	}
-	public static Triple fromTuple(Tuple t) {
-		Node s = fromAtom(t.atom(1));
-		Node p = fromAtom(t.atom(2));
-		Node o = fromAtom(t.atom(3));
+	public static Triple fromTuple(Tuple t, Map<Object, String> langs) {
+		Node s = fromAtom(t.atom(1), langs);
+		Node p = fromAtom(t.atom(2), langs);
+		Node o = fromAtom(t.atom(3), langs);
 		return Triple.create(s, p, o);
 	}
 	
-	public static void addTupleSet(Graph G, TupleSet tt) {
+	public static void addTupleSet(Graph G, TupleSet tt, Map<Object, String> langs) {
 		for(Tuple t : tt) {
-			G.add(fromTuple(t));
+			G.add(fromTuple(t, langs));
 		}
 	}
 	

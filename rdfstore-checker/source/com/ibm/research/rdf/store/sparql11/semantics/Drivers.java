@@ -265,6 +265,17 @@ public class Drivers {
 			Pair<Formula, Pair<Formula, Formula>> answer,
 			String relation)
 			throws URISyntaxException {
+		Map<String, TupleSet> rels = check(uf, answer);
+		if (rels != null) {
+			return rels.get(relation);
+		} else {
+			return null;
+		}
+	}
+	
+	public static Map<String,TupleSet> check(UniverseFactory uf,
+			Pair<Formula, Pair<Formula, Formula>> answer)
+			throws URISyntaxException {
 		Formula qf = answer.fst;		
 		if (answer.snd.fst != null) {
 			qf = qf.and(answer.snd.fst);
@@ -292,16 +303,13 @@ public class Drivers {
 		
 		if (s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE) {
 			Instance instance = s.instance();
-			Evaluator eval = new Evaluator(instance, solver.options());
 				
+			Map<String,TupleSet> result = HashMapFactory.make();
 			for(Relation rl : instance.relations()) {
-				if (rl.name().equals(relation)) {
-					TupleSet tuples = eval.evaluate(rl);
-					return tuples;
-				}
+				result.put(rl.name(), instance.tuples(rl));
 			}
 			
-			return null;
+			return result;
 		} else {
 			if (answer.snd.snd != null) {				
 				Solution diff = solver.solve(Nodes.simplify(cf, b), b);
