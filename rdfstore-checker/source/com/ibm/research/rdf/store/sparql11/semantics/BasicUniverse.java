@@ -22,8 +22,6 @@ import java.util.TreeSet;
 import com.hp.hpl.jena.graph.impl.LiteralLabel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.sparql.core.Quad;
-import com.ibm.wala.util.Predicate;
-import com.ibm.wala.util.collections.FilterIterator;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
@@ -59,7 +57,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 	protected final Set<String> blankNodes = HashSetFactory.make();
 	protected final Set<Pair<String,?>> literals = HashSetFactory.make();
 	private final Set<URI> datatypes = HashSetFactory.make();
-	private final Set<String> languages = HashSetFactory.make();
+	protected final Set<String> languages = HashSetFactory.make();
 	private final Map<Object,Relation> atomRelations = HashMapFactory.make();
 		
 	@Override
@@ -67,7 +65,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 		iris.add(iri);
 	}
 
-	private void addLanguage(String language) {
+	protected void addLanguage(String language) {
 		languages.add(language);
 		ensureLiteral(Pair.make(language, null));
 	}
@@ -211,7 +209,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 		
 		boundLiteralTypes(liveRelations, tf, b, liveAtoms);
 		
-		boundExactly(liveRelations, liveAtoms, b, QuadTableRelations.literalLanguages, languageTableBound(tf));
+		boundLanguages(liveRelations, tf, b, liveAtoms);
 
 		boundExactly(liveRelations, liveAtoms, b, QuadTableRelations.languageCaseMatch, languageCaseMatchBound(tf));
 	
@@ -282,6 +280,11 @@ public abstract class BasicUniverse implements UniverseFactory {
 		}
 
 		return liveAtoms;
+	}
+
+	protected void boundLanguages(Set<Relation> liveRelations, final TupleFactory tf, Bounds b, Set<Object> liveAtoms)
+			throws URISyntaxException {
+		boundExactly(liveRelations, liveAtoms, b, QuadTableRelations.literalLanguages, languageTableBound(tf));
 	}
 
 	protected abstract void boundLiteralTypes(Set<Relation> liveRelations,
@@ -528,26 +531,11 @@ public abstract class BasicUniverse implements UniverseFactory {
 	
 	public LazyTupleSet languageTableBound(final TupleFactory f) {
 		return new LazyTupleSet() {
-			private Iterator<String> langs = 
-					languages.isEmpty()? null:
-						new FilterIterator<String>(
-						  languages.iterator(),
-						  new Predicate<String>() {
-							@Override
-							public boolean test(String t) {
-								return ! ANY_LANGUAGE.equalsIgnoreCase(t);
-							} });
-			
 			public TupleSet tuples() throws URISyntaxException {
 				Collection<Tuple> tuples = HashSetFactory.make();
 				for(Pair<String,?> l : literals) {
 					if (l.snd instanceof String) {
-						if (langs != null && ANY_LANGUAGE.equals(l.snd)) {
-							if (! langs.hasNext()) {
-								langs = languages.iterator();
-							}
-							tuples.add(f.tuple(l, Pair.make(langs.next(), null)));
-						} else {
+						if (! ANY_LANGUAGE.equals(l.snd)) {
 							tuples.add(f.tuple(l, Pair.make(l.snd, null)));
 						}
 					} 

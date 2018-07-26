@@ -965,6 +965,17 @@ public class JenaTranslator implements OpVisitor {
 					}
 					System.err.println("adding verification constraint\n");
 				} else {
+					int i = 0, j = 0;
+					IntExpression[] indexes = new IntExpression[ x.arity() ];
+					for (Variable v : projectedVars) {
+						if (liveVars.contains(v)) {
+							indexes[i++] = IntConstant.constant(j);
+						}
+						j++;
+					}
+
+					expectedSolution = expectedSolution.project(indexes);
+					
 					correctness = x.eq(expectedSolution);				
 					System.err.println("adding verification constraint for \n" + expectedSolution);
 				}
@@ -2144,7 +2155,7 @@ public class JenaTranslator implements OpVisitor {
 		
 				context.setStaticBinding(leftStaticBinding);
 				
-				if (context.explicitChoices()) {
+				if (context.explicitChoices()) {					
 					SplitContext leftContext = new SplitContext(context);
 					context = leftContext;
 					context.setDynamicBinding(leftDynamicBinding);

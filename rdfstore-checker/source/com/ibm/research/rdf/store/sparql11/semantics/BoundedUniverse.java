@@ -10,13 +10,18 @@ import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.xsdSt
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.Set;
 
+import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
+import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
 import kodkod.ast.Relation;
 import kodkod.instance.Bounds;
+import kodkod.instance.Tuple;
 import kodkod.instance.TupleFactory;
+import kodkod.instance.TupleSet;
 
 public class BoundedUniverse extends BasicUniverse {
 
@@ -53,6 +58,47 @@ public class BoundedUniverse extends BasicUniverse {
 		iris.add(typeURI(xsdDecimalType));
 		iris.add(typeURI(xsdStringType));
 		iris.add(typeURI(xsdBooleanType));
+		
+		for(Pair<String, ?> l : TypeMap.languages) {
+			addLanguage(l.fst.toLowerCase());
+		}
+	}
+
+	public LazyTupleSet anyLanguageTableBound(final TupleFactory f) {
+		return new LazyTupleSet() {
+			public TupleSet tuples() throws URISyntaxException {
+				Collection<Tuple> tuples = HashSetFactory.make();
+				for(Pair<String,?> l : literals) {
+					if (l.snd instanceof String && ANY_LANGUAGE.equals(l.snd)) {
+						for(String ll : languages) {
+							tuples.add(f.tuple(l, Pair.make(ll, null)));
+						}
+					} 
+				}
+				if (tuples.isEmpty()) {
+					return f.noneOf(2);
+				} else {
+					return f.setOf(tuples);
+				}
+			}
+		};
+	}
+
+	@Override
+	protected void boundLanguages(Set<Relation> liveRelations, TupleFactory tf, Bounds b, Set<Object> liveAtoms)
+			throws URISyntaxException {
+		LazyTupleSet base = super.languageTableBound(tf);
+		bound(liveRelations, liveAtoms, b, QuadTableRelations.literalLanguages, 
+			base, 
+			new LazyTupleSet() {
+				@Override
+				public TupleSet tuples() throws URISyntaxException {
+					TupleSet ts = tf.noneOf(2);
+					ts.addAll(base.tuples());
+					ts.addAll(anyLanguageTableBound(tf).tuples());
+					return ts;
+				}			
+			});
 	}
 
 	@Override
