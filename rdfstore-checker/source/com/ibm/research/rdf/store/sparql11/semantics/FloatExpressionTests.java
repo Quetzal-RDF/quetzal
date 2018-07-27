@@ -436,9 +436,15 @@ public class FloatExpressionTests extends FloatTestBase {
 	public void testMultiply2p4p1() {
 		testMultiply(2f, 4.2f);
 	}
+
 	@Test
 	public void testMultiply11441p1v2p3() {
 		testMultiply(11441.2f, 2.3f);
+	}
+
+	@Test
+	public void testMultiply11441p1v0() {
+		testMultiply(11441.2f, 0.0f);
 	}
 
 	@Test

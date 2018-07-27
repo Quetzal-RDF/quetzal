@@ -142,9 +142,9 @@ public class FloatingPoint {
 		
 		IntExpression s = sign(l).eq(sign(r)).thenElse(zero, one);
 		
-		return s.shl(IntConstant.constant(exponentBits+mantissaBits))
+		return l.eq(zero).or(r.eq(zero)).thenElse(zero, s.shl(IntConstant.constant(exponentBits+mantissaBits))
 			.or(e.plus(IntConstant.constant(exponentBias)).shl(IntConstant.constant(mantissaBits)))
-			.or(m);
+			.or(m));
 	}
 	
 	public static IntExpression floatAbs(IntExpression e) {
