@@ -403,6 +403,11 @@ public class FloatExpressionTests extends FloatTestBase {
 	}
 
 	@Test
+	public void testAdd10101Zero() {
+		testAdd(10101f, 0f);
+	}
+
+	@Test
 	public void testAdd10101p11One() {
 		testAdd(10101.11f, 1f);
 	}
