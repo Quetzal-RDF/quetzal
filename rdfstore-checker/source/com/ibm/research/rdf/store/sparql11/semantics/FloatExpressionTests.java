@@ -423,8 +423,23 @@ public class FloatExpressionTests extends FloatTestBase {
 	}
 
 	@Test
+	public void testCompare2vMinus1() {
+		testCompare(2f, -1f);
+	}
+
+	@Test
+	public void testCompareMinus2v1() {
+		testCompare(-2f, 1f);
+	}
+
+	@Test
 	public void testCompare2v1() {
 		testCompare(2f, 1f);
+	}
+
+	@Test
+	public void testCompareMinus2vMinus1() {
+		testCompare(-2f, -1f);
 	}
 
 	@Test

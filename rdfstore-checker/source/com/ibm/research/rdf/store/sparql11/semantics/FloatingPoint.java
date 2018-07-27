@@ -209,8 +209,11 @@ public class FloatingPoint {
 		IntExpression rm = mantissa(r);
 		
 		return
-			threeWayTest(ls, rs,
-				threeWayTest(le, re,
-					threeWayTest(lm, rm, zero)));
+			threeWayTest(rs, ls,
+				ls.eq(IntConstant.constant(0)).thenElse(
+					threeWayTest(le, re,
+						threeWayTest(lm, rm, zero)),
+					threeWayTest(re, le,
+						threeWayTest(rm, lm, zero))));
 	}
 }
