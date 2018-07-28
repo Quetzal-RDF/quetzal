@@ -1817,6 +1817,8 @@ public class JenaTranslator implements OpVisitor {
 				context.setCurrentQuery(fail);
 				next.next(context, fail);	
 				
+				context = splitSave;
+				
 			} else {
 				context.setCurrentQuery(pass);
 				next.next(context, pass);	
@@ -2130,19 +2132,19 @@ public class JenaTranslator implements OpVisitor {
 			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
 				Expression rightDynamicBinding = context.getDynamicBinding();
 
-				Formula filters = null;
+				Formula ifilters = null;
 				if (arg0.getExprs() != null) {
 					for(Expr e : arg0.getExprs()) {
 						ExpressionContext ec = handleExpression(e);
 						Formula x = ec.booleanValue().and(ec.guard());
-						filters = filters==null? x: filters.and(x);
+						ifilters = ifilters==null? x: ifilters.and(x);
 					}
-					assert filters != null;
+					assert ifilters != null;
 				}
 
 				Set<Variable> neededVars = HashSetFactory.make(lhsVars);
-				if (filters != null) {
-					neededVars.addAll(ASTUtils.gatherVariables(filters));
+				if (ifilters != null) {
+					neededVars.addAll(ASTUtils.gatherVariables(ifilters));
 				}
 				neededVars.retainAll(ASTUtils.gatherVariables(r));
 
@@ -2150,50 +2152,52 @@ public class JenaTranslator implements OpVisitor {
 				
 				context = save;
 				
-				Formula both = r;
-				if (filters != null) {
-					both = both.and(filters);
-				}
-
-				Formula leftOnly;
-				if (rhs != null) {
-					leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
-				} else {
-					Set<Variable> rvs = ASTUtils.gatherVariables(r);
-					if (rvs.isEmpty()) {
-						leftOnly = r.not();
-					} else {
-						leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
-					}
+				for(Formula filters : ifilters != null  && context.explicitChoices()? new Formula[] {ifilters, ifilters.not()}: new Formula[] {ifilters}) {
+					Formula both = r;
 					if (filters != null) {
-						leftOnly = leftOnly.or(filters.not());
+						both = both.and(filters);
 					}
-				}
+
+					Formula leftOnly;
+					if (rhs != null) {
+						leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
+					} else {
+						Set<Variable> rvs = ASTUtils.gatherVariables(r);
+						if (rvs.isEmpty()) {
+							leftOnly = r.not();
+						} else {
+							leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
+						}
+						if (filters != null) {
+							leftOnly = leftOnly.or(filters.not());
+						}
+					}
 				
-				context = outerSave;
+					context = outerSave;
 		
-				context.setStaticBinding(leftStaticBinding);
+					context.setStaticBinding(leftStaticBinding);
 				
-				if (context.explicitChoices()) {	
-					TranslatorContext splitSave = context;
+					if (context.explicitChoices()) {	
+						TranslatorContext splitSave = context;
 					
-					SplitContext leftContext = new SplitContext(splitSave);
-					context = leftContext;
-					context.setDynamicBinding(leftDynamicBinding);
-					context.setCurrentQuery(l.and(leftOnly));				
-					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+						SplitContext leftContext = new SplitContext(splitSave);
+						context = leftContext;
+						context.setDynamicBinding(leftDynamicBinding);
+						context.setCurrentQuery(l.and(leftOnly));				
+						context.getCurrentContinuation().next(context, context.getCurrentQuery());
 
-					SplitContext rightContext = new SplitContext(splitSave);
-					context = rightContext;
-					context.setDynamicBinding(rightDynamicBinding);
-					context.setCurrentQuery(l.and(both));				
-					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+						SplitContext rightContext = new SplitContext(splitSave);
+						context = rightContext;
+						context.setDynamicBinding(rightDynamicBinding);
+						context.setCurrentQuery(l.and(both));				
+						context.getCurrentContinuation().next(context, context.getCurrentQuery());
 
-				} else {
-					context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
-					context.setCurrentQuery(l.and(both.or(leftOnly)));
+					} else {
+						context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
+						context.setCurrentQuery(l.and(both.or(leftOnly)));
 				
-					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+						context.getCurrentContinuation().next(context, context.getCurrentQuery());
+					}
 				}
 			});
 		});
