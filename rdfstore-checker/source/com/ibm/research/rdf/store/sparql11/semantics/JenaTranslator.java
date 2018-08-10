@@ -2132,19 +2132,19 @@ public class JenaTranslator implements OpVisitor {
 			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
 				Expression rightDynamicBinding = context.getDynamicBinding();
 
-				Formula ifilters = null;
+				Formula filters = null;
 				if (arg0.getExprs() != null) {
 					for(Expr e : arg0.getExprs()) {
 						ExpressionContext ec = handleExpression(e);
 						Formula x = ec.booleanValue().and(ec.guard());
-						ifilters = ifilters==null? x: ifilters.and(x);
+						filters = filters==null? x: filters.and(x);
 					}
-					assert ifilters != null;
+					assert filters != null;
 				}
 
 				Set<Variable> neededVars = HashSetFactory.make(lhsVars);
-				if (ifilters != null) {
-					neededVars.addAll(ASTUtils.gatherVariables(ifilters));
+				if (filters != null) {
+					neededVars.addAll(ASTUtils.gatherVariables(filters));
 				}
 				neededVars.retainAll(ASTUtils.gatherVariables(r));
 
@@ -2152,23 +2152,22 @@ public class JenaTranslator implements OpVisitor {
 				
 				context = save;
 				
-				for(Formula filters : ifilters != null  && context.explicitChoices()? new Formula[] {ifilters, ifilters.not()}: new Formula[] {ifilters}) {
-					Formula both = r;
-					if (filters != null) {
-						both = both.and(filters);
-					}
-
-					Formula leftOnly;
-					if (rhs != null) {
-						leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
+				Formula both = r;
+				if (filters != null) {
+					both = both.and(filters);
+				}
+				
+				Formula leftOnly;
+				if (rhs != null) {
+					leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
+				} else {
+					Set<Variable> rvs = ASTUtils.gatherVariables(r);
+					if (rvs.isEmpty()) {
+						leftOnly = r.not();
 					} else {
-						Set<Variable> rvs = ASTUtils.gatherVariables(r);
-						if (rvs.isEmpty()) {
-							leftOnly = r.not();
-						} else {
-							leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
-						}
-						if (filters != null) {
+						leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
+					}
+					if (filters != null) {
 							leftOnly = leftOnly.or(filters.not());
 						}
 					}
@@ -2192,13 +2191,20 @@ public class JenaTranslator implements OpVisitor {
 						context.setCurrentQuery(l.and(both));				
 						context.getCurrentContinuation().next(context, context.getCurrentQuery());
 
+						if (filters != null) {
+							SplitContext rightNegContext = new SplitContext(splitSave);
+							context = rightNegContext;
+							context.setDynamicBinding(rightDynamicBinding);
+							context.setCurrentQuery(l.and(r));				
+							context.getCurrentContinuation().next(context, context.getCurrentQuery());
+						}
+						
 					} else {
 						context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
 						context.setCurrentQuery(l.and(both.or(leftOnly)));
 				
 						context.getCurrentContinuation().next(context, context.getCurrentQuery());
 					}
-				}
 			});
 		});
 	}

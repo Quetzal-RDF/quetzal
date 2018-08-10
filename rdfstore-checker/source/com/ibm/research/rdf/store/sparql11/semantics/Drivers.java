@@ -272,8 +272,15 @@ public class Drivers {
 			return null;
 		}
 	}
+
+	public static Map<String,TupleSet> check(UniverseFactory uf,
+			Pair<Formula, Pair<Formula, Formula>> answer)
+			throws URISyntaxException {
+		return check(uf, SATFactory.MiniSat, answer);
+	}
 	
 	public static Map<String,TupleSet> check(UniverseFactory uf,
+			SATFactory sat,
 			Pair<Formula, Pair<Formula, Formula>> answer)
 			throws URISyntaxException {
 		Formula qf = answer.fst;		
@@ -291,7 +298,7 @@ public class Drivers {
 		Bounds b = uf.boundUniverse(liveRelations);
 		
 		Solver solver = new Solver();
-		solver.options().setSolver(SATFactory.MiniSat);
+		solver.options().setSolver(sat);
 		solver.options().setIntEncoding(IntEncoding.TWOSCOMPLEMENT);
 		solver.options().setBitwidth(bitWidth);
 		solver.options().setSkolemDepth(-1);
