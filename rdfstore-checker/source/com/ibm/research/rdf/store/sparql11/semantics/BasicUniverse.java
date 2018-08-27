@@ -65,6 +65,11 @@ public abstract class BasicUniverse implements UniverseFactory {
 		iris.add(iri);
 	}
 
+	@Override
+	public void ensureGraph(URI iri) {
+		graphs.add(iri);
+	}
+
 	protected void addLanguage(String language) {
 		languages.add(language);
 		ensureLiteral(Pair.make(language, null));
@@ -72,15 +77,17 @@ public abstract class BasicUniverse implements UniverseFactory {
 	
 	@Override
 	public void ensureLiteral(Pair<String, ?> lit) {
-		if (lit.snd instanceof URI) {
-			datatypes.add((URI)lit.snd);
-		} else if (lit.snd instanceof String) {
-			addLanguage((String)lit.snd);
-			addLanguage(((String)lit.snd).toLowerCase());
-		} else {
-			assert lit.snd == null;
+		if (! literals.contains(lit)) {
+			if (lit.snd instanceof URI) {
+				datatypes.add((URI)lit.snd);
+			} else if (lit.snd instanceof String) {
+				addLanguage((String)lit.snd);
+				addLanguage(((String)lit.snd).toLowerCase());
+			} else {
+				assert lit.snd == null;
+			}
+			literals.add(lit);
 		}
-		literals.add(lit);
 	}
 
 	@Override
@@ -365,16 +372,15 @@ public abstract class BasicUniverse implements UniverseFactory {
 
 			public TupleSet tuples() {
 				Collection<Tuple> tuples = HashSetFactory.make();
+				
 				for(Pair<String,?> l : literals) {
 					String type = String.valueOf(l.snd);
 					try {
-						if (type == ANY_NUMBER.toString()) {
-							encode(f, tuples, l, Integer.MAX_VALUE/2 - 1);
-						} else if (type.equals(xsdFloatType) || type.equals(xsdDoubleType) || type.equals(xsdDecimalType)) {
+						if (type.equals(xsdFloatType) || type.equals(xsdDoubleType) || type.equals(xsdDecimalType)) {
 							encode(f, tuples, l, Float.floatToIntBits(Float.parseFloat(String.valueOf(l.fst))));		
 						} else if (type.equals(xsdIntegerType)) {
 							encode(f, tuples, l, Integer.parseInt(String.valueOf(l.fst)));
-						} else {
+						} else if (! ANY_NUMBER.equals(l.snd)) {
 							tuples.add(f.tuple(l, l.fst));							
 						}
 					} catch (NumberFormatException e) {
@@ -535,8 +541,8 @@ public abstract class BasicUniverse implements UniverseFactory {
 				Collection<Tuple> tuples = HashSetFactory.make();
 				for(Pair<String,?> l : literals) {
 					if (l.snd instanceof String) {
-						if (! ANY_LANGUAGE.equals(l.snd)) {
-							tuples.add(f.tuple(l, Pair.make(l.snd, null)));
+						if (! ANY_LANGUAGE.equalsIgnoreCase((String)l.snd)) {
+							tuples.add(f.tuple(l, l.snd));
 						}
 					} 
 				}
@@ -727,8 +733,13 @@ public abstract class BasicUniverse implements UniverseFactory {
 				for(Pair<String, ?> lit : literals) {
 					z.add(f.tuple(lit));
 				}
-	
-				final TupleSet g = f.setOf(f.tuple(QuadTableRelations.defaultGraph));
+
+				final TupleSet g = f.noneOf(1);
+				g.add(f.tuple(QuadTableRelations.defaultGraph));
+				for(URI iri : graphs) {
+					g.add(f.tuple(iri));
+				}
+
 				return g.product(y).product(x).product(z);
 			}	
 		};

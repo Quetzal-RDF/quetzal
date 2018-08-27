@@ -1,23 +1,28 @@
 package com.ibm.research.rdf.store.sparql11.semantics;
 
+import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.bitWidth;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.datatypes.xsd.impl.XMLLiteralType;
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.impl.LiteralLabel;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.AnonId;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.sparql.algebra.Algebra;
 import com.hp.hpl.jena.sparql.algebra.Op;
 import com.hp.hpl.jena.sparql.algebra.OpVisitorBase;
@@ -41,6 +46,12 @@ import com.hp.hpl.jena.sparql.expr.ExprAggregator;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
+import kodkod.ast.Relation;
+import kodkod.engine.Evaluator;
+import kodkod.engine.config.Options;
+import kodkod.engine.config.Options.IntEncoding;
+import kodkod.engine.fol2sat.UnboundLeafException;
+import kodkod.instance.Instance;
 import kodkod.instance.Tuple;
 import kodkod.instance.TupleSet;
 
@@ -88,37 +99,61 @@ public class JenaUtil {
 	public static Op compile(Query query) throws MalformedURLException, IOException {
 		return Algebra.compile(query);
 	}
-
-	static Node fromLiteral(Pair<String,Object> o, Map<Object, String> langs) {
-		if (o.snd instanceof String) {
-			return NodeFactory.createLiteral(o.fst, langs.containsKey(o)? langs.get(o): (String)o.snd, false);
-		} else if (o.snd instanceof URI) {
-			RDFDatatype dtype = XMLLiteralType.theXMLLiteralType;
-			return NodeFactory.createLiteral(o.fst, dtype);
-		} else {
-			assert o.snd == null;
-			return NodeFactory.createLiteral(o.fst);
+	
+	static RDFNode fromLiteral(Model m, Pair<String,Object> o, BasicUniverse u, Instance t2) {
+		try {
+			Relation me = Relation.unary("me");
+			t2.add(me, t2.universe().factory().setOf(t2.universe().factory().tuple(o)));
+			Options opt = new Options();
+			opt.setIntEncoding(IntEncoding.TWOSCOMPLEMENT);
+			opt.setBitwidth(bitWidth);
+			Evaluator e = new Evaluator(t2, opt);
+			if (o.snd instanceof String) {
+				TupleSet langs = e.evaluate(me.join(QuadTableRelations.literalLanguages));
+				if (! langs.isEmpty()) {
+					return m.createLiteral(o.fst, langs.iterator().next().atom(0).toString());
+				} else {
+					return m.createLiteral(o.fst, (String)o.snd);				
+				}
+			} else if (o.snd == null) {
+				return m.createLiteral(o.fst);			
+			} else {
+				TupleSet tt = e.evaluate(me.join(QuadTableRelations.literalDatatypes));
+				String type = String.valueOf(tt.iterator().next().atom(0));
+				if (ExpressionUtil.numericTypeNames.contains(type)) {
+					int v = e.evaluate(me.join(QuadTableRelations.literalValues).sum());
+					return m.createTypedLiteral(v, type);
+				} else {
+					Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
+					return m.createTypedLiteral(v, type);			
+				}
+			}
+		} catch (UnboundLeafException | NoSuchElementException ee) {
+			return m.createTypedLiteral(o.fst, String.valueOf(o.snd));
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Node fromAtom(Object o, Map<Object, String> langs) {
+	public static RDFNode fromAtom(Model m, Object o, BasicUniverse u, Instance t2) {
 		if (o instanceof Pair<?,?>) {
-			return fromLiteral((Pair<String,Object>) o, langs);
+			return fromLiteral(m, (Pair<String,Object>) o, u, t2);
 		} else {
-			return fromURI(o.toString());
+			return m.createResource(o.toString());
 		}
 	}
-	public static Triple fromTuple(Tuple t, Map<Object, String> langs) {
-		Node s = fromAtom(t.atom(1), langs);
-		Node p = fromAtom(t.atom(2), langs);
-		Node o = fromAtom(t.atom(3), langs);
-		return Triple.create(s, p, o);
+	
+	public static Statement fromTuple(Model m, Tuple t, BasicUniverse u, Instance t2) {
+		Resource s = m.createResource(String.valueOf(t.atom(1)));
+		Property p = m.createProperty(String.valueOf(t.atom(2)));
+		RDFNode o = fromAtom(m, t.atom(3), u, t2);
+		return m.createStatement(s, p, o);
 	}
 	
-	public static void addTupleSet(Graph G, TupleSet tt, Map<Object, String> langs) {
+	public static void addTupleSet(Dataset dataset, TupleSet tt, BasicUniverse u, Instance t2) {
 		for(Tuple t : tt) {
-			G.add(fromTuple(t, langs));
+			Object graph = t.atom(0);
+			Model m = QuadTableRelations.defaultGraph.equals(graph)? dataset.getDefaultModel(): dataset.getNamedModel(graph.toString());
+			m.add(fromTuple(m, t, u, t2));
 		}
 	}
 	

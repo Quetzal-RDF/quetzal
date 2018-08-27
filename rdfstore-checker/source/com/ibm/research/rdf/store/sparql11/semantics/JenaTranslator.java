@@ -165,6 +165,8 @@ import kodkod.ast.operator.Multiplicity;
 @SuppressWarnings("unused")
 public class JenaTranslator implements OpVisitor {
 	
+	private final static boolean SUPPORT_FLOAT = false;
+	
 	private interface Domain {		
 		Expression bound();
 	}
@@ -272,6 +274,8 @@ public class JenaTranslator implements OpVisitor {
 
 		public abstract Expression getActiveGraph();
 
+		public abstract void setActiveGraph(Expression g);
+
 		public abstract Formula getCurrentQuery();
 
 		public abstract void setCurrentQuery(Formula currentQuery);
@@ -333,6 +337,11 @@ public class JenaTranslator implements OpVisitor {
 			return parent.getCurrentQuery();
 		}
 
+		@Override
+		public void setActiveGraph(Expression g) {
+			parent.setActiveGraph(g);
+		}
+
 		public void setCurrentQuery(Formula currentQuery) {
 			parent.setCurrentQuery(currentQuery);
 		}
@@ -387,11 +396,11 @@ public class JenaTranslator implements OpVisitor {
 	private static class BaseTranslatorContext implements Cloneable, TranslatorContext {
 		private final Map<String, Variable> vars;
 		private final Map<String, Object> constants;
-		private final Expression activeGraph;
 		private final Map<Variable,Domain> domain = HashMapFactory.make();
 		private final Op top;
 		private final boolean choices;
 		
+		private Expression activeGraph;
 		private Formula currentQuery;
 		private Continuation currentContinuation;
 		private Expression dynamicBinding;
@@ -428,6 +437,11 @@ public class JenaTranslator implements OpVisitor {
 		@Override
 		public Expression getActiveGraph() {
 			return activeGraph;
+		}
+
+		@Override
+		public void setActiveGraph(Expression g) {
+			activeGraph = g;
 		}
 
 		/* (non-Javadoc)
@@ -535,7 +549,7 @@ public class JenaTranslator implements OpVisitor {
 			super(parent);
 		}
 
-		private final Map<Variable,Domain> domain = HashMapFactory.make();
+		protected final Map<Variable,Domain> domain = HashMapFactory.make();
 		
 		@Override
 		public Domain getDomain(Variable v) {
@@ -732,11 +746,14 @@ public class JenaTranslator implements OpVisitor {
 	}
 	
 	private Formula ebv(ExpressionContext e) {
-		return 
+		Formula ebv =
 			isBooleanType(e.type()).and(e.value().eq(universe.atomRelation(TRUE()))).or(
 			isIntegerType(e.type()).and(e.intValue().compare(IntCompOperator.EQ, IntConstant.constant(0)).not())).or(
-			isSomeFloatType(e.type()).and(e.floatValue().compare(IntCompOperator.EQ, IntConstant.constant(0)).not())).or(
 			isStringOrSimple(e.value()).and(e.value().join(QuadTableRelations.literalValues).eq(universe.atomRelation(EMPTY()).join(QuadTableRelations.literalValues)).not()));	
+		if (SUPPORT_FLOAT) {
+			ebv = ebv.or(isSomeFloatType(e.type()).and(e.floatValue().compare(IntCompOperator.EQ, IntConstant.constant(0)).not()));
+		}
+		return ebv;
 	}
 	
 	private Formula validEBV(ExpressionContext v) {
@@ -879,7 +896,7 @@ public class JenaTranslator implements OpVisitor {
 		Op query = queries.iterator().next();
 
 		this.context = new BaseTranslatorContext(allVars, bindings, universe.atomRelation(QuadTableRelations.defaultGraph), query, expand);
-		visit(query, (TranslatorContext context1, Formula q) -> {
+		visit(query, (TranslatorContext context, Formula q) -> {
 			Expression actualSolution;
 			Formula correctness = null;
 			Formula differences = null;
@@ -965,16 +982,18 @@ public class JenaTranslator implements OpVisitor {
 					}
 					System.err.println("adding verification constraint\n");
 				} else {
-					int i = 0, j = 0;
-					IntExpression[] indexes = new IntExpression[ x.arity() ];
-					for (Variable v : projectedVars) {
-						if (liveVars.contains(v)) {
-							indexes[i++] = IntConstant.constant(j);
+					if (x.arity() != expectedSolution.arity()) {
+						int i = 0, j = 0;
+						IntExpression[] indexes = new IntExpression[ x.arity() ];
+						for (Variable v : projectedVars) {
+							if (liveVars.contains(v)) {
+								indexes[i++] = IntConstant.constant(j);
+							}
+							j++;
 						}
-						j++;
-					}
 
-					expectedSolution = expectedSolution.project(indexes);
+						expectedSolution = expectedSolution.project(indexes);
+					}
 					
 					correctness = x.eq(expectedSolution);				
 					System.err.println("adding verification constraint for \n" + expectedSolution);
@@ -1088,7 +1107,7 @@ public class JenaTranslator implements OpVisitor {
 		return e;
 	}
 	private Formula handleTriple(Triple arg0) {
-		return context.getActiveGraph()
+		return constrainDomain(context.getActiveGraph(), Leaf.GRAPH)
 		.product(constrainDomain(toTerm(arg0.getSubject()), Leaf.SUBJECT))
 		.product(constrainDomain(toTerm(arg0.getPredicate()), Leaf.PREDICATE))
 		.product(constrainDomain(toTerm(arg0.getObject()), Leaf.OBJECT))
@@ -1202,7 +1221,8 @@ public class JenaTranslator implements OpVisitor {
 	}
 	
 	private Formula isType(Expression type, String typeName) {
-		return type.intersection(typeRelation(typeName)).one();
+		// return type.intersection(typeRelation(typeName)).one();
+		return type.eq(typeRelation(typeName));
 	}
 
 	private Formula isDoubleType(Expression type) {
@@ -1222,7 +1242,7 @@ public class JenaTranslator implements OpVisitor {
 	}
 
 	private Formula isNumericType(Expression type) {
-		return isIntegerType(type).or(isSomeFloatType(type));
+		return SUPPORT_FLOAT? isIntegerType(type).or(isSomeFloatType(type)): isIntegerType(type);
 	}
 
 	private Formula isSomeFloatType(Expression type) {
@@ -1282,6 +1302,7 @@ public class JenaTranslator implements OpVisitor {
 		}
 		
 		public IntExpression floatValue() {
+			assert SUPPORT_FLOAT;
 			return 
 			  isSomeFloatType(type()).thenElse(intValue(), intToFloat(intValue()));
 		}
@@ -1402,9 +1423,12 @@ public class JenaTranslator implements OpVisitor {
 						universe.atomRelation(ExpressionUtil.xsdStringType), 
 						v.guard().and(isLiteral(v.value()).or(isLanguage(v.value()))));
 				} else if (e instanceof E_UnaryMinus) {
-					ret(isSomeFloatType(v.type()).thenElse(
-							floatMinus(v.floatValue()), 
-							minus(v.intValue())),
+					ret(
+						SUPPORT_FLOAT?
+							isSomeFloatType(v.type()).thenElse(
+								floatMinus(v.floatValue()), 
+								minus(v.intValue())):
+							minus(v.intValue()),
 						v.type(),
 						v.guard().and(isNumericType(v.type())));
 				} else if (e instanceof E_IsBlank) {
@@ -1420,33 +1444,41 @@ public class JenaTranslator implements OpVisitor {
 				ExpressionContext arg2 = visit(e.getArg2());
 				Expression type = promoteType(arg1.type(), arg2.type());
 				if (e instanceof E_Equals) {
-					ret( (isIntegerType(type).and(arg1.intValue().eq(arg2.intValue()))).or(
-							isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).eq(zero)).or(
-									equal_test(arg1.value(), arg2.value()))),
-									arg1.guard().and(arg2.guard()));
+					Formula eqTest = (isIntegerType(type).and(arg1.intValue().eq(arg2.intValue()))).or(equal_test(arg1.value(), arg2.value()));
+					if (SUPPORT_FLOAT) {
+						eqTest = eqTest.or(isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).eq(zero)));
+					}
+					ret( eqTest, arg1.guard().and(arg2.guard()));
 				} else if (e instanceof E_NotEquals) {
-					ret( (isIntegerType(type).and(arg1.intValue().eq(arg2.intValue()).not())).or(
-							isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).eq(zero)).or(
-									not_equal_test(arg1.value(), arg2.value()))),
-									arg1.guard().and(arg2.guard()) );
+					Formula neqTest = (isIntegerType(type).and(arg1.intValue().eq(arg2.intValue()).not())).or(not_equal_test(arg1.value(), arg2.value()));
+					if (SUPPORT_FLOAT) {
+						neqTest = neqTest.or(isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).eq(zero).not()));
+					}
+					ret( neqTest, arg1.guard().and(arg2.guard()) );
 				} else if (e instanceof E_LessThan) {
-					ret( (isIntegerType(type).and(arg1.intValue().lt(arg2.intValue()))).or(
-							isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).lt(zero))).or(
-									string_less(arg1.value(), arg2.value())),
-									arg1.guard().and(arg2.guard()).and(isNumericType(type).or(isStringOrSimple(arg1.value()).and(isStringOrSimple(arg2.value())))) );
+					Formula ltTest = (isIntegerType(type).and(arg1.intValue().lt(arg2.intValue()))).or(string_less(arg1.value(), arg2.value()));
+					if (SUPPORT_FLOAT) {
+						ltTest = ltTest.or(isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).lt(zero)));
+					}
+					ret( ltTest, arg1.guard().and(arg2.guard()).and(isNumericType(type).or(isStringOrSimple(arg1.value()).and(isStringOrSimple(arg2.value())))) );
 				} else if (e instanceof E_LessThanOrEqual) {
-					ret( (isIntegerType(type).and(arg1.intValue().lte(arg2.intValue()))).or(
-							isFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).lte(zero))),
-							isNumericType(type) );
+					Formula leTest = (isIntegerType(type).and(arg1.intValue().lte(arg2.intValue())));
+					if (SUPPORT_FLOAT) {
+						leTest = leTest.or(isFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).lte(zero)));
+					}
+					ret( leTest, isNumericType(type) );
 				} else if (e instanceof E_GreaterThan) {
-					ret( (isIntegerType(type).and(arg1.intValue().gt(arg2.intValue()))).or(
-							isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).gt(zero)).or(
-									string_greater(arg1.value(), arg2.value()))),
-									isNumericType(type).or(isStringOrSimple(arg1.value()).and(isStringOrSimple(arg2.value()))) );
+					Formula gtTest = (isIntegerType(type).and(arg1.intValue().gt(arg2.intValue()))).or(string_greater(arg1.value(), arg2.value()));
+					if (SUPPORT_FLOAT) {
+						gtTest = gtTest.or(isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).gt(zero)));
+					}
+					ret( gtTest, isNumericType(type).or(isStringOrSimple(arg1.value()).and(isStringOrSimple(arg2.value()))) );
 				} else if (e instanceof E_GreaterThanOrEqual) {
-					ret( (isIntegerType(type).and(arg1.intValue().gte(arg2.intValue()))).or(
-							isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).gte(zero))),
-							isNumericType(type) );
+					Formula geTest = isIntegerType(type).and(arg1.intValue().gte(arg2.intValue()));
+					if (SUPPORT_FLOAT) {
+						geTest = geTest.or(isSomeFloatType(type).and(floatCompare(arg1.floatValue(), arg2.floatValue()).gte(zero)));
+					}
+					ret( geTest, isNumericType(type) );
 				} else if (e instanceof E_LogicalAnd) {
 					Formula lv = ebv(arg1);
 					Formula rv = ebv(arg2);
@@ -1460,27 +1492,35 @@ public class JenaTranslator implements OpVisitor {
 					Formula g2 = arg2.guard();
 					ret(lv.or(rv), g1.and(g2).or(lv.implies(g1)).or(rv.implies(g2)));
 				} else if (e instanceof E_Add) {
-					ret(isIntegerType(type).thenElse(
-							plus(arg1.intValue(), arg2.intValue()),				
-							floatAdd(arg1.floatValue(), arg2.floatValue())),
+					ret(SUPPORT_FLOAT?
+							isIntegerType(type).thenElse(
+									plus(arg1.intValue(), arg2.intValue()),				
+									floatAdd(arg1.floatValue(), arg2.floatValue())):
+							plus(arg1.intValue(), arg2.intValue()),
 							type,
 							isNumericType(type).and(arg1.guard()).and(arg2.guard()));
 				} else if (e instanceof E_Subtract) {
-					ret(isIntegerType(type).thenElse(
-							minus(arg1.intValue(), arg2.intValue()),				
-							floatMinus(arg1.floatValue(), arg2.floatValue())),
+					ret(SUPPORT_FLOAT?
+							isIntegerType(type).thenElse(
+									minus(arg1.intValue(), arg2.intValue()),				
+									floatMinus(arg1.floatValue(), arg2.floatValue())):
+							minus(arg1.intValue(), arg2.intValue()),
 							type,
 							isNumericType(type));
 				} else if (e instanceof E_Multiply) {
-					ret(isIntegerType(type).thenElse(
-							times(arg1.intValue(), arg2.intValue()),				
-							floatMultiply(arg1.floatValue(), arg2.floatValue())),
+					ret(SUPPORT_FLOAT?
+							isIntegerType(type).thenElse(
+									times(arg1.intValue(), arg2.intValue()),				
+									floatMultiply(arg1.floatValue(), arg2.floatValue())):
+							times(arg1.intValue(), arg2.intValue()),
 							type,
 							isNumericType(type));
 				} else if (e instanceof E_Divide) {
-					ret(isIntegerType(type).thenElse(
-							divide(arg1.intValue(), arg2.intValue()),				
-							floatDivide(arg1.floatValue(), arg2.floatValue())),
+					ret(SUPPORT_FLOAT?
+							isIntegerType(type).thenElse(
+									divide(arg1.intValue(), arg2.intValue()),				
+									floatDivide(arg1.floatValue(), arg2.floatValue())):
+							divide(arg1.intValue(), arg2.intValue()),
 							type,
 							isNumericType(type).and(arg2.intValue().eq(zero).not()));
 				} else if (e instanceof E_SameTerm) {
@@ -1792,8 +1832,7 @@ public class JenaTranslator implements OpVisitor {
 
 	@Override
 	public void visit(OpFilter arg0) {
-		Continuation next = context.getCurrentContinuation();
-		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+		visit(arg0.getSubOp(), (TranslatorContext context1, Formula f) -> {
 			context.setCurrentQuery(f);
 
 			Formula filter = Formula.TRUE;
@@ -1803,25 +1842,24 @@ public class JenaTranslator implements OpVisitor {
 			}
 			
 			Formula pass = f.and(filter);
+			Continuation cc = context.getCurrentContinuation();
 			if (context.explicitChoices()) {	
-				TranslatorContext splitSave = context;
+				TranslatorContext splitSave = context1;
 				
 				SplitContext leftContext = new SplitContext(splitSave);
 				context = leftContext;
 				context.setCurrentQuery(pass);
-				next.next(context, pass);	
+				cc.next(context, pass);	
 				
 				SplitContext rightContext = new SplitContext(splitSave);
 				context = rightContext;
 				Formula fail = f.and(filter.not());
 				context.setCurrentQuery(fail);
-				next.next(context, fail);	
-				
-				context = splitSave;
+				cc.next(context, fail);	
 				
 			} else {
 				context.setCurrentQuery(pass);
-				next.next(context, pass);	
+				cc.next(context, pass);	
 			}
 		});
 	}
@@ -1829,22 +1867,18 @@ public class JenaTranslator implements OpVisitor {
 
 	@Override
 	public void visit(OpGraph arg0) {
-		final Expression g = toTerm(arg0.getNode());
-		
-		constrainDomain(g, Leaf.GRAPH);
-		
-		TranslatorContext save = context;
-		context = new DelegatingContext(save) {
-			@Override
-			public Expression getActiveGraph() {
-				return g;
-			}
-		};
-		
-		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
+		Continuation cc = context.getCurrentContinuation();
+		Expression oldGraph = context.getActiveGraph();
 
-			context = save;
-			context.setCurrentQuery(f.and(g.eq(universe.atomRelation(QuadTableRelations.defaultGraph)).not()));
+		final Expression g = toTerm(arg0.getNode());
+		constrainDomain(g, Leaf.GRAPH);
+		context.setActiveGraph(g);
+		
+		visit(arg0.getSubOp(), (TranslatorContext context1, Formula f) -> {
+			context = context1;
+			context1.setActiveGraph(oldGraph);
+			context1.setCurrentQuery(f.and(g.eq(universe.atomRelation(QuadTableRelations.defaultGraph)).not()));
+			cc.next(context1, context1.getCurrentQuery());
 		});
 	}
 
@@ -1873,6 +1907,11 @@ public class JenaTranslator implements OpVisitor {
 			staticBinding = parent.getStaticBinding()==null? HashSetFactory.<Variable>make(): HashSetFactory.make(parent.getStaticBinding());
 			dynamicBinding = parent.getDynamicBinding();
 		}
+
+		@Override
+		public void setDomain(Variable v, Domain d) {
+			domain.put(v, d);
+		}		
 
 		@Override
 		public Expression getDynamicBinding() {
@@ -1910,17 +1949,19 @@ public class JenaTranslator implements OpVisitor {
 		TranslatorContext save = context;
 		Continuation c = save.getCurrentContinuation();
 		TranslatorContext scope = new ScopeContext(save, arg0);
-
 		TranslatorContext left = context = new SplitContext(scope);
 
 		if (context.explicitChoices()) {
 			visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
+				context = context1;
 				context1.setCurrentQuery(l);
 				c.next(context1, l);
 			});
 
-			TranslatorContext right = context = new SplitContext(scope);
+			TranslatorContext scope2 = new ScopeContext(save, arg0);
+			TranslatorContext right = context = new SplitContext(scope2);
 			visit(arg0.getRight(), (TranslatorContext context1, Formula r) -> {
+				context = context1;
 				context1.setCurrentQuery(r);
 				c.next(context1, r);
 			});
@@ -1987,17 +2028,17 @@ public class JenaTranslator implements OpVisitor {
 	
 	@Override
 	public void visit(OpJoin arg0) {
-		TranslatorContext save = context;
-		context = new ScopeContext(save, arg0);
+		Continuation cc = context.getCurrentContinuation();
+		context = new ScopeContext(context, arg0);
 		
 		visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {	
 			
 			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
 				
-				context = save;
+				context = context2;
 				context.setCurrentQuery(l.and(r));
 				
-				context.getCurrentContinuation().next(save, context.getCurrentQuery());
+				cc.next(context, context.getCurrentQuery());
 			});
 		});
 	}
@@ -2177,7 +2218,7 @@ public class JenaTranslator implements OpVisitor {
 					context.setStaticBinding(leftStaticBinding);
 				
 					if (context.explicitChoices()) {	
-						TranslatorContext splitSave = context;
+						TranslatorContext splitSave = context1;
 					
 						SplitContext leftContext = new SplitContext(splitSave);
 						context = leftContext;
@@ -2185,7 +2226,7 @@ public class JenaTranslator implements OpVisitor {
 						context.setCurrentQuery(l.and(leftOnly));				
 						context.getCurrentContinuation().next(context, context.getCurrentQuery());
 
-						SplitContext rightContext = new SplitContext(splitSave);
+						SplitContext rightContext = new SplitContext(context2);
 						context = rightContext;
 						context.setDynamicBinding(rightDynamicBinding);
 						context.setCurrentQuery(l.and(both));				
@@ -2234,13 +2275,12 @@ public class JenaTranslator implements OpVisitor {
 				Variable v = context.getVars().get(ve.getKey().getName());
 				ExpressionContext expr = handleExpression(ve.getValue());
 
+				Formula x = isIntegerType(expr.type()).and(intValue(v).eq(expr.intValue())).or(v.eq(expr.value()));
 				Formula bound = 
 					expr.guard().and( 
 							typeRelation(ExpressionUtil.xsdStringType).equals(expr.type())?
 							v.eq(expr.value()):
-							(isSomeFloatType(expr.type()).and(intValue(v).eq(expr.floatValue())))
-								.or(isIntegerType(expr.type()).and(intValue(v).eq(expr.intValue())))
-								.or(v.eq(expr.value())));
+							SUPPORT_FLOAT? (isSomeFloatType(expr.type()).and(intValue(v).eq(expr.floatValue()))).or(x): x);
 
 				Formula notBound = expr.guard().not().and(v.eq(NULL));
 
@@ -2381,8 +2421,7 @@ public class JenaTranslator implements OpVisitor {
 
 	@Override
 	public void visit(OpSlice arg0) {
-		// TODO Auto-generated method stub
-
+		visit(arg0.getSubOp(), this.context.getCurrentContinuation());
 	}
 
 	@Override
@@ -2433,6 +2472,15 @@ public class JenaTranslator implements OpVisitor {
 						}
 					}
 				}
+				for(ExprAggregator e : arg0.getAggregators()) {
+					for(Var ev : e.getAggregator().getExpr().getVarsMentioned()) {
+						Variable pev = (Variable) toTerm(ev);
+						if (x.fst.equals(pev)) {
+							continue grouped_vars;
+						}
+					}
+				}
+				
 
 				Decl d = x.fst.oneOf(nodes.union(NULL));
 				dd = dd==null? d: dd.and(d);
@@ -2449,7 +2497,10 @@ public class JenaTranslator implements OpVisitor {
 				if (e.getExpr() != null) {
 					ExpressionContext ec = handleExpression(e.getExpr());
 
-					Decls ad = agg.oneOf(nodes.union(NULL)).and(dd);
+					Decls ad = agg.oneOf(nodes.union(NULL));
+					if (dd != null) {
+						ad = ad.and(dd);
+					}
 
 					table = inner.and(ec.guard()).and(ec.value().eq(agg)).comprehension(ad);
 				} else {
@@ -2479,10 +2530,10 @@ public class JenaTranslator implements OpVisitor {
 			return lv.in(table);
 		} else if (agg instanceof AggMax) {
 			Variable elt = Variable.unary("elt");
-			return lv.in(table).and(lv.eq(elt).not().and(less_test(lv, elt)).forSome(elt.oneOf(table)).not());		
+			return isNumericType(lv.join(QuadTableRelations.literalDatatypes)).and(lv.in(table).and(lv.eq(elt).not().and(less_test(lv, elt)).forSome(elt.oneOf(table)).not()));		
 		} else if (agg instanceof AggMin) {
 			Variable elt = Variable.unary("elt");
-			return lv.in(table).and(lv.eq(elt).not().and(greater_test(lv, elt)).forSome(elt.oneOf(table)).not());		
+			return isNumericType(lv.join(QuadTableRelations.literalDatatypes)).and(lv.in(table).and(lv.eq(elt).not().and(greater_test(lv, elt)).forSome(elt.oneOf(table)).not()));		
 		} else if (agg instanceof AggCount || agg instanceof AggCountVar || agg instanceof AggCountVarDistinct) {
 			return intValue(lv).eq(table.count());
 		} else {
@@ -2500,8 +2551,28 @@ public class JenaTranslator implements OpVisitor {
 	@Override
 	public void visit(OpProject arg0) {
 		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
-			context.setCurrentQuery(f);
-			context.getCurrentContinuation().next(context, f);
+			TranslatorContext sub = new DelegatingContext(context) {
+				private final Map<String, Variable> vars;
+				
+				{
+					vars = HashMapFactory.make();
+					for(Var v : arg0.getVars()) {
+						String name = v.getName();
+						Variable nv = context.getVars().get(name);
+						vars.put(name, nv);
+					}
+				}
+				
+				@Override
+				public Map<String, Variable> getVars() {
+					return vars;
+				}
+				
+			};
+
+			this.context = sub;
+			sub.setCurrentQuery(f);
+			sub.getCurrentContinuation().next(sub, f);
 		});
 	}
 

@@ -1,5 +1,6 @@
 package com.ibm.research.rdf.store.sparql11.semantics;
 
+import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.bitWidth;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.typeURI;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.xsdBooleanType;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.xsdDecimalType;
@@ -28,13 +29,20 @@ public class BoundedUniverse extends BasicUniverse {
 	private final int uriLimit = 5;
 	private final int literalLimit = 5;
 	private final int numberLimit = 5;
+	private final int graphLimit = 3;
 	
 	public BoundedUniverse() throws URISyntaxException {
 		initBounded();
 	}
 
 	protected void initBounded() throws URISyntaxException {
-		for(int i = 0; i < uriLimit; i++) {
+		for(int i = 0; i < graphLimit; i++) {
+			URI iri = new URI("http://synthetic/" + i);
+			ensureGraph(iri);
+			ensureIRI(iri);
+		}
+
+		for(int i = graphLimit; i < uriLimit; i++) {
 			ensureIRI(new URI("http://synthetic/" + i));
 		}
 	
@@ -71,9 +79,35 @@ public class BoundedUniverse extends BasicUniverse {
 				for(Pair<String,?> l : literals) {
 					if (l.snd instanceof String && ANY_LANGUAGE.equals(l.snd)) {
 						for(String ll : languages) {
-							tuples.add(f.tuple(l, Pair.make(ll, null)));
+							if (! ANY_LANGUAGE.equalsIgnoreCase(ll)) {
+								tuples.add(f.tuple(l, Pair.make(ll, null)));
+							}
 						}
 					} 
+				}
+				if (tuples.isEmpty()) {
+					return f.noneOf(2);
+				} else {
+					return f.setOf(tuples);
+				}
+			}
+		};
+	}
+
+	public LazyTupleSet anyNumberTableBound(final TupleFactory f) {
+		return new LazyTupleSet() {
+			public TupleSet tuples() throws URISyntaxException {
+				Collection<Tuple> tuples = HashSetFactory.make();
+				for(Pair<String,?> l : literals) {
+					String type = String.valueOf(l.snd);
+					if (type == ANY_NUMBER.toString()) {
+						int msb = bitWidth - 1;
+						for(int i = 0; i < msb; i++) {
+							Integer v = Integer.valueOf(1<<i);
+							tuples.add(f.tuple(l, v));
+						}
+						tuples.add(f.tuple(l, Integer.valueOf(-(1<<msb))));
+					}
 				}
 				if (tuples.isEmpty()) {
 					return f.noneOf(2);
@@ -119,7 +153,18 @@ public class BoundedUniverse extends BasicUniverse {
 	@Override
 	protected void boundNumbers(Set<Relation> liveRelations, TupleFactory tf,
 			Bounds b, Set<Object> liveAtoms) throws URISyntaxException {
-		bound(liveRelations, liveAtoms, b, QuadTableRelations.literalValues, numericTableBound(tf));
+		LazyTupleSet base = super.numericTableBound(tf);
+		bound(liveRelations, liveAtoms, b, QuadTableRelations.literalValues, 
+			base, 
+			new LazyTupleSet() {
+				@Override
+				public TupleSet tuples() throws URISyntaxException {
+					TupleSet ts = tf.noneOf(2);
+					ts.addAll(base.tuples());
+					ts.addAll(anyNumberTableBound(tf).tuples());
+					return ts;
+				}			
+			});
 	}
 
 	@Override

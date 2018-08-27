@@ -265,21 +265,26 @@ public class Drivers {
 			Pair<Formula, Pair<Formula, Formula>> answer,
 			String relation)
 			throws URISyntaxException {
-		Map<String, TupleSet> rels = check(uf, answer);
+		Instance rels = check(uf, answer);
 		if (rels != null) {
-			return rels.get(relation);
+			for(Relation r : rels.relations()) {
+				if (r.toString().equals(relation)) {
+					return rels.tuples(r);
+				}
+			}
+			return null;
 		} else {
 			return null;
 		}
 	}
 
-	public static Map<String,TupleSet> check(UniverseFactory uf,
+	public static Instance check(UniverseFactory uf,
 			Pair<Formula, Pair<Formula, Formula>> answer)
 			throws URISyntaxException {
 		return check(uf, SATFactory.MiniSat, answer);
 	}
 	
-	public static Map<String,TupleSet> check(UniverseFactory uf,
+	public static Instance check(UniverseFactory uf,
 			SATFactory sat,
 			Pair<Formula, Pair<Formula, Formula>> answer)
 			throws URISyntaxException {
@@ -301,7 +306,7 @@ public class Drivers {
 		solver.options().setSolver(sat);
 		solver.options().setIntEncoding(IntEncoding.TWOSCOMPLEMENT);
 		solver.options().setBitwidth(bitWidth);
-		solver.options().setSkolemDepth(-1);
+		//solver.options().setSkolemDepth(-1);
 		solver.options().setSymmetryBreaking(0);
 		solver.options().setSharing(1);
 		Formula f = Nodes.simplify(qf, b);
@@ -311,12 +316,8 @@ public class Drivers {
 		if (s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE) {
 			Instance instance = s.instance();
 				
-			Map<String,TupleSet> result = HashMapFactory.make();
-			for(Relation rl : instance.relations()) {
-				result.put(rl.name(), instance.tuples(rl));
-			}
-			
-			return result;
+			System.err.println(instance);
+			return instance;
 		} else {
 			if (answer.snd.snd != null) {				
 				Solution diff = solver.solve(Nodes.simplify(cf, b), b);

@@ -18,7 +18,9 @@ public interface UniverseFactory {
 	public void nodesRelation(Relation r);
 
 	public void ensureIRI(URI iri);
-	
+
+	public void ensureGraph(URI iri);
+
 	public void ensureLiteral(Pair<String,?> lit);
 	
 	public void ensureBlankNode(String blankId);
