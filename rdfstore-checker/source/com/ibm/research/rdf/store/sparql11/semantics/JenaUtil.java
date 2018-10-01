@@ -10,39 +10,42 @@ import java.net.URL;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.impl.LiteralLabel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.sparql.algebra.Algebra;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpVisitorBase;
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct;
-import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
-import com.hp.hpl.jena.sparql.algebra.op.OpGraph;
-import com.hp.hpl.jena.sparql.algebra.op.OpGroup;
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpMinus;
-import com.hp.hpl.jena.sparql.algebra.op.OpPath;
-import com.hp.hpl.jena.sparql.algebra.op.OpProject;
-import com.hp.hpl.jena.sparql.algebra.op.OpService;
-import com.hp.hpl.jena.sparql.algebra.op.OpTable;
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.ExprAggregator;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.LiteralLabel;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpVisitorBase;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpExtend;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpGraph;
+import org.apache.jena.sparql.algebra.op.OpGroup;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpMinus;
+import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.ExprAggregator;
+
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
@@ -70,7 +73,7 @@ public class JenaUtil {
 	}
 
 	static Node fromBlank(String s) {
-		return NodeFactory.createAnon(new AnonId(s));
+		return NodeFactory.createAnon(s);
 	}
 		
 	public static Object toAtom(Node n) throws URISyntaxException {
@@ -100,6 +103,7 @@ public class JenaUtil {
 		return Algebra.compile(query);
 	}
 	
+	@SuppressWarnings("unchecked")
 	static RDFNode fromLiteral(Model m, Pair<String,Object> o, BasicUniverse u, Instance t2) {
 		try {
 			Relation me = Relation.unary("me");
@@ -111,7 +115,7 @@ public class JenaUtil {
 			if (o.snd instanceof String) {
 				TupleSet langs = e.evaluate(me.join(QuadTableRelations.literalLanguages));
 				if (! langs.isEmpty()) {
-					return m.createLiteral(o.fst, langs.iterator().next().atom(0).toString());
+					return m.createLiteral(o.fst, ((Pair<String,?>)langs.iterator().next().atom(0)).fst);
 				} else {
 					return m.createLiteral(o.fst, (String)o.snd);				
 				}
@@ -137,13 +141,15 @@ public class JenaUtil {
 	public static RDFNode fromAtom(Model m, Object o, BasicUniverse u, Instance t2) {
 		if (o instanceof Pair<?,?>) {
 			return fromLiteral(m, (Pair<String,Object>) o, u, t2);
+		} else if (o.toString().startsWith("_:")) {
+			return m.createResource(new AnonId(o.toString()));
 		} else {
 			return m.createResource(o.toString());
 		}
 	}
 	
 	public static Statement fromTuple(Model m, Tuple t, BasicUniverse u, Instance t2) {
-		Resource s = m.createResource(String.valueOf(t.atom(1)));
+		Resource s = (Resource) fromAtom(m, t.atom(1), u, t2);
 		Property p = m.createProperty(String.valueOf(t.atom(2)));
 		RDFNode o = fromAtom(m, t.atom(3), u, t2);
 		return m.createStatement(s, p, o);
@@ -281,7 +287,17 @@ public class JenaUtil {
 			@Override
 			public void visit(OpDistinct opDistinct) {
 				opDistinct.getSubOp().visit(this);
-			}				
+			}
+
+			@Override
+			public void visit(OpOrder opOrder) {
+				opOrder.getSubOp().visit(this);
+			}
+
+			@Override
+			public void visit(OpSlice opSlice) {
+				opSlice.getSubOp().visit(this);
+			}
 		});
 		return result;
 	}

@@ -34,6 +34,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.util.FileManager;
 import org.coode.owlapi.rdf.rdfxml.RDFXMLRenderer;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.io.RDFOntologyFormat;
@@ -53,17 +65,6 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.util.FileManager;
 import com.ibm.research.owlql.ConjunctiveQuery;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 /**
@@ -385,9 +386,9 @@ public class OCUtils {
 		for (OWLClass owlclass: ont.getClassesInSignature(true)) {
 			ElementTriplesBlock p = new ElementTriplesBlock();
 			String x = "x";
-			Node sub = Node.createVariable(x);
-			Node pred = Node.createURI(RDFConstants.RDF_TYPE);
-			Node obj = Node.createURI(owlclass.getIRI().toString());
+			Node sub = NodeFactory.createVariable(x);
+			Node pred = NodeFactory.createURI(RDFConstants.RDF_TYPE);
+			Node obj = NodeFactory.createURI(owlclass.getIRI().toString());
 			Triple qt = new Triple(sub, pred, obj);
 			p.getPattern().add(qt);
 			ConjunctiveQuery cq = new ConjunctiveQuery();

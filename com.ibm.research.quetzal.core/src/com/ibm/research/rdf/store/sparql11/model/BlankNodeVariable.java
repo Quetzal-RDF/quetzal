@@ -16,8 +16,4 @@ public class BlankNodeVariable extends Variable {
 		super(name);
 	}
 	
-	public String toString() {
-		return "_:" + super.getName();
-	}
-
 }

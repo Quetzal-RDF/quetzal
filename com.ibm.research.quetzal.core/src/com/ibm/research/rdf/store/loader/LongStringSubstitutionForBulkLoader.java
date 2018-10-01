@@ -14,16 +14,17 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
-import org.apache.jena.atlas.lib.Sink;
-import org.apache.jena.riot.RiotReader;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.out.SinkQuadOutput;
 import org.apache.jena.riot.out.SinkTripleOutput;
+import org.apache.jena.riot.system.StreamRDF;
+import org.apache.jena.sparql.core.Quad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.sparql.core.Quad;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.hashing.HashingHelper;
 
@@ -40,10 +41,10 @@ public class LongStringSubstitutionForBulkLoader {
 		final BufferedWriter stringFileWriter = new BufferedWriter(new OutputStreamWriter(System.out));
 				
 		if (quads) {
-			RiotReader.parseQuads(fileName, new Sink<Quad>() {
+			RDFDataMgr.parse(new StreamRDF() {
 				private final SinkQuadOutput qo = new SinkQuadOutput(new FileOutputStream(outFile), null, null);
 				@Override
-				public void send(Quad arg0) {
+				public void quad(Quad arg0) {
 					try {
 						Node newGraph = null;
 						Node newSubj = null;
@@ -51,28 +52,28 @@ public class LongStringSubstitutionForBulkLoader {
 						Node newPredicate = null;
 						
 						if (arg0.getGraph().toString().length() > stringLength) {
-							newGraph = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getGraph().toString()));
+							newGraph = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getGraph().toString()));
 							stringFileWriter.write(newGraph + " " + arg0.getGraph().toString() + "\n");
 						} else {
 							newGraph = arg0.getGraph();
 						}
 						
 						if (arg0.getSubject().toString().length() > stringLength) {
-							newSubj = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getSubject().toString()));
+							newSubj = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getSubject().toString()));
 							stringFileWriter.write(newSubj + " " + arg0.getSubject().toString() + "\n");
 						} else {
 							newSubj = arg0.getSubject();
 						}
 						
 						if (arg0.getObject().toString().length() > stringLength) {
-							newObject = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getObject().toString()));
+							newObject = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getObject().toString()));
 							stringFileWriter.write(newObject + " " + arg0.getObject().toString() + "\n");
 						} else {
 							newObject = arg0.getObject();
 						}
 						
 						if (arg0.getPredicate().toString().length() > stringLength) {
-							newPredicate = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getPredicate().toString()));
+							newPredicate = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getPredicate().toString()));
 							stringFileWriter.write(newPredicate + " " + arg0.getPredicate().toString() + "\n");
 						} else {
 							newPredicate = arg0.getPredicate();
@@ -84,40 +85,57 @@ public class LongStringSubstitutionForBulkLoader {
 					}
 				}
 				@Override
-				public void close() {
-					qo.close();
+				public void start() {
+					// TODO Auto-generated method stub
+					
 				}
 				@Override
-				public void flush() {
-					qo.flush();
+				public void triple(Triple triple) {
+					// TODO Auto-generated method stub
+					
 				}
-			});
+				@Override
+				public void base(String base) {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void prefix(String prefix, String iri) {
+					// TODO Auto-generated method stub
+					
+				}
+				@Override
+				public void finish() {
+					// TODO Auto-generated method stub
+					
+				}
+			}, fileName);
 		} else {
-			RiotReader.parseTriples(fileName, new Sink<Triple>() {
+			RDFDataMgr.parse(new StreamRDF() {
 				private final SinkTripleOutput to = new SinkTripleOutput(new FileOutputStream(outFile), null, null);
 				@Override
-				public void send(Triple arg0) {
+				public void triple(Triple arg0) {
 					try {
 						Node newSubj = null;
 						Node newObject = null;
 						Node newPredicate = null;
 												
 						if (arg0.getSubject().toString().length() > stringLength) {
-							newSubj = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getSubject().toString()));
+							newSubj = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getSubject().toString()));
 							stringFileWriter.write(newSubj + " " + arg0.getSubject().toString() + "\n");
 						} else {
 							newSubj = arg0.getSubject();
 						}
 						
 						if (arg0.getObject().toString().length() > stringLength) {
-							newObject = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getObject().toString()));
+							newObject = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getObject().toString()));
 							stringFileWriter.write(newObject + " " + arg0.getObject().toString() + "\n");
 						} else {
 							newObject = arg0.getObject();
 						}
 						
 						if (arg0.getPredicate().toString().length() > stringLength) {
-							newPredicate = Node.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getPredicate().toString()));
+							newPredicate = NodeFactory.createURI(Constants.PREFIX_SHORT_STRING + HashingHelper.hashLongString(arg0.getPredicate().toString()));
 							stringFileWriter.write(newPredicate + " " + arg0.getPredicate().toString() + "\n");
 						} else {
 							newPredicate = arg0.getPredicate();
@@ -131,15 +149,35 @@ public class LongStringSubstitutionForBulkLoader {
 				}
 
 				@Override
-				public void close() {
-					to.close();
+				public void start() {
+					// TODO Auto-generated method stub
+					
 				}
 
 				@Override
-				public void flush() {
-					to.flush();
+				public void quad(Quad quad) {
+					// TODO Auto-generated method stub
+					
 				}
-			});
+
+				@Override
+				public void base(String base) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void prefix(String prefix, String iri) {
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void finish() {
+					// TODO Auto-generated method stub
+					
+				}
+			}, fileName);
 		}
 		
 		stringFileWriter.close();

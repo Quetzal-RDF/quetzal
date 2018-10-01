@@ -17,18 +17,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.openjena.riot.RiotWriter;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.riot.writer.NQuadsWriter;
+import org.apache.jena.sparql.graph.GraphFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.graph.GraphFactory;
 import com.ibm.research.rdf.store.config.Constants;
 
 public class PredicateMappingsDataSet {
@@ -252,7 +252,7 @@ public class PredicateMappingsDataSet {
 				
 		// Dump the dataset to a file in n-quad format
 		PrintStream ps = new PrintStream(outputStream); 
-		RiotWriter.writeNQuads(ps, dataset.asDatasetGraph());
+		NQuadsWriter.write(ps, dataset.asDatasetGraph().find());
 		ps.close();
 	}
 

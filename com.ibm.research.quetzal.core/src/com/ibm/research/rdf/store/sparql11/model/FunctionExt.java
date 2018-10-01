@@ -11,6 +11,7 @@
  package com.ibm.research.rdf.store.sparql11.model;
 
 import java.util.ArrayList;
+
 import com.ibm.research.rdf.store.sparql11.XTree;
 
 public class FunctionExt extends FunctionBase {

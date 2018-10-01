@@ -17,11 +17,14 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFDataMgr;
 import org.xml.sax.SAXException;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.core.Var;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.core.Var;
 import com.ibm.research.kodkod.util.Nodes;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.utilities.io.SparqlRdfResultReader;
@@ -139,8 +142,17 @@ public class Drivers {
 		System.err.println(result);
 		return result;
 	}
+
+	public static Set<List<Object>> tryToCheck(URL datasetURL, SparqlSelectResult result,
+			Query q, List<Var> vars, Map<String, Object> bindings, String relation, boolean expand) throws URISyntaxException,
+			MalformedURLException, IOException {
+		Dataset D = RDFDataMgr.loadDataset(
+				datasetURL.toExternalForm(),
+						datasetURL.getPath().endsWith(".nq")? Lang.NQUADS: Lang.NTRIPLES);
+		return tryToCheck(D, result, q, vars, bindings, relation, expand);
+	}
 	
-	private static Set<List<Object>> tryToCheck(URL dataSet, SparqlSelectResult result,
+	public static Set<List<Object>> tryToCheck(Dataset dataSet, SparqlSelectResult result,
 			Query q, List<Var> vars, Map<String, Object> bindings, String relation, boolean expand) throws URISyntaxException,
 			MalformedURLException, IOException {
 
@@ -176,20 +188,20 @@ public class Drivers {
 			}
 			return r;
 		} else {
-			List<Var> split = new LinkedList<Var>();
+			List<Var> newVars = new ArrayList<Var>();
 			Iterator<Var> vs = vars.iterator();
-			vs.next();
+			
 			while (vs.hasNext()) {
-				if (vs.hasNext()) {
-					split.add(vs.next());
+				Var x = vs.next();
+				if (q.getQueryPattern().toString().contains(x.toString())) {
+					newVars.add(x);
+					break;
 				}
 			}
-			List<Var> newVars = new ArrayList<Var>(vars);
-			for(Var v : split) {
-				System.err.println("removing " + v + " from " + newVars);
-				newVars.remove(v);
-			}
 			
+			List<Var> split = new LinkedList<>(vars);
+			split.removeAll(newVars);
+
 			assert newVars.size() < vars.size();
 			
 			Set<List<Object>> subset = tryToCheck(dataSet, result, q, newVars, bindings, relation, expand);
@@ -199,11 +211,11 @@ public class Drivers {
 				newBindings.putAll(bindings);
 				for (List<Object> ext : tryToCheck(dataSet, result, q, split, newBindings, relation, expand)) {
 					List<Object> bt = new ArrayList<Object>(vars.size());
-					for (int i = 0; i < ext.size(); i++) {
-						bt.add(ext.get(i));
-					}
 					for(int i = 0; i < t.size(); i++) {
 						bt.add(t.get(i));
+					}
+					for (int i = 0; i < ext.size(); i++) {
+						bt.add(ext.get(i));
 					}
 					fullset.add(bt);
 				}
@@ -311,6 +323,8 @@ public class Drivers {
 		solver.options().setSharing(1);
 		Formula f = Nodes.simplify(qf, b);
 
+		System.err.println(f);
+		
 		Solution s = solver.solve(f, b);
 		
 		if (s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE) {

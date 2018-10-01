@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.ibm.research.rdf.store.hashing.ColoringFunction;
@@ -29,6 +27,8 @@ import com.ibm.wala.util.collections.Pair;
 import com.ibm.wala.util.graph.labeled.LabeledGraph;
 import com.ibm.wala.util.intset.IntSetUtil;
 import com.ibm.wala.util.intset.MutableIntSet;
+
+import junit.framework.Assert;
 
 public class QueriesPredicateIndexTest {
 

@@ -16,8 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,13 +23,15 @@ import org.junit.runner.RunWith;
 import com.ibm.rdf.store.testing.RandomizedRepeat;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
-import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.Store.Backend;
+import com.ibm.research.rdf.store.StoreManager;
 import com.ibm.research.rdf.store.query.QueryProcessor;
 import com.ibm.research.rdf.store.query.QueryProcessorFactory;
 import com.ibm.research.rdf.store.runtime.service.types.LiteralInfoResultSet;
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.rdf.store.sparql11.model.Query;
+
+import junit.framework.Assert;
 
 @RunWith(com.ibm.rdf.store.testing.RandomizedRepeatRunner.class)
 @RandomizedRepeat(8) 

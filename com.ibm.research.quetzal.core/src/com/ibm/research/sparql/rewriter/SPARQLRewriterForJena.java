@@ -18,11 +18,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.ibm.wala.util.collections.HashMapFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 
 /**
  * @author Kavitha Srinivas <ksrinivs@us.ibm.com>

@@ -23,39 +23,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.ExprVars;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementExists;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementMinus;
+import org.apache.jena.sparql.syntax.ElementNotExists;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementSubQuery;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementVisitor;
+import org.apache.jena.sparql.syntax.ElementVisitorBase;
+import org.apache.jena.sparql.syntax.PatternVars;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCopyBase;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.ExprVars;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.ElementAssign;
-import com.hp.hpl.jena.sparql.syntax.ElementBind;
-import com.hp.hpl.jena.sparql.syntax.ElementData;
-import com.hp.hpl.jena.sparql.syntax.ElementDataset;
-import com.hp.hpl.jena.sparql.syntax.ElementExists;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementGroup;
-import com.hp.hpl.jena.sparql.syntax.ElementMinus;
-import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
-import com.hp.hpl.jena.sparql.syntax.ElementNotExists;
-import com.hp.hpl.jena.sparql.syntax.ElementOptional;
-import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementService;
-import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementUnion;
-import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
-import com.hp.hpl.jena.sparql.syntax.ElementVisitorBase;
-import com.hp.hpl.jena.sparql.syntax.ElementWalker;
-import com.hp.hpl.jena.sparql.syntax.PatternVars;
 import com.ibm.research.owlql.rule.RuleSystem;
 import com.ibm.research.utils.FindAllVariables;
 import com.ibm.research.utils.OCUtils;
@@ -347,132 +338,25 @@ public class OWLQLSPARQLCompiler extends OWLQLToNonRecursiveDatalogCompiler {
 	 * Assumption: All variables are distinguished variables
 	 * 
 	 */
-	protected class ExpandBasicGraphPatterns implements ElementVisitor {
+	protected class ExpandBasicGraphPatterns extends ElementTransformCopyBase {
 
 		private Set<String> allVars;
 		//private List<String> distinguishedVars;
-		private Element result;
-		
 		
 		public Element expand(Element root, /*List<String> distinguishedVars,*/  Set<String> allVars) {
-			
 			this.allVars = allVars;
-			//this.distinguishedVars = distinguishedVars;
-			root.visit(this);
-			return result;
-		}
-		@Override
-		public void visit(ElementAssign e) {
-			result = e;		
-		}
-		@Override
-		public void visit(ElementBind e) {
-			result = e;		
-		}
-		
-		@Override
-		public void visit(ElementDataset e) {
-		   e.getPatternElement().visit(this);
-		   e.setPatternElement(result);
-		   result = e;
+			return ElementTransformer.transform(root, this);
 		}
 
-		@Override
-		public void visit(ElementExists e) {
-			e.getElement().visit(this);
-			result = new ElementExists(result);
-			
-		}
-		
-		
 
 		@Override
-		public void visit(ElementMinus e) {
-			e.getMinusElement().visit(this);
-			result = new ElementMinus(result);
-		}
-		
-		@Override
-		public void visit(ElementData ed) {
-			result = ed;
-			
-		}
-		/*@Override
-		public void visit(ElementFetch e) {
-			result = e;
-			
-		}*/
-
-		@Override
-		public void visit(ElementFilter e) {
-			result = e;
-			
+		public Element transform(ElementPathBlock arg0) {
+			return OCUtils.toTriples(arg0);
 		}
 
-		@Override
-		public void visit(ElementGroup group) {
-			ElementGroup newgroup = new ElementGroup();
-			for (Element e: group.getElements()) {
-				e.visit(this);
-				newgroup.addElement(result);
-			}
-			result = newgroup;
-			
-		}
 
 		@Override
-		public void visit(ElementNamedGraph ng) {
-			Node n = ng.getGraphNameNode();
-			Element e = ng.getElement();
-			e.visit(this);
-			if (n==null) {
-				result = new ElementNamedGraph(result);
-			} else {
-				result = new ElementNamedGraph(n, result);
-			}
-		}
-
-		@Override
-		public void visit(ElementNotExists e) {
-			e.getElement().visit(this);
-			result = new ElementNotExists(result);
-			
-		}
-
-		@Override
-		public void visit(ElementOptional e) {
-			e.getOptionalElement().visit(this);
-			result = new ElementOptional(result);
-			
-		}
-
-		@Override
-		public void visit(ElementPathBlock arg0) {
-			visit(OCUtils.toTriples(arg0));
-		}
-
-		@Override
-		public void visit(ElementService es) {
-			Node n = es.getServiceNode();
-			String uri = n!=null && n.isURI()? n.getURI(): null;
-			es.getElement().visit(this);
-			if (uri!=null) {
-				result = new ElementService(uri, result, es.getSilent());
-			}  else if (n!=null) {
-				result = new ElementService(n, result,es.getSilent());
-			} else {
-				result = new ElementService((Node) null, result, es.getSilent() );
-			}
-		}
-
-		@Override
-		public void visit(ElementSubQuery sq) {
-			Query newsq = primCompile(sq.getQuery(), allVars);
-			result = new ElementSubQuery(newsq);
-		}
-
-		@Override
-		public void visit(ElementTriplesBlock tb) {
+		public Element transform(ElementTriplesBlock tb) {
 			List<Triple> triples = tb.getPattern().getList();
 			// convert set of triples to a rule system
 			// here is where all variables in triples are assumed to be distinguished variables
@@ -484,30 +368,18 @@ public class OWLQLSPARQLCompiler extends OWLQLToNonRecursiveDatalogCompiler {
 			logger.debug("RuleSystem:\n{}", outrs );
 			if (outrs!=null) {
 				Query q = RuleSystemToUnionQuery.toUnionQuery(outrs);
-				result = q.getQueryPattern();		
+				return q.getQueryPattern();		
 			} else {
 				/*ElementTriplesBlock ts = new ElementTriplesBlock();
 				Node owlNothing =  Node.createURI(OWL.Nothing.getURI());
 				Node rdfType  = Node.createURI(RDF.type.getURI());
 				ts.addTriple(new Triple(owlNothing, rdfType, owlNothing));
 				result = ts;*/
-				result = tb;
+				return tb;
 			}
-		}
-
-		@Override
-		public void visit(ElementUnion union) {
-			ElementUnion newunion = new ElementUnion();
-			for (Element e: union.getElements()) {
-				e.visit(this);
-				newunion.addElement(result);
-			}
-			result = newunion;
-			
-			
-		}
-		
+		}		
 	}
+	
 	/**
 	 * Map-based implementation of a multiset.
 	 * @author fokoue
@@ -651,10 +523,11 @@ public class OWLQLSPARQLCompiler extends OWLQLToNonRecursiveDatalogCompiler {
 		
 	}
 	
-	protected static class SkipMinusWalker extends ElementWalker.Walker {
-
+	protected static class SkipMinusWalker extends ElementVisitorBase {
+		ElementVisitor proc;
+		
 		public SkipMinusWalker(ElementVisitor arg0) {
-			super(arg0, null, null);
+			this.proc = arg0;
 		}
 
 		@Override

@@ -12,14 +12,14 @@
 
 import java.io.IOException;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.util.FileManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.util.FileManager;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.jena.impl.DB2Dataset;
 import com.ibm.research.rdf.store.jena.impl.DB2Graph;
@@ -91,6 +91,7 @@ public class RdfStoreQueryExecutionFactory {
 	public static QueryExecution create(String sparql, Dataset dataset) {
 		return create(sparql, dataset, null);
 	}
+
 	public static QueryExecution create(Query query, Dataset dataset, OWLQLSPARQLCompiler compiler) {
 		checkArg(dataset);
 		return new DB2QueryExecutionImpl((com.ibm.research.rdf.store.jena.Query)query,

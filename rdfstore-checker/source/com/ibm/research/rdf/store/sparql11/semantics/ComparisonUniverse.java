@@ -7,7 +7,7 @@ import java.util.Set;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 
 import kodkod.ast.Relation;
 import kodkod.instance.Bounds;

@@ -15,7 +15,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.hp.hpl.jena.query.QueryFactory;
+import org.apache.jena.query.QueryFactory;
+
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 
 public class TestQueryToStrring {
@@ -57,7 +58,7 @@ public class TestQueryToStrring {
 		 Query q  = SparqlParserUtilities.parseSparqlFile(fileName, Collections.<String,String>emptyMap());
 		 System.out.println("Query:\n"+q);
 		 try {
-			 com.hp.hpl.jena.query.Query jenaq = QueryFactory.create(q.toString());
+			 org.apache.jena.query.Query jenaq = QueryFactory.create(q.toString());
 		 } catch (Exception e) {
 			 e.printStackTrace(System.out);
 			 return false;

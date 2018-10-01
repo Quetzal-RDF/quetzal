@@ -15,10 +15,10 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.util.HashMap;
 
+import org.apache.jena.rdf.model.Model;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;

@@ -19,36 +19,36 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.core.Prologue;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.path.Path;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementAssign;
+import org.apache.jena.sparql.syntax.ElementBind;
+import org.apache.jena.sparql.syntax.ElementData;
+import org.apache.jena.sparql.syntax.ElementDataset;
+import org.apache.jena.sparql.syntax.ElementExists;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementMinus;
+import org.apache.jena.sparql.syntax.ElementNamedGraph;
+import org.apache.jena.sparql.syntax.ElementNotExists;
+import org.apache.jena.sparql.syntax.ElementOptional;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementService;
+import org.apache.jena.sparql.syntax.ElementSubQuery;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.ElementVisitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.core.Prologue;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.core.VarExprList;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.path.Path;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.ElementAssign;
-import com.hp.hpl.jena.sparql.syntax.ElementBind;
-import com.hp.hpl.jena.sparql.syntax.ElementData;
-import com.hp.hpl.jena.sparql.syntax.ElementDataset;
-import com.hp.hpl.jena.sparql.syntax.ElementExists;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementGroup;
-import com.hp.hpl.jena.sparql.syntax.ElementMinus;
-import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
-import com.hp.hpl.jena.sparql.syntax.ElementNotExists;
-import com.hp.hpl.jena.sparql.syntax.ElementOptional;
-import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementService;
-import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementUnion;
-import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
 import com.ibm.research.owlql.NewVariableGenerator;
 import com.ibm.research.owlql.OWLQLCompiler;
 import com.ibm.research.owlql.rule.AtomicFormula;
@@ -177,21 +177,21 @@ public class RuleSystemToUnionQuery extends RuleSystemToQueries {
 
 		@Override
 		public void visit(ElementAssign assign) {
-			com.hp.hpl.jena.sparql.expr.Expr expr = assign.getExpr().copySubstitute(this);
+			org.apache.jena.sparql.expr.Expr expr = assign.getExpr().copySubstitute(this);
 			Var v = assign.getVar();
 			result = new ElementAssign(v, expr);
 		}
 		
 		@Override
 		public void visit(ElementBind eb) {
-			com.hp.hpl.jena.sparql.expr.Expr expr = eb.getExpr().copySubstitute(this);
+			org.apache.jena.sparql.expr.Expr expr = eb.getExpr().copySubstitute(this);
 			Var v = eb.getVar();
 			result = new ElementBind(v, expr);
 		}
 
 		@Override
 		public void visit(ElementDataset e) {
-			e.getPatternElement().visit(this);
+			e.getElement().visit(this);
 			result = new ElementDataset(e.getDataset(), result);
 		}
 
@@ -218,7 +218,7 @@ public class RuleSystemToUnionQuery extends RuleSystemToQueries {
 
 		@Override
 		public void visit(ElementFilter filter) {
-			com.hp.hpl.jena.sparql.expr.Expr expr = filter.getExpr();
+			org.apache.jena.sparql.expr.Expr expr = filter.getExpr();
 			expr = expr.copySubstitute(this);
 			result = new ElementFilter(expr);
 		}

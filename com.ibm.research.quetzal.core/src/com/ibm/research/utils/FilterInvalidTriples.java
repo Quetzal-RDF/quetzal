@@ -17,12 +17,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
-import org.apache.jena.riot.RiotReader;
-import org.apache.jena.riot.RiotWriter;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.Checker;
+import org.apache.jena.riot.writer.NTriplesWriter;
 
-import com.hp.hpl.jena.graph.Triple;
 import com.ibm.wala.util.Predicate;
 import com.ibm.wala.util.collections.FilterIterator;
 
@@ -30,7 +30,7 @@ public class FilterInvalidTriples {
 
 	private static Iterator<Triple> filterTriples(URL url, String baseURI,
 			Lang lang) throws MalformedURLException, IOException {
-		Iterator<Triple> ts = RiotReader.createIteratorTriples(
+		Iterator<Triple> ts = RDFDataMgr.createIteratorTriples(
 				url.openStream(), lang, baseURI);
 		return new FilterIterator<Triple>(ts, new Predicate<Triple>() {
 			private int i = 0;
@@ -48,7 +48,7 @@ public class FilterInvalidTriples {
 			FileOutputStream riotOut, Lang language)
 			throws MalformedURLException, IOException {
 		Iterator<Triple> ts = filterTriples(uri, dataFile, language);
-		RiotWriter.writeTriples(riotOut, ts);
+		NTriplesWriter.write(riotOut, ts);
 	}
 
 	public static void main(String[] args) throws FileNotFoundException,

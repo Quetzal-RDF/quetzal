@@ -12,8 +12,7 @@
 
 import java.io.File;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.Syntax;
+import org.apache.jena.query.Syntax;
 
 public class RdfStoreQueryFactory {
 

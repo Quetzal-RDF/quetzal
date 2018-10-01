@@ -23,8 +23,8 @@ import java.util.Properties;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
+import org.apache.jena.rdf.model.Property;
 
-import com.hp.hpl.jena.rdf.model.Property;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;

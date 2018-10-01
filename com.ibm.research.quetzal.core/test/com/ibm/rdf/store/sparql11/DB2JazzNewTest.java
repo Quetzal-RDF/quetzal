@@ -10,10 +10,10 @@
  *****************************************************************************/
  package com.ibm.rdf.store.sparql11;
 
-import junit.framework.TestSuite;
-
 import com.ibm.rdf.store.sparql11.TestRunner.DB2Engine;
 import com.ibm.rdf.store.sparql11.TestRunner.DB2TestData;
+
+import junit.framework.TestSuite;
 
 public class DB2JazzNewTest extends JazzNewTest {
 	public static TestSuite suite() {

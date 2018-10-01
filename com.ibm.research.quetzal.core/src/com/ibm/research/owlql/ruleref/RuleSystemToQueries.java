@@ -20,23 +20,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.E_Str;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementBind;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.E_Equals;
-import com.hp.hpl.jena.sparql.expr.E_NotEquals;
-import com.hp.hpl.jena.sparql.expr.E_Str;
-import com.hp.hpl.jena.sparql.expr.ExprVar;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.ElementBind;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 import com.ibm.research.owlql.ConjunctiveQuery;
 import com.ibm.research.owlql.NewVariableGenerator;
 import com.ibm.research.owlql.OWLQLCompiler;
@@ -195,33 +196,33 @@ public class RuleSystemToQueries {
 	
 	protected static E_Equals toEqualsFilter(Expr left, Expr right) {
 		Node ln = toNode(left);
-		com.hp.hpl.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
+		org.apache.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
 		Node rn = toNode(right);
-		com.hp.hpl.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
+		org.apache.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
 		return new E_Equals(le, re);
 	}
 	protected static E_Equals toIRIEqualsFilter(Expr left, Expr right) {
 		Node ln = toNode(left);
-		com.hp.hpl.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
+		org.apache.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
 		Node rn = toNode(right);
-		com.hp.hpl.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
+		org.apache.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
 		return new E_Equals(new E_Str(le), new E_Str(re));
 	}
 	
 	
 	protected static E_NotEquals toNotEqualsFilter(Expr left, Expr right) {
 		Node ln = toNode(left);
-		com.hp.hpl.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
+		org.apache.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
 		Node rn = toNode(right);
-		com.hp.hpl.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
+		org.apache.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
 		return new E_NotEquals(le, re);
 	}
 	
 	protected static E_NotEquals toIRINotEqualsFilter(Expr left, Expr right) {
 		Node ln = toNode(left);
-		com.hp.hpl.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
+		org.apache.jena.sparql.expr.Expr le = ln.isVariable()? new ExprVar(ln.getName()) : new NodeValueNode(ln);
 		Node rn = toNode(right);
-		com.hp.hpl.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
+		org.apache.jena.sparql.expr.Expr re = rn.isVariable()? new ExprVar(rn.getName()) : new NodeValueNode(rn);
 		return new E_NotEquals(new E_Str(le), new E_Str(re));
 	}
 	
@@ -245,9 +246,9 @@ public class RuleSystemToQueries {
 		}
 		return ret;
 	}
-	protected static com.hp.hpl.jena.sparql.expr.Expr toJenaExpr(Expr e        ) {
+	protected static org.apache.jena.sparql.expr.Expr toJenaExpr(Expr e        ) {
 		
-		com.hp.hpl.jena.sparql.expr.Expr ret;
+		org.apache.jena.sparql.expr.Expr ret;
 		if(e.isVariable()) {
 			ret = new ExprVar(((VariableExpr)e).getName());
 		} else {
@@ -260,16 +261,16 @@ public class RuleSystemToQueries {
 		
 		Node ret;
 		if(e.isVariable()) {
-			ret = Node.createVariable(((VariableExpr)e).getName());
+			ret = NodeFactory.createVariable(((VariableExpr)e).getName());
 		} else {
 			Object v = ((ConstantExpr) e).getValue();
 			if (v instanceof URI) {
-				ret = Node.createURI(v.toString());
+				ret = NodeFactory.createURI(v.toString());
 			} /*else if (predicatePosition) {
 				ret = Node.createURI(v.toString());
 			}*/ else
 			{
-				ret = Node.createLiteral(v.toString());
+				ret = NodeFactory.createLiteral(v.toString());
 			}
 		}
 		return ret;
@@ -318,13 +319,13 @@ public class RuleSystemToQueries {
 		for (ElementFilter ef: cq.getFilters()) {
 			assert  (ef.getExpr() instanceof E_Equals ): ef;
 			E_Equals e = (E_Equals) ef.getExpr();
-			com.hp.hpl.jena.sparql.expr.Expr left = e.getArg1();
-			com.hp.hpl.jena.sparql.expr.Expr right = e.getArg2();
-			com.hp.hpl.jena.sparql.expr.Expr newLeft = left;
-			com.hp.hpl.jena.sparql.expr.Expr newRight = right;
+			org.apache.jena.sparql.expr.Expr left = e.getArg1();
+			org.apache.jena.sparql.expr.Expr right = e.getArg2();
+			org.apache.jena.sparql.expr.Expr newLeft = left;
+			org.apache.jena.sparql.expr.Expr newRight = right;
 			for (int i=0;i<2;i++) {
-				com.hp.hpl.jena.sparql.expr.Expr  expr = i==0? left: right;
-				com.hp.hpl.jena.sparql.expr.Expr  newExpr = null;
+				org.apache.jena.sparql.expr.Expr  expr = i==0? left: right;
+				org.apache.jena.sparql.expr.Expr  newExpr = null;
 				if (expr instanceof ExprVar) {
 					ExprVar evar = (ExprVar) expr;
 					Node newVar = oldVar2NewValue.get(evar.getVarName());

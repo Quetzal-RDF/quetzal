@@ -10,8 +10,7 @@
  *****************************************************************************/
 package com.ibm.research.owlql;
 
-import com.hp.hpl.jena.query.Query;
-
+import org.apache.jena.query.Query;
 
 /**
  * result of a consistency check performed based on a QL Tbox only.

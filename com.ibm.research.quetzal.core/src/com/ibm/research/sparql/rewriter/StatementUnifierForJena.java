@@ -12,9 +12,9 @@
 
 package com.ibm.research.sparql.rewriter;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.sparql.algebra.op.OpTriple;
-import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.graph.NodeTransformLib;
 
 
 /**

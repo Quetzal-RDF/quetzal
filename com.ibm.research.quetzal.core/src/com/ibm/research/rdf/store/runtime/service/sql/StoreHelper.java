@@ -26,8 +26,8 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.sparql.core.DatasetGraph;
 
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.ibm.research.proppaths.StoreProcedure;
 import com.ibm.research.proppaths.TemporaryTableSpaceCreation;
 import com.ibm.research.rdf.store.Context;

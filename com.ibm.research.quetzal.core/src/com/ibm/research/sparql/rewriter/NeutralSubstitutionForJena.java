@@ -14,7 +14,7 @@ package com.ibm.research.sparql.rewriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.graph.Node;
 
 
 

@@ -20,13 +20,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.resultset.ResultSetMem;
 import org.junit.Assert;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
@@ -257,7 +257,7 @@ public class TestRunner<D> {
 
 		int executeSQLTest(D data, String file, String sqlCode);
 		
-		com.hp.hpl.jena.query.ResultSet getResultSetForQuery();
+		org.apache.jena.query.ResultSet getResultSetForQuery();
 
 	}
 
@@ -321,7 +321,7 @@ public class TestRunner<D> {
 		return nOR;
 	}
 	
-	public com.hp.hpl.jena.query.ResultSet getResultSetForQuery() {
+	public org.apache.jena.query.ResultSet getResultSetForQuery() {
 		return engine.getResultSetForQuery();
 	}
 	
@@ -349,7 +349,7 @@ public class TestRunner<D> {
 		protected OWLQLSPARQLCompiler compiler;
 		// protected boolean isWrapperEnabled = true;
 		protected boolean isWrapperEnabled = true;
-		protected com.hp.hpl.jena.query.ResultSet  resultSet;
+		protected org.apache.jena.query.ResultSet  resultSet;
 
 		protected boolean print = false;
 		
@@ -368,9 +368,9 @@ public class TestRunner<D> {
 		@Override
 		public int executeStringQuery(D data, String query) {
 			if (isWrapperEnabled) {
-				com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory
+				org.apache.jena.query.Query q = RdfStoreQueryFactory
 						.create(query);
-				// com.hp.hpl.jena.query.Query q = QueryFactory.create(query);
+				// org.apache.jena.query.Query q = QueryFactory.create(query);
 				return executeWithInternal(data, q);
 			} else {
 				Query q = SparqlParserUtilities.parseSparqlString(query);
@@ -392,13 +392,13 @@ public class TestRunner<D> {
 
 		protected int executeWith(D data, String file,
 				boolean isDescribeWithoutRows) {
-			com.hp.hpl.jena.query.Query q = RdfStoreQueryFactory.read(file,
+			org.apache.jena.query.Query q = RdfStoreQueryFactory.read(file,
 					null, null);
 
 			return executeWithInternal(data, q);
 		}
 
-		private int executeWithInternal(D data, com.hp.hpl.jena.query.Query q) {
+		private int executeWithInternal(D data, org.apache.jena.query.Query q) {
 			int count = 0;
 			long time = System.currentTimeMillis();
 			try {
@@ -446,7 +446,7 @@ public class TestRunner<D> {
 			return count;
 		}
 		
-		public com.hp.hpl.jena.query.ResultSet getResultSetForQuery() {
+		public org.apache.jena.query.ResultSet getResultSetForQuery() {
 			((ResultSetMem) resultSet).rewind();
 			return resultSet;
 		}

@@ -21,21 +21,22 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.Symbol;
+import org.apache.jena.util.FileManager;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.util.Context;
-import com.hp.hpl.jena.sparql.util.Symbol;
-import com.hp.hpl.jena.util.FileManager;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
@@ -514,7 +515,7 @@ public class DB2QueryExecutionImpl implements QueryExecution
       }
 
    @Override
-   public com.hp.hpl.jena.query.Query getQuery()
+   public org.apache.jena.query.Query getQuery()
       {
       return query;
       }
@@ -558,5 +559,30 @@ public class DB2QueryExecutionImpl implements QueryExecution
       throw new UnsupportedOperationException();
 
       }
+
+@Override
+public Iterator<Quad> execConstructQuads() {
+	
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Dataset execConstructDataset() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Dataset execConstructDataset(Dataset dataset) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public boolean isClosed() {
+	// TODO Auto-generated method stub
+	return false;
+}
 
    }

@@ -18,6 +18,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLObjectInverseOf;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -33,15 +43,6 @@ import org.semanticweb.owlapi.rdf.util.RDFConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.expr.E_Equals;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprVar;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
 import com.ibm.research.owlql.rule.RuleSystem;
 
 
@@ -438,7 +439,7 @@ public class OWLQLCompiler implements IOWLQLCompiler {
 		
 		//update projected variables
 		for (String var: q.getResultVars()) {
-			Node tvar = Node.createVariable(var);
+			Node tvar = NodeFactory.createVariable(var);
 			Node newTvar = old2New.get(tvar);
 			if (newTvar == null ) {
 				continue;
@@ -509,9 +510,9 @@ public class OWLQLCompiler implements IOWLQLCompiler {
 					&& !isValidNameForUnboundVariable(var)) {
 						String newVar = varGen.createNewVariable();
 						if (i==0) {
-							newSubj = Node.createVariable(newVar);
+							newSubj = NodeFactory.createVariable(newVar);
 						} else {
-							newObj = Node.createVariable(newVar);
+							newObj = NodeFactory.createVariable(newVar);
 						}
 					}
 				}
@@ -652,9 +653,9 @@ public class OWLQLCompiler implements IOWLQLCompiler {
 					assert isValidNameForUnboundVariable(var): var;
 					String newVar = varGen.createNewVariable();
 					if (i==0) {
-						newSubj = Node.createVariable(newVar);
+						newSubj = NodeFactory.createVariable(newVar);
 					} else {
-						newObj = Node.createVariable(newVar);
+						newObj = NodeFactory.createVariable(newVar);
 					}
 				}
 			}

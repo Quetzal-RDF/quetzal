@@ -17,13 +17,13 @@ public class QueryTripleTermUtil {
 		StringLiteral lit = val.getConstant().getLiteral();
 		
 		Object snd = null;
-		if (! isNull(lit.getType())) {
-			assert isNull(lit.getLanguage()) : lit.getLanguage() + " unexpected with " + lit.getType();
-			snd = new URI(lit.getType().getValue());
-		}
 		if (! isNull(lit.getLanguage())) {
-			assert isNull(lit.getType()) : lit.getType() + " unexpected with " + lit.getLanguage();
+			assert isNull(lit.getType()) || isStringType(lit.getType()): lit.getType() + " unexpected with " + lit.getLanguage();
 			snd = lit.getLanguage().toLowerCase();
+		}
+		if (! isNull(lit.getType())) {
+			assert isNull(lit.getLanguage()) || isStringType(lit.getType()): lit.getLanguage() + " unexpected with " + lit.getType();
+			snd = new URI(lit.getType().getValue());
 		}
 		
 		return Pair.make(lit.getValue(), snd);
@@ -46,4 +46,8 @@ public class QueryTripleTermUtil {
 		return x == null || "".equals(x.toString());
 	}
 	
+	public static boolean isStringType(Object x) {
+		return x != null && x.toString().equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#langString");
+	}
+
 }

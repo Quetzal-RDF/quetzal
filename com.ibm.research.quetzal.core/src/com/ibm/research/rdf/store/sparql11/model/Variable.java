@@ -18,7 +18,6 @@ public class Variable {
 	private String name;
 	
 	public Variable(String name) {
-		assert ! name.contains(":");
 		this.name = name;
 		this.isSystemVariable = false;
 	}
