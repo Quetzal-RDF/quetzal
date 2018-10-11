@@ -767,12 +767,12 @@ public class JenaTranslator implements OpVisitor {
 	}
 
 	private Expression scope(Formula f, Expression dynamicBinding, Collection<Variable> neededVars) {
-		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, neededVars);
+		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, neededVars, Collections.emptySet());
 		return x.fst.comprehension(x.snd);
 	}
 
-	private Formula existentialScope(Collection<Variable> vars, Formula f, Expression dynamicBinding) {
-		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, Collections.<Variable>emptySet());
+	private Formula existentialScope(Collection<Variable> projectedVars, Formula f, Expression dynamicBinding) {
+		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, Collections.emptySet(), projectedVars);
 		if (x.snd == null) {
 			return x.fst;
 		} else {
@@ -780,7 +780,7 @@ public class JenaTranslator implements OpVisitor {
 		}
 	}
 
-	private Pair<Formula, Decls> scopeInternal(Formula f, Expression dynamicBinding, Collection<Variable> projectedVars) {
+	private Pair<Formula, Decls> scopeInternal(Formula f, Expression dynamicBinding, Collection<Variable> projectedVars, Collection<Variable> outerBound) {
 		Decls ds = null, eds = null;
 		Set<Variable> used = ASTUtils.gatherVariables(f);
 		if (dynamicBinding != null) {
@@ -796,6 +796,9 @@ public class JenaTranslator implements OpVisitor {
 				}
 			} else {
 				r = NULL;
+			}
+			if (outerBound.contains(v)) {	
+				continue;
 			}
 			Decl d = v.declare(Multiplicity.ONE, context.getStaticBinding().contains(v)? r: r.union(NULL));
 			if (! projectedVars.contains(v)) {
@@ -911,7 +914,7 @@ public class JenaTranslator implements OpVisitor {
 			if (solution != null && solution.variables().isEmpty()) {
 				actualSolution = null;
 
-				q = existentialScope(context.getVars().values(), q, context.getDynamicBinding());
+				q = existentialScope(Collections.emptySet(), q, context.getDynamicBinding());
 				if (solution.hasSolutions()) {
 					s = q; 
 				} else {
@@ -2086,7 +2089,9 @@ public class JenaTranslator implements OpVisitor {
 
 		rvs = sortVars(rvs);
 		
-		return reifyOpAsRelation(rhs, rvs);
+		Pair<Relation, List<Pair<Variable, Domain>>> ret = reifyOpAsRelation(rhs, rvs);
+		assert ret != null;
+		return ret;
 	}
 	
 	private Pair<Relation,List<Pair<Variable,Domain>>> reifyOpAsRelation(Op rhs, Collection<Variable> neededVars) {
@@ -2132,6 +2137,7 @@ public class JenaTranslator implements OpVisitor {
 			});
 		}
 		
+		assert relations.containsKey(rhs);
 		return relations.get(rhs);
 	}
 	
@@ -2191,6 +2197,7 @@ public class JenaTranslator implements OpVisitor {
 			context = new DomainContext(context1);
 			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
 				Expression rightDynamicBinding = context2.getDynamicBinding();
+				Set<Variable> rightStaticBinding = context2.getStaticBinding();
 
 				Formula filters = null;
 				if (arg0.getExprs() != null) {
@@ -2208,64 +2215,60 @@ public class JenaTranslator implements OpVisitor {
 				}
 				neededVars.retainAll(ASTUtils.gatherVariables(r));
 
-				Formula both = r;
+				Formula both = l.and(r);
 				if (filters != null) {
 					both = both.and(filters);
 				}
-	
-				Pair<Relation, List<Pair<Variable, Domain>>> rhs = reifyOpAsRelation(arg0.getRight(), context);
-				
-				context = save;
-							
-				Formula leftOnly;
-				if (rhs != null) {
-					leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
-				} else {
-					Set<Variable> rvs = ASTUtils.gatherVariables(r);
-					if (rvs.isEmpty()) {
-						leftOnly = r.not();
-					} else {
-						leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
-					}
-					if (filters != null) {
-							leftOnly = leftOnly.or(filters.not());
-						}
-					}
-				
-					context = outerSave;
-		
-					context.setStaticBinding(leftStaticBinding);
-				
-					if (context.explicitChoices()) {	
-						TranslatorContext splitSave = context1;
 					
-						SplitContext leftContext = new SplitContext(splitSave);
-						context = leftContext;
-						context.setDynamicBinding(leftDynamicBinding);
-						context.setCurrentQuery(l.and(leftOnly));				
-						cont.next(context, context.getCurrentQuery());
-
-						SplitContext rightContext = new SplitContext(splitSave);
-						context = rightContext;
-						context.setDynamicBinding(rightDynamicBinding);
-						context.setCurrentQuery(l.and(both));				
-						cont.next(context, context.getCurrentQuery());
-
-						if (filters != null) {
-							SplitContext rightNegContext = new SplitContext(splitSave);
-							context = rightNegContext;
-							context.setDynamicBinding(rightDynamicBinding);
-							context.setCurrentQuery(l.and(r));				
-							context.getCurrentContinuation().next(context, context.getCurrentQuery());
-						}
-						
-					} else {
-						context = context1;
-						context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
-						context.setCurrentQuery(l.and(both.or(leftOnly)));
+				context = save;
+					
+				Formula leftOnly;
+				Set<Variable> rvs = ASTUtils.gatherVariables(r);
+				if (rvs.isEmpty()) {
+					leftOnly = r.not();
+				} else {
+					Set<Variable> lhsOnly = HashSetFactory.make(lhsVars);
+					lhsOnly.retainAll(rvs);
+					leftOnly = existentialScope(lhsOnly, filters==null? r: r.and(filters), rightDynamicBinding).not();
+				}
+									
+				context = outerSave;
+		
+				context.setStaticBinding(leftStaticBinding);
 				
+				if (context.explicitChoices()) {	
+					TranslatorContext splitSave = context1;
+					
+					SplitContext leftContext = new SplitContext(splitSave);
+					context = leftContext;
+					context.setStaticBinding(leftStaticBinding);
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setCurrentQuery(l.and(leftOnly));				
+					cont.next(context, context.getCurrentQuery());
+					
+					//SplitContext rightContext = new SplitContext(splitSave);
+					//context = rightContext;
+					//context.setDynamicBinding(rightDynamicBinding);
+					context = context2;
+					context.setCurrentQuery(both);				
+					cont.next(context, context.getCurrentQuery());
+
+					if (filters != null) {
+						SplitContext rightNegContext = new SplitContext(splitSave);
+						context = rightNegContext;
+						context.setDynamicBinding(rightDynamicBinding);
+						context.setCurrentQuery(l.and(r).and(filters.not()));				
 						context.getCurrentContinuation().next(context, context.getCurrentQuery());
 					}
+						
+				} else {
+					context = context2;
+					context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
+					context.setStaticBinding(leftStaticBinding);
+					context.setCurrentQuery(l.and(both.or(leftOnly)));
+						
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+				}
 			});
 		});
 	}
@@ -2279,7 +2282,7 @@ public class JenaTranslator implements OpVisitor {
 			System.err.println(context.getDynamicBinding());
 		
 			Pair<Relation, List<Pair<Variable, Domain>>> r = reifyOpAsRelation(arg0.getRight(), new ScopeContext(context, arg0.getRight()));
-			
+	
 			context.setStaticBinding(leftStaticBinding);
 			context.setDynamicBinding(leftDynamicBinding);
 			context.setCurrentQuery(l.and(checkExists(ASTUtils.gatherVariables(l), leftStaticBinding, leftDynamicBinding, r, true, true, null)));

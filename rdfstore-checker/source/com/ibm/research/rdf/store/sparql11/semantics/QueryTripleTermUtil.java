@@ -26,6 +26,8 @@ public class QueryTripleTermUtil {
 			snd = new URI(lit.getType().getValue());
 		}
 		
+		assert snd != null;
+		
 		return Pair.make(lit.getValue(), snd);
 	}
 

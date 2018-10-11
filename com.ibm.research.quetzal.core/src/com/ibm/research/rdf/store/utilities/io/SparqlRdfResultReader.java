@@ -86,11 +86,10 @@ public class SparqlRdfResultReader implements SparqlSelectResult {
 						n = new QueryTripleTerm(new IRI(x.getURI()));
 					} else if (x.isLiteral()) {
 						StringLiteral l = new StringLiteral(x.getLiteralLexicalForm());
-						if (x.getLiteralDatatypeURI() != null) {
-							l.setType(new IRI(x.getLiteralDatatypeURI()));
-						}
 						if (x.getLiteralLanguage() != null) {
 							l.setLanguage(x.getLiteralLanguage());
+						} else if (x.getLiteralDatatypeURI() != null) {
+							l.setType(new IRI(x.getLiteralDatatypeURI()));
 						}
 						n = new QueryTripleTerm(new Constant(l));
 					} else if (x.isBlank()) {

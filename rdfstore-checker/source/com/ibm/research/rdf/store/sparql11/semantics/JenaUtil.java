@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -113,24 +114,35 @@ public class JenaUtil {
 			opt.setBitwidth(bitWidth);
 			Evaluator e = new Evaluator(t2, opt);
 			if (o.snd instanceof String) {
-				TupleSet langs = e.evaluate(me.join(QuadTableRelations.literalLanguages));
-				if (! langs.isEmpty()) {
-					return m.createLiteral(o.fst, ((Pair<String,?>)langs.iterator().next().atom(0)).fst);
-				} else {
-					return m.createLiteral(o.fst, (String)o.snd);				
+				if (t2.contains(QuadTableRelations.literalLanguages)) {
+					TupleSet langs = e.evaluate(me.join(QuadTableRelations.literalLanguages));
+					if (! langs.isEmpty()) {
+						return m.createLiteral(o.fst, ((Pair<String,?>)langs.iterator().next().atom(0)).fst);
+					}
 				}
+				return m.createLiteral(o.fst, (String)o.snd);				
 			} else if (o.snd == null) {
 				return m.createLiteral(o.fst);			
 			} else {
-				TupleSet tt = e.evaluate(me.join(QuadTableRelations.literalDatatypes));
-				String type = String.valueOf(tt.iterator().next().atom(0));
-				if (ExpressionUtil.numericTypeNames.contains(type)) {
-					int v = e.evaluate(me.join(QuadTableRelations.literalValues).sum());
-					return m.createTypedLiteral(v, type);
-				} else {
-					Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
-					return m.createTypedLiteral(v, type);			
+				if (t2.contains(QuadTableRelations.literalDatatypes)) {
+					TupleSet tt = e.evaluate(me.join(QuadTableRelations.literalDatatypes));
+					Iterator<Tuple> types = tt.iterator();
+					String type = String.valueOf(types.next().atom(0));
+					if (types.hasNext()) {
+						if (ExpressionUtil.numericTypeNames.contains(type)) {
+							int v = e.evaluate(me.join(QuadTableRelations.literalValues).sum());
+							return m.createTypedLiteral(v, type);
+						} else {
+							Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
+							return m.createTypedLiteral(v, type);			
+						}	
+					}
 				}
+				if (t2.contains(QuadTableRelations.literalValues)) {
+					Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
+					return m.createTypedLiteral(v, o.snd.toString());			
+				}
+				return m.createTypedLiteral(o.fst, o.snd.toString());			
 			}
 		} catch (UnboundLeafException | NoSuchElementException ee) {
 			return m.createTypedLiteral(o.fst, String.valueOf(o.snd));
@@ -165,15 +177,14 @@ public class JenaUtil {
 	
 	public static Pair<String, Object> toAtom(LiteralLabel l) {
 		Object snd = null;
-		if (l.getDatatypeURI() != null) {
+		if (l.language() != null && !"".equals(l.language())) {
+			snd = l.language().toLowerCase();
+		} else if (l.getDatatypeURI() != null) {
 			try {
 				snd = new URI(l.getDatatypeURI());
 			} catch (URISyntaxException e) {
 				assert false : l.getDatatypeURI() + " is not a datatype";
 			}
-		}
-		if (l.language() != null && !"".equals(l.language())) {
-			snd = l.language().toLowerCase();
 		}
 		return Pair.make(l.getLexicalForm(), snd);
 	}
