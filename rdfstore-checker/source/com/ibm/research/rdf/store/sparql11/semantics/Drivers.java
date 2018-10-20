@@ -51,7 +51,7 @@ import kodkod.instance.Tuple;
 import kodkod.instance.TupleSet;
 
 public class Drivers {
-
+	private final static boolean DEBUG = false;
 
 	public static class DumpSolution {
 		public static void main(String[] args) throws MalformedURLException, ParserConfigurationException, SAXException, IOException {
@@ -109,7 +109,7 @@ public class Drivers {
 			answer = Pair.make(answer.fst.and(QuadTableRelations.quads.count().lte(IntConstant.constant(bound))), answer.snd);
 		}
 		
-		System.err.println(answer.fst);
+		if (DEBUG) System.err.println(answer.fst);
 		
 		check(uf, answer, "solution");
 	}
@@ -139,7 +139,7 @@ public class Drivers {
 			result.put(vars.get(i).getVarName(), t.get(i));
 		}
 		
-		System.err.println(result);
+		if (DEBUG) System.err.println(result);
 		return result;
 	}
 
@@ -162,7 +162,7 @@ public class Drivers {
 			uf.addSolution(solutionRelation = new SolutionRelation(result, vars, bindings));
 
 			Op query = JenaUtil.compile(q);
-			System.err.println(query);
+			if (DEBUG) System.err.println(query);
 			JenaTranslator jt = JenaTranslator.make(vars, query, uf, solutionRelation);
 			Set<Pair<Formula, Pair<Formula, Formula>>> answer = jt.translateSingle(bindings, expand);
 
@@ -221,7 +221,7 @@ public class Drivers {
 				}
 				
 			}
-			System.err.println("combined solution: " + fullset);
+			if (DEBUG) System.err.println("combined solution: " + fullset);
 			return fullset;
 		}
 	}
@@ -323,27 +323,28 @@ public class Drivers {
 		solver.options().setSharing(1);
 		Formula f = Nodes.simplify(qf, b);
 
-		System.err.println(f);
+		if (DEBUG) System.err.println(f);
 		
 		Solution s = solver.solve(f, b);
 		
 		if (s.outcome() == Outcome.SATISFIABLE || s.outcome() == Outcome.TRIVIALLY_SATISFIABLE) {
 			Instance instance = s.instance();
 				
-			System.err.println(instance);
+			if (DEBUG) System.err.println(instance);
 			return instance;
 		} else {
 			if (answer.snd.snd != null) {				
 				Solution diff = solver.solve(Nodes.simplify(cf, b), b);
 
-				Evaluator eval = new Evaluator(diff.instance());
+				if (diff.sat()) {
+					Evaluator eval = new Evaluator(diff.instance());
 
-				for(Relation rl : diff.instance().relations()) {
-					if ("extra_solutions".equals(rl.name()) || "missing_solutions".equals(rl.name())) {
-						System.err.println(rl.name() + ":\n" + eval.evaluate(rl));
+					for(Relation rl : diff.instance().relations()) {
+						if ("extra_solutions".equals(rl.name()) || "missing_solutions".equals(rl.name())) {
+							System.err.println(rl.name() + ":\n" + eval.evaluate(rl));
+						}
 					}
 				}
-
 			}
 			return null;
 		}

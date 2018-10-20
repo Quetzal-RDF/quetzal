@@ -167,7 +167,9 @@ import kodkod.ast.operator.Multiplicity;
 @SuppressWarnings("unused")
 public class JenaTranslator implements OpVisitor {
 	
-	private final static boolean SUPPORT_FLOAT = false;
+	private static final boolean DEBUG = false;
+	
+	private final static boolean SUPPORT_FLOAT = true;
 	
 	private final static boolean IGNORE_UNSUPPORTED_FUNCTIONS = true;
 	
@@ -821,7 +823,7 @@ public class JenaTranslator implements OpVisitor {
 			f = f.forSome(eds);
 		}
 		
-		System.err.println("scope: " + eds + " -- " + ds);
+		if (DEBUG) System.err.println("scope: " + eds + " -- " + ds);
 		
 		return Pair.make(f, ds);
 	}
@@ -1015,10 +1017,10 @@ public class JenaTranslator implements OpVisitor {
 					} else {
 						correctness = x.no();
 					}
-					System.err.println("adding verification constraint\n");
+					if (DEBUG) System.err.println("adding verification constraint\n");
 				} else {					
 					correctness = x.eq(expectedSolution);				
-					System.err.println("adding verification constraint for \n" + expectedSolution);
+					if (DEBUG) System.err.println("adding verification constraint for \n" + expectedSolution);
 				}
 
 				Relation extraSolutions = Relation.nary("extra_solutions", actualSolution.arity());
@@ -1124,7 +1126,7 @@ public class JenaTranslator implements OpVisitor {
 			} else {
 				context.setDomain((Variable)e, d);
 			}
-			System.err.println("constraining " + e + " to be " + context.getDomain((Variable)e));
+			if (DEBUG) System.err.println("constraining " + e + " to be " + context.getDomain((Variable)e));
 		}
 		return e;
 	}
@@ -1628,7 +1630,7 @@ public class JenaTranslator implements OpVisitor {
 
 			@Override
 			public void visit(ExprVar arg0) {
-				if (! scope.contains(arg0.getVarName())) {
+				if (DEBUG && !scope.contains(arg0.getVarName())) {
 					System.err.println("out of scope " + arg0.getVarName());
 				}
 				ret(toTerm(arg0.getAsNode()), toType(arg0.getAsNode()), scope.contains(arg0.getVarName())? Formula.TRUE: Formula.FALSE);
@@ -1659,7 +1661,7 @@ public class JenaTranslator implements OpVisitor {
 		
 		if (op != context.top()) {
 			Set<String> privateVars = privateVariableNames(op, context.top());
-			if (! privateVars.isEmpty()) {
+			if (DEBUG && !privateVars.isEmpty()) {
 				System.err.println("private vars " + privateVars + " for " + op);
 			}
 		}	
@@ -2071,7 +2073,7 @@ public class JenaTranslator implements OpVisitor {
 	private Pair<Relation,List<Pair<Variable,Domain>>> reifyOpAsRelation(Op rhs, TranslatorContext context) {
 		List<Variable> rvs = getVariables(rhs, context);		
 		
-		System.err.println(rhs + " -- " + context.top());
+		if (DEBUG) System.err.println(rhs + " -- " + context.top());
 
 		Set<String> privateNames = privateVariableNames(rhs, context.top());
 		for(Iterator<Variable> vs = rvs.iterator(); vs.hasNext(); ) {
@@ -2120,7 +2122,7 @@ public class JenaTranslator implements OpVisitor {
 				}
 				Relation opRelation = Relation.nary("rel" + relationBindings.size(), neededVars.size());
 				Expression rel = scope(nr, context.getDynamicBinding(), neededVars);
-				// System.err.println(rel);
+				if (DEBUG) System.err.println(rel);
 				relationBindings.add(opRelation.eq(rel));
 				universe.nodesRelation(opRelation);
 			
@@ -2131,7 +2133,7 @@ public class JenaTranslator implements OpVisitor {
 			
 				relations.put(rhs, Pair.make(opRelation, vars));
 			
-				System.err.println(relations.get(rhs));
+				if (DEBUG) System.err.println(relations.get(rhs));
 			
 				context = save;
 			});
@@ -2191,7 +2193,7 @@ public class JenaTranslator implements OpVisitor {
 
 			Set<Variable> leftStaticBinding = HashSetFactory.make(context1.getStaticBinding());
 			Expression leftDynamicBinding = context1.getDynamicBinding();
-			System.err.println(context1.getDynamicBinding());
+			if (DEBUG) System.err.println(context1.getDynamicBinding());
 		
 			final TranslatorContext save = context1;
 			context = new DomainContext(context1);
@@ -2275,19 +2277,94 @@ public class JenaTranslator implements OpVisitor {
 	
 	@Override
 	public void visit(OpMinus arg0) {	
-		visit(arg0.getLeft(), (TranslatorContext context, Formula l) -> {
-			Continuation next = context.getCurrentContinuation();
-			Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
-			Expression leftDynamicBinding = context.getDynamicBinding();
-			System.err.println(context.getDynamicBinding());
+		TranslatorContext outerSave = context;
+		Continuation cont = context.getCurrentContinuation();
+		context = new ScopeContext(outerSave, arg0);
+
+		visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
+			Set<Variable> lhsVars = ASTUtils.gatherVariables(l);
+
+			Set<Variable> leftStaticBinding = HashSetFactory.make(context1.getStaticBinding());
+			Expression leftDynamicBinding = context1.getDynamicBinding();
+			if (DEBUG) System.err.println(context1.getDynamicBinding());
 		
-			Pair<Relation, List<Pair<Variable, Domain>>> r = reifyOpAsRelation(arg0.getRight(), new ScopeContext(context, arg0.getRight()));
-	
-			context.setStaticBinding(leftStaticBinding);
-			context.setDynamicBinding(leftDynamicBinding);
-			context.setCurrentQuery(l.and(checkExists(ASTUtils.gatherVariables(l), leftStaticBinding, leftDynamicBinding, r, true, true, null)));
+			final TranslatorContext save = context1;
+			context = new DomainContext(outerSave) {
+				private Formula q = Formula.TRUE;
+				
+				@Override
+				public Formula getCurrentQuery() {
+					return q;
+				}
+
+				@Override
+				public void setCurrentQuery(Formula currentQuery) {
+					q = currentQuery;
+				}
+			};
 			
-			next.next(context, context.getCurrentQuery());
+			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
+				Expression rightDynamicBinding = context2.getDynamicBinding();
+				Set<Variable> rightStaticBinding = context2.getStaticBinding();
+
+				Set<Variable> neededVars = HashSetFactory.make(lhsVars);
+				neededVars.retainAll(ASTUtils.gatherVariables(r));
+
+				Formula intersect = Formula.FALSE;
+				for(Variable v : neededVars) {
+					intersect = intersect.or(v.eq(NULL).not());
+				}
+				
+				Formula both = l.and(r).and(intersect);
+					
+				context = save;
+					
+				Formula leftOnly;
+				Set<Variable> rvs = ASTUtils.gatherVariables(r);
+				if (rvs.isEmpty()) {
+					leftOnly = r.not().or(intersect.not());
+				} else {
+					Set<Variable> lhsOnly = HashSetFactory.make(lhsVars);
+					lhsOnly.retainAll(rvs);
+					leftOnly = existentialScope(lhsOnly, r.and(intersect), rightDynamicBinding).not();
+				}
+									
+				context = outerSave;
+		
+				context.setStaticBinding(leftStaticBinding);
+				
+				if (context.explicitChoices()) {	
+					TranslatorContext splitSave = context1;
+					
+					SplitContext leftContext = new SplitContext(splitSave);
+					context = leftContext;
+					context.setStaticBinding(leftStaticBinding);
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setCurrentQuery(l.and(leftOnly));				
+					cont.next(context, context.getCurrentQuery());
+					
+					//SplitContext rightContext = new SplitContext(splitSave);
+					//context = rightContext;
+					//context.setDynamicBinding(rightDynamicBinding);
+					context = context2;
+					context.setCurrentQuery(both);				
+					cont.next(context, context.getCurrentQuery());
+
+					SplitContext rightNegContext = new SplitContext(splitSave);
+					context = rightNegContext;
+					context.setDynamicBinding(rightDynamicBinding);
+					context.setCurrentQuery(l.and(r).and(intersect.not()));				
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+						
+				} else {
+					context = context1;
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setStaticBinding(leftStaticBinding);
+					context.setCurrentQuery(l.and(leftOnly));
+						
+					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+				}
+			});
 		});
 	}
 
@@ -2543,12 +2620,12 @@ public class JenaTranslator implements OpVisitor {
 					table = inner.comprehension(dd);
 				}
 
-				System.err.println("group=" + table);
+				if (DEBUG) System.err.println("group=" + table);
 
 				query = query.and(handleAggregator(e, table.project(IntConstant.constant(0))));
 			}
 
-			System.err.println("group query: " + query);
+			if (DEBUG) System.err.println("group query: " + query);
 
 			context.setStaticBinding(subStaticBinding);
 			context.setDynamicBinding(subDynamicBinding);
