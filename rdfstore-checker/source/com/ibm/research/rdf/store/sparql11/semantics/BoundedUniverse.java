@@ -61,7 +61,7 @@ public class BoundedUniverse extends BasicUniverse {
 			String blankId = "_:blank" + i;
 			ensureBlankNode(blankId);
 		}
-		 		
+		
 		for(int i = 0; i < numberLimit; i++) {
 			Pair<String, Object> lit = Pair.<String, Object>make("num" + i, ANY_NUMBER);
 			ensureLiteral(lit);

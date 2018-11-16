@@ -31,6 +31,7 @@ import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.Lock;
@@ -230,7 +231,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
       return defaultModel.getGraph();
       }
 
-   public void addNamedModel(String uri, Model model) throws LabelExistsException
+   public Dataset addNamedModel(String uri, Model model) throws LabelExistsException
       {
 
       if (containsNamedModel(uri))
@@ -239,13 +240,15 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
          }
 
       getNamedModel(uri).add(model);
+      return null;
       }
 
-   public void replaceNamedModel(String uri, Model model)
+   public Dataset replaceNamedModel(String uri, Model model)
       {
       Model m = getNamedModel(uri);
       m.removeAll();
       m.add(model);
+      return null;
       }
 
    public void addGraph(Node graphName, Graph graph)
@@ -253,9 +256,10 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
       replaceNamedModel(graphName.getURI(), ModelFactory.createModelForGraph(graph));
       }
 
-   public void removeNamedModel(String uri)
+   public Dataset removeNamedModel(String uri)
       {
       getNamedModel(uri).removeAll();
+      return null;
       }
 
    public void removeGraph(Node graphName)
@@ -456,7 +460,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
 
       }
 
-   public void setDefaultModel(Model model)
+   public Dataset setDefaultModel(Model model)
       {
       throw new RdfStoreException("Operation not supported");
       }
@@ -493,5 +497,30 @@ public Model getUnionModel() {
 	// TODO Auto-generated method stub
 	return null;
 }
+
+@Override
+public void begin(TxnType type) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public boolean promote(Promote mode) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public ReadWrite transactionMode() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public TxnType transactionType() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
 
    }

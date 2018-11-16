@@ -7,7 +7,9 @@ import java.util.Set;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 
+import kodkod.ast.Comprehension;
 import kodkod.ast.Node;
+import kodkod.ast.QuantifiedFormula;
 import kodkod.ast.Relation;
 import kodkod.ast.Variable;
 import kodkod.ast.visitor.AbstractCollector;
@@ -48,6 +50,15 @@ public class ASTUtils {
 		class VariableCollector extends SomethingCollector<Variable> {
 			private VariableCollector(Set<Node> arg0) {
 				super(arg0);
+			}
+
+			@Override
+			public Set<Variable> visit(QuantifiedFormula arg0) {
+				Set<Variable> scope = visit(arg0.decls());
+				Set<Variable> stuff = HashSetFactory.make(super.visit(arg0));
+				stuff.removeAll(scope);
+				return stuff;
+				//return super.visit(arg0);
 			}
 
 			@Override

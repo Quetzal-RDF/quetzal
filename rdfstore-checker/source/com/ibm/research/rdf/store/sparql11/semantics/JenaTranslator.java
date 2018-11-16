@@ -2248,19 +2248,21 @@ public class JenaTranslator implements OpVisitor {
 					context.setCurrentQuery(l.and(leftOnly));				
 					cont.next(context, context.getCurrentQuery());
 					
-					//SplitContext rightContext = new SplitContext(splitSave);
-					//context = rightContext;
-					//context.setDynamicBinding(rightDynamicBinding);
-					context = context2;
+					/*
+					SplitContext rightContext = new SplitContext(splitSave);
+					context = rightContext;
+					context.setStaticBinding(rightStaticBinding);
+					context.setDynamicBinding(rightDynamicBinding);
 					context.setCurrentQuery(both);				
 					cont.next(context, context.getCurrentQuery());
-
+					*/
+					
 					if (filters != null) {
 						SplitContext rightNegContext = new SplitContext(splitSave);
 						context = rightNegContext;
-						context.setDynamicBinding(rightDynamicBinding);
+						context.setDynamicBinding(leftDynamicBinding);
 						context.setCurrentQuery(l.and(r).and(filters.not()));				
-						context.getCurrentContinuation().next(context, context.getCurrentQuery());
+						cont.next(context, context.getCurrentQuery());
 					}
 						
 				} else {
@@ -2269,7 +2271,7 @@ public class JenaTranslator implements OpVisitor {
 					context.setStaticBinding(leftStaticBinding);
 					context.setCurrentQuery(l.and(both.or(leftOnly)));
 						
-					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+					cont.next(context, context.getCurrentQuery());
 				}
 			});
 		});
@@ -2308,7 +2310,8 @@ public class JenaTranslator implements OpVisitor {
 				Set<Variable> rightStaticBinding = context2.getStaticBinding();
 
 				Set<Variable> neededVars = HashSetFactory.make(lhsVars);
-				neededVars.retainAll(ASTUtils.gatherVariables(r));
+				Set<Variable> rhsVars = ASTUtils.gatherVariables(r);
+				neededVars.retainAll(rhsVars);
 
 				Formula intersect = Formula.FALSE;
 				for(Variable v : neededVars) {
@@ -2320,12 +2323,12 @@ public class JenaTranslator implements OpVisitor {
 				context = save;
 					
 				Formula leftOnly;
-				Set<Variable> rvs = ASTUtils.gatherVariables(r);
+				Set<Variable> rvs = rhsVars;
 				if (rvs.isEmpty()) {
 					leftOnly = r.not().or(intersect.not());
 				} else {
 					Set<Variable> lhsOnly = HashSetFactory.make(lhsVars);
-					lhsOnly.retainAll(rvs);
+					//lhsOnly.retainAll(rvs);
 					leftOnly = existentialScope(lhsOnly, r.and(intersect), rightDynamicBinding).not();
 				}
 									
@@ -2354,7 +2357,7 @@ public class JenaTranslator implements OpVisitor {
 					context = rightNegContext;
 					context.setDynamicBinding(rightDynamicBinding);
 					context.setCurrentQuery(l.and(r).and(intersect.not()));				
-					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+					cont.next(context, context.getCurrentQuery());
 						
 				} else {
 					context = context1;
@@ -2362,7 +2365,7 @@ public class JenaTranslator implements OpVisitor {
 					context.setStaticBinding(leftStaticBinding);
 					context.setCurrentQuery(l.and(leftOnly));
 						
-					context.getCurrentContinuation().next(context, context.getCurrentQuery());
+					cont.next(context, context.getCurrentQuery());
 				}
 			});
 		});

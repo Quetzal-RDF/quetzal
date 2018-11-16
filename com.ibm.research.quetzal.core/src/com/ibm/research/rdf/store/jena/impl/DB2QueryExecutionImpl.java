@@ -21,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.atlas.json.JsonArray;
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
@@ -583,6 +585,18 @@ public Dataset execConstructDataset(Dataset dataset) {
 public boolean isClosed() {
 	// TODO Auto-generated method stub
 	return false;
+}
+
+@Override
+public JsonArray execJson() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public Iterator<JsonObject> execJsonItems() {
+	// TODO Auto-generated method stub
+	return null;
 }
 
    }
