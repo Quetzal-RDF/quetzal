@@ -171,7 +171,11 @@ public class JenaTranslator implements OpVisitor {
 	
 	private final static boolean SUPPORT_FLOAT = true;
 	
-	private final static boolean IGNORE_UNSUPPORTED_FUNCTIONS = true;
+	enum UnsupportedFilters {
+		IGNORE, FAIL, CONTINUE
+	}
+	
+	private final static UnsupportedFilters IGNORE_UNSUPPORTED_FUNCTIONS = UnsupportedFilters.FAIL;
 	
 	private interface Domain {		
 		Expression bound();
@@ -1638,7 +1642,7 @@ public class JenaTranslator implements OpVisitor {
 
 			@Override
 			public void visit(ExprAggregator arg0) {
-				currentExpr = visit(arg0.getExpr());		
+				currentExpr = visit(arg0.getAggregator().getExprList().get(0));
 			}
 
 			@Override
@@ -1858,9 +1862,14 @@ public class JenaTranslator implements OpVisitor {
 			Formula filter = Formula.TRUE;
 			for(Expr e : arg0.getExprs()) {
 				ExpressionContext val = handleExpression(e);
-				if (val == null && IGNORE_UNSUPPORTED_FUNCTIONS) {
+				
+				if (val == null && IGNORE_UNSUPPORTED_FUNCTIONS == UnsupportedFilters.IGNORE) {
 					continue;
+				} else if (val == null && IGNORE_UNSUPPORTED_FUNCTIONS == UnsupportedFilters.FAIL) {
+					filter = Formula.FALSE;
+					break;
 				}
+
 				filter = filter.and(val.guard()).and(ebv(val));
 			}
 			
@@ -2501,10 +2510,10 @@ public class JenaTranslator implements OpVisitor {
 
 	private void doSeq(OpSequence arg0, int i, Continuation cc, Formula q) {
 		visit(arg0.get(i), (TranslatorContext context, Formula f) -> {
-			if (i < arg0.size()) {
-				doSeq(arg0, i+1, cc, q.and(f));
+			if (i < arg0.size()-1) {
+				doSeq(arg0, i+1, cc, (q == null)? f: q.and(f));
 			} else {
-				context.setCurrentQuery(q);
+				context.setCurrentQuery(q.and(f));
 				cc.next(context, context.getCurrentQuery());
 			}
 		});
@@ -2540,6 +2549,7 @@ public class JenaTranslator implements OpVisitor {
 		visit(arg0.getSubOp(), this.context.getCurrentContinuation());
 	}
 
+	
 	@Override
 	public void visit(OpGroup arg0) {
 		final TranslatorContext save = context;
@@ -2711,7 +2721,7 @@ public class JenaTranslator implements OpVisitor {
 	@Override
 	public void visit(OpOrder arg0) {
 		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
-			context.setCurrentQuery(f);
+			context.setCurrentQuery(context.getCurrentQuery().and(f));
 			context.getCurrentContinuation().next(context, f);
 		});
 	}

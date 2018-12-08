@@ -127,8 +127,8 @@ public class JenaUtil {
 				if (t2.contains(QuadTableRelations.literalDatatypes)) {
 					TupleSet tt = e.evaluate(me.join(QuadTableRelations.literalDatatypes));
 					Iterator<Tuple> types = tt.iterator();
-					String type = String.valueOf(types.next().atom(0));
 					if (types.hasNext()) {
+						String type = String.valueOf(types.next().atom(0));
 						if (ExpressionUtil.numericTypeNames.contains(type)) {
 							int v = e.evaluate(me.join(QuadTableRelations.literalValues).sum());
 							return m.createTypedLiteral(v, type);
@@ -138,7 +138,7 @@ public class JenaUtil {
 						}	
 					}
 				}
-				if (t2.contains(QuadTableRelations.literalValues)) {
+				if (t2.contains(QuadTableRelations.literalValues) && e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().hasNext()) {
 					Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
 					return m.createTypedLiteral(v, o.snd.toString());			
 				}
@@ -168,10 +168,12 @@ public class JenaUtil {
 	}
 	
 	public static void addTupleSet(Dataset dataset, TupleSet tt, BasicUniverse u, Instance t2) {
-		for(Tuple t : tt) {
-			Object graph = t.atom(0);
-			Model m = QuadTableRelations.defaultGraph.equals(graph)? dataset.getDefaultModel(): dataset.getNamedModel(graph.toString());
-			m.add(fromTuple(m, t, u, t2));
+		if (tt != null) {
+			for(Tuple t : tt) {
+				Object graph = t.atom(0);
+				Model m = QuadTableRelations.defaultGraph.equals(graph)? dataset.getDefaultModel(): dataset.getNamedModel(graph.toString());
+				m.add(fromTuple(m, t, u, t2));
+			}
 		}
 	}
 	
