@@ -72,7 +72,7 @@ import com.ibm.wala.util.graph.impl.SlowSparseNumberedGraph;
 import com.ibm.wala.util.intset.IntSet;
 import com.ibm.wala.util.intset.IntSetUtil;
 
-import akka.remote.ContainerFormats.PatternType;
+// import akka.remote.ContainerFormats.PatternType;
 
 @SuppressWarnings("unused")
 public class Planner {
