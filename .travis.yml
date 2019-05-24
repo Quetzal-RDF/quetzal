@@ -8,7 +8,7 @@ install:
  - ant
  - popd
 script:
- - mvn clean install -B -q
+ - mvn clean install -B -q -DskipTests
 sudo: false
 cache:
   directories:
