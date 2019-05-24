@@ -238,8 +238,8 @@ public class DbBasedStatisticsMgr
       String preds = store.getSchemaName() + "." + store.getStoreName() + "_" + (direct ? "direct" : "reverse") + "_preds";
       String ret= "WITH Q0 AS (select entity, count(*) as count from " + secondary + " group by entity)," + "Q1 AS ("
             + flipPrimaryComponent(direct, "SELECT entry AS entity, count(*) as count ", false)
-            + (isPostgresqlEngine()? " WHERE": " AND")
-            + (sharkEngine? " LT.VAL NOT LIKE 'lid:%'": " LT.PROP in (select pred from " + preds + " where onetoone = 1) ")
+            + (isPostgresqlEngine()? " WHERE": sharkEngine? "": " AND")
+            + (sharkEngine? " ": " LT.PROP in (select pred from " + preds + " where onetoone = 1) ")
             + " group by entry),"
             + "Q2 AS (select entity, count from Q0 union all select entity, count from Q1) "
             + (sharkEngine?"select "+ type+", 'null', "+(direct?"entity, 'null', 'null', ":"'null', 'null', entity, ")+" sum(count)": "select " + type + ", entity, sum(count) ")
@@ -272,7 +272,7 @@ public class DbBasedStatisticsMgr
 	   boolean sharkEngine = isSharkEngine();
       StringBuffer query = new StringBuffer();
       query.append("WITH Q0 AS (");
-      query.append(flipPrimaryComponent(true, "SELECT ENTRY as ENTRY, LT.PROP AS PREDICATE, LT.VAL AS VAL ",
+      query.append(flipPrimaryComponent(true, "SELECT ENTRY as ENTRY, " + (sharkEngine? "prop": "LT.PROP") + " AS PREDICATE, " + (sharkEngine? "val": "LT.VAL") + " AS VAL ",
             false));
       query.append("),");
       query.append("Q1 AS (");
@@ -635,165 +635,155 @@ public class DbBasedStatisticsMgr
       }
 
    private String flipPrimaryComponent(boolean direct, String selectClause, boolean predOnly)
-      {
-      StringBuffer query = new StringBuffer(selectClause);
-      int maxPreds = (direct) ? store.getDPrimarySize() : store.getRPrimarySize();
-      query.append(" FROM \n");
+   {
+	   StringBuffer query = new StringBuffer(selectClause);
+	   int maxPreds = (direct) ? store.getDPrimarySize() : store.getRPrimarySize();
+	   query.append(" FROM \n");
 
-      if (isBigQueryEngine()) {
-    	  List<String> onePreds = new LinkedList<String>();    	  
-    	  List<String> multiPreds = new LinkedList<String>();
-    	  PredicateTable preds = store.getDirectPredicates();
-    	  preds.predicates().forEach((String p) -> {
-    		if (preds.isOneToOne(p)) {
-    			onePreds.add(p);
-    		} else {
-    			multiPreds.add(p);
-    		}
-    	  });
-    	      
-    	  query.append("(");
-    	  boolean first = true;
-    	  for(String p : multiPreds) {
-    		  if (! first) {
-    			  query.append(" UNION ALL ");
-    		  }
-    		  query.append("SELECT " + (direct? "entry": "entry as val") + ", \"" + p + "\" AS prop, " + 
-    				       (direct? "val": "val as entry") + " " +
-    		               "FROM " + store.getDirectPrimary() +  " " + 		
-    				  	   "cross join unnest(val" + preds.getHashes(p)[0] + ") as val " +
-     		               "WHERE val" + preds.getHashes(p)[0] + " is not null ");
-    		  first = false;
-    	  }
-    	  if (onePreds.size() > 0) {
-       		  if (! first) {
-    			  query.append(" UNION ALL ");
-    		  }
-       		  
-       		  query.append("SELECT entry as " + (direct? "entry": "val") + 
-       				       ", s.prop as prop, s.val as " + (direct? "val": "entry") + 
-       				       " from (select entry, [");
-       		  
-      		  first = true;
-      		  for(String p : onePreds) {
-      			  if (! first) {
-      				  query.append(",");
-      			  }
-      			  first = false;
-      			  query.append("struct(").append('"').append(p).append('"').append(" as prop, ");
-      			  query.append("val").append(preds.getHashes(p)[0]).append(" as val)");
-      		  }
- 
-      		  query.append("] as data from " + store.getDirectPrimary());
-      		  query.append(") t cross join unnest(t.data) as s where s.val is not null");
-    	  }
-    	  query.append(")");
-    	  
-      } else if (isPostgresqlEngine()) {
-         query.append(" (SELECT ENTRY, GID, UNNEST(ARRAY_REMOVE(ARRAY[");
-         int nrPreds = 0;
-         for (; nrPreds < maxPreds; nrPreds++)
-            {
-            if (nrPreds > 0)
-               {
-               query.append(",");
-               }
-            query.append("prop" + nrPreds);
-            }
-         query.append("], NULL)) AS prop");
+	   if (isBigQueryEngine()) {
+		   List<String> onePreds = new LinkedList<String>();    	  
+		   List<String> multiPreds = new LinkedList<String>();
+		   PredicateTable preds = store.getDirectPredicates();
+		   preds.predicates().forEach((String p) -> {
+			   if (preds.isOneToOne(p)) {
+				   onePreds.add(p);
+			   } else {
+				   multiPreds.add(p);
+			   }
+		   });
 
-         if (!predOnly)
-            {
-            query.append(", UNNEST(ARRAY_REMOVE(ARRAY[");
-            nrPreds = 0;
-            for (; nrPreds < maxPreds; nrPreds++)
-               {
-               if (nrPreds > 0)
-                  {
-                  query.append(",");
-                  }
-               query.append("val" + nrPreds);
-               }
-            query.append("], NULL)) AS val");
-            }
-         
-         query.append(" FROM " + ((direct)?store.getDirectPrimary():store.getReversePrimary()) + ") AS LT");
-         }
-      else if (isSharkEngine()) {
-    	  query.append("( ");
-    	  if (predOnly) {
-	    	  query.append("select entry, gid, prop");
-	    	  query.append(" from ")
-	    	  	   .append(direct?store.getDirectPrimary():store.getReversePrimary())
-	    	  	   .append(" lateral view explode(array(");
-	    	  	for (int nrPreds = 0; nrPreds< maxPreds;nrPreds++) {
-				  if (nrPreds>0) {
-					  query.append(", ");
-				  }
-				  query.append("prop"+nrPreds);
-	    	  	}
-	    	  query.append(")) a AS prop ");
-    	  } else {
-    		  query.append("select entry, gid, prop, val");
-	    	  query.append(" from ")
-	    	  	   .append(direct?store.getDirectPrimary():store.getReversePrimary())
-	    	  	   .append(" lateral view explode(map(");
-	    	  	for (int nrPreds = 0; nrPreds< maxPreds;nrPreds++) {
-				  if (nrPreds>0) {
-					  query.append(", ");
-				  }
-				  query.append("prop"+nrPreds+", val"+nrPreds);
-	    	  	}
-	    	  query.append(")) m AS prop, val ");
-    	  }
-    	 
-    	  query.append(") LT");
-    	  query.append(" WHERE LT.PROP IS NOT NULL");
-      } else  {
-         if (direct)
-            {
-            query.append(store.getDirectPrimary());
-            maxPreds = store.getDPrimarySize();
-            }
-         else
-            {
-            query.append(store.getReversePrimary());
-            maxPreds = store.getRPrimarySize();
-            }
-         query.append(" AS T,");
-         query.append("TABLE(VALUES ");
-         int nrPreds = 0;
-         for (; nrPreds < maxPreds; nrPreds++)
-            {
-            if (nrPreds > 0)
-               query.append(",");
-            query.append("(");
+		   query.append("(");
+		   boolean first = true;
+		   for(String p : multiPreds) {
+			   if (! first) {
+				   query.append(" UNION ALL ");
+			   }
+			   query.append("SELECT " + (direct? "entry": "entry as val") + ", \"" + p + "\" AS prop, " + 
+					   (direct? "val": "val as entry") + " " +
+					   "FROM " + store.getDirectPrimary() +  " " + 		
+					   "cross join unnest(val" + preds.getHashes(p)[0] + ") as val " +
+					   "WHERE val" + preds.getHashes(p)[0] + " is not null ");
+			   first = false;
+		   }
+		   if (onePreds.size() > 0) {
+			   if (! first) {
+				   query.append(" UNION ALL ");
+			   }
 
-            query.append("T.PROP");
-            query.append(nrPreds);
+			   query.append("SELECT entry as " + (direct? "entry": "val") + 
+					   ", s.prop as prop, s.val as " + (direct? "val": "entry") + 
+					   " from (select entry, [");
 
-            if (!predOnly)
-               {
-               query.append(",");
-               query.append("T.VAL");
-               query.append(nrPreds);
-               }
-            query.append(")");
-            }
+			   first = true;
+			   for(String p : onePreds) {
+				   if (! first) {
+					   query.append(",");
+				   }
+				   first = false;
+				   query.append("struct(").append('"').append(p).append('"').append(" as prop, ");
+				   query.append("val").append(preds.getHashes(p)[0]).append(" as val)");
+			   }
 
-         if (predOnly)
-            {
-            query.append(") AS LT(PROP) ");
-            }
-         else
-            {
-            query.append(") AS LT(PROP,VAL) ");
-            }
-         query.append(" WHERE LT.PROP IS NOT NULL");
-         }
+			   query.append("] as data from " + store.getDirectPrimary());
+			   query.append(") t cross join unnest(t.data) as s where s.val is not null");
+		   }
+		   query.append(")");
 
-      return query.toString();
-      }
+	   } else if (isPostgresqlEngine()) {
+		   query.append(" (SELECT ENTRY, GID, UNNEST(ARRAY_REMOVE(ARRAY[");
+		   int nrPreds = 0;
+		   for (; nrPreds < maxPreds; nrPreds++)
+		   {
+			   if (nrPreds > 0)
+			   {
+				   query.append(",");
+			   }
+			   query.append("prop" + nrPreds);
+		   }
+		   query.append("], NULL)) AS prop");
+
+		   if (!predOnly)
+		   {
+			   query.append(", UNNEST(ARRAY_REMOVE(ARRAY[");
+			   nrPreds = 0;
+			   for (; nrPreds < maxPreds; nrPreds++)
+			   {
+				   if (nrPreds > 0)
+				   {
+					   query.append(",");
+				   }
+				   query.append("val" + nrPreds);
+			   }
+			   query.append("], NULL)) AS val");
+		   }
+
+		   query.append(" FROM " + ((direct)?store.getDirectPrimary():store.getReversePrimary()) + ") AS LT");
+	   }
+	   else if (isSharkEngine()) {
+		   query.append("( ");
+		   if (predOnly) {
+			   query.append("select entry, gid, prop0 as prop from ");
+			   query.append(direct?store.getDirectPrimary():store.getReversePrimary());
+			   for (int nrPreds = 1; nrPreds< maxPreds;nrPreds++) {
+				   query.append(" UNION select entry, gid, prop" + nrPreds + " as prop from ");
+				   query.append(direct?store.getDirectPrimary():store.getReversePrimary());
+				   query.append(" WHERE prop" + nrPreds + " IS NOT NULL");
+			   }
+		   } else {
+			   query.append("select entry, gid, prop0 as prop, val0 as val from ");
+			   query.append(direct?store.getDirectPrimary():store.getReversePrimary());
+			   for (int nrPreds = 1; nrPreds< maxPreds;nrPreds++) {
+				   query.append(" UNION select entry, gid, prop" + nrPreds + " as prop, val" + nrPreds + " as val from ");
+				   query.append(direct?store.getDirectPrimary():store.getReversePrimary());
+				   query.append(" WHERE prop" + nrPreds + " IS NOT NULL");
+			   }
+		   }
+		   query.append(" )");
+	   } else  {
+		   if (direct)
+		   {
+			   query.append(store.getDirectPrimary());
+			   maxPreds = store.getDPrimarySize();
+		   }
+		   else
+		   {
+			   query.append(store.getReversePrimary());
+			   maxPreds = store.getRPrimarySize();
+		   }
+		   query.append(" AS T,");
+		   query.append("TABLE(VALUES ");
+		   int nrPreds = 0;
+		   for (; nrPreds < maxPreds; nrPreds++)
+		   {
+			   if (nrPreds > 0)
+				   query.append(",");
+			   query.append("(");
+
+			   query.append("T.PROP");
+			   query.append(nrPreds);
+
+			   if (!predOnly)
+			   {
+				   query.append(",");
+				   query.append("T.VAL");
+				   query.append(nrPreds);
+			   }
+			   query.append(")");
+		   }
+
+		   if (predOnly)
+		   {
+			   query.append(") AS LT(PROP) ");
+		   }
+		   else
+		   {
+			   query.append(") AS LT(PROP,VAL) ");
+		   }
+		   query.append(" WHERE LT.PROP IS NOT NULL");
+	   }
+
+	   return query.toString();
+   }
 
    private String getSecondaryComponent(boolean isDirect, String queryPart)
       {

@@ -7,7 +7,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <description>RDF store for multiple backends</description>
   <build>
-    <sourceDirectory>.</sourceDirectory>
+    <sourceDirectory>src</sourceDirectory>
     <resources>
       <resource>
         <directory>src</directory>
@@ -16,14 +16,6 @@
         </excludes>
       </resource>
     </resources>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -46,6 +38,19 @@
                     <ignore />
                   </action>
                 </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <versionRange>[1.9.1,)</versionRange>
+                    <goals>
+                      <goal>add-source</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
@@ -54,28 +59,77 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-          <includes>
-            <include>src/**/*.java</include>
-            <include>test/**/*.java</include>
-            <include>generated/**/*.java</include>
-          </includes>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <excludes>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
+              </excludes>
+            </filter>
+          </filters>
         </configuration>
       </plugin>
       <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.2</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.9.1</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>generated</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>define-classpath</id>
+            <phase>process-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <exportAntProperties>true</exportAntProperties>
+              <target>
+                <property />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
         <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <mainClass>com.ibm.rdf.store.sparql11.CommandLineDriver</mainClass>
-            </manifest>
-          </archive>
+          <compilerArgs>
+            <arg>-classpath</arg>
+            <arg>${maven.classpath}:${basedir}/src/lib/GoogleBigQueryJDBC42.jar</arg>
+          </compilerArgs>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
@@ -102,6 +156,18 @@
         <version>1.8</version>
         <executions>
           <execution>
+            <id>download</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <ant />
+              </target>
+            </configuration>
+          </execution>
+          <execution>
             <id>grammars</id>
             <phase>generate-sources</phase>
             <goals>
@@ -116,18 +182,30 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <repositories>
     <repository>
-      <releases />
-      <snapshots />
-      <id>helix-maven-repo</id>
-      <url>http://75.126.173.238:8082/nexus/content/groups/public/</url>
-    </repository>
-    <repository>
       <id>org.topbraid</id>
       <url>http://topquadrant.com/repository/spin</url>
+    </repository>
+    <repository>
+      <releases />
+      <snapshots />
+      <id>sonatype-public-repository</id>
+      <url>https://oss.sonatype.org/content/groups/public</url>
     </repository>
   </repositories>
 </project>
