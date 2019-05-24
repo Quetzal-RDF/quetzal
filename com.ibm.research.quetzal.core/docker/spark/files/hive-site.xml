@@ -1,0 +1,27 @@
+<configuration>
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://localhost:9083</value>
+  </property>
+  <property>
+    <name>hive.metastore.client.socket.timeout</name>
+    <value>300</value>
+  </property>
+  <property>
+      <name>hive.metastore.warehouse.dir</name>
+      <value>/data/hive/warehouse</value>
+  </property>
+  <property>
+      <name>javax.jdo.option.ConnectionURL</name>
+      <value>jdbc:derby:;databaseName=/data/hive/metastore_db;create=true</value>
+      <description>JDBC connect string for a JDBC metastore</description>
+  </property>
+  <property>
+    <name>hive.enable.spark.execution.engine</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>hive.exec.stagingdir</name>
+    <value>/tmp/hive/hive-staging</value>
+  </property>
+</configuration>
