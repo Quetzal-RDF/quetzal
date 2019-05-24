@@ -10,11 +10,12 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.jena.impl.update;
 
-import com.hp.hpl.jena.datatypes.TypeMapper;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResourceFactory;
+
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;

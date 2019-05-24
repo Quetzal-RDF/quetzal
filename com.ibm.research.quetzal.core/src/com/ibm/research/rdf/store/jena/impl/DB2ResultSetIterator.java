@@ -18,24 +18,24 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.commons.dbutils.BasicRowProcessor;
 import org.apache.commons.dbutils.ResultSetIterator;
 import org.apache.commons.dbutils.RowProcessor;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.FilterIterator;
+import org.apache.jena.util.iterator.MapFilter;
+import org.apache.jena.util.iterator.MapFilterIterator;
+import org.apache.jena.util.iterator.NiceIterator;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.Filter;
-import com.hp.hpl.jena.util.iterator.FilterIterator;
-import com.hp.hpl.jena.util.iterator.Map1;
-import com.hp.hpl.jena.util.iterator.MapFilter;
-import com.hp.hpl.jena.util.iterator.MapFilterIterator;
-import com.hp.hpl.jena.util.iterator.NiceIterator;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.jena.impl.update.InsertAndUpdateStatements;
@@ -182,12 +182,12 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 	}
 
 	@Override
-	public ExtendedIterator<Triple> filterDrop(final Filter<Triple> filter) {
-		 Filter<Triple> negFilter = new Filter<Triple>() {
+	public ExtendedIterator<Triple> filterDrop(final Predicate<Triple> filter) {
+		 Predicate<Triple> negFilter = new Predicate<Triple>() {
 
 			@Override
-			public boolean accept(Triple t) {
-				return !filter.accept(t) ;
+			public boolean test(Triple t) {
+				return !filter.test(t) ;
 			}
 			 
 		 };
@@ -196,17 +196,17 @@ public class DB2ResultSetIterator   implements ExtendedIterator<Triple> {
 	}
 	
 	@Override
-	public ExtendedIterator<Triple> filterKeep(Filter<Triple> filter) {
+	public ExtendedIterator<Triple> filterKeep(Predicate<Triple> filter) {
 		 return new FilterIterator<Triple>(filter, this) ;
 	}
 
 	@Override
-	public <U> ExtendedIterator<U> mapWith(final Map1<Triple, U> map) {
+	public <U> ExtendedIterator<U> mapWith(final Function<Triple, U> map) {
 		MapFilter<Triple, U> mf = new MapFilter<Triple, U>() {
 
 			@Override
 			public U accept(Triple t) {
-				return map.map1(t);
+				return map.apply(t);
 			}
 			
 		};

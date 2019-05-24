@@ -10,17 +10,7 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.sparql11.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.antlr.runtime.tree.CommonTree;
-
-import com.ibm.research.rdf.store.sparql11.XTree;
-import com.ibm.research.rdf.store.sparql11.model.Expression.EExpressionType;
-import com.ibm.wala.util.collections.HashMapFactory;
-import com.ibm.wala.util.collections.HashSetFactory;
 
 /*FUNCBODY
 	(

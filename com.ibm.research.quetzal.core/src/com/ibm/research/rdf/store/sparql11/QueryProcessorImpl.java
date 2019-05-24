@@ -20,10 +20,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.query.QueryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.query.QueryFactory;
 import com.ibm.research.owlql.ruleref.OWLQLSPARQLCompiler;
 import com.ibm.research.proppaths.CTENameMgr;
 import com.ibm.research.proppaths.CodeGenerator;
@@ -137,8 +137,8 @@ public class QueryProcessorImpl implements QueryProcessor
 
    public static Query compile(OWLQLSPARQLCompiler compiler, String query)
       {
-      com.hp.hpl.jena.query.Query jq = QueryFactory.create(query);
-      com.hp.hpl.jena.query.Query compiledJQ = compiler.compile(jq);
+      org.apache.jena.query.Query jq = QueryFactory.create(query);
+      org.apache.jena.query.Query compiledJQ = compiler.compile(jq);
       logger.debug("QL query compilation:\n\t OriginalQuery: {}\n\t CompiledQuery:\n\t{}", jq, compiledJQ);
       Query ret = SparqlParserUtilities.parseSparqlString(compiledJQ.toString());
       return ret;

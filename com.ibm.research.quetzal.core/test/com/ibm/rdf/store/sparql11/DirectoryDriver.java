@@ -7,14 +7,13 @@ import java.io.File;
 import java.io.FileFilter;
 import java.lang.reflect.InvocationTargetException;
 
-import junit.framework.TestCase;
-import junitx.framework.OrderedTestSuite;
-
 import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;
 import com.ibm.rdf.store.sparql11.TestRunner.TestData;
-import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.wala.util.Predicate;
 import com.ibm.wala.util.functions.VoidFunction;
+
+import junit.framework.TestCase;
+import junitx.framework.OrderedTestSuite;
 
 public class DirectoryDriver extends TestCase {
 

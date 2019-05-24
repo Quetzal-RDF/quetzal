@@ -10,7 +10,8 @@
  *****************************************************************************/
  package com.ibm.research.rdf.store.jena.impl.update;
 
-import com.hp.hpl.jena.graph.Node;
+import org.apache.jena.graph.Node;
+
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;

@@ -27,8 +27,6 @@ import org.openrdf.query.algebra.helpers.QueryModelVisitorBase;
 import org.openrdf.query.algebra.helpers.VarNameCollector;
 import org.openrdf.query.parser.ParsedTupleQuery;
 
-import com.hp.hpl.jena.graph.Node_Variable.VariableName;
-
 
 /**
  * @author Mariano Rodriguez <mrodrig@us.ibm.com>

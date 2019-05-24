@@ -16,9 +16,9 @@ import java.sql.Connection;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openjena.riot.RiotWriter;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.riot.writer.NQuadsWriter;
 
-import com.hp.hpl.jena.query.Dataset;
 import com.ibm.research.rdf.store.Context;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.Store.Backend;
@@ -49,7 +49,7 @@ public class DumpRdfStore extends AbstractRdfCommand {
 			Dataset ds = RdfStoreFactory.connectDataset(store, conn, Backend.valueOf(params.get("-backend")));
 			
 			PrintStream ps = new PrintStream(new BufferedOutputStream(System.out,1000000));
-			RiotWriter.writeNQuads(ps, ds.asDatasetGraph());
+			NQuadsWriter.write(ps, ds.asDatasetGraph().find());
 			ps.close();
 		}
 		catch(RdfStoreException e) {

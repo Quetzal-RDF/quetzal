@@ -12,7 +12,8 @@
 
 import java.util.Set;
 
-import com.hp.hpl.jena.query.Query;
+import org.apache.jena.query.Query;
+
 import com.ibm.research.owlql.rule.RuleSystem;
 
 public interface IOWLQLCompiler {

@@ -18,10 +18,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import com.ibm.rdf.store.sparql11.TestRunner.DatabaseEngine;
 
 
 public abstract class JazzNewTest extends TestCase {

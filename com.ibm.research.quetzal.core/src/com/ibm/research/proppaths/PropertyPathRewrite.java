@@ -15,52 +15,43 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.E_Equals;
-import com.hp.hpl.jena.sparql.expr.E_NotEquals;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprVar;
-import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
-import com.hp.hpl.jena.sparql.path.P_Alt;
-import com.hp.hpl.jena.sparql.path.P_Distinct;
-import com.hp.hpl.jena.sparql.path.P_FixedLength;
-import com.hp.hpl.jena.sparql.path.P_Inverse;
-import com.hp.hpl.jena.sparql.path.P_Link;
-import com.hp.hpl.jena.sparql.path.P_Mod;
-import com.hp.hpl.jena.sparql.path.P_Multi;
-import com.hp.hpl.jena.sparql.path.P_NegPropSet;
-import com.hp.hpl.jena.sparql.path.P_OneOrMore1;
-import com.hp.hpl.jena.sparql.path.P_OneOrMoreN;
-import com.hp.hpl.jena.sparql.path.P_ReverseLink;
-import com.hp.hpl.jena.sparql.path.P_Seq;
-import com.hp.hpl.jena.sparql.path.P_Shortest;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrMore1;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrMoreN;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrOne;
-import com.hp.hpl.jena.sparql.path.PathVisitor;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.ElementAssign;
-import com.hp.hpl.jena.sparql.syntax.ElementBind;
-import com.hp.hpl.jena.sparql.syntax.ElementData;
-import com.hp.hpl.jena.sparql.syntax.ElementDataset;
-import com.hp.hpl.jena.sparql.syntax.ElementExists;
-import com.hp.hpl.jena.sparql.syntax.ElementFilter;
-import com.hp.hpl.jena.sparql.syntax.ElementGroup;
-import com.hp.hpl.jena.sparql.syntax.ElementMinus;
-import com.hp.hpl.jena.sparql.syntax.ElementNamedGraph;
-import com.hp.hpl.jena.sparql.syntax.ElementNotExists;
-import com.hp.hpl.jena.sparql.syntax.ElementOptional;
-import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementService;
-import com.hp.hpl.jena.sparql.syntax.ElementSubQuery;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementUnion;
-import com.hp.hpl.jena.sparql.syntax.ElementVisitor;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_Distinct;
+import org.apache.jena.sparql.path.P_FixedLength;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_Mod;
+import org.apache.jena.sparql.path.P_Multi;
+import org.apache.jena.sparql.path.P_NegPropSet;
+import org.apache.jena.sparql.path.P_OneOrMore1;
+import org.apache.jena.sparql.path.P_OneOrMoreN;
+import org.apache.jena.sparql.path.P_ReverseLink;
+import org.apache.jena.sparql.path.P_Seq;
+import org.apache.jena.sparql.path.P_Shortest;
+import org.apache.jena.sparql.path.P_ZeroOrMore1;
+import org.apache.jena.sparql.path.P_ZeroOrMoreN;
+import org.apache.jena.sparql.path.P_ZeroOrOne;
+import org.apache.jena.sparql.path.PathVisitor;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformCopyBase;
+import org.apache.jena.sparql.syntax.syntaxtransform.ElementTransformer;
+
 import com.ibm.research.rdf.store.sparql11.SparqlParserUtilities;
 import com.ibm.research.rdf.store.sparql11.model.AltPath;
 import com.ibm.research.rdf.store.sparql11.model.BindPattern;
@@ -117,7 +108,7 @@ public class PropertyPathRewrite {
 		System.out.println("Rewritten Query has no property paths: "+resultQueryWithoutPropertyPath);
  	}
 
-	protected  class ElementRewrite implements ElementVisitor {
+	protected  class ElementRewrite extends ElementTransformCopyBase {
 		private Element result;
 		private boolean hasPropertyPaths;
 		private boolean bestEffort;
@@ -128,92 +119,19 @@ public class PropertyPathRewrite {
 			this.vargen = vargen;
 		}
 		
-		public Element getResult() {
-			return result;
-		}
 		public boolean isResultWithPropertyPaths() {
 			return hasPropertyPaths;
 		}
-		@Override
-		public void visit(ElementAssign e) {
-			result = e;
-			
-		}
-		@Override
-		public void visit(ElementBind e) {
-			result = e;
-			
-		}
-		@Override
-		public void visit(ElementData e) {
-			result = e;
-			
-		}
-		@Override
-		public void visit(ElementDataset e) {
-		   e.getPatternElement().visit(this);
-		   e.setPatternElement(result);
-		   result = e;
-		}
-		@Override
-		public void visit(ElementExists e) {
-			e.getElement().visit(this);
-			result = new ElementExists(result);
-			
-		}
-		@Override
-		public void visit(ElementFilter e) {
-			result = e;
-			
-		}
-		@Override
-		public void visit(ElementGroup group) {
-			ElementGroup newgroup = new ElementGroup();
-			for (Element e: group.getElements()) {
-				e.visit(this);
-				newgroup.addElement(result);
-			}
-			result = newgroup;
-		}
-		@Override
-		public void visit(ElementMinus e) {
-			e.getMinusElement().visit(this);
-			result = new ElementMinus(result);
-		}
 		
-		@Override
-		public void visit(ElementNamedGraph ng) {
-			Node n = ng.getGraphNameNode();
-			Element e = ng.getElement();
-			e.visit(this);
-			if (n==null) {
-				result = new ElementNamedGraph(result);
-			} else {
-				result = new ElementNamedGraph(n, result);
-			}
-		}
-		@Override
-		public void visit(ElementNotExists e) {
-			e.getElement().visit(this);
-			result = new ElementNotExists(result);
-			
-		}
 
 		@Override
-		public void visit(ElementOptional e) {
-			e.getOptionalElement().visit(this);
-			result = new ElementOptional(result);
-			
-		}
-
-		@Override
-		public void visit(ElementPathBlock e) {
+		public Element transform(ElementPathBlock e) {
 			ElementPathBlock epb = null;
 			ElementTriplesBlock etb = null;
 			ElementGroup g = new ElementGroup();
 			for (TriplePath tp : e.getPattern().getList()) {
 				boolean[] hasPropPaths = new boolean[]{false};
-				Element tpres =transform(tp, bestEffort, vargen, hasPropPaths);
+				Element tpres = PropertyPathRewrite.this.transform(tp, bestEffort, vargen, hasPropPaths);
 				if (!hasPropertyPaths) {
 					hasPropertyPaths = hasPropPaths[0];
 				}
@@ -243,53 +161,13 @@ public class PropertyPathRewrite {
 				}
 			}
 			if (g.getElements().size()>1) {
-				result = g;
+				return g;
 			} else if (g.getElements().size() ==1) {
-				result = g.getElements().get(0);
+				return g.getElements().get(0);
 			} else {
-				result = g;
+				return g;
 			}
-			
-		}
-		@Override
-		public void visit(ElementService es) {
-			Node n = es.getServiceNode();
-			String uri = n!=null && n.isURI()? n.getURI(): null;
-			es.getElement().visit(this);
-			if (uri!=null) {
-				result = new ElementService(uri, result, es.getSilent());
-			}  else if (n!=null) {
-				result = new ElementService(n, result,es.getSilent());
-			} else {
-				result = new ElementService((Node) null, result, es.getSilent() );
-			}
-		}
-
-		@Override
-		public void visit(ElementSubQuery sq) {
-			boolean hasNoPropPaths =  rewrite(sq.getQuery(), bestEffort);//primCompile(sq.getQuery(), allVars);
-			if (!hasPropertyPaths) {
-				hasPropertyPaths = !hasNoPropPaths;
-			}
-			result = new ElementSubQuery(sq.getQuery());
-		}
-
-		@Override
-		public void visit(ElementTriplesBlock e) {
-			result = e;
-			
-		}
-
-		@Override
-		public void visit(ElementUnion union) {
-			ElementUnion newunion = new ElementUnion();
-			for (Element e: union.getElements()) {
-				e.visit(this);
-				newunion.addElement(result);
-			}
-			result = newunion;
-		}
-		
+		}	
 	}
 	
 	protected class PathRewrite implements com.ibm.research.rdf.store.sparql11.model.PathVisitor {
@@ -1073,8 +951,7 @@ public class PropertyPathRewrite {
 		int startSuffix = OCUtils.nextAvailableSuffixVariable(varNames, varPrefix)+1;
 		NewVariableGenerator vargen = new NewVariableGenerator(varPrefix, startSuffix);
 		ElementRewrite er = new ElementRewrite(bestEffort, vargen);
-		query.getQueryPattern().visit(er);
-		Element newElt = er.getResult();
+		Element newElt = ElementTransformer.transform(query.getQueryPattern(), er);
 		query.setQueryPattern(newElt);
 		return !er.isResultWithPropertyPaths();
 	}

@@ -30,6 +30,7 @@ public class BoundedUniverse extends BasicUniverse {
 	private final int literalLimit = 5;
 	private final int numberLimit = 5;
 	private final int graphLimit = 3;
+	private final int blankLimit = 1;
 	
 	public BoundedUniverse() throws URISyntaxException {
 		initBounded();
@@ -43,21 +44,28 @@ public class BoundedUniverse extends BasicUniverse {
 		}
 
 		for(int i = graphLimit; i < uriLimit; i++) {
-			ensureIRI(new URI("http://synthetic/" + i));
+			URI iri = new URI("http://synthetic/" + i);
+			ensureIRI(iri);
 		}
 	
 		ensureLiteral(Pair.<String, Object>make(ANY_LANGUAGE, null));
 		
 		for(int i = 0; i < literalLimit; i++) {
-			ensureLiteral(
-				Pair.<String, Object>make(
-					"lit" + i, 
-					i%2==0? ANY_IRI: ANY_LANGUAGE));
+			Pair<String, Object> lit = Pair.<String, Object>make(
+				"lit" + i, 
+				i%2==0? ANY_IRI: ANY_LANGUAGE);
+			ensureLiteral(lit);
 		}
 	
+		for(int i = 0; i < blankLimit; i++) {
+			String blankId = "_:blank" + i;
+			ensureBlankNode(blankId);
+		}
+		
 		for(int i = 0; i < numberLimit; i++) {
-			ensureLiteral(
-				Pair.<String, Object>make("num" + i, ANY_NUMBER));
+			Pair<String, Object> lit = Pair.<String, Object>make("num" + i, ANY_NUMBER);
+			ensureLiteral(lit);
+			objects.add(lit);
 		}
 	
 		iris.add(typeURI(xsdIntegerType));
@@ -67,9 +75,10 @@ public class BoundedUniverse extends BasicUniverse {
 		iris.add(typeURI(xsdStringType));
 		iris.add(typeURI(xsdBooleanType));
 		
-		for(Pair<String, ?> l : TypeMap.languages) {
-			addLanguage(l.fst.toLowerCase());
-		}
+		addLanguage("en");
+		//for(Pair<String, ?> l : TypeMap.languages) {
+		//	addLanguage(l.fst.toLowerCase());
+		//}
 	}
 
 	public LazyTupleSet anyLanguageTableBound(final TupleFactory f) {

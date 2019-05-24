@@ -13,15 +13,16 @@
 import java.util.Collection;
 import java.util.HashSet;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.ARQConstants;
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandler;
-import com.hp.hpl.jena.sparql.util.Context;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.ARQConstants;
+import org.apache.jena.sparql.core.describe.DescribeHandler;
+import org.apache.jena.sparql.util.Context;
+
 import com.ibm.research.rdf.store.jena.RdfStoreQueryExecutionFactory;
 
 public class DB2DescribeHandler implements DescribeHandler {

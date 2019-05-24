@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.hp.hpl.jena.sparql.util.Symbol;
+import org.apache.jena.sparql.util.Symbol;
 /**
  * 
  **

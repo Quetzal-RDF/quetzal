@@ -15,9 +15,9 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.impl.SimpleTransactionHandler;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.impl.SimpleTransactionHandler;
 import com.ibm.research.rdf.store.jena.RdfStoreException;
 
 public class DB2TransactionHandler extends SimpleTransactionHandler {

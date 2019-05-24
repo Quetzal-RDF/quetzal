@@ -15,19 +15,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Node_Literal;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.algebra.Algebra;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
-import com.hp.hpl.jena.sparql.algebra.op.OpTriple;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.core.VarExprList;
-import com.hp.hpl.jena.sparql.expr.nodevalue.NodeValueNode;
-import com.hp.hpl.jena.sparql.graph.NodeTransform;
-import com.hp.hpl.jena.sparql.graph.NodeTransformLib;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.op.OpExtend;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.expr.nodevalue.NodeValueNode;
+import org.apache.jena.sparql.graph.NodeTransform;
+import org.apache.jena.sparql.graph.NodeTransformLib;
 
 /**
  * @author Kavitha Srinivas <ksrinivs@us.ibm.com>
@@ -82,7 +82,7 @@ public class RuleforJena {
 			VarExprList expr = new VarExprList();
 			expr.add(
 					Var.alloc("RULEID"),
-					new NodeValueNode(Node_Literal.createLiteral(String
+					new NodeValueNode(NodeFactory.createLiteral(String
 							.valueOf(id))));
 			bind = OpExtend.extend(antecedent, expr);
 			antecedent = bind;
@@ -127,7 +127,7 @@ public class RuleforJena {
 		}
 
 		@Override
-		public Node convert(Node node) {
+		public Node apply(Node node) {
 			if (!Var.isVar(node))
 				return node;
 

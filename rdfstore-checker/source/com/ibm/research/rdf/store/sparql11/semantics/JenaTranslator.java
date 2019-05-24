@@ -10,6 +10,7 @@ import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.isLit
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.isNumeric;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.isSimple;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.isStringOrSimple;
+import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.language;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.less_test;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.minus;
 import static com.ibm.research.rdf.store.sparql11.semantics.ExpressionUtil.not_equal_test;
@@ -43,109 +44,110 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpVisitor;
-import com.hp.hpl.jena.sparql.algebra.op.OpAssign;
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
-import com.hp.hpl.jena.sparql.algebra.op.OpConditional;
-import com.hp.hpl.jena.sparql.algebra.op.OpDatasetNames;
-import com.hp.hpl.jena.sparql.algebra.op.OpDiff;
-import com.hp.hpl.jena.sparql.algebra.op.OpDisjunction;
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct;
-import com.hp.hpl.jena.sparql.algebra.op.OpExt;
-import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
-import com.hp.hpl.jena.sparql.algebra.op.OpGraph;
-import com.hp.hpl.jena.sparql.algebra.op.OpGroup;
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpLabel;
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpList;
-import com.hp.hpl.jena.sparql.algebra.op.OpMinus;
-import com.hp.hpl.jena.sparql.algebra.op.OpNull;
-import com.hp.hpl.jena.sparql.algebra.op.OpOrder;
-import com.hp.hpl.jena.sparql.algebra.op.OpPath;
-import com.hp.hpl.jena.sparql.algebra.op.OpProcedure;
-import com.hp.hpl.jena.sparql.algebra.op.OpProject;
-import com.hp.hpl.jena.sparql.algebra.op.OpPropFunc;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuad;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuadBlock;
-import com.hp.hpl.jena.sparql.algebra.op.OpQuadPattern;
-import com.hp.hpl.jena.sparql.algebra.op.OpReduced;
-import com.hp.hpl.jena.sparql.algebra.op.OpSequence;
-import com.hp.hpl.jena.sparql.algebra.op.OpService;
-import com.hp.hpl.jena.sparql.algebra.op.OpSlice;
-import com.hp.hpl.jena.sparql.algebra.op.OpTable;
-import com.hp.hpl.jena.sparql.algebra.op.OpTopN;
-import com.hp.hpl.jena.sparql.algebra.op.OpTriple;
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
-import com.hp.hpl.jena.sparql.expr.E_Add;
-import com.hp.hpl.jena.sparql.expr.E_Bound;
-import com.hp.hpl.jena.sparql.expr.E_Coalesce;
-import com.hp.hpl.jena.sparql.expr.E_Datatype;
-import com.hp.hpl.jena.sparql.expr.E_Divide;
-import com.hp.hpl.jena.sparql.expr.E_Equals;
-import com.hp.hpl.jena.sparql.expr.E_Exists;
-import com.hp.hpl.jena.sparql.expr.E_GreaterThan;
-import com.hp.hpl.jena.sparql.expr.E_GreaterThanOrEqual;
-import com.hp.hpl.jena.sparql.expr.E_IsBlank;
-import com.hp.hpl.jena.sparql.expr.E_IsIRI;
-import com.hp.hpl.jena.sparql.expr.E_IsLiteral;
-import com.hp.hpl.jena.sparql.expr.E_IsNumeric;
-import com.hp.hpl.jena.sparql.expr.E_Lang;
-import com.hp.hpl.jena.sparql.expr.E_LessThan;
-import com.hp.hpl.jena.sparql.expr.E_LessThanOrEqual;
-import com.hp.hpl.jena.sparql.expr.E_LogicalAnd;
-import com.hp.hpl.jena.sparql.expr.E_LogicalNot;
-import com.hp.hpl.jena.sparql.expr.E_LogicalOr;
-import com.hp.hpl.jena.sparql.expr.E_Multiply;
-import com.hp.hpl.jena.sparql.expr.E_NotEquals;
-import com.hp.hpl.jena.sparql.expr.E_NotExists;
-import com.hp.hpl.jena.sparql.expr.E_SameTerm;
-import com.hp.hpl.jena.sparql.expr.E_Subtract;
-import com.hp.hpl.jena.sparql.expr.E_UnaryMinus;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprAggregator;
-import com.hp.hpl.jena.sparql.expr.ExprFunction0;
-import com.hp.hpl.jena.sparql.expr.ExprFunction1;
-import com.hp.hpl.jena.sparql.expr.ExprFunction2;
-import com.hp.hpl.jena.sparql.expr.ExprFunction3;
-import com.hp.hpl.jena.sparql.expr.ExprFunctionN;
-import com.hp.hpl.jena.sparql.expr.ExprFunctionOp;
-import com.hp.hpl.jena.sparql.expr.ExprVar;
-import com.hp.hpl.jena.sparql.expr.ExprVisitor;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggCount;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggCountVar;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggCountVarDistinct;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggMax;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggMin;
-import com.hp.hpl.jena.sparql.expr.aggregate.AggSample;
-import com.hp.hpl.jena.sparql.expr.aggregate.Aggregator;
-import com.hp.hpl.jena.sparql.path.P_Alt;
-import com.hp.hpl.jena.sparql.path.P_Distinct;
-import com.hp.hpl.jena.sparql.path.P_FixedLength;
-import com.hp.hpl.jena.sparql.path.P_Inverse;
-import com.hp.hpl.jena.sparql.path.P_Link;
-import com.hp.hpl.jena.sparql.path.P_Mod;
-import com.hp.hpl.jena.sparql.path.P_Multi;
-import com.hp.hpl.jena.sparql.path.P_NegPropSet;
-import com.hp.hpl.jena.sparql.path.P_OneOrMore1;
-import com.hp.hpl.jena.sparql.path.P_OneOrMoreN;
-import com.hp.hpl.jena.sparql.path.P_Path0;
-import com.hp.hpl.jena.sparql.path.P_ReverseLink;
-import com.hp.hpl.jena.sparql.path.P_Seq;
-import com.hp.hpl.jena.sparql.path.P_Shortest;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrMore1;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrMoreN;
-import com.hp.hpl.jena.sparql.path.P_ZeroOrOne;
-import com.hp.hpl.jena.sparql.path.PathVisitor;
-import com.ibm.research.sparql.rewriter.OpVariableVistor;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpVisitor;
+import org.apache.jena.sparql.algebra.op.OpAssign;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpConditional;
+import org.apache.jena.sparql.algebra.op.OpDatasetNames;
+import org.apache.jena.sparql.algebra.op.OpDiff;
+import org.apache.jena.sparql.algebra.op.OpDisjunction;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpExt;
+import org.apache.jena.sparql.algebra.op.OpExtend;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpGraph;
+import org.apache.jena.sparql.algebra.op.OpGroup;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLabel;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpList;
+import org.apache.jena.sparql.algebra.op.OpMinus;
+import org.apache.jena.sparql.algebra.op.OpNull;
+import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpProcedure;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpPropFunc;
+import org.apache.jena.sparql.algebra.op.OpQuad;
+import org.apache.jena.sparql.algebra.op.OpQuadBlock;
+import org.apache.jena.sparql.algebra.op.OpQuadPattern;
+import org.apache.jena.sparql.algebra.op.OpReduced;
+import org.apache.jena.sparql.algebra.op.OpSequence;
+import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpTopN;
+import org.apache.jena.sparql.algebra.op.OpTriple;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
+import org.apache.jena.sparql.expr.E_Add;
+import org.apache.jena.sparql.expr.E_Bound;
+import org.apache.jena.sparql.expr.E_Coalesce;
+import org.apache.jena.sparql.expr.E_Datatype;
+import org.apache.jena.sparql.expr.E_Divide;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_Exists;
+import org.apache.jena.sparql.expr.E_GreaterThan;
+import org.apache.jena.sparql.expr.E_GreaterThanOrEqual;
+import org.apache.jena.sparql.expr.E_IsBlank;
+import org.apache.jena.sparql.expr.E_IsIRI;
+import org.apache.jena.sparql.expr.E_IsLiteral;
+import org.apache.jena.sparql.expr.E_IsNumeric;
+import org.apache.jena.sparql.expr.E_Lang;
+import org.apache.jena.sparql.expr.E_LangMatches;
+import org.apache.jena.sparql.expr.E_LessThan;
+import org.apache.jena.sparql.expr.E_LessThanOrEqual;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_LogicalNot;
+import org.apache.jena.sparql.expr.E_LogicalOr;
+import org.apache.jena.sparql.expr.E_Multiply;
+import org.apache.jena.sparql.expr.E_NotEquals;
+import org.apache.jena.sparql.expr.E_NotExists;
+import org.apache.jena.sparql.expr.E_SameTerm;
+import org.apache.jena.sparql.expr.E_Subtract;
+import org.apache.jena.sparql.expr.E_UnaryMinus;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprAggregator;
+import org.apache.jena.sparql.expr.ExprFunction0;
+import org.apache.jena.sparql.expr.ExprFunction1;
+import org.apache.jena.sparql.expr.ExprFunction2;
+import org.apache.jena.sparql.expr.ExprFunction3;
+import org.apache.jena.sparql.expr.ExprFunctionN;
+import org.apache.jena.sparql.expr.ExprFunctionOp;
+import org.apache.jena.sparql.expr.ExprNone;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.ExprVisitor;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.expr.aggregate.AggCount;
+import org.apache.jena.sparql.expr.aggregate.AggCountVar;
+import org.apache.jena.sparql.expr.aggregate.AggCountVarDistinct;
+import org.apache.jena.sparql.expr.aggregate.AggMax;
+import org.apache.jena.sparql.expr.aggregate.AggMin;
+import org.apache.jena.sparql.expr.aggregate.AggSample;
+import org.apache.jena.sparql.expr.aggregate.Aggregator;
+import org.apache.jena.sparql.path.P_Alt;
+import org.apache.jena.sparql.path.P_Distinct;
+import org.apache.jena.sparql.path.P_FixedLength;
+import org.apache.jena.sparql.path.P_Inverse;
+import org.apache.jena.sparql.path.P_Link;
+import org.apache.jena.sparql.path.P_Mod;
+import org.apache.jena.sparql.path.P_Multi;
+import org.apache.jena.sparql.path.P_NegPropSet;
+import org.apache.jena.sparql.path.P_OneOrMore1;
+import org.apache.jena.sparql.path.P_OneOrMoreN;
+import org.apache.jena.sparql.path.P_Path0;
+import org.apache.jena.sparql.path.P_ReverseLink;
+import org.apache.jena.sparql.path.P_Seq;
+import org.apache.jena.sparql.path.P_Shortest;
+import org.apache.jena.sparql.path.P_ZeroOrMore1;
+import org.apache.jena.sparql.path.P_ZeroOrMoreN;
+import org.apache.jena.sparql.path.P_ZeroOrOne;
+import org.apache.jena.sparql.path.PathVisitor;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
@@ -165,7 +167,15 @@ import kodkod.ast.operator.Multiplicity;
 @SuppressWarnings("unused")
 public class JenaTranslator implements OpVisitor {
 	
-	private final static boolean SUPPORT_FLOAT = false;
+	private static final boolean DEBUG = false;
+	
+	private final static boolean SUPPORT_FLOAT = true;
+	
+	enum UnsupportedFilters {
+		IGNORE, FAIL, CONTINUE
+	}
+	
+	private final static UnsupportedFilters IGNORE_UNSUPPORTED_FUNCTIONS = UnsupportedFilters.FAIL;
 	
 	private interface Domain {		
 		Expression bound();
@@ -763,12 +773,12 @@ public class JenaTranslator implements OpVisitor {
 	}
 
 	private Expression scope(Formula f, Expression dynamicBinding, Collection<Variable> neededVars) {
-		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, neededVars);
+		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, neededVars, Collections.emptySet());
 		return x.fst.comprehension(x.snd);
 	}
 
-	private Formula existentialScope(Collection<Variable> vars, Formula f, Expression dynamicBinding) {
-		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, Collections.<Variable>emptySet());
+	private Formula existentialScope(Collection<Variable> projectedVars, Formula f, Expression dynamicBinding) {
+		Pair<Formula,Decls> x = scopeInternal(f, dynamicBinding, Collections.emptySet(), projectedVars);
 		if (x.snd == null) {
 			return x.fst;
 		} else {
@@ -776,7 +786,7 @@ public class JenaTranslator implements OpVisitor {
 		}
 	}
 
-	private Pair<Formula, Decls> scopeInternal(Formula f, Expression dynamicBinding, Collection<Variable> projectedVars) {
+	private Pair<Formula, Decls> scopeInternal(Formula f, Expression dynamicBinding, Collection<Variable> projectedVars, Collection<Variable> outerBound) {
 		Decls ds = null, eds = null;
 		Set<Variable> used = ASTUtils.gatherVariables(f);
 		if (dynamicBinding != null) {
@@ -792,6 +802,9 @@ public class JenaTranslator implements OpVisitor {
 				}
 			} else {
 				r = NULL;
+			}
+			if (outerBound.contains(v)) {	
+				continue;
 			}
 			Decl d = v.declare(Multiplicity.ONE, context.getStaticBinding().contains(v)? r: r.union(NULL));
 			if (! projectedVars.contains(v)) {
@@ -814,13 +827,15 @@ public class JenaTranslator implements OpVisitor {
 			f = f.forSome(eds);
 		}
 		
-		System.err.println("scope: " + eds + " -- " + ds);
+		if (DEBUG) System.err.println("scope: " + eds + " -- " + ds);
 		
 		return Pair.make(f, ds);
 	}
 
 	public static List<Variable> sortVars(Collection<Variable> vars) {
-		return sortVars(vars, new Function<Variable,String>() {
+		Set<Variable> vs = HashSetFactory.make(vars);
+		vs.remove(null);
+		return sortVars(vs, new Function<Variable,String>() {
 			@Override
 			public String apply(Variable arg0) {
 				return arg0.name();
@@ -905,7 +920,7 @@ public class JenaTranslator implements OpVisitor {
 			if (solution != null && solution.variables().isEmpty()) {
 				actualSolution = null;
 
-				q = existentialScope(context.getVars().values(), q, context.getDynamicBinding());
+				q = existentialScope(Collections.emptySet(), q, context.getDynamicBinding());
 				if (solution.hasSolutions()) {
 					s = q; 
 				} else {
@@ -960,6 +975,19 @@ public class JenaTranslator implements OpVisitor {
 					x = actualSolution;
 				}
 
+				if (x.arity() != expectedSolution.arity()) {
+					int i = 0, j = 0;
+					IntExpression[] indexes = new IntExpression[ x.arity() ];
+					for (Variable v : projectedVars) {
+						if (liveVars.contains(v)) {
+							indexes[i++] = IntConstant.constant(j);
+						}
+						j++;
+					}
+
+					expectedSolution = expectedSolution.project(indexes);
+				}
+
 				if (solution.hasBlankNodes()) {
 					Variable m1 = Variable.unary("x");
 					Variable m2 = Variable.unary("y");
@@ -975,14 +1003,7 @@ public class JenaTranslator implements OpVisitor {
 							.implies(m1.eq(m3).iff(m2.eq(m4))).forAll(md);
 					s = s.and(map);
 
-					if (sol != null) {
-						correctness = x.eq(sol);
-					} else {
-						correctness = x.no();
-					}
-					System.err.println("adding verification constraint\n");
-				} else {
-					if (x.arity() != expectedSolution.arity()) {
+					if (x.arity() != sol.arity()) {
 						int i = 0, j = 0;
 						IntExpression[] indexes = new IntExpression[ x.arity() ];
 						for (Variable v : projectedVars) {
@@ -992,11 +1013,18 @@ public class JenaTranslator implements OpVisitor {
 							j++;
 						}
 
-						expectedSolution = expectedSolution.project(indexes);
+						sol = sol.project(indexes);
 					}
-					
+
+					if (sol != null) {
+						correctness = x.eq(sol);
+					} else {
+						correctness = x.no();
+					}
+					if (DEBUG) System.err.println("adding verification constraint\n");
+				} else {					
 					correctness = x.eq(expectedSolution);				
-					System.err.println("adding verification constraint for \n" + expectedSolution);
+					if (DEBUG) System.err.println("adding verification constraint for \n" + expectedSolution);
 				}
 
 				Relation extraSolutions = Relation.nary("extra_solutions", actualSolution.arity());
@@ -1102,7 +1130,7 @@ public class JenaTranslator implements OpVisitor {
 			} else {
 				context.setDomain((Variable)e, d);
 			}
-			System.err.println("constraining " + e + " to be " + context.getDomain((Variable)e));
+			if (DEBUG) System.err.println("constraining " + e + " to be " + context.getDomain((Variable)e));
 		}
 		return e;
 	}
@@ -1381,16 +1409,6 @@ public class JenaTranslator implements OpVisitor {
 			}
 			
 			@Override
-			public void finishVisit() {
-				// do nothing
-			}
-
-			@Override
-			public void startVisit() {
-				// do nothing
-			}
-
-			@Override
 			public void visit(ExprFunction0 arg0) {
 				assert false;					
 			}
@@ -1401,11 +1419,9 @@ public class JenaTranslator implements OpVisitor {
 				if (e instanceof E_Bound) {
 					ret(v.value().eq(NULL).not(), Formula.TRUE);
 				} else if (e instanceof E_Lang) {
-					ret(v.type().one().and(QuadTableRelations.literalLanguages.join(v.type()).some()).thenElse(
-							v.type(), 
-							universe.atomRelation(EMPTY())),
+					ret(language(v.value()),
 						typeRelation(ExpressionUtil.xsdStringType), 
-						v.guard().and(isLanguage(v.value())));	
+						v.guard().and(language(v.value()).one()));
 				} else if (e instanceof E_LogicalNot) {
 					ret(ebv(v).not(), v.guard().and(validEBV(v)));
 				} else if (e instanceof E_IsNumeric) {
@@ -1525,6 +1541,8 @@ public class JenaTranslator implements OpVisitor {
 							isNumericType(type).and(arg2.intValue().eq(zero).not()));
 				} else if (e instanceof E_SameTerm) {
 					ret(arg1.value().eq(arg2.value()), Formula.TRUE);
+				} else if (e instanceof E_LangMatches) {
+					ret(language(arg1.value()).eq(arg2.value()), arg1.guard().and(arg2.guard()).and(isLanguage(arg1.value())));
 				} else {
 					assert false : e;
 				}
@@ -1616,7 +1634,7 @@ public class JenaTranslator implements OpVisitor {
 
 			@Override
 			public void visit(ExprVar arg0) {
-				if (! scope.contains(arg0.getVarName())) {
+				if (DEBUG && !scope.contains(arg0.getVarName())) {
 					System.err.println("out of scope " + arg0.getVarName());
 				}
 				ret(toTerm(arg0.getAsNode()), toType(arg0.getAsNode()), scope.contains(arg0.getVarName())? Formula.TRUE: Formula.FALSE);
@@ -1624,7 +1642,12 @@ public class JenaTranslator implements OpVisitor {
 
 			@Override
 			public void visit(ExprAggregator arg0) {
-				currentExpr = visit(arg0.getAggregator().getExpr());		
+				currentExpr = visit(arg0.getAggregator().getExprList().get(0));
+			}
+
+			@Override
+			public void visit(ExprNone exprNone) {
+				// do nothing			
 			}
 		}.visit(e);
 	}
@@ -1642,7 +1665,7 @@ public class JenaTranslator implements OpVisitor {
 		
 		if (op != context.top()) {
 			Set<String> privateVars = privateVariableNames(op, context.top());
-			if (! privateVars.isEmpty()) {
+			if (DEBUG && !privateVars.isEmpty()) {
 				System.err.println("private vars " + privateVars + " for " + op);
 			}
 		}	
@@ -1653,9 +1676,10 @@ public class JenaTranslator implements OpVisitor {
 	@Override
 	public void visit(OpBGP arg0) {
 		for(Triple t : arg0.getPattern().getList()) {
-			conj(handleTriple(t));
+			Formula tripleConstraint = handleTriple(t);
+			conj(tripleConstraint);
+			doStandardBindings(tripleConstraint, arg0);
 		}
-		doStandardBindings(context.getCurrentQuery(), arg0);
 		context.getCurrentContinuation().next(context, context.getCurrentQuery());
 	}
 
@@ -1838,6 +1862,14 @@ public class JenaTranslator implements OpVisitor {
 			Formula filter = Formula.TRUE;
 			for(Expr e : arg0.getExprs()) {
 				ExpressionContext val = handleExpression(e);
+				
+				if (val == null && IGNORE_UNSUPPORTED_FUNCTIONS == UnsupportedFilters.IGNORE) {
+					continue;
+				} else if (val == null && IGNORE_UNSUPPORTED_FUNCTIONS == UnsupportedFilters.FAIL) {
+					filter = Formula.FALSE;
+					break;
+				}
+
 				filter = filter.and(val.guard()).and(ebv(val));
 			}
 			
@@ -2050,7 +2082,7 @@ public class JenaTranslator implements OpVisitor {
 	private Pair<Relation,List<Pair<Variable,Domain>>> reifyOpAsRelation(Op rhs, TranslatorContext context) {
 		List<Variable> rvs = getVariables(rhs, context);		
 		
-		System.err.println(rhs + " -- " + context.top());
+		if (DEBUG) System.err.println(rhs + " -- " + context.top());
 
 		Set<String> privateNames = privateVariableNames(rhs, context.top());
 		for(Iterator<Variable> vs = rvs.iterator(); vs.hasNext(); ) {
@@ -2068,7 +2100,9 @@ public class JenaTranslator implements OpVisitor {
 
 		rvs = sortVars(rvs);
 		
-		return reifyOpAsRelation(rhs, rvs);
+		Pair<Relation, List<Pair<Variable, Domain>>> ret = reifyOpAsRelation(rhs, rvs);
+		assert ret != null;
+		return ret;
 	}
 	
 	private Pair<Relation,List<Pair<Variable,Domain>>> reifyOpAsRelation(Op rhs, Collection<Variable> neededVars) {
@@ -2097,7 +2131,7 @@ public class JenaTranslator implements OpVisitor {
 				}
 				Relation opRelation = Relation.nary("rel" + relationBindings.size(), neededVars.size());
 				Expression rel = scope(nr, context.getDynamicBinding(), neededVars);
-				// System.err.println(rel);
+				if (DEBUG) System.err.println(rel);
 				relationBindings.add(opRelation.eq(rel));
 				universe.nodesRelation(opRelation);
 			
@@ -2108,12 +2142,13 @@ public class JenaTranslator implements OpVisitor {
 			
 				relations.put(rhs, Pair.make(opRelation, vars));
 			
-				System.err.println(relations.get(rhs));
+				if (DEBUG) System.err.println(relations.get(rhs));
 			
 				context = save;
 			});
 		}
 		
+		assert relations.containsKey(rhs);
 		return relations.get(rhs);
 	}
 	
@@ -2159,19 +2194,21 @@ public class JenaTranslator implements OpVisitor {
 	@Override
 	public void visit(OpLeftJoin arg0) {		
 		TranslatorContext outerSave = context;
+		Continuation cont = context.getCurrentContinuation();
 		context = new ScopeContext(outerSave, arg0);
 
 		visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
 			Set<Variable> lhsVars = ASTUtils.gatherVariables(l);
 
-			Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
-			Expression leftDynamicBinding = context.getDynamicBinding();
-			System.err.println(context.getDynamicBinding());
+			Set<Variable> leftStaticBinding = HashSetFactory.make(context1.getStaticBinding());
+			Expression leftDynamicBinding = context1.getDynamicBinding();
+			if (DEBUG) System.err.println(context1.getDynamicBinding());
 		
-			final TranslatorContext save = context;
-			context = new DomainContext(context);
+			final TranslatorContext save = context1;
+			context = new DomainContext(context1);
 			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
-				Expression rightDynamicBinding = context.getDynamicBinding();
+				Expression rightDynamicBinding = context2.getDynamicBinding();
+				Set<Variable> rightStaticBinding = context2.getStaticBinding();
 
 				Formula filters = null;
 				if (arg0.getExprs() != null) {
@@ -2189,88 +2226,164 @@ public class JenaTranslator implements OpVisitor {
 				}
 				neededVars.retainAll(ASTUtils.gatherVariables(r));
 
-				Pair<Relation, List<Pair<Variable, Domain>>> rhs = reifyOpAsRelation(arg0.getRight(), context);
-				
-				context = save;
-				
-				Formula both = r;
+				Formula both = l.and(r);
 				if (filters != null) {
 					both = both.and(filters);
 				}
-				
-				Formula leftOnly;
-				if (rhs != null) {
-					leftOnly = checkExists(lhsVars, leftStaticBinding, leftDynamicBinding, rhs, true, false, filters);
-				} else {
-					Set<Variable> rvs = ASTUtils.gatherVariables(r);
-					if (rvs.isEmpty()) {
-						leftOnly = r.not();
-					} else {
-						leftOnly = existentialScope(rvs, r, rightDynamicBinding).not();
-					}
-					if (filters != null) {
-							leftOnly = leftOnly.or(filters.not());
-						}
-					}
-				
-					context = outerSave;
-		
-					context.setStaticBinding(leftStaticBinding);
-				
-					if (context.explicitChoices()) {	
-						TranslatorContext splitSave = context1;
 					
-						SplitContext leftContext = new SplitContext(splitSave);
-						context = leftContext;
-						context.setDynamicBinding(leftDynamicBinding);
-						context.setCurrentQuery(l.and(leftOnly));				
-						context.getCurrentContinuation().next(context, context.getCurrentQuery());
-
-						SplitContext rightContext = new SplitContext(context2);
-						context = rightContext;
-						context.setDynamicBinding(rightDynamicBinding);
-						context.setCurrentQuery(l.and(both));				
-						context.getCurrentContinuation().next(context, context.getCurrentQuery());
-
-						if (filters != null) {
-							SplitContext rightNegContext = new SplitContext(splitSave);
-							context = rightNegContext;
-							context.setDynamicBinding(rightDynamicBinding);
-							context.setCurrentQuery(l.and(r));				
-							context.getCurrentContinuation().next(context, context.getCurrentQuery());
-						}
-						
-					} else {
-						context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
-						context.setCurrentQuery(l.and(both.or(leftOnly)));
+				context = save;
+					
+				Formula leftOnly;
+				Set<Variable> rvs = ASTUtils.gatherVariables(r);
+				if (rvs.isEmpty()) {
+					leftOnly = r.not();
+				} else {
+					Set<Variable> lhsOnly = HashSetFactory.make(lhsVars);
+					lhsOnly.retainAll(rvs);
+					leftOnly = existentialScope(lhsOnly, filters==null? r: r.and(filters), rightDynamicBinding).not();
+				}
+									
+				context = outerSave;
+		
+				context.setStaticBinding(leftStaticBinding);
 				
-						context.getCurrentContinuation().next(context, context.getCurrentQuery());
+				if (context.explicitChoices()) {	
+					TranslatorContext splitSave = context1;
+					
+					SplitContext leftContext = new SplitContext(splitSave);
+					context = leftContext;
+					context.setStaticBinding(leftStaticBinding);
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setCurrentQuery(l.and(leftOnly));				
+					cont.next(context, context.getCurrentQuery());
+					
+					/*
+					SplitContext rightContext = new SplitContext(splitSave);
+					context = rightContext;
+					context.setStaticBinding(rightStaticBinding);
+					context.setDynamicBinding(rightDynamicBinding);
+					context.setCurrentQuery(both);				
+					cont.next(context, context.getCurrentQuery());
+					*/
+					
+					if (filters != null) {
+						SplitContext rightNegContext = new SplitContext(splitSave);
+						context = rightNegContext;
+						context.setDynamicBinding(leftDynamicBinding);
+						context.setCurrentQuery(l.and(r).and(filters.not()));				
+						cont.next(context, context.getCurrentQuery());
 					}
+						
+				} else {
+					context = context2;
+					context.setDynamicBinding(both.thenElse(rightDynamicBinding, leftDynamicBinding));
+					context.setStaticBinding(leftStaticBinding);
+					context.setCurrentQuery(l.and(both.or(leftOnly)));
+						
+					cont.next(context, context.getCurrentQuery());
+				}
 			});
 		});
 	}
 	
 	@Override
 	public void visit(OpMinus arg0) {	
-		visit(arg0.getLeft(), (TranslatorContext context, Formula l) -> {
-			Continuation next = context.getCurrentContinuation();
-			Set<Variable> leftStaticBinding = HashSetFactory.make(context.getStaticBinding());
-			Expression leftDynamicBinding = context.getDynamicBinding();
-			System.err.println(context.getDynamicBinding());
+		TranslatorContext outerSave = context;
+		Continuation cont = context.getCurrentContinuation();
+		context = new ScopeContext(outerSave, arg0);
+
+		visit(arg0.getLeft(), (TranslatorContext context1, Formula l) -> {
+			Set<Variable> lhsVars = ASTUtils.gatherVariables(l);
+
+			Set<Variable> leftStaticBinding = HashSetFactory.make(context1.getStaticBinding());
+			Expression leftDynamicBinding = context1.getDynamicBinding();
+			if (DEBUG) System.err.println(context1.getDynamicBinding());
 		
-			Pair<Relation, List<Pair<Variable, Domain>>> r = reifyOpAsRelation(arg0.getRight(), new ScopeContext(context, arg0.getRight()));
+			final TranslatorContext save = context1;
+			context = new DomainContext(outerSave) {
+				private Formula q = Formula.TRUE;
+				
+				@Override
+				public Formula getCurrentQuery() {
+					return q;
+				}
+
+				@Override
+				public void setCurrentQuery(Formula currentQuery) {
+					q = currentQuery;
+				}
+			};
 			
-			context.setStaticBinding(leftStaticBinding);
-			context.setDynamicBinding(leftDynamicBinding);
-			context.setCurrentQuery(l.and(checkExists(ASTUtils.gatherVariables(l), leftStaticBinding, leftDynamicBinding, r, true, true, null)));
-			
-			next.next(context, context.getCurrentQuery());
+			visit(arg0.getRight(), (TranslatorContext context2, Formula r) -> {
+				Expression rightDynamicBinding = context2.getDynamicBinding();
+				Set<Variable> rightStaticBinding = context2.getStaticBinding();
+
+				Set<Variable> neededVars = HashSetFactory.make(lhsVars);
+				Set<Variable> rhsVars = ASTUtils.gatherVariables(r);
+				neededVars.retainAll(rhsVars);
+
+				Formula intersect = Formula.FALSE;
+				for(Variable v : neededVars) {
+					intersect = intersect.or(v.eq(NULL).not());
+				}
+				
+				Formula both = l.and(r).and(intersect);
+					
+				context = save;
+					
+				Formula leftOnly;
+				Set<Variable> rvs = rhsVars;
+				if (rvs.isEmpty()) {
+					leftOnly = r.not().or(intersect.not());
+				} else {
+					Set<Variable> lhsOnly = HashSetFactory.make(lhsVars);
+					//lhsOnly.retainAll(rvs);
+					leftOnly = existentialScope(lhsOnly, r.and(intersect), rightDynamicBinding).not();
+				}
+									
+				context = outerSave;
+		
+				context.setStaticBinding(leftStaticBinding);
+				
+				if (context.explicitChoices()) {	
+					TranslatorContext splitSave = context1;
+					
+					SplitContext leftContext = new SplitContext(splitSave);
+					context = leftContext;
+					context.setStaticBinding(leftStaticBinding);
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setCurrentQuery(l.and(leftOnly));				
+					cont.next(context, context.getCurrentQuery());
+					
+					//SplitContext rightContext = new SplitContext(splitSave);
+					//context = rightContext;
+					//context.setDynamicBinding(rightDynamicBinding);
+					context = context2;
+					context.setCurrentQuery(both);				
+					cont.next(context, context.getCurrentQuery());
+
+					SplitContext rightNegContext = new SplitContext(splitSave);
+					context = rightNegContext;
+					context.setDynamicBinding(rightDynamicBinding);
+					context.setCurrentQuery(l.and(r).and(intersect.not()));				
+					cont.next(context, context.getCurrentQuery());
+						
+				} else {
+					context = context1;
+					context.setDynamicBinding(leftDynamicBinding);
+					context.setStaticBinding(leftStaticBinding);
+					context.setCurrentQuery(l.and(leftOnly));
+						
+					cont.next(context, context.getCurrentQuery());
+				}
+			});
 		});
 	}
 
 	@Override
 	public void visit(OpExtend arg0) {
-		visit(arg0.getSubOp(), (TranslatorContext context1, Formula f) -> {
+		Continuation next = context.getCurrentContinuation();
+		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
 			for(Map.Entry<Var,Expr> ve : arg0.getVarExprList().getExprs().entrySet()) {
 				Variable v = context.getVars().get(ve.getKey().getName());
 				ExpressionContext expr = handleExpression(ve.getValue());
@@ -2290,13 +2403,13 @@ public class JenaTranslator implements OpVisitor {
 				if (bind == null) {
 					bind = Expression.NONE;
 				}
+				
 				context.setDynamicBinding(expr.guard().thenElse(bind.union(varExpr(v)), bind));
-
 				context.setDomain(v, Leaf.ANY);
 			}
 			context.setCurrentQuery(f);
 
-			context.getCurrentContinuation().next(context, context.getCurrentQuery());
+			next.next(context, context.getCurrentQuery());
 		});
 	}
 
@@ -2395,10 +2508,22 @@ public class JenaTranslator implements OpVisitor {
 
 	}
 
+	private void doSeq(OpSequence arg0, int i, Continuation cc, Formula q) {
+		visit(arg0.get(i), (TranslatorContext context, Formula f) -> {
+			if (i < arg0.size()-1) {
+				doSeq(arg0, i+1, cc, (q == null)? f: q.and(f));
+			} else {
+				context.setCurrentQuery(q.and(f));
+				cc.next(context, context.getCurrentQuery());
+			}
+		});
+	}
+	
 	@Override
 	public void visit(OpSequence arg0) {
-		// TODO Auto-generated method stub
-
+		Continuation cc = context.getCurrentContinuation();
+		Formula q = context.getCurrentQuery();
+		doSeq(arg0, 0, cc, q);
 	}
 
 	@Override
@@ -2424,6 +2549,7 @@ public class JenaTranslator implements OpVisitor {
 		visit(arg0.getSubOp(), this.context.getCurrentContinuation());
 	}
 
+	
 	@Override
 	public void visit(OpGroup arg0) {
 		final TranslatorContext save = context;
@@ -2473,7 +2599,7 @@ public class JenaTranslator implements OpVisitor {
 					}
 				}
 				for(ExprAggregator e : arg0.getAggregators()) {
-					for(Var ev : e.getAggregator().getExpr().getVarsMentioned()) {
+					for(Var ev : e.getExpr().getVarsMentioned()) {
 						Variable pev = (Variable) toTerm(ev);
 						if (x.fst.equals(pev)) {
 							continue grouped_vars;
@@ -2507,12 +2633,12 @@ public class JenaTranslator implements OpVisitor {
 					table = inner.comprehension(dd);
 				}
 
-				System.err.println("group=" + table);
+				if (DEBUG) System.err.println("group=" + table);
 
 				query = query.and(handleAggregator(e, table.project(IntConstant.constant(0))));
 			}
 
-			System.err.println("group query: " + query);
+			if (DEBUG) System.err.println("group query: " + query);
 
 			context.setStaticBinding(subStaticBinding);
 			context.setDynamicBinding(subDynamicBinding);
@@ -2595,7 +2721,7 @@ public class JenaTranslator implements OpVisitor {
 	@Override
 	public void visit(OpOrder arg0) {
 		visit(arg0.getSubOp(), (TranslatorContext context, Formula f) -> {
-			context.setCurrentQuery(f);
+			context.setCurrentQuery(context.getCurrentQuery().and(f));
 			context.getCurrentContinuation().next(context, f);
 		});
 	}

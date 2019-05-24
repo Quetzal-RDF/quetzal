@@ -75,11 +75,11 @@ public class ExpressionUtil {
 	}
 
 	public static Expression language(Expression e) {
-		return e.join(QuadTableRelations.literalLanguages).join(QuadTableRelations.languageCaseMatch);
+		return e.join(QuadTableRelations.literalLanguages)/*.join(QuadTableRelations.languageCaseMatch)*/;
 	}
 	
 	public static Formula isLanguage(Expression e) {
-		return e.join(QuadTableRelations.literalLanguages).some();
+		return e.join(QuadTableRelations.literalLanguages).one();
 	}
 
 	public static Expression value(Expression e) {

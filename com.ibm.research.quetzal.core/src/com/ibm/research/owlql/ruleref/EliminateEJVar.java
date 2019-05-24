@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.vocabulary.RDF;
 import org.semanticweb.owlapi.model.ClassExpressionType;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -37,7 +38,6 @@ import org.semanticweb.owlapi.model.OWLQuantifiedRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.ibm.research.owlql.NormalizedOWLQLTbox;
 import com.ibm.research.owlql.Taxonomy;
 import com.ibm.research.owlql.rule.AtomicFormula;

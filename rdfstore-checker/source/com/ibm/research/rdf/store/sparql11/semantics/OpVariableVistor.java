@@ -9,7 +9,7 @@
  *     IBM Corporation - initial API and implementation
  *****************************************************************************/
 
-package com.ibm.research.sparql.rewriter;
+package com.ibm.research.rdf.store.sparql11.semantics;
 
 import java.util.LinkedList;
 import java.util.List;

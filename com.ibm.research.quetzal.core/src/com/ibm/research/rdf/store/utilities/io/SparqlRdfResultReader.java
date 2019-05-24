@@ -4,17 +4,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.engine.binding.Binding;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.ibm.research.rdf.store.sparql11.model.BlankNode;
 import com.ibm.research.rdf.store.sparql11.model.Constant;
 import com.ibm.research.rdf.store.sparql11.model.IRI;
@@ -45,7 +45,7 @@ public class SparqlRdfResultReader implements SparqlSelectResult {
 
 		query = QueryFactory.create("select distinct * where { ?x <http://www.w3.org/2001/sw/DataAccess/tests/result-set#resultVariable> ?v . }");
 		qexec = QueryExecutionFactory.create(query, ds);
-		com.hp.hpl.jena.query.ResultSet results = qexec.execSelect();
+		org.apache.jena.query.ResultSet results = qexec.execSelect();
 
 		this.vs = HashSetFactory.make();
 		for (; results.hasNext(); ) {
@@ -86,11 +86,10 @@ public class SparqlRdfResultReader implements SparqlSelectResult {
 						n = new QueryTripleTerm(new IRI(x.getURI()));
 					} else if (x.isLiteral()) {
 						StringLiteral l = new StringLiteral(x.getLiteralLexicalForm());
-						if (x.getLiteralDatatypeURI() != null) {
-							l.setType(new IRI(x.getLiteralDatatypeURI()));
-						}
-						if (x.getLiteralLanguage() != null) {
+						if (x.getLiteralLanguage() != null && ! "".equals(x.getLiteralLanguage()) ) {
 							l.setLanguage(x.getLiteralLanguage());
+						} else if (x.getLiteralDatatypeURI() != null) {
+							l.setType(new IRI(x.getLiteralDatatypeURI()));
 						}
 						n = new QueryTripleTerm(new Constant(l));
 					} else if (x.isBlank()) {

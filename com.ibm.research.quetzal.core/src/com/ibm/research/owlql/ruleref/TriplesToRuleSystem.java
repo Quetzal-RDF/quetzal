@@ -19,13 +19,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.ibm.research.owlql.ConjunctiveQuery;
 import com.ibm.research.owlql.NormalizedOWLQLTbox;
 import com.ibm.research.owlql.rule.AtomicFormula;

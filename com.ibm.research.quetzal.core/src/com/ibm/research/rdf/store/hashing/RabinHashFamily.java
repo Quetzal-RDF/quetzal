@@ -11,8 +11,6 @@ hello  * Copyright (c) 2015 IBM Corporation.
  package com.ibm.research.rdf.store.hashing;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Vector;
 
 import org.rabinfingerprint.polynomial.Polynomial;
 

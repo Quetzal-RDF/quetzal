@@ -7,7 +7,6 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.BufferedTreeNodeStream;
-import org.antlr.runtime.tree.CommonTree;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -11,11 +11,8 @@
 
 package com.ibm.research.sparql.rewriter;
 
-import java.util.UUID;
-
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.graph.NodeTransform;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.graph.NodeTransform;
 
 
 
@@ -32,7 +29,7 @@ import com.hp.hpl.jena.sparql.graph.NodeTransform;
 	}
 
 	@Override
-	public Node convert(Node node) {		
+	public Node apply(Node node) {		
 		Node node2 = s.get(node);
 		if (node2 != null)
 			return node2;

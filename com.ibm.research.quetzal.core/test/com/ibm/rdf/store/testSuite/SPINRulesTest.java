@@ -1,7 +1,5 @@
 package com.ibm.rdf.store.testSuite;
 
-import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,13 +7,12 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 import org.junit.Test;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.ibm.research.sparql.rewriter.ResolutionEngineForJena;
 import com.ibm.research.sparql.rewriter.RuleforJena;
-import com.ibm.research.sparql.rewriter.SPARQLRewriterForJena;
 
 public class SPINRulesTest {
 	private File ruleFile;

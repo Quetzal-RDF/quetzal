@@ -20,6 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+import org.apache.jena.sparql.syntax.ElementUnion;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.AxiomType;
 import org.semanticweb.owlapi.model.ClassExpressionType;
@@ -54,12 +60,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.manchester.cs.owl.owlapi.OWLDataFactoryImpl;
-
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.sparql.syntax.ElementTriplesBlock;
-import com.hp.hpl.jena.sparql.syntax.ElementUnion;
 
 public class NormalizedOWLQLTbox {
 
@@ -1178,7 +1178,7 @@ public class NormalizedOWLQLTbox {
 				OWLSubClassOfAxiom subax = (OWLSubClassOfAxiom) ax;
 				OWLClassExpression subclass = subax.getSubClass();
 				OWLClassExpression superclass = subax.getSuperClass();
-				Node var = Node.createVariable(varGen.createNewVariable());
+				Node var = NodeFactory.createVariable(varGen.createNewVariable());
 				assert NormalizedOWLQLTbox.isNegatedOWLQLRHSConcept(superclass) : "Invalid negative subclass axiom: "+ ax;
 				Triple t1 = toTriple(subclass, var, varGen, getFactory());
 				if (!getReflexiveProperties().contains(getFactory().getOWLObjectProperty(IRI.create(t1.getPredicate().getURI())))) {
@@ -1197,8 +1197,8 @@ public class NormalizedOWLQLTbox {
 				OWLDisjointObjectPropertiesAxiom disjAx = (OWLDisjointObjectPropertiesAxiom) ax;
 				Set<OWLObjectPropertyExpression> props = disjAx.getProperties();
 				assert props.size() == 1 || props.size() ==2: ax;
-				Node x = Node.createVariable(varGen.createNewVariable());
-				Node y = Node.createVariable(varGen.createNewVariable());
+				Node x = NodeFactory.createVariable(varGen.createNewVariable());
+				Node y = NodeFactory.createVariable(varGen.createNewVariable());
 				int numberOfReflexiveProps =  0;
 				for (OWLObjectPropertyExpression prop: props) {
 					triples.add(toTriple(prop, x, y, varGen));
@@ -1228,8 +1228,8 @@ public class NormalizedOWLQLTbox {
 				OWLDisjointDataPropertiesAxiom disjAx = (OWLDisjointDataPropertiesAxiom) ax;
 				Set<OWLDataPropertyExpression> props = disjAx.getProperties();
 				assert props.size() == 1 || props.size() ==2: ax;
-				Node x = Node.createVariable(varGen.createNewVariable());
-				Node y = Node.createVariable(varGen.createNewVariable());
+				Node x = NodeFactory.createVariable(varGen.createNewVariable());
+				Node y = NodeFactory.createVariable(varGen.createNewVariable());
 				for (OWLDataPropertyExpression prop: props) {
 					triples.add(toTriple(prop, x, y, varGen));
 				}			
@@ -1259,7 +1259,7 @@ public class NormalizedOWLQLTbox {
 						return new ConsistencyCheckResult(false);	
 					} else {
 						ElementTriplesBlock sp = new ElementTriplesBlock();
-						Node x = Node.createVariable(varGen.createNewVariable());
+						Node x = NodeFactory.createVariable(varGen.createNewVariable());
 						Triple triple = toTriple(subp, x, x, varGen);
 						if (!isTripleAbsentFromAbox(triple)) {
 							sp.addTriple(toTriple(subp, x, x, varGen));
@@ -1297,8 +1297,8 @@ public class NormalizedOWLQLTbox {
 		if (!lhsConcept.isAnonymous()) {
 			return new Triple(
 						var,
-						Node.createURI(RDFConstants.RDF_TYPE),
-						Node.createURI(((OWLClass)lhsConcept).getIRI().toString()));
+						NodeFactory.createURI(RDFConstants.RDF_TYPE),
+						NodeFactory.createURI(((OWLClass)lhsConcept).getIRI().toString()));
 		 } else if (lhsConcept.getClassExpressionType().equals(ClassExpressionType.OBJECT_SOME_VALUES_FROM)
 				 || lhsConcept.getClassExpressionType().equals(ClassExpressionType.DATA_SOME_VALUES_FROM)) {
 			 OWLQuantifiedRestriction rest = (OWLQuantifiedRestriction) lhsConcept;
@@ -1312,16 +1312,16 @@ public class NormalizedOWLQLTbox {
 				 OWLProperty p = (OWLProperty) prop;
 				 return new Triple(
 							var,
-							Node.createURI(p.getIRI().toString()),
-							Node.createVariable(varGen.createNewVariable()));
+							NodeFactory.createURI(p.getIRI().toString()),
+							NodeFactory.createVariable(varGen.createNewVariable()));
 			 } else {
 				assert prop instanceof OWLObjectInverseOf : prop;
 			 	OWLObjectInverseOf inv = (OWLObjectInverseOf) prop;
 			 	assert !inv.getInverse().isAnonymous() : inv+"\n"+ "Property expression simplification failed!";
 			 	OWLObjectProperty op = (OWLObjectProperty) inv.getInverse();
 			 	return new Triple(
-			 			Node.createVariable(varGen.createNewVariable()),
-						Node.createURI(op.getIRI().toString()),
+			 			NodeFactory.createVariable(varGen.createNewVariable()),
+						NodeFactory.createURI(op.getIRI().toString()),
 						var);
 			 	
 			 }
@@ -1344,7 +1344,7 @@ public class NormalizedOWLQLTbox {
 			OWLProperty p = (OWLProperty) pe;
 			 return new Triple(
 						x,
-						Node.createURI(p.getIRI().toString()),
+						NodeFactory.createURI(p.getIRI().toString()),
 						y); 
 		} else {
 			assert pe instanceof OWLObjectInverseOf: pe;
@@ -1352,7 +1352,7 @@ public class NormalizedOWLQLTbox {
 			OWLObjectProperty p = (OWLObjectProperty) inv.getInverse();
 			 return new Triple(
 						y,
-						Node.createURI(p.getIRI().toString()),
+						NodeFactory.createURI(p.getIRI().toString()),
 						x); 
 		}
 	}

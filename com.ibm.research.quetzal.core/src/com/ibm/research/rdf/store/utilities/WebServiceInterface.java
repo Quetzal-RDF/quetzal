@@ -1,8 +1,6 @@
 package com.ibm.research.rdf.store.utilities;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,13 +23,11 @@ import org.apache.hadoop.io.Text;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.ibm.research.rdf.store.runtime.service.types.TypeMap;
-import com.ibm.wala.util.collections.Pair;
 
 public interface WebServiceInterface {
 	public Map<String, Integer> getOutputColumnNames();

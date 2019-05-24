@@ -19,9 +19,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.hp.hpl.jena.graph.impl.LiteralLabel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.core.Quad;
+import org.apache.jena.graph.impl.LiteralLabel;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.Quad;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
@@ -63,16 +63,21 @@ public abstract class BasicUniverse implements UniverseFactory {
 	@Override
 	public void ensureIRI(URI iri) {
 		iris.add(iri);
+		subjects.add(iri);
+		predicates.add(iri);
+		objects.add(iri);
 	}
 
 	@Override
 	public void ensureGraph(URI iri) {
 		graphs.add(iri);
+		subjects.add(iri);
+		predicates.add(iri);
+		objects.add(iri);
 	}
 
 	protected void addLanguage(String language) {
 		languages.add(language);
-		ensureLiteral(Pair.make(language, null));
 	}
 	
 	@Override
@@ -86,6 +91,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 			} else {
 				assert lit.snd == null;
 			}
+			objects.add(lit);
 			literals.add(lit);
 		}
 	}
@@ -93,6 +99,8 @@ public abstract class BasicUniverse implements UniverseFactory {
 	@Override
 	public void ensureBlankNode(String blankId) {
 		blankNodes.add(blankId);
+		subjects.add(blankId);
+		objects.add(blankId);
 	}
 	
 	private Set<Object> universe() throws URISyntaxException {
@@ -113,6 +121,11 @@ public abstract class BasicUniverse implements UniverseFactory {
 		for(Pair<String,?> l : literals) {
 			atoms.add(l);
 			atoms.add(l.fst);
+		}
+
+		for(String l : languages) {
+			atoms.add(l);
+			atoms.add(Pair.make(l, null));
 		}
 
 		int msb = bitWidth - 1;
@@ -387,6 +400,11 @@ public abstract class BasicUniverse implements UniverseFactory {
 						tuples.add(f.tuple(l, l.fst));							
 					}
 				}
+				
+				for(String l : languages) {
+					tuples.add(f.tuple(Pair.make(l, null), l));
+				}
+				
 				if (tuples.isEmpty()) {
 					return f.noneOf(2);
 				} else {
@@ -412,7 +430,9 @@ public abstract class BasicUniverse implements UniverseFactory {
 							}
 						} else if (ANY_NUMBER.equals(l.snd)) {
 							for(URI type : numericTypes) {
-								tuples.add(f.tuple(l, type));
+								if (f.universe().contains(type)) {
+									tuples.add(f.tuple(l, type));
+								}
 							}
 						} else {
 							tuples.add(f.tuple(l, l.snd));
@@ -542,7 +562,7 @@ public abstract class BasicUniverse implements UniverseFactory {
 				for(Pair<String,?> l : literals) {
 					if (l.snd instanceof String) {
 						if (! ANY_LANGUAGE.equalsIgnoreCase((String)l.snd)) {
-							tuples.add(f.tuple(l, l.snd));
+							tuples.add(f.tuple(l, Pair.make(l.snd, null)));
 						}
 					} 
 				}
@@ -563,6 +583,9 @@ public abstract class BasicUniverse implements UniverseFactory {
 					if (l.snd instanceof String) {
 						tuples.add(f.tuple(l.snd, ((String)l.snd).toLowerCase()));
 					}
+				}
+				for(String s : languages) {
+					tuples.add(f.tuple(s, s.toLowerCase()));					
 				}
 				if (tuples.isEmpty()) {
 					return f.noneOf(2);

@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.vocabulary.RDF;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -33,7 +34,6 @@ import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLPropertyExpression;
 
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.ibm.research.owlql.Taxonomy;
 import com.ibm.research.owlql.rule.AtomicFormula;
 import com.ibm.research.owlql.rule.BoundVariablePredicate;

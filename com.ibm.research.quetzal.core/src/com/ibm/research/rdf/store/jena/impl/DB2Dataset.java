@@ -24,23 +24,24 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.LabelExistsException;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Transactional;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.sparql.util.Symbol;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.LabelExistsException;
-import com.hp.hpl.jena.query.ReadWrite;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.core.Transactional;
-import com.hp.hpl.jena.sparql.util.Context;
-import com.hp.hpl.jena.sparql.util.Symbol;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.hashing.HashingException;
@@ -171,7 +172,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
    // Creating/connecting to the given Model name.
    public Model getNamedModel(String namedModel)
       {
-      return ModelFactory.createModelForGraph(getGraph(Node.createURI(namedModel)));
+      return ModelFactory.createModelForGraph(getGraph(NodeFactory.createURI(namedModel)));
       }
 
    // Getting list of all the graph name present in the store.
@@ -209,7 +210,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
       Set<Node> nodes = new HashSet<Node>();
       while (names.hasNext())
          {
-         nodes.add(Node.createURI(names.next()));
+         nodes.add(NodeFactory.createURI(names.next()));
          }
       return nodes.iterator();
 
@@ -230,7 +231,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
       return defaultModel.getGraph();
       }
 
-   public void addNamedModel(String uri, Model model) throws LabelExistsException
+   public Dataset addNamedModel(String uri, Model model) throws LabelExistsException
       {
 
       if (containsNamedModel(uri))
@@ -239,13 +240,15 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
          }
 
       getNamedModel(uri).add(model);
+      return null;
       }
 
-   public void replaceNamedModel(String uri, Model model)
+   public Dataset replaceNamedModel(String uri, Model model)
       {
       Model m = getNamedModel(uri);
       m.removeAll();
       m.add(model);
+      return null;
       }
 
    public void addGraph(Node graphName, Graph graph)
@@ -253,9 +256,10 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
       replaceNamedModel(graphName.getURI(), ModelFactory.createModelForGraph(graph));
       }
 
-   public void removeNamedModel(String uri)
+   public Dataset removeNamedModel(String uri)
       {
       getNamedModel(uri).removeAll();
+      return null;
       }
 
    public void removeGraph(Node graphName)
@@ -357,29 +361,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
 
       if ((g == null) || g.equals(Node.ANY))
          {
-         it = DB2Graph.find(store, new TripleMatch()
-            {
-               public Triple asTriple()
-                  {
-                  return new Triple(s, p, o);
-                  }
-
-               public Node getMatchObject()
-                  {
-                  return o;
-                  }
-
-               public Node getMatchPredicate()
-                  {
-                  return p;
-                  }
-
-               public Node getMatchSubject()
-                  {
-                  return s;
-                  }
-
-            }, null, connection, false, /* not reification */
+         it = DB2Graph.find(store, new Triple(s, p, o), null, connection, false, /* not reification */
                true /* search all graphs */);
          }
       else
@@ -478,7 +460,7 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
 
       }
 
-   public void setDefaultModel(Model model)
+   public Dataset setDefaultModel(Model model)
       {
       throw new RdfStoreException("Operation not supported");
       }
@@ -492,5 +474,53 @@ public class DB2Dataset implements /* DataSource, */Dataset, DatasetGraph, Trans
       {
       closed = true;
       }
+
+@Override
+public boolean supportsTransactionAbort() {
+	return false;
+}
+
+@Override
+public Graph getUnionGraph() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public void clear() {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public Model getUnionModel() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public void begin(TxnType type) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public boolean promote(Promote mode) {
+	// TODO Auto-generated method stub
+	return false;
+}
+
+@Override
+public ReadWrite transactionMode() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+@Override
+public TxnType transactionType() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
 
    }

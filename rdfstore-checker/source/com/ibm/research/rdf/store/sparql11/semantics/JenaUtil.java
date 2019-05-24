@@ -7,42 +7,46 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.impl.LiteralLabel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.sparql.algebra.Algebra;
-import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.algebra.OpVisitorBase;
-import com.hp.hpl.jena.sparql.algebra.op.OpBGP;
-import com.hp.hpl.jena.sparql.algebra.op.OpDistinct;
-import com.hp.hpl.jena.sparql.algebra.op.OpExtend;
-import com.hp.hpl.jena.sparql.algebra.op.OpFilter;
-import com.hp.hpl.jena.sparql.algebra.op.OpGraph;
-import com.hp.hpl.jena.sparql.algebra.op.OpGroup;
-import com.hp.hpl.jena.sparql.algebra.op.OpJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpLeftJoin;
-import com.hp.hpl.jena.sparql.algebra.op.OpMinus;
-import com.hp.hpl.jena.sparql.algebra.op.OpPath;
-import com.hp.hpl.jena.sparql.algebra.op.OpProject;
-import com.hp.hpl.jena.sparql.algebra.op.OpService;
-import com.hp.hpl.jena.sparql.algebra.op.OpTable;
-import com.hp.hpl.jena.sparql.algebra.op.OpUnion;
-import com.hp.hpl.jena.sparql.core.TriplePath;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.expr.ExprAggregator;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.LiteralLabel;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
+import org.apache.jena.sparql.algebra.OpVisitorBase;
+import org.apache.jena.sparql.algebra.op.OpBGP;
+import org.apache.jena.sparql.algebra.op.OpDistinct;
+import org.apache.jena.sparql.algebra.op.OpExtend;
+import org.apache.jena.sparql.algebra.op.OpFilter;
+import org.apache.jena.sparql.algebra.op.OpGraph;
+import org.apache.jena.sparql.algebra.op.OpGroup;
+import org.apache.jena.sparql.algebra.op.OpJoin;
+import org.apache.jena.sparql.algebra.op.OpLeftJoin;
+import org.apache.jena.sparql.algebra.op.OpMinus;
+import org.apache.jena.sparql.algebra.op.OpOrder;
+import org.apache.jena.sparql.algebra.op.OpPath;
+import org.apache.jena.sparql.algebra.op.OpProject;
+import org.apache.jena.sparql.algebra.op.OpService;
+import org.apache.jena.sparql.algebra.op.OpSlice;
+import org.apache.jena.sparql.algebra.op.OpTable;
+import org.apache.jena.sparql.algebra.op.OpUnion;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.ExprAggregator;
+
 import com.ibm.wala.util.collections.HashSetFactory;
 import com.ibm.wala.util.collections.Pair;
 
@@ -70,7 +74,7 @@ public class JenaUtil {
 	}
 
 	static Node fromBlank(String s) {
-		return NodeFactory.createAnon(new AnonId(s));
+		return NodeFactory.createAnon(s);
 	}
 		
 	public static Object toAtom(Node n) throws URISyntaxException {
@@ -100,6 +104,7 @@ public class JenaUtil {
 		return Algebra.compile(query);
 	}
 	
+	@SuppressWarnings("unchecked")
 	static RDFNode fromLiteral(Model m, Pair<String,Object> o, BasicUniverse u, Instance t2) {
 		try {
 			Relation me = Relation.unary("me");
@@ -109,24 +114,35 @@ public class JenaUtil {
 			opt.setBitwidth(bitWidth);
 			Evaluator e = new Evaluator(t2, opt);
 			if (o.snd instanceof String) {
-				TupleSet langs = e.evaluate(me.join(QuadTableRelations.literalLanguages));
-				if (! langs.isEmpty()) {
-					return m.createLiteral(o.fst, langs.iterator().next().atom(0).toString());
-				} else {
-					return m.createLiteral(o.fst, (String)o.snd);				
+				if (t2.contains(QuadTableRelations.literalLanguages)) {
+					TupleSet langs = e.evaluate(me.join(QuadTableRelations.literalLanguages));
+					if (! langs.isEmpty()) {
+						return m.createLiteral(o.fst, ((Pair<String,?>)langs.iterator().next().atom(0)).fst);
+					}
 				}
+				return m.createLiteral(o.fst, (String)o.snd);				
 			} else if (o.snd == null) {
 				return m.createLiteral(o.fst);			
 			} else {
-				TupleSet tt = e.evaluate(me.join(QuadTableRelations.literalDatatypes));
-				String type = String.valueOf(tt.iterator().next().atom(0));
-				if (ExpressionUtil.numericTypeNames.contains(type)) {
-					int v = e.evaluate(me.join(QuadTableRelations.literalValues).sum());
-					return m.createTypedLiteral(v, type);
-				} else {
-					Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
-					return m.createTypedLiteral(v, type);			
+				if (t2.contains(QuadTableRelations.literalDatatypes)) {
+					TupleSet tt = e.evaluate(me.join(QuadTableRelations.literalDatatypes));
+					Iterator<Tuple> types = tt.iterator();
+					if (types.hasNext()) {
+						String type = String.valueOf(types.next().atom(0));
+						if (ExpressionUtil.numericTypeNames.contains(type)) {
+							int v = e.evaluate(me.join(QuadTableRelations.literalValues).sum());
+							return m.createTypedLiteral(v, type);
+						} else {
+							Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
+							return m.createTypedLiteral(v, type);			
+						}	
+					}
 				}
+				if (t2.contains(QuadTableRelations.literalValues) && e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().hasNext()) {
+					Object v = e.evaluate(me.join(QuadTableRelations.literalValues)).iterator().next().atom(0);
+					return m.createTypedLiteral(v, o.snd.toString());			
+				}
+				return m.createTypedLiteral(o.fst, o.snd.toString());			
 			}
 		} catch (UnboundLeafException | NoSuchElementException ee) {
 			return m.createTypedLiteral(o.fst, String.valueOf(o.snd));
@@ -137,37 +153,40 @@ public class JenaUtil {
 	public static RDFNode fromAtom(Model m, Object o, BasicUniverse u, Instance t2) {
 		if (o instanceof Pair<?,?>) {
 			return fromLiteral(m, (Pair<String,Object>) o, u, t2);
+		} else if (o.toString().startsWith("_:")) {
+			return m.createResource(new AnonId(o.toString()));
 		} else {
 			return m.createResource(o.toString());
 		}
 	}
 	
 	public static Statement fromTuple(Model m, Tuple t, BasicUniverse u, Instance t2) {
-		Resource s = m.createResource(String.valueOf(t.atom(1)));
+		Resource s = (Resource) fromAtom(m, t.atom(1), u, t2);
 		Property p = m.createProperty(String.valueOf(t.atom(2)));
 		RDFNode o = fromAtom(m, t.atom(3), u, t2);
 		return m.createStatement(s, p, o);
 	}
 	
 	public static void addTupleSet(Dataset dataset, TupleSet tt, BasicUniverse u, Instance t2) {
-		for(Tuple t : tt) {
-			Object graph = t.atom(0);
-			Model m = QuadTableRelations.defaultGraph.equals(graph)? dataset.getDefaultModel(): dataset.getNamedModel(graph.toString());
-			m.add(fromTuple(m, t, u, t2));
+		if (tt != null) {
+			for(Tuple t : tt) {
+				Object graph = t.atom(0);
+				Model m = QuadTableRelations.defaultGraph.equals(graph)? dataset.getDefaultModel(): dataset.getNamedModel(graph.toString());
+				m.add(fromTuple(m, t, u, t2));
+			}
 		}
 	}
 	
 	public static Pair<String, Object> toAtom(LiteralLabel l) {
 		Object snd = null;
-		if (l.getDatatypeURI() != null) {
+		if (l.language() != null && !"".equals(l.language())) {
+			snd = l.language().toLowerCase();
+		} else if (l.getDatatypeURI() != null) {
 			try {
 				snd = new URI(l.getDatatypeURI());
 			} catch (URISyntaxException e) {
 				assert false : l.getDatatypeURI() + " is not a datatype";
 			}
-		}
-		if (l.language() != null && !"".equals(l.language())) {
-			snd = l.language().toLowerCase();
 		}
 		return Pair.make(l.getLexicalForm(), snd);
 	}
@@ -281,7 +300,17 @@ public class JenaUtil {
 			@Override
 			public void visit(OpDistinct opDistinct) {
 				opDistinct.getSubOp().visit(this);
-			}				
+			}
+
+			@Override
+			public void visit(OpOrder opOrder) {
+				opOrder.getSubOp().visit(this);
+			}
+
+			@Override
+			public void visit(OpSlice opSlice) {
+				opSlice.getSubOp().visit(this);
+			}
 		});
 		return result;
 	}

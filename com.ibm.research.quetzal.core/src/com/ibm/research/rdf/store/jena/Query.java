@@ -16,19 +16,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.QueryVisitor;
-import com.hp.hpl.jena.query.SortCondition;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.sparql.core.Var;
-import com.hp.hpl.jena.sparql.core.VarExprList;
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandler;
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandlerFactory;
-import com.hp.hpl.jena.sparql.core.describe.DescribeHandlerRegistry;
-import com.hp.hpl.jena.sparql.expr.Expr;
-import com.hp.hpl.jena.sparql.expr.ExprAggregator;
-import com.hp.hpl.jena.sparql.syntax.Element;
-import com.hp.hpl.jena.sparql.syntax.Template;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.query.QueryVisitor;
+import org.apache.jena.query.SortCondition;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.core.VarExprList;
+import org.apache.jena.sparql.core.describe.DescribeHandler;
+import org.apache.jena.sparql.core.describe.DescribeHandlerFactory;
+import org.apache.jena.sparql.core.describe.DescribeHandlerRegistry;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprAggregator;
+import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.Template;
+
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.jena.impl.DB2DescribeHandler;
 import com.ibm.research.rdf.store.query.QueryProcessorFactory;
@@ -52,7 +54,7 @@ import com.ibm.research.rdf.store.sparql11.model.SolutionModifiers;
 import com.ibm.research.rdf.store.sparql11.model.Variable;
 import com.ibm.research.rdf.store.sparql11.model.VariableExpression;
 
-public class Query extends com.hp.hpl.jena.query.Query {
+public class Query extends org.apache.jena.query.Query {
 
 
 
@@ -309,7 +311,7 @@ public class Query extends com.hp.hpl.jena.query.Query {
 				for (BinaryUnion<Variable, IRI> binaryUnion : binaryUnions) {
 					if (binaryUnion.getSecond() != null) {
 						String v = binaryUnion.getSecond().toString();
-						Node e = Node.createURI(v);
+						Node e = NodeFactory.createURI(v);
 						list.add(e);
 					}
 				}

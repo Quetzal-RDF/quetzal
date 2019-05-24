@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.jena.vocabulary.RDF;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
@@ -28,7 +29,6 @@ import org.semanticweb.owlapi.model.OWLPropertyExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.ibm.research.owlql.Taxonomy;
 import com.ibm.research.owlql.rule.AtomicFormula;
 import com.ibm.research.owlql.rule.ConstantExpr;

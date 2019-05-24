@@ -20,13 +20,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.GraphBase;
+import org.apache.jena.graph.impl.GraphWithPerform;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.impl.GraphBase;
-import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.ibm.research.rdf.store.Store;
 import com.ibm.research.rdf.store.config.Constants;
 import com.ibm.research.rdf.store.hashing.HashingException;
@@ -102,7 +101,7 @@ public class DB2Graph extends GraphBase implements GraphWithPerform
       }
 
    // mdb support for find in any graph.. from Dataset.find(Quad)
-   public static ExtendedIterator<Triple> find(Store store, TripleMatch m, String gid, Connection con, boolean isReified,
+   public static ExtendedIterator<Triple> find(Store store, Triple m, String gid, Connection con, boolean isReified,
          boolean searchAllGraphs)
       {
 
@@ -239,7 +238,7 @@ public class DB2Graph extends GraphBase implements GraphWithPerform
       }
 
    @Override
-   protected ExtendedIterator<Triple> graphBaseFind(TripleMatch arg0)
+   protected ExtendedIterator<Triple> graphBaseFind(Triple arg0)
       {
       // TODO Auto-generated method stub
       return null;
